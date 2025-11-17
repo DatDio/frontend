@@ -1,0 +1,106 @@
+.pricing-page {
+  background: #f8f9fa;
+  min-height: calc(100vh - 200px);
+}
+
+.page-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #333;
+}
+
+.pricing-card {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+
+  &:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  &--popular {
+    border: 3px solid #667eea;
+    transform: scale(1.05);
+
+    &:hover {
+      transform: scale(1.05) translateY(-10px);
+    }
+  }
+
+  &__badge {
+    position: absolute;
+    top: -15px;
+    right: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  &__header {
+    text-align: center;
+    padding-bottom: 2rem;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  &__name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  &__price {
+    .currency {
+      font-size: 1.5rem;
+      color: #666;
+    }
+
+    .amount {
+      font-size: 3rem;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .period {
+      font-size: 1rem;
+      color: #666;
+    }
+  }
+
+  &__features {
+    list-style: none;
+    padding: 2rem 0;
+    margin: 0;
+
+    li {
+      padding: 0.75rem 0;
+      
+      i {
+        margin-right: 0.75rem;
+      }
+    }
+  }
+
+  .btn {
+    padding: 0.75rem;
+    font-weight: 600;
+    border-radius: 8px;
+  }
+}
+
+.faq-section {
+  .accordion-button {
+    font-weight: 600;
+    
+    &:not(.collapsed) {
+      background-color: #f8f9fa;
+      color: #667eea;
+    }
+  }
+}

@@ -1,0 +1,140 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="text-center mb-4">
+      <h2 class="auth-card__title">Create Account</h2>
+      <p class="text-muted">Sign up to get started</p>
+    </div>
+
+    @if (errorMessage) {
+      <div class="alert alert-danger" role="alert">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label for="email" class="form-label">Email Address</label>
+        <input
+          type="email"
+          class="form-control"
+          id="email"
+          formControlName="email"
+          placeholder="Enter your email"
+          [class.is-invalid]="email?.invalid && email?.touched"
+        >
+        @if (email?.invalid && email?.touched) {
+          <div class="invalid-feedback">
+            @if (email?.errors?.['required']) {
+              <span>Email is required</span>
+            }
+            @if (email?.errors?.['email']) {
+              <span>Please enter a valid email</span>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <input
+          type="text"
+          class="form-control"
+          id="username"
+          formControlName="username"
+          placeholder="Choose a username"
+          [class.is-invalid]="username?.invalid && username?.touched"
+        >
+        @if (username?.invalid && username?.touched) {
+          <div class="invalid-feedback">
+            @if (username?.errors?.['required']) {
+              <span>Username is required</span>
+            }
+            @if (username?.errors?.['minlength']) {
+              <span>Username must be at least 3 characters</span>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="firstName" class="form-label">First Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="firstName"
+            formControlName="firstName"
+            placeholder="First name"
+          >
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="lastName" class="form-label">Last Name</label>
+          <input
+            type="text"
+            class="form-control"
+            id="lastName"
+            formControlName="lastName"
+            placeholder="Last name"
+          >
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input
+          type="password"
+          class="form-control"
+          id="password"
+          formControlName="password"
+          placeholder="Create a password"
+          [class.is-invalid]="password?.invalid && password?.touched"
+        >
+        @if (password?.invalid && password?.touched) {
+          <div class="invalid-feedback">
+            @if (password?.errors?.['required']) {
+              <span>Password is required</span>
+            }
+            @if (password?.errors?.['minlength']) {
+              <span>Password must be at least 6 characters</span>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="mb-3">
+        <label for="confirmPassword" class="form-label">Confirm Password</label>
+        <input
+          type="password"
+          class="form-control"
+          id="confirmPassword"
+          formControlName="confirmPassword"
+          placeholder="Confirm your password"
+          [class.is-invalid]="(confirmPassword?.invalid && confirmPassword?.touched) || registerForm.errors?.['passwordMismatch']"
+        >
+        @if (registerForm.errors?.['passwordMismatch'] && confirmPassword?.touched) {
+          <div class="invalid-feedback d-block">
+            <span>Passwords do not match</span>
+          </div>
+        }
+      </div>
+
+      <div class="d-grid gap-2 mb-3">
+        <button type="submit" class="btn btn-primary" [disabled]="loading">
+          @if (loading) {
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Creating account...
+          } @else {
+            Sign Up
+          }
+        </button>
+      </div>
+
+      <div class="text-center">
+        <p class="mb-0">
+          Already have an account?
+          <a routerLink="/auth/login" class="text-decoration-none">Sign In</a>
+        </p>
+      </div>
+    </form>
+  </div>
+</div>

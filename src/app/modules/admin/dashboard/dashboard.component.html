@@ -1,0 +1,106 @@
+<div class="dashboard">
+  <div class="dashboard__header mb-4">
+    <h1>Dashboard</h1>
+    <p class="text-muted">Welcome back! Here's what's happening today.</p>
+  </div>
+
+  @if (loading) {
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary"></div>
+    </div>
+  } @else {
+    <div class="row g-4 mb-4">
+      <div class="col-md-6 col-lg-3">
+        <div class="stat-card stat-card--primary">
+          <div class="stat-card__icon">
+            <i class="bi bi-people"></i>
+          </div>
+          <div class="stat-card__content">
+            <h3>{{ stats.totalUsers }}</h3>
+            <p>Total Users</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="stat-card stat-card--success">
+          <div class="stat-card__icon">
+            <i class="bi bi-envelope"></i>
+          </div>
+          <div class="stat-card__content">
+            <h3>{{ stats.totalAccounts }}</h3>
+            <p>Mail Accounts</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="stat-card stat-card--warning">
+          <div class="stat-card__icon">
+            <i class="bi bi-check-circle"></i>
+          </div>
+          <div class="stat-card__content">
+            <h3>{{ stats.activeAccounts }}</h3>
+            <p>Active Accounts</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-lg-3">
+        <div class="stat-card stat-card--info">
+          <div class="stat-card__icon">
+            <i class="bi bi-currency-dollar"></i>
+          </div>
+          <div class="stat-card__content">
+            <h3>${{ stats.revenue }}</h3>
+            <p>Total Revenue</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-lg-8">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">Recent Activities</h5>
+          </div>
+          <div class="card-body">
+            <div class="activity-list">
+              @for (activity of recentActivities; track activity.message) {
+                <div class="activity-item">
+                  <div class="activity-item__icon" [class]="'activity-item__icon--' + activity.type">
+                    <i class="bi" [class.bi-person-plus]="activity.type === 'user'"
+                       [class.bi-envelope-plus]="activity.type === 'account'"
+                       [class.bi-cart-check]="activity.type === 'sale'"></i>
+                  </div>
+                  <div class="activity-item__content">
+                    <p class="mb-0">{{ activity.message }}</p>
+                    <small class="text-muted">{{ activity.time }}</small>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">Quick Actions</h5>
+          </div>
+          <div class="card-body">
+            <div class="d-grid gap-2">
+              <a routerLink="/admin/users-management" class="btn btn-outline-primary">
+                <i class="bi bi-people"></i> Manage Users
+              </a>
+              <a routerLink="/admin/mail-management" class="btn btn-outline-primary">
+                <i class="bi bi-envelope"></i> Manage Mail Accounts
+              </a>
+              <button class="btn btn-outline-secondary">
+                <i class="bi bi-file-earmark-arrow-down"></i> Export Reports
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+</div>

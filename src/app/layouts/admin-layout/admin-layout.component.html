@@ -1,0 +1,67 @@
+<div class="admin-layout">
+  <!-- Top Navigation -->
+  <nav class="navbar navbar-expand navbar-dark bg-dark admin-navbar">
+    <div class="container-fluid">
+      <button class="btn btn-sm btn-outline-light me-3" (click)="toggleSidebar()">
+        <i class="bi bi-list"></i>
+      </button>
+      <a class="navbar-brand" routerLink="/admin">
+        <strong>MailShop Admin</strong>
+      </a>
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+            <i class="bi bi-person-circle"></i>
+            {{ (authService.currentUser$ | async)?.username }}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" routerLink="/admin/profile">Profile</a></li>
+            <li><a class="dropdown-item" routerLink="/admin/settings">Settings</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" (click)="logout()" style="cursor: pointer;">Logout</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="admin-container">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar" [class.sidebar-open]="sidebarOpen">
+      <nav class="nav flex-column">
+        <a class="nav-link" routerLink="/admin/dashboard" routerLinkActive="active">
+          <i class="bi bi-speedometer2"></i>
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-link" routerLink="/admin/users-management" routerLinkActive="active">
+          <i class="bi bi-people"></i>
+          <span>Users Management</span>
+        </a>
+        <a class="nav-link" routerLink="/admin/mail-management" routerLinkActive="active">
+          <i class="bi bi-envelope"></i>
+          <span>Mail Management</span>
+        </a>
+        <a class="nav-link" routerLink="/admin/analytics" routerLinkActive="active">
+          <i class="bi bi-graph-up"></i>
+          <span>Analytics</span>
+        </a>
+        <a class="nav-link" routerLink="/admin/settings" routerLinkActive="active">
+          <i class="bi bi-gear"></i>
+          <span>Settings</span>
+        </a>
+        <hr>
+        <a class="nav-link" routerLink="/">
+          <i class="bi bi-arrow-left"></i>
+          <span>Back to Site</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main" [class.sidebar-open]="sidebarOpen">
+      <div class="container-fluid py-4">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+</div>

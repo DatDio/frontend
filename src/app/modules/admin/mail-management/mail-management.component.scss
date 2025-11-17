@@ -1,0 +1,32 @@
+.mail-management {
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+  }
+}
+
+.table {
+  th {
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+    color: #666;
+    border-bottom: 2px solid #e9ecef;
+  }
+
+  td {
+    vertical-align: middle;
+  }
+
+  tbody tr {
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #f8f9fa;
+    }
+  }
+}
+
+.form-check-input {
+  cursor: pointer;
+}

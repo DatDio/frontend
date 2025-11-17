@@ -1,0 +1,68 @@
+<div class="detail-page py-5">
+  <div class="container">
+    <div class="mb-4">
+      <a routerLink="/mail-accounts" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Accounts
+      </a>
+    </div>
+
+    @if (loading) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    } @else if (account) {
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="detail-card">
+            <div class="detail-card__header">
+              <h2>{{ account.email }}</h2>
+              <span class="badge bg-{{ account.status === 'ACTIVE' ? 'success' : 'secondary' }}">
+                {{ account.status }}
+              </span>
+            </div>
+            <div class="detail-card__body">
+              <div class="detail-row">
+                <label>Provider</label>
+                <span class="detail-value">{{ account.provider }}</span>
+              </div>
+              <div class="detail-row">
+                <label>Email Address</label>
+                <span class="detail-value">{{ account.email }}</span>
+              </div>
+              <div class="detail-row">
+                <label>Password</label>
+                <div class="password-field">
+                  <span class="detail-value">
+                    {{ showPassword ? account.password : '••••••••' }}
+                  </span>
+                  <button class="btn btn-sm btn-outline-secondary" (click)="togglePassword()">
+                    <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="detail-row">
+                <label>Created At</label>
+                <span class="detail-value">{{ account.createdAt | date: 'full' }}</span>
+              </div>
+              <div class="detail-row">
+                <label>Updated At</label>
+                <span class="detail-value">{{ account.updatedAt | date: 'full' }}</span>
+              </div>
+            </div>
+            <div class="detail-card__footer">
+              <a [routerLink]="['/mail-accounts', account.id, 'edit']" class="btn btn-primary">
+                <i class="bi bi-pencil"></i> Edit Account
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div class="alert alert-warning">
+        Account not found
+      </div>
+    }
+  </div>
+</div>

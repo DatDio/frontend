@@ -1,0 +1,32 @@
+<div class="blog-page py-5">
+  <div class="container">
+    <div class="text-center mb-5">
+      <h1 class="page-title">Our Blog</h1>
+      <p class="lead text-muted">Tips, guides, and insights about email management</p>
+    </div>
+
+    <div class="row g-4">
+      @for (post of posts; track post.id) {
+        <div class="col-md-6 col-lg-4">
+          <article class="blog-card">
+            <div class="blog-card__image">
+              <img [src]="post.image" [alt]="post.title" class="img-fluid">
+              <span class="blog-card__category">{{ post.category }}</span>
+            </div>
+            <div class="blog-card__content">
+              <div class="blog-card__meta">
+                <span><i class="bi bi-calendar"></i> {{ post.date | date: 'MMM d, y' }}</span>
+                <span><i class="bi bi-person"></i> {{ post.author }}</span>
+              </div>
+              <h3 class="blog-card__title">{{ post.title }}</h3>
+              <p class="blog-card__excerpt">{{ post.excerpt }}</p>
+              <a [routerLink]="['/blog', post.id]" class="blog-card__link">
+                Read More <i class="bi bi-arrow-right"></i>
+              </a>
+            </div>
+          </article>
+        </div>
+      }
+    </div>
+  </div>
+</div>

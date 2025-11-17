@@ -1,0 +1,36 @@
+.client-navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  .navbar-brand {
+    font-size: 1.5rem;
+    color: #007bff;
+  }
+
+  .nav-link {
+    margin: 0 0.5rem;
+    
+    &.active {
+      color: #007bff;
+      font-weight: 500;
+    }
+  }
+
+  .btn-primary {
+    margin-left: 0.5rem;
+  }
+}
+
+.client-main {
+  min-height: calc(100vh - 200px);
+}
+
+.client-footer {
+  a {
+    text-decoration: none;
+    transition: opacity 0.3s;
+    
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+}

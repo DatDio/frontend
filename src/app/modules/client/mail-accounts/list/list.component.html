@@ -1,0 +1,63 @@
+<div class="mail-accounts-page py-5">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1 class="page-title">My Mail Accounts</h1>
+      <a routerLink="/mail-accounts/new" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Add Account
+      </a>
+    </div>
+
+    @if (loading) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    } @else if (accounts.length === 0) {
+      <div class="empty-state text-center py-5">
+        <i class="bi bi-inbox display-1 text-muted"></i>
+        <h3 class="mt-3">No mail accounts yet</h3>
+        <p class="text-muted">Add your first mail account to get started</p>
+        <a routerLink="/mail-accounts/new" class="btn btn-primary">Add Account</a>
+      </div>
+    } @else {
+      <div class="row g-4">
+        @for (account of accounts; track account.id) {
+          <div class="col-md-6 col-lg-4">
+            <div class="account-card">
+              <div class="account-card__header">
+                <div class="account-card__provider">
+                  <i class="bi bi-envelope-fill"></i>
+                  {{ account.provider }}
+                </div>
+                <span [class]="getStatusClass(account.status)">
+                  {{ account.status }}
+                </span>
+              </div>
+              <div class="account-card__body">
+                <h5 class="account-card__email">{{ account.email }}</h5>
+                <p class="account-card__meta">
+                  <small class="text-muted">
+                    <i class="bi bi-calendar"></i>
+                    Added {{ account.createdAt | date: 'MMM d, y' }}
+                  </small>
+                </p>
+              </div>
+              <div class="account-card__footer">
+                <a [routerLink]="['/mail-accounts', account.id]" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-eye"></i> View
+                </a>
+                <a [routerLink]="['/mail-accounts', account.id, 'edit']" class="btn btn-sm btn-outline-secondary">
+                  <i class="bi bi-pencil"></i> Edit
+                </a>
+                <button (click)="deleteAccount(account.id)" class="btn btn-sm btn-outline-danger">
+                  <i class="bi bi-trash"></i> Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>
