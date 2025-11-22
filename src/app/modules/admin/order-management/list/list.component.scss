@@ -1,0 +1,69 @@
+/* Order list component styles */
+
+.container-fluid {
+  background-color: #f8f9fa;
+  min-height: calc(100vh - 60px);
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+}
+
+.form-control,
+.form-select {
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 12px;
+
+  &:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
+}
+
+.btn-primary {
+  padding: 8px 16px;
+  border-radius: 4px;
+}
+
+.table {
+  thead {
+    th {
+      font-weight: 600;
+      color: #495057;
+      border-bottom: 2px solid #dee2e6;
+      padding: 12px;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid #dee2e6;
+      
+      &:hover {
+        background-color: #f8f9fa;
+      }
+
+      td {
+        padding: 12px;
+        vertical-align: middle;
+      }
+    }
+  }
+}
+
+.badge {
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.btn-sm {
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+.fw-bold {
+  font-weight: 600;
+}

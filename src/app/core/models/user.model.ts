@@ -1,12 +1,48 @@
+import { PageFilter } from "./common.model";
+
 export interface User {
-  id: string;
+  id: number;
   email: string;
-  username: string;
-  role: 'USER' | 'ADMIN';
-  firstName?: string;
-  lastName?: string;
-  createdAt: Date;
-  updatedAt: Date;
+  fullName: string;
+  phone?: string | null;
+  address?: string | null;
+  avatarUrl?: string | null;
+
+  authProvider?: string | null;
+  emailVerified: boolean;
+
+  roles: string[];
+  status?: string;
+
+  createdAt: string; // hoặc Date nếu bạn map sang Date
+  updatedAt: string; // hoặc Date
+}
+
+export interface CreateUserRequest {
+  email: string;
+  fullName: string;
+  password: string;
+  phone?: string;
+  address?: string;
+  roles: string[];
+  status?: string;
+}
+
+export interface UpdateUserRequest {
+  id: number;
+  email: string;
+  fullName: string;
+  phone?: string;
+  address?: string;
+  roles: string[];
+  status?: string;
+}
+
+export interface UserFilter extends PageFilter {
+  email?: string;
+  username?: string;
+  role?: string;
+  status?: string;
 }
 
 export interface LoginRequest {

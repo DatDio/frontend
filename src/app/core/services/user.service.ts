@@ -1,167 +1,127 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
-import { environment } from '../../../environments/environment';
 import { LoaderService } from './loader.service';
-import { User, LoginRequest, LoginResponse, RegisterRequest } from '../models/user.model';
-import { ApiResponse, PaginatedResponse } from '../models/api-response.model';
-
-export interface UserFilter {
-  email?: string;
-  username?: string;
-  role?: string;
-  status?: string;
-  page?: number;
-  limit?: number;
-  sort?: string;
-}
+import { User, UserFilter, CreateUserRequest, UpdateUserRequest } from '../models/user.model';
+import { ApiResponse, PaginatedResponse } from '../models/common.model';
+import { AdminUserApi } from '../../Utils/apis/users/admin-user.api';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
+
   private readonly httpClient = inject(HttpClient);
   private readonly loaderService = inject(LoaderService);
-  private readonly apiUrl = environment.apiUrl;
 
-  // Get user list with filters
+  // ===== SEARCH USERS =====
   list(filter?: UserFilter): Observable<ApiResponse<PaginatedResponse<User>>> {
     this.loaderService.show();
-    
+
     const params = this.createUserFilter(filter);
-    
+
     return this.httpClient
-      .post<ApiResponse<PaginatedResponse<User>>>(`${this.apiUrl}/admin/users/search`, params)
+      .get<ApiResponse<PaginatedResponse<User>>>(AdminUserApi.SEARCH, {
+        params: params
+      })
       .pipe(
-        catchError((error) => {
-          throw error;
-        }),
-        finalize(() => {
-          this.loaderService.hide();
-        })
+        finalize(() => this.loaderService.hide())
       );
   }
 
-  // Get user by ID
-  getById(id: string): Observable<ApiResponse<User>> {
+  // ===== GET BY ID =====
+  getById(id: number): Observable<ApiResponse<User>> {
     this.loaderService.show();
-    
+
     return this.httpClient
-      .get<ApiResponse<User>>(`${this.apiUrl}/admin/users/${id}`)
+      .get<ApiResponse<User>>(AdminUserApi.GET_BY_ID(id))
       .pipe(
-        catchError((error) => {
-          throw error;
-        }),
-        finalize(() => {
-          this.loaderService.hide();
-        })
+        finalize(() => this.loaderService.hide())
       );
   }
 
-  // Create new user
-  create(data: RegisterRequest): Observable<ApiResponse<User>> {
+  // ===== CREATE =====
+  create(data: CreateUserRequest): Observable<ApiResponse<User>> {
     this.loaderService.show();
-    
+
     return this.httpClient
-      .post<ApiResponse<User>>(`${this.apiUrl}/admin/users`, data)
+      .post<ApiResponse<User>>(AdminUserApi.CREATE, data)
       .pipe(
-        catchError((error) => {
-          throw error;
-        }),
-        finalize(() => {
-          this.loaderService.hide();
-        })
+        finalize(() => this.loaderService.hide())
       );
   }
 
-  // Update user
-  update(id: string, data: Partial<User>): Observable<ApiResponse<User>> {
+  // ===== UPDATE =====
+  update(data: UpdateUserRequest): Observable<ApiResponse<User>> {
     this.loaderService.show();
-    
+
     return this.httpClient
-      .put<ApiResponse<User>>(`${this.apiUrl}/admin/users/${id}`, data)
+      .put<ApiResponse<User>>(AdminUserApi.UPDATE(data.id), data)
       .pipe(
-        catchError((error) => {
-          throw error;
-        }),
-        finalize(() => {
-          this.loaderService.hide();
-        })
+        finalize(() => this.loaderService.hide())
       );
   }
 
-  // Delete users
-  delete(ids: string[]): Observable<ApiResponse<void>> {
+  // ===== DELETE MULTIPLE =====
+  delete(ids: number[]): Observable<ApiResponse<void>> {
     this.loaderService.show();
-    
-    const requestBody = { ids: ids.join(',') };
-    
+
     return this.httpClient
-      .post<ApiResponse<void>>(`${this.apiUrl}/admin/users/delete`, requestBody)
+      .post<ApiResponse<void>>(AdminUserApi.DELETE, { ids: ids.join(',') })
       .pipe(
-        catchError((error) => {
-          throw error;
-        }),
-        finalize(() => {
-          this.loaderService.hide();
-        })
+        finalize(() => this.loaderService.hide())
       );
   }
 
-  // Bulk update status
-  bulkUpdateStatus(ids: string[], status: string): Observable<ApiResponse<void>> {
+  // ===== BULK UPDATE STATUS =====
+  bulkUpdateStatus(ids: number[], status: string): Observable<ApiResponse<void>> {
     this.loaderService.show();
-    
-    const requestBody = { 
-      ids: ids.join(','),
-      status 
-    };
-    
+
     return this.httpClient
-      .post<ApiResponse<void>>(`${this.apiUrl}/admin/users/bulk-update-status`, requestBody)
+      .post<ApiResponse<void>>(AdminUserApi.BULK_UPDATE_STATUS, {
+        ids: ids.join(','),
+        status
+      })
       .pipe(
-        catchError((error) => {
-          throw error;
-        }),
-        finalize(() => {
-          this.loaderService.hide();
-        })
+        finalize(() => this.loaderService.hide())
       );
   }
 
-  // Export to Excel
+  // ===== EXPORT EXCEL =====
   exportExcel(filter?: UserFilter): Observable<Blob> {
     this.loaderService.show();
-    
     const params = this.createUserFilter(filter);
-    
+
     return this.httpClient
-      .post<Blob>(`${this.apiUrl}/admin/users/export`, params, {
+      .post<Blob>(AdminUserApi.EXPORT, params, {
         responseType: 'blob' as 'json'
       })
       .pipe(
-        catchError((error) => {
-          throw error;
-        }),
-        finalize(() => {
-          this.loaderService.hide();
-        })
+        finalize(() => this.loaderService.hide())
       );
   }
 
-  // Helper method to create filter object
-  private createUserFilter(filter?: UserFilter): any {
-    if (!filter) return {};
-    
-    return {
-      email: filter.email || null,
-      username: filter.username || null,
-      role: filter.role || null,
-      status: filter.status || null,
-      page: filter.page || 1,
-      limit: filter.limit || 10,
-      sort: filter.sort || 'createdAt,desc'
-    };
-  }
+  // ===== FILTER BUILDER =====
+  private createUserFilter(filter?: UserFilter): HttpParams {
+  let params = new HttpParams()
+    .set('page', '0')
+    .set('limit', '20');
+
+  if (!filter) return params;
+
+  if (filter.email) params = params.set('email', filter.email);
+  if (filter.username) params = params.set('username', filter.username);
+  if (filter.role) params = params.set('role', filter.role);
+  if (filter.status) params = params.set('status', filter.status);
+
+  params = params
+    .set('page', (filter.page ?? 0).toString())
+    .set('limit', (filter.limit ?? 10).toString())
+    .set('sort', filter.sort ?? 'createdAt,desc');
+
+  return params;
+}
+
+
 }

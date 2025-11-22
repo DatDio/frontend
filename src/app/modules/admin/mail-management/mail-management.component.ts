@@ -35,7 +35,7 @@ export class MailManagementComponent implements OnInit {
     this.mailAccountService.list().subscribe({
       next: (response) => {
         if (response.success) {
-          this.accounts = response.data.items || response.data as any;
+          this.accounts = response.data.content || response.data as any;
           this.notificationService.success('Success', 'Mail accounts loaded successfully');
         } else {
           this.notificationService.error('Error', response.message || 'Failed to load accounts');

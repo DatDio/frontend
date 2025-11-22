@@ -1,0 +1,54 @@
+<div class="modal-overlay" *ngIf="true">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h5 class="modal-title">
+        {{ mode === 'create' ? 'Create Category' : 'Edit Category' }}
+      </h5>
+      <button type="button" class="btn-close" (click)="onCancel()"></button>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="name" class="form-label">Category Name <span class="text-danger">*</span></label>
+          <input
+            type="text"
+            class="form-control"
+            id="name"
+            formControlName="name"
+            placeholder="Enter category name"
+            [class.is-invalid]="submitted && name?.invalid"
+          >
+          <div class="invalid-feedback" *ngIf="submitted && name?.invalid">
+            <span *ngIf="name?.errors?.['required']">Category name is required</span>
+            <span *ngIf="name?.errors?.['minlength']">Category name must be at least 2 characters</span>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="description" class="form-label">Description</label>
+          <textarea
+            class="form-control"
+            id="description"
+            formControlName="description"
+            placeholder="Enter description (optional)"
+            rows="3"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="loading">
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="loading">
+          <span *ngIf="!loading">{{ mode === 'create' ? 'Create' : 'Update' }}</span>
+          <span *ngIf="loading">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            {{ mode === 'create' ? 'Creating...' : 'Updating...' }}
+          </span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

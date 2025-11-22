@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { ApiService } from '../../../../core/services/api.service';
 import { SeoService } from '../../../../core/services/seo.service';
+import { MailAccountService } from '../../../../core/services/mail-account.service';
+import { NotificationService } from '../../../../core/services/notification.service';
 import { MailAccount, MailAccountStatus } from '../../../../core/models/mail-account.model';
-import { ApiResponse } from '../../../../core/models/api-response.model';
+import { ApiResponse } from '../../../../core/models/common.model';
 
 @Component({
   selector: 'app-mail-account-list',
@@ -18,10 +19,9 @@ export class MailAccountListComponent implements OnInit {
   loading = true;
   MailAccountStatus = MailAccountStatus;
 
-  constructor(
-    private apiService: ApiService,
-    private seoService: SeoService
-  ) {}
+  readonly mailAccountService = inject(MailAccountService);
+  readonly seoService = inject(SeoService);
+  readonly notificationService = inject(NotificationService);
 
   ngOnInit(): void {
     this.seoService.setPageMeta(
@@ -34,30 +34,35 @@ export class MailAccountListComponent implements OnInit {
 
   loadAccounts(): void {
     this.loading = true;
-    this.apiService.get<ApiResponse<MailAccount[]>>('/mail-accounts/my').subscribe({
+
+    this.mailAccountService.list().subscribe({
       next: (response) => {
         if (response.success) {
-          this.accounts = response.data;
+          this.accounts = response.data.content || response.data as any;
+          this.notificationService.success('Success', 'Mail accounts loaded successfully');
+        } else {
+          this.notificationService.error('Error', response.message || 'Failed to load accounts');
         }
         this.loading = false;
       },
-      error: () => {
+      error: (error) => {
+        this.notificationService.error('Error', error.error?.message || 'Failed to load accounts');
         this.loading = false;
       }
     });
   }
 
-  deleteAccount(id: string): void {
-    if (confirm('Are you sure you want to delete this account?')) {
-      this.apiService.delete<ApiResponse<void>>(`/mail-accounts/${id}`).subscribe({
-        next: (response) => {
-          if (response.success) {
-            this.loadAccounts();
-          }
-        }
-      });
-    }
-  }
+  // deleteAccount(id: string): void {
+  //   if (confirm('Are you sure you want to delete this account?')) {
+  //     this.apiService.delete<ApiResponse<void>>(`/mail-accounts/${id}`).subscribe({
+  //       next: (response) => {
+  //         if (response.success) {
+  //           this.loadAccounts();
+  //         }
+  //       }
+  //     });
+  //   }
+  // }
 
   getStatusClass(status: MailAccountStatus): string {
     switch (status) {

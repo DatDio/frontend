@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { LoaderService } from '../../core/services/loader.service';
+import { LoaderService } from '../../../core/services/loader.service';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({
@@ -68,14 +68,13 @@ import { Subject, takeUntil } from 'rxjs';
 })
 export class LoaderComponent implements OnInit, OnDestroy {
   isLoading = false;
-  private destroy$ = new Subject<void>();
-
-  constructor(private loaderService: LoaderService) {}
+  private readonly destroy$ = new Subject<void>();
+  readonly #loaderService = inject(LoaderService);
 
   ngOnInit(): void {
-    this.loaderService.loading$
+    this.#loaderService.loading$
       .pipe(takeUntil(this.destroy$))
-      .subscribe(loading => {
+      .subscribe((loading: boolean) => {
         this.isLoading = loading;
       });
   }

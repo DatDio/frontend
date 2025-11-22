@@ -1,0 +1,37 @@
+<div class="modal-overlay" (click)="onClose()" (keydown.escape)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5 class="modal-title">Nhập tài khoản email</h5>
+      <button type="button" class="btn-close" (click)="onClose()"></button>
+    </div>
+    <div class="modal-body">
+      <div class="mb-3">
+        <label for="accountsInput" class="form-label">Dán danh sách tài khoản (mỗi dòng một tài khoản)</label>
+        <textarea
+          id="accountsInput"
+          class="form-control"
+          rows="10"
+          [(ngModel)]="accountsText"
+          placeholder="email@example.com|password&#10;mail2@example.com|pass2"
+          [disabled]="isLoading">
+        </textarea>
+        <small class="text-muted d-block mt-2">
+          Định dạng: email|mật khẩu, hoặc bất kỳ định dạng nào bạn hỗ trợ
+        </small>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="onClose()" [disabled]="isLoading">
+        Hủy
+      </button>
+      <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="isLoading">
+        @if (isLoading) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          Đang xử lý...
+        } @else {
+          <i class="fas fa-upload"></i> Nhập
+        }
+      </button>
+    </div>
+  </div>
+</div>

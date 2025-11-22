@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NotificationService, ToastNotification, NOTI_TYPE_ENUM } from '../../core/services/notification.service';
+import { NotificationService, ToastNotification, NOTI_TYPE_ENUM } from '../../../core/services/notification.service';
 import { Subject, takeUntil } from 'rxjs';
 
 @Component({

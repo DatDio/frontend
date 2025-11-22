@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { SeoService } from '../../../core/services/seo.service';
+import { Role } from '../../../Utils/enums/commom.enum';
 
 @Component({
   selector: 'app-login',
@@ -58,18 +59,18 @@ export class LoginComponent implements OnInit {
       next: (response) => {
         if (response.success) {
           const user = this.authService.getCurrentUser();
-          if (user?.role === 'ADMIN') {
+          if (user?.roles.includes(Role.ADMIN)) {
             this.router.navigate(['/admin/dashboard']);
           } else {
             this.router.navigate([this.returnUrl]);
           }
         } else {
-          this.errorMessage = response.message || 'Login failed';
+          this.errorMessage = response.message || 'Đăng nhập thất bại';
           this.loading = false;
         }
       },
       error: (error) => {
-        this.errorMessage = error.error?.message || 'An error occurred during login';
+        this.errorMessage = error.error?.message || 'Có lỗi xảy ra';
         this.loading = false;
       }
     });

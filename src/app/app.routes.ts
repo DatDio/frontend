@@ -14,14 +14,6 @@ export const routes: Routes = [
         loadComponent: () => import('./modules/client/home/home.component').then(m => m.HomeComponent)
       },
       {
-        path: 'pricing',
-        loadComponent: () => import('./modules/client/pricing/pricing.component').then(m => m.PricingComponent)
-      },
-      {
-        path: 'blog',
-        loadComponent: () => import('./modules/client/blog/blog.component').then(m => m.BlogComponent)
-      },
-      {
         path: 'mail-accounts',
         canActivate: [authGuard],
         children: [
@@ -34,6 +26,16 @@ export const routes: Routes = [
             loadComponent: () => import('./modules/client/mail-accounts/detail/detail.component').then(m => m.MailAccountDetailComponent)
           }
         ]
+      },
+      {
+        path: 'orders',
+        canActivate: [authGuard],
+        loadComponent: () => import('./modules/client/orders/list/list.component').then(m => m.ClientOrderListComponent)
+      },
+      {
+        path: 'transactions',
+        canActivate: [authGuard],
+        loadComponent: () => import('./modules/client/transactions/list/list.component').then(m => m.ClientTransactionListComponent)
       }
     ]
   },
@@ -66,11 +68,49 @@ export const routes: Routes = [
       },
       {
         path: 'users-management',
-        loadComponent: () => import('./modules/admin/users-management/list/list.component').then(m => m.UsersListComponent)
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./modules/admin/users-management/list/list.component').then(m => m.UsersListComponent)
+          },
+          {
+            path: 'create',
+            loadComponent: () => import('./modules/admin/users-management/create/create.component').then(m => m.UsersCreateComponent)
+          },
+          {
+            path: ':id',
+            loadComponent: () => import('./modules/admin/users-management/detail/detail.component').then(m => m.UsersDetailComponent)
+          },
+          {
+            path: 'edit/:id',
+            loadComponent: () => import('./modules/admin/users-management/update/update.component').then(m => m.UsersUpdateComponent)
+          }
+        ]
       },
       {
         path: 'mail-management',
-        loadComponent: () => import('./modules/admin/mail-management/mail-management.component').then(m => m.MailManagementComponent)
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./modules/admin/mail-management/list/list.component').then(m => m.MailManagementListComponent)
+          },
+          {
+            path: ':id/items',
+            loadComponent: () => import('./modules/admin/mail-management/product-item-list/product-item-list.component').then(m => m.ProductItemListComponent)
+          }
+        ]
+      },
+      {
+        path: 'categories',
+        loadComponent: () => import('./modules/admin/category-management/list/list.component').then(m => m.CategoryListComponent)
+      },
+      {
+        path: 'orders',
+        loadComponent: () => import('./modules/admin/order-management/list/list.component').then(m => m.OrderListComponent)
+      },
+      {
+        path: 'transactions',
+        loadComponent: () => import('./modules/admin/transaction-management/list/list.component').then(m => m.TransactionListComponent)
       }
     ]
   },

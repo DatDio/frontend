@@ -12,7 +12,7 @@ import {
   UpdateMailAccountRequest,
   BulkUpdateStatusRequest
 } from '../models/mail-account.model';
-import { ApiResponse, PaginatedResponse } from '../models/api-response.model';
+import { ApiResponse, PaginatedResponse } from '../models/common.model';
 
 export interface MailAccountFilter {
   email?: string;
@@ -50,7 +50,7 @@ export class MailAccountService {
 
   // Get all mail accounts (for admin)
   list(filter?: MailAccountFilter): Observable<ApiResponse<PaginatedResponse<MailAccount>>> {
-    this.loaderService.show();
+    //this.loaderService.show();
     
     const params = this.createMailAccountFilter(filter);
     

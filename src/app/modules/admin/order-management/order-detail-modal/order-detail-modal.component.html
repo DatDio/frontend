@@ -1,0 +1,83 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5 class="modal-title">Chi tiết đơn hàng</h5>
+      <button type="button" class="btn-close" (click)="onClose()"></button>
+    </div>
+    <div class="modal-body">
+      <!-- Order Info -->
+      <div class="order-info mb-4">
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Mã đơn hàng:</strong> {{ order.orderNumber }}</p>
+            <p><strong>Email:</strong> {{ order.userEmail }}</p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Trạng thái:</strong> 
+              <span [ngClass]="'badge bg-' + getStatusClass(order.orderStatus)">
+                {{ getStatusLabel(order.orderStatus) }}
+              </span>
+            </p>
+            <p><strong>Tổng tiền:</strong> ${{ order.totalAmount | number: '1.2-2' }}</p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Ngày tạo:</strong> {{ order.createdAt | date: 'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Cập nhật:</strong> {{ order.updatedAt | date: 'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+        </div>
+        @if (order.notes) {
+          <div class="row">
+            <div class="col-12">
+              <p><strong>Ghi chú:</strong> {{ order.notes }}</p>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Order Items -->
+      <div class="order-items">
+        <h6 class="mb-3">Danh sách tài khoản</h6>
+        <div class="table-responsive">
+          <table class="table table-sm table-bordered">
+            <thead class="table-light">
+              <tr>
+                <th>Tên sản phẩm</th>
+                <th>Tài khoản</th>
+                <th>Đã bán</th>
+                <th>Ngày tạo</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (order.orderItems.length === 0) {
+                <tr>
+                  <td colspan="4" class="text-center text-muted">Không có dữ liệu</td>
+                </tr>
+              }
+              @for (item of order.orderItems; track item.id) {
+                <tr>
+                  <td>{{ item.productName }}</td>
+                  <td class="text-monospace small">{{ item.accountData }}</td>
+                  <td>
+                    <span [ngClass]="item.sold ? 'badge bg-success' : 'badge bg-secondary'">
+                      {{ item.sold ? 'Có' : 'Không' }}
+                    </span>
+                  </td>
+                  <td>{{ item.createdAt | date: 'dd/MM/yyyy' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="onClose()">
+        Đóng
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,85 @@
+/* Client order list styles */
+
+.order-card {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .card-header {
+    border-bottom: 1px solid #dee2e6;
+    padding: 16px;
+
+    h6 {
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 4px;
+    }
+
+    small {
+      font-size: 12px;
+    }
+  }
+
+  .card-body {
+    padding: 16px;
+
+    small {
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    strong {
+      font-size: 16px;
+    }
+
+    p {
+      font-size: 13px;
+      color: #495057;
+    }
+  }
+
+  .card-footer {
+    padding: 12px 16px;
+    border-top: 1px solid #dee2e6;
+
+    .btn {
+      font-size: 13px;
+      padding: 8px 16px;
+    }
+  }
+}
+
+.badge {
+  font-size: 12px;
+  padding: 6px 10px;
+  font-weight: 500;
+}
+
+.btn-outline-primary {
+  border-color: #007bff;
+  color: #007bff;
+  padding: 8px 12px;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: #007bff;
+    color: #fff;
+  }
+}
+
+h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+}
+
+.alert {
+  border-radius: 8px;
+  padding: 16px;
+  font-size: 14px;
+}

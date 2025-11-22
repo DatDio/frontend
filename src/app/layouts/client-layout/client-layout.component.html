@@ -12,10 +12,7 @@
           <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/pricing" routerLinkActive="active">Pricing</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/blog" routerLinkActive="active">Blog</a>
+          <a class="nav-link" routerLink="/pricing" routerLinkActive="active">Tài liệu</a>
         </li>
         @if (authService.isAuthenticated$ | async) {
           <li class="nav-item">
@@ -23,7 +20,7 @@
           </li>
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-              {{ (authService.currentUser$ | async)?.username }}
+              {{ (authService.currentUser$ | async)?.email }}
             </a>
             <ul class="dropdown-menu dropdown-menu-end">
               <li><a class="dropdown-item" routerLink="/profile">Profile</a></li>

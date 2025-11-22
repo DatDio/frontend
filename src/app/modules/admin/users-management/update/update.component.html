@@ -1,0 +1,121 @@
+<div class="container-fluid py-4">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h2>Edit User</h2>
+    </div>
+    <div class="col-md-4 text-end">
+      <button class="btn btn-secondary" (click)="onCancel()">Back</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="email" class="form-label">Email <span class="text-danger">*</span></label>
+            <input 
+              type="email" 
+              class="form-control" 
+              id="email"
+              formControlName="email"
+              [class.is-invalid]="submitted && email?.invalid"
+            >
+            <div class="invalid-feedback" *ngIf="submitted && email?.invalid">
+              <span *ngIf="email?.errors?.['required']">Email is required</span>
+              <span *ngIf="email?.errors?.['email']">Email must be valid</span>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <label for="fullName" class="form-label">Full Name <span class="text-danger">*</span></label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="fullName"
+              formControlName="fullName"
+              [class.is-invalid]="submitted && fullName?.invalid"
+            >
+            <div class="invalid-feedback" *ngIf="submitted && fullName?.invalid">
+              <span *ngIf="fullName?.errors?.['required']">Full name is required</span>
+              <span *ngIf="fullName?.errors?.['minlength']">Full name must be at least 2 characters</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="phone" class="form-label">Phone</label>
+            <input 
+              type="tel" 
+              class="form-control" 
+              id="phone"
+              formControlName="phone"
+            >
+          </div>
+
+          <div class="col-md-6">
+            <label for="status" class="form-label">Status</label>
+            <select class="form-select" id="status" formControlName="status">
+              <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label for="address" class="form-label">Address</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              id="address"
+              formControlName="address"
+            >
+          </div>
+        </div>
+
+        <div class="row mb-3">
+          <div class="col-md-12">
+            <label for="roles" class="form-label">Roles <span class="text-danger">*</span></label>
+            <select 
+              multiple 
+              class="form-select" 
+              id="roles"
+              formControlName="roles"
+              [class.is-invalid]="submitted && rolesControl?.invalid"
+            >
+              <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+            </select>
+            <div class="invalid-feedback" *ngIf="submitted && rolesControl?.invalid">
+              At least one role is required
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-12">
+            <button 
+              type="submit" 
+              class="btn btn-primary me-2"
+              [disabled]="loading"
+            >
+              <span *ngIf="!loading">Update User</span>
+              <span *ngIf="loading">
+                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Updating...
+              </span>
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-secondary"
+              (click)="onCancel()"
+              [disabled]="loading"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

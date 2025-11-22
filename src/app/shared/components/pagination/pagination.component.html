@@ -1,0 +1,85 @@
+<div class="pagination-wrapper">
+  <div class="pagination-container d-flex align-items-center justify-content-between gap-3">
+    <!-- Page Size Selector -->
+    <div class="page-size-selector d-flex align-items-center gap-2">
+      <label class="form-label mb-0" for="page-size-select">Items per page:</label>
+      <select 
+        id="page-size-select"
+        class="form-select form-select-sm" 
+        style="width: auto"
+        [(ngModel)]="config.pageSize"
+        (change)="onPageSizeChange(config.pageSize)">
+        @for (option of pageSizeOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Go to Page Input -->
+    <div class="go-to-page d-flex align-items-center gap-2">
+      <span class="text-muted">Go to page:</span>
+      <input 
+        type="number" 
+        class="form-control form-control-sm" 
+        style="width: 80px"
+        [(ngModel)]="searchPageInput"
+        (keyup.enter)="onSearchPage()"
+        placeholder="Page #"
+        min="1"
+        [max]="config.totalPages">
+      <button 
+        class="btn btn-sm btn-outline-primary" 
+        (click)="onSearchPage()">
+        <i class="fas fa-search"></i>
+      </button>
+    </div>
+
+    <!-- Pagination Info -->
+    <div class="pagination-info text-muted">
+      Page {{ config.currentPage + 1 }} / {{ config.totalPages }} | Total: {{ config.totalElements }} items
+    </div>
+  </div>
+
+  <!-- Pagination Controls -->
+  <nav class="d-flex justify-content-center mt-3">
+    <ul class="pagination mb-0">
+      <li class="page-item" [class.disabled]="config.currentPage === 0">
+        <button class="page-link" (click)="onPreviousPage()" [disabled]="config.currentPage === 0">
+          <i class="fas fa-chevron-left"></i> Previous
+        </button>
+      </li>
+
+      @if (getVisiblePages()[0] > 0) {
+        <li class="page-item">
+          <button class="page-link" (click)="onPageClick(0)">1</button>
+        </li>
+        @if (getVisiblePages()[0] > 1) {
+          <li class="page-item disabled">
+            <span class="page-link">...</span>
+          </li>
+        }
+      }
+
+      @for (page of getVisiblePages(); track page) {
+        <li class="page-item" [class.active]="page === config.currentPage">
+          <button class="page-link" (click)="onPageClick(page)">{{ page + 1 }}</button>
+        </li>
+      }
+
+      @if (getVisiblePages()[getVisiblePages().length - 1] < config.totalPages - 1) {
+        <li class="page-item disabled">
+          <span class="page-link">...</span>
+        </li>
+        <li class="page-item">
+          <button class="page-link" (click)="onPageClick(config.totalPages - 1)">{{ config.totalPages }}</button>
+        </li>
+      }
+
+      <li class="page-item" [class.disabled]="config.currentPage >= config.totalPages - 1">
+        <button class="page-link" (click)="onNextPage()" [disabled]="config.currentPage >= config.totalPages - 1">
+          Next <i class="fas fa-chevron-right"></i>
+        </button>
+      </li>
+    </ul>
+  </nav>
+</div>

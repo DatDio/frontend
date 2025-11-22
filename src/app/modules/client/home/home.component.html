@@ -1,80 +1,146 @@
-<section class="hero">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-lg-6">
-        <h1 class="hero__title">Premium Mail Accounts Marketplace</h1>
-        <p class="hero__subtitle">
-          Buy and sell verified mail accounts securely. Gmail, Outlook, Yahoo, and custom domains available.
-        </p>
-        <div class="hero__actions">
-          <a routerLink="/mail-accounts" class="btn btn-primary btn-lg me-3">Browse Accounts</a>
-          <a routerLink="/auth/register" class="btn btn-outline-light btn-lg">Get Started</a>
-        </div>
+<div class="home-page">
+  <!-- Hero Section with Navigation Menu -->
+  <section class="hero-section">
+    <div class="container-fluid hero-top">
+      <div class="nav-menu">
+        <a href="#" class="nav-link">
+          <i class="fas fa-home me-2"></i> Trang chủ
+        </a>
+        <a href="#" class="nav-link">
+          <i class="fas fa-info-circle me-2"></i> Thông tin tài khoản
+        </a>
+        <a href="#" class="nav-link">
+          <i class="fas fa-credit-card me-2"></i> Nạp tiền
+        </a>
+        <a href="#" class="nav-link">
+          <i class="fas fa-shopping-cart me-2"></i> Lịch sử mua
+        </a>
+        <a href="#" class="nav-link">
+          <i class="fas fa-headset me-2"></i> Hỗ trợ
+        </a>
       </div>
-      <div class="col-lg-6">
-        <img src="/assets/images/hero-illustration.svg" alt="Mail Accounts" class="img-fluid">
-      </div>
-    </div>
-  </div>
-</section>
 
-<section class="features py-5">
-  <div class="container">
-    <div class="text-center mb-5">
-      <h2 class="section-title">Why Choose MailShop?</h2>
-      <p class="text-muted">Experience the best mail account marketplace</p>
-    </div>
-    <div class="row g-4">
-      @for (feature of features; track feature.title) {
-        <div class="col-md-6 col-lg-3">
-          <div class="feature-card text-center">
-            <div class="feature-card__icon">
-              <i class="bi bi-{{ feature.icon }}"></i>
+      @if (isAuthenticated) {
+        <div class="user-section">
+          <div class="balance-info">
+            <div class="label">
+              <i class="fas fa-wallet me-2"></i> Số dư
             </div>
-            <h4 class="feature-card__title">{{ feature.title }}</h4>
-            <p class="feature-card__description">{{ feature.description }}</p>
+            <div class="amount">0 VNĐ</div>
+          </div>
+          <div class="quick-buttons">
+            <button routerLink="/orders" class="btn-quick">
+              <i class="fas fa-shopping-bag me-1"></i> Đơn hàng
+            </button>
+            <button routerLink="/transactions" class="btn-quick">
+              <i class="fas fa-history me-1"></i> Lịch sử
+            </button>
           </div>
         </div>
       }
     </div>
-  </div>
-</section>
 
-<section class="cta bg-primary text-white py-5">
-  <div class="container text-center">
-    <h2 class="mb-4">Ready to Get Started?</h2>
-    <p class="lead mb-4">Join thousands of satisfied customers today</p>
-    <a routerLink="/auth/register" class="btn btn-light btn-lg">Create Free Account</a>
-  </div>
-</section>
+    <div class="hero-content">
+      <div class="container">
+        <h1>Chuyên cung cấp tài nguyên marketing, quảng cáo uy tín, chất lượng cao!</h1>
+        <p>
+          Mailshop cung cấp các tài khoản email chất lượng cao cho mục đích marketing và quảng cáo.
+        </p>
+        <button class="cta-button">
+          <i class="fas fa-arrow-down me-2"></i> Bắt đầu ngay
+        </button>
+      </div>
+    </div>
+  </section>
 
-<section class="stats py-5 bg-light">
-  <div class="container">
-    <div class="row text-center">
-      <div class="col-md-3">
-        <div class="stat">
-          <h3 class="stat__number">10,000+</h3>
-          <p class="stat__label">Active Users</p>
+  <!-- Service Cards Section -->
+  <section class="services-section">
+    <div class="container">
+      <h2 class="section-title">Dịch vụ cấp tài nguyên</h2>
+      <div class="services-grid">
+        @for (service of services; track service.id) {
+          <div class="service-card" [ngClass]="'service-card--' + service.color">
+            <div class="icon">
+              <i [class]="'fas fa-' + service.icon"></i>
+            </div>
+            <div class="name">{{ service.name }}</div>
+            <div class="rating">
+              <i class="fas fa-star"></i> {{ service.rating }}
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Products/Pricing Section -->
+  <section class="products-section">
+    <div class="container">
+      <!-- Product Group 1 -->
+      <div class="product-group">
+        <h3 class="group-title">
+          <i class="fas fa-envelope me-2"></i> Mail Facebook
+        </h3>
+
+        <div class="product-list">
+          @for (item of productGroup1; track item.id) {
+            <div class="product-item">
+              <div class="checkbox-col">
+                <input type="checkbox">
+              </div>
+              <div class="info-col">
+                <div class="product-name">{{ item.name }}</div>
+                <div class="product-desc">{{ item.description }}</div>
+              </div>
+              <div class="duration-col">{{ item.duration }}</div>
+              <div class="price-col">
+                <div class="price">{{ item.price }}</div>
+              </div>
+              <div class="qty-col">
+                <input type="number" class="qty-input" [value]="item.quantity" disabled>
+              </div>
+              <div class="action-col">
+                <button class="buy-btn">
+                  <i class="fas fa-plus me-1"></i> Mua
+                </button>
+              </div>
+            </div>
+          }
         </div>
       </div>
-      <div class="col-md-3">
-        <div class="stat">
-          <h3 class="stat__number">50,000+</h3>
-          <p class="stat__label">Accounts Sold</p>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="stat">
-          <h3 class="stat__number">99.9%</h3>
-          <p class="stat__label">Uptime</p>
-        </div>
-      </div>
-      <div class="col-md-3">
-        <div class="stat">
-          <h3 class="stat__number">24/7</h3>
-          <p class="stat__label">Support</p>
+
+      <!-- Product Group 2 -->
+      <div class="product-group">
+        <h3 class="group-title">
+          <i class="fas fa-envelope me-2"></i> Mail PVA
+        </h3>
+
+        <div class="product-list">
+          @for (item of productGroup2; track item.id) {
+            <div class="product-item">
+              <div class="checkbox-col">
+                <input type="checkbox">
+              </div>
+              <div class="info-col">
+                <div class="product-name">{{ item.name }}</div>
+                <div class="product-desc">{{ item.description }}</div>
+              </div>
+              <div class="duration-col">{{ item.duration }}</div>
+              <div class="price-col">
+                <div class="price">{{ item.price }}</div>
+              </div>
+              <div class="qty-col">
+                <input type="number" class="qty-input" [value]="item.quantity" disabled>
+              </div>
+              <div class="action-col">
+                <button class="buy-btn">
+                  <i class="fas fa-plus me-1"></i> Mua
+                </button>
+              </div>
+            </div>
+          }
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
+</div>

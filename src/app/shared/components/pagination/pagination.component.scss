@@ -1,0 +1,104 @@
+/* Pagination component styles */
+
+.pagination-wrapper {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.pagination-container {
+  flex-wrap: wrap;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+}
+
+.page-size-selector {
+  .form-select-sm {
+    height: auto;
+    padding: 4px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+  }
+
+  .form-label {
+    color: #495057;
+    font-weight: 500;
+  }
+}
+
+.go-to-page {
+  .form-control-sm {
+    height: auto;
+    padding: 4px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 13px;
+
+    &:focus {
+      border-color: #007bff;
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+  }
+
+  .btn-outline-primary {
+    padding: 4px 8px;
+    font-size: 12px;
+  }
+
+  .text-muted {
+    font-size: 13px;
+  }
+}
+
+.pagination-info {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.pagination {
+  .page-link {
+    color: #007bff;
+    border: 1px solid #ddd;
+    padding: 6px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #e9ecef;
+      border-color: #007bff;
+    }
+  }
+
+  .page-item {
+    margin: 0 2px;
+
+    &.active {
+      .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: #ffffff;
+      }
+    }
+
+    &.disabled {
+      .page-link {
+        color: #6c757d;
+        cursor: not-allowed;
+        background-color: transparent;
+        border-color: transparent;
+      }
+    }
+  }
+}

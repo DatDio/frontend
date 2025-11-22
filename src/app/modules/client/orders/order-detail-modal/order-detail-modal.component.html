@@ -1,0 +1,96 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5 class="modal-title">Chi tiết đơn hàng</h5>
+      <button type="button" class="btn-close" (click)="onClose()"></button>
+    </div>
+    <div class="modal-body">
+      <!-- Order Info -->
+      <div class="order-info mb-4">
+        <div class="row">
+          <div class="col-md-6">
+            <p><strong>Mã đơn hàng:</strong></p>
+            <div class="d-flex align-items-center gap-2">
+              <code>{{ order.orderNumber }}</code>
+              <button class="btn btn-sm btn-outline-secondary" (click)="copyToClipboard(order.orderNumber)">
+                <i class="fas fa-copy"></i>
+              </button>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Trạng thái:</strong></p>
+            <span [ngClass]="'badge bg-' + getStatusClass(order.orderStatus)">
+              {{ getStatusLabel(order.orderStatus) }}
+            </span>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <p><strong>Tổng tiền:</strong></p>
+            <p class="text-primary fs-5">${{ order.totalAmount | number: '1.2-2' }}</p>
+          </div>
+          <div class="col-md-6">
+            <p><strong>Ngày tạo:</strong></p>
+            <p>{{ order.createdAt | date: 'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+        </div>
+        @if (order.notes) {
+          <div class="row mt-3">
+            <div class="col-12">
+              <p><strong>Ghi chú:</strong></p>
+              <p>{{ order.notes }}</p>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Order Items -->
+      <div class="order-items">
+        <h6 class="mb-3">Danh sách tài khoản ({{ order.orderItems.length }})</h6>
+        <div class="table-responsive">
+          <table class="table table-sm table-bordered">
+            <thead class="table-light">
+              <tr>
+                <th>Sản phẩm</th>
+                <th>Tài khoản</th>
+                <th>Trạng thái</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (order.orderItems.length === 0) {
+                <tr>
+                  <td colspan="3" class="text-center text-muted">Không có dữ liệu</td>
+                </tr>
+              }
+              @for (item of order.orderItems; track item.id) {
+                <tr>
+                  <td>{{ item.productName }}</td>
+                  <td>
+                    <div class="d-flex align-items-center gap-2">
+                      <code class="small">{{ item.accountData }}</code>
+                      <button class="btn btn-sm btn-outline-secondary" (click)="copyToClipboard(item.accountData)">
+                        <i class="fas fa-copy"></i>
+                      </button>
+                    </div>
+                  </td>
+                  <td>
+                    @if (item.sold) {
+                      <span class="badge bg-success">Đã bán</span>
+                    } @else {
+                      <span class="badge bg-secondary">Chưa bán</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="onClose()">
+        Đóng
+      </button>
+    </div>
+  </div>
+</div>

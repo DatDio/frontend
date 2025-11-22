@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ApiService } from '../../../core/services/api.service';
 import { SeoService } from '../../../core/services/seo.service';
 
 interface DashboardStats {
@@ -33,26 +32,25 @@ export class DashboardComponent implements OnInit {
   ];
 
   constructor(
-    private apiService: ApiService,
     private seoService: SeoService
   ) {}
 
   ngOnInit(): void {
     this.seoService.setTitle('Admin Dashboard - MailShop');
-    this.loadStats();
+    //this.loadStats();
   }
 
-  loadStats(): void {
-    this.apiService.get<any>('/admin/stats').subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.stats = response.data;
-        }
-        this.loading = false;
-      },
-      error: () => {
-        this.loading = false;
-      }
-    });
-  }
+  // loadStats(): void {
+  //   this.apiService.get<any>('/admin/stats').subscribe({
+  //     next: (response) => {
+  //       if (response.success) {
+  //         this.stats = response.data;
+  //       }
+  //       this.loading = false;
+  //     },
+  //     error: () => {
+  //       this.loading = false;
+  //     }
+  //   });
+  // }
 }

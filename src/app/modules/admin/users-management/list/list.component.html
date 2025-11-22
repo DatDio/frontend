@@ -1,7 +1,7 @@
 <div class="users-management">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Users Management</h1>
-    <button class="btn btn-primary">
+    <button class="btn btn-primary" (click)="onCreate()">
       <i class="bi bi-plus-circle"></i> Add User
     </button>
   </div>
@@ -36,7 +36,8 @@
               <tr>
                 <th>User</th>
                 <th>Email</th>
-                <th>Role</th>
+                <th>Roles</th>
+                <th>Status</th>
                 <th>Joined</th>
                 <th>Actions</th>
               </tr>
@@ -47,30 +48,35 @@
                   <td>
                     <div class="user-info">
                       <div class="user-avatar">
-                        {{ user.username.charAt(0).toUpperCase() }}
+                        {{ user.email.charAt(0).toUpperCase() }}
                       </div>
                       <div>
-                        <div class="fw-semibold">{{ user.username }}</div>
-                        @if (user.firstName || user.lastName) {
-                          <small class="text-muted">{{ user.firstName }} {{ user.lastName }}</small>
-                        }
+                        <div class="fw-semibold">{{ user.fullName }}</div>
+                        <small class="text-muted">{{ user.email }}</small>
                       </div>
                     </div>
                   </td>
                   <td>{{ user.email }}</td>
                   <td>
-                    <span [class]="getRoleBadgeClass(user.role)">{{ user.role }}</span>
+                    @for (role of user.roles; track role) {
+                      <span class="badge bg-info me-1">{{ role }}</span>
+                    }
+                  </td>
+                  <td>
+                    <span class="badge" [ngClass]="user.status === 'ACTIVE' ? 'bg-success' : 'bg-warning'">
+                      {{ user.status }}
+                    </span>
                   </td>
                   <td>{{ user.createdAt | date: 'MMM d, y' }}</td>
                   <td>
                     <div class="btn-group btn-group-sm">
-                      <a [routerLink]="['/admin/users-management', user.id]" class="btn btn-outline-primary">
+                      <button (click)="onView(user.id)" class="btn btn-outline-primary" title="View">
                         <i class="bi bi-eye"></i>
-                      </a>
-                      <a [routerLink]="['/admin/users-management', user.id, 'edit']" class="btn btn-outline-secondary">
+                      </button>
+                      <button (click)="onEdit(user.id)" class="btn btn-outline-secondary" title="Edit">
                         <i class="bi bi-pencil"></i>
-                      </a>
-                      <button (click)="deleteUser(user.id)" class="btn btn-outline-danger">
+                      </button>
+                      <button (click)="deleteUser(user.id)" class="btn btn-outline-danger" title="Delete">
                         <i class="bi bi-trash"></i>
                       </button>
                     </div>
