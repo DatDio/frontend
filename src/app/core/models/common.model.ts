@@ -13,7 +13,7 @@ export interface PaginatedResponse<T> {
     number: number;
 }
 export interface PageFilter {
-    page: number;
-    limit: number;
-    sort: string;
+    page?: number;
+    limit?: number;
+    sort?: string;
 }

@@ -10,6 +10,7 @@ export class AdminProductItemApi {
   public static readonly IMPORT_TXT = (productId: string | number) =>
     AdminProductItemApi.BASE + `/import/${productId}`;
 
-  public static readonly DELETE = AdminProductItemApi.BASE + '/delete';
+   public static readonly DELETE = (id: number) =>
+        AdminProductItemApi.BASE + `/${id}`;
 
 }

@@ -6,21 +6,71 @@
     </button>
   </div>
 
+  <!-- Search Form -->
+  <div class="card mb-3">
+    <div class="card-body">
+      <form [formGroup]="formSearch" class="row g-3">
+        <div class="col-md-4">
+          <label for="emailInput" class="form-label">Email</label>
+          <input 
+            id="emailInput"
+            type="email"
+            class="form-control"
+            placeholder="Search by email..."
+            formControlName="email">
+        </div>
+        <div class="col-md-4">
+          <label for="statusSelect" class="form-label">Status</label>
+          <select id="statusSelect" class="form-select" formControlName="status">
+            <option value="">All Status</option>
+            <option value="ACTIVE">Active</option>
+            <option value="INACTIVE">Inactive</option>
+            <option value="PENDING">Pending</option>
+          </select>
+        </div>
+        <div class="col-md-4 d-flex align-items-end gap-2">
+          <button 
+            type="button"
+            class="btn btn-primary w-50"
+            (click)="handleSearch()">
+            <i class="bi bi-search"></i> Search
+          </button>
+          <button 
+            type="button"
+            class="btn btn-outline-secondary w-50"
+            (click)="clearForm()">
+            <i class="bi bi-arrow-clockwise"></i> Clear
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-header">
       <div class="row align-items-center">
         <div class="col-md-6">
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Search users..."
-            [(ngModel)]="searchTerm"
-          >
+          <span class="text-muted">Total: {{ paginationConfig.totalElements }} users</span>
         </div>
         <div class="col-md-6 text-end">
-          <button class="btn btn-outline-secondary">
-            <i class="bi bi-filter"></i> Filters
-          </button>
+          <div class="d-inline-flex gap-2 align-items-center">
+            <label for="pageInput" class="form-label mb-0">Go to page:</label>
+            <input 
+              id="pageInput"
+              type="number" 
+              class="form-control form-control-sm" 
+              style="width: 80px"
+              formControlName="searchPage"
+              placeholder="Page #"
+              min="1"
+              [max]="paginationConfig.totalPages"
+              (keyup.enter)="handleSearchPage()">
+            <button 
+              class="btn btn-sm btn-outline-primary"
+              (click)="handleSearchPage()">
+              <i class="bi bi-arrow-right"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -34,17 +84,21 @@
           <table class="table table-hover mb-0">
             <thead>
               <tr>
+                <th style="width: 50px; text-align: center;">STT</th>
                 <th>User</th>
                 <th>Email</th>
                 <th>Roles</th>
                 <th>Status</th>
                 <th>Joined</th>
-                <th>Actions</th>
+                <th style="width: 120px; text-align: center;">Actions</th>
               </tr>
             </thead>
             <tbody>
-              @for (user of users; track user.id) {
+              @for (user of users; track user.id; let i = $index) {
                 <tr>
+                  <td style="text-align: center; font-weight: 500;">
+                    {{ i + 1 + (paginationConfig.currentPage * paginationConfig.pageSize) }}
+                  </td>
                   <td>
                     <div class="user-info">
                       <div class="user-avatar">
@@ -68,18 +122,26 @@
                     </span>
                   </td>
                   <td>{{ user.createdAt | date: 'MMM d, y' }}</td>
-                  <td>
-                    <div class="btn-group btn-group-sm">
-                      <button (click)="onView(user.id)" class="btn btn-outline-primary" title="View">
+                  <td style="text-align: center;">
+                    <div class="action-buttons">
+                      <button (click)="onView(user.id)" class="btn btn-icon btn-primary" title="View" data-bs-toggle="tooltip">
                         <i class="bi bi-eye"></i>
                       </button>
-                      <button (click)="onEdit(user.id)" class="btn btn-outline-secondary" title="Edit">
+                      <button (click)="onEdit(user.id)" class="btn btn-icon btn-info" title="Edit" data-bs-toggle="tooltip">
                         <i class="bi bi-pencil"></i>
                       </button>
-                      <button (click)="deleteUser(user.id)" class="btn btn-outline-danger" title="Delete">
+                      <button (click)="deleteUser(user.id)" class="btn btn-icon btn-danger" title="Delete" data-bs-toggle="tooltip">
                         <i class="bi bi-trash"></i>
                       </button>
                     </div>
+                  </td>
+                </tr>
+              }
+
+              @if (users.length === 0) {
+                <tr>
+                  <td colspan="7" class="text-center py-4 text-muted">
+                    No users found
                   </td>
                 </tr>
               }
@@ -88,5 +150,19 @@
         </div>
       }
     </div>
+
+    <!-- Pagination -->
+    @if (paginationConfig.totalPages > 0) {
+      <div class="card-footer">
+        <app-pagination 
+          [config]="paginationConfig"
+          (pageChange)="handlePageChange($event)"
+          (pageSizeChange)="selectPageSize($event)">
+        </app-pagination>
+      </div>
+    }
   </div>
 </div>
+
+<!-- User Detail Modal -->
+<app-user-detail-modal #userDetailModal></app-user-detail-modal>

@@ -1,0 +1,156 @@
+<div class="container-fluid p-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Quản lý tài khoản email</h1>
+    <button class="btn btn-success" (click)="onCreateClick()">
+      <i class="bi bi-plus-lg"></i> Tạo sản phẩm
+    </button>
+  </div>
+
+  <!-- Search Form -->
+  <div class="card mb-3">
+    <div class="card-body">
+      <form [formGroup]="formSearch" class="row g-3">
+        <div class="col-md-3">
+          <label for="nameInput" class="form-label">Tên sản phẩm</label>
+          <input 
+            id="nameInput"
+            type="text"
+            class="form-control"
+            placeholder="Tìm kiếm theo tên..."
+            formControlName="name">
+        </div>
+        <div class="col-md-3">
+          <label for="categorySelect" class="form-label">Danh mục</label>
+          <select id="categorySelect" class="form-select" formControlName="categoryId">
+            <option value="">Tất cả danh mục</option>
+            @for (category of categories; track category.id) {
+              <option [value]="category.id">{{ category.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label for="statusSelect" class="form-label">Trạng thái</label>
+          <select id="statusSelect" class="form-select" formControlName="status">
+            <option value="">Tất cả trạng thái</option>
+            <option value="active">Hoạt động</option>
+            <option value="inactive">Vô hiệu</option>
+          </select>
+        </div>
+        <div class="col-md-3 d-flex align-items-end gap-2">
+          <button 
+            type="button"
+            class="btn btn-primary w-50"
+            (click)="handleSearch()">
+            <i class="bi bi-search"></i> Tìm kiếm
+          </button>
+          <button 
+            type="button"
+            class="btn btn-outline-secondary w-50"
+            (click)="clearForm()">
+            <i class="bi bi-arrow-clockwise"></i> Xóa
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <span class="text-muted">Tổng: {{ paginationConfig.totalElements }} sản phẩm</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      @if (loading) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary"></div>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th style="width: 50px; text-align: center;">STT</th>
+                <th>Tên sản phẩm</th>
+                <th>Danh mục</th>
+                <th>Giá</th>
+                <th>Trạng thái</th>
+                <th style="width: 100px; text-align: center;">Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (product of products; track product.id; let i = $index) {
+                <tr>
+                  <td style="text-align: center; font-weight: 500;">
+                    {{ i + 1 + (paginationConfig.currentPage * paginationConfig.pageSize) }}
+                  </td>
+                  <td>{{ product.name }}</td>
+                  <td>{{ product.categoryName || product.categoryId }}</td>
+                  <td>{{ product.price}}</td>
+                  <td>
+                    <span class="badge" [ngClass]="product.status === 'active' ? 'bg-success' : 'bg-danger'">
+                      {{ product.status === 'active' ? 'Hoạt động' : 'Vô hiệu' }}
+                    </span>
+                  </td>
+                  <td style="text-align: center;">
+                    <div class="action-buttons gap-2">
+                      <button class="btn btn-sm btn-info" (click)="onDetail(product.id)" title="Xem tài khoản">
+                        <i class="bi bi-eye"></i>
+                      </button>
+                      <button class="btn btn-sm btn-warning" (click)="onEditClick(product)" title="Chỉnh sửa">
+                        <i class="bi bi-pencil"></i>
+                      </button>
+                      <button class="btn btn-sm btn-danger" (click)="onDeleteClick(product.id)" title="Xóa">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+
+              @if (products.length === 0) {
+                <tr>
+                  <td colspan="6" class="text-center py-4 text-muted">
+                    Không có dữ liệu
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    <!-- Pagination -->
+    @if (paginationConfig.totalPages > 0) {
+      <div class="card-footer">
+        <app-pagination 
+          [config]="paginationConfig"
+          (pageChange)="handlePageChange($event)"
+          (pageSizeChange)="selectPageSize($event)">
+        </app-pagination>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- Create Modal -->
+@if (showCreateModal) {
+  <app-product-create-modal
+    [categories]="categories"
+    (closeModal)="onCreateModalClose()"
+    (successCreate)="onCreateSuccess()">
+  </app-product-create-modal>
+}
+
+<!-- Update Modal -->
+@if (showUpdateModal && selectedProduct) {
+  <app-product-update-modal
+    [product]="selectedProduct"
+    [categories]="categories"
+    (closeModal)="onUpdateModalClose()"
+    (successUpdate)="onUpdateSuccess()">
+  </app-product-update-modal>
+}

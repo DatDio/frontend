@@ -1,104 +1,240 @@
-/* Pagination component styles */
-
+/* Pagination Component Styles */
 .pagination-wrapper {
-  background: #fff;
-  border: 1px solid #dee2e6;
+  /* Thay đổi gradient nhẹ nhàng hơn hoặc dùng màu nền trắng thuần */
+  background-color: #ffffff; 
+  border: 1px solid #dcdfe6; /* Màu viền nhẹ nhàng hơn */
   border-radius: 8px;
-  padding: 16px;
+  padding: 12px 16px; /* Giảm padding một chút */
   margin-top: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Shadow rõ ràng hơn */
 }
 
-.pagination-container {
-  flex-wrap: wrap;
+/* Single Row Layout */
+.pagination-row {
+  display: flex;
+  align-items: center;
+  /* Đảm bảo khoảng cách và căn chỉnh giữa các khối */
+  justify-content: space-between; 
+  gap: 16px;
+  
+  @media (max-width: 1024px) {
+    gap: 12px;
+  }
   
   @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start !important;
+    /* Khi chuyển xuống mobile, căn chỉnh các thành phần theo hàng dọc/đầu */
+    flex-wrap: wrap;
+    justify-content: flex-start; 
   }
 }
 
+/* Page Size Selector */
 .page-size-selector {
-  .form-select-sm {
-    height: auto;
-    padding: 4px 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-
-    &:focus {
-      border-color: #007bff;
-      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-    }
-  }
-
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  
   .form-label {
     color: #495057;
-    font-weight: 500;
+    font-weight: 500; /* Giảm độ đậm một chút */
+    font-size: 13px;
+    margin-bottom: 0;
+    white-space: nowrap;
+  }
+
+  .form-select-sm {
+    height: 32px;
+    padding: 4px 28px 4px 12px;
+    border: 1px solid #dcdfe6;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: white;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23333' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+    background-size: 14px 10px;
+    appearance: none;
+    font-size: 13px;
+    font-weight: 400;
+    transition: all 0.2s ease;
+    color: #333;
+
+    &:hover {
+      border-color: #409eff;
+    }
+
+    &:focus {
+      border-color: #409eff;
+      box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+      outline: none;
+    }
   }
 }
 
+/* Bỏ style cho .pagination-info vì đã loại bỏ khỏi HTML */
+
+
+/* Go to Page Section */
 .go-to-page {
-  .form-control-sm {
-    height: auto;
-    padding: 4px 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 13px;
-
-    &:focus {
-      border-color: #007bff;
-      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-    }
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 16px;
+  border-left: 1px solid #e0e0e0;
+  white-space: nowrap;
+  
+  @media (max-width: 992px) {
+    border-left: none; /* Bỏ đường kẻ khi màn hình nhỏ hơn */
+    padding-left: 0;
+    margin-left: 0;
   }
-
-  .btn-outline-primary {
-    padding: 4px 8px;
-    font-size: 12px;
+  
+  @media (max-width: 768px) {
+    /* Đẩy xuống cuối hàng trên mobile để nó không chiếm hàng đầu */
+    order: 4; 
+    width: auto;
+    border-left: none;
+    flex-direction: row;
   }
 
   .text-muted {
     font-size: 13px;
+    font-weight: 500;
+    color: #606266; /* Màu text xám đậm hơn */
   }
-}
 
-.pagination-info {
-  font-size: 13px;
-  white-space: nowrap;
-}
-
-.pagination {
-  .page-link {
-    color: #007bff;
-    border: 1px solid #ddd;
-    padding: 6px 10px;
-    font-size: 12px;
-    cursor: pointer;
+  .form-control-sm {
+    height: 32px; /* Chiều cao thống nhất */
+    padding: 4px 10px;
+    border: 1px solid #dcdfe6;
+    border-radius: 4px;
+    font-size: 13px;
     transition: all 0.2s ease;
+    min-width: 60px; /* Giảm độ rộng tối thiểu */
 
     &:hover {
-      background-color: #e9ecef;
-      border-color: #007bff;
+      border-color: #409eff;
+    }
+
+    &:focus {
+      border-color: #409eff;
+      box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+      outline: none;
     }
   }
 
+  .btn-primary {
+    padding: 4px 10px; /* Giảm padding nút */
+    height: 32px;
+    font-size: 13px;
+    font-weight: 500;
+    /* Màu sắc nút chính */
+    background-color: #409eff; 
+    border-color: #409eff;
+    color: white;
+    transition: all 0.2s ease;
+
+    &:hover:not(:disabled) {
+      background-color: #66b1ff;
+      border-color: #66b1ff;
+      /* Bỏ hiệu ứng translate, thay bằng shadow tinh tế hơn */
+      transform: none; 
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
+    }
+
+    &:disabled {
+      background-color: #a0cfff;
+      border-color: #a0cfff;
+      opacity: 1; /* Giữ opacity, chỉ thay đổi màu */
+      cursor: not-allowed;
+    }
+  }
+}
+
+/* Pagination Controls */
+nav.pagination-nav {
+  /* Cho phép component phân trang chiếm không gian còn lại và căn giữa */
+  width: auto; 
+  flex-grow: 1;
+}
+
+.pagination {
+  gap: 2px; /* Giảm khoảng cách giữa các nút */
+  padding: 0;
+  margin: 0;
+  list-style: none;
+
   .page-item {
-    margin: 0 2px;
+    .page-link {
+      height: 32px; /* Chiều cao thống nhất */
+      min-width: 32px; /* Chiều rộng tối thiểu cho nút số */
+      padding: 6px 8px; /* Giảm padding ngang */
+      font-size: 13px;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+      color: #606266;
+      background-color: white;
+      transition: all 0.2s ease;
+      font-weight: 400;
+      /* Căn giữa nội dung trong nút */
+      display: flex;
+      justify-content: center;
+      align-items: center; 
+      gap: 4px;
+
+      &:hover:not(:disabled) {
+        color: #409eff; /* Hover chỉ thay đổi màu text/viền */
+        background-color: #ecf5ff; /* Màu nền hover nhẹ */
+        border-color: #409eff;
+        transform: none; /* Bỏ translate */
+        box-shadow: none;
+      }
+
+      &:disabled {
+        color: #c0c4cc;
+        background-color: #f4f4f5;
+        border-color: #e4e7ed;
+        cursor: not-allowed;
+      }
+      
+      /* Riêng nút Previous/Next (chỉ có icon) */
+      &:has(i:only-child) {
+         padding: 0 8px; /* Padding chỉ cho nút Previous/Next */
+      }
+
+      i {
+        font-size: 12px;
+      }
+    }
 
     &.active {
       .page-link {
-        background-color: #007bff;
-        border-color: #007bff;
-        color: #ffffff;
+        background-color: #409eff;
+        border-color: #409eff;
+        color: white;
+        font-weight: 500;
+        box-shadow: 0 2px 4px rgba(64, 158, 255, 0.2);
       }
     }
 
     &.disabled {
-      .page-link {
-        color: #6c757d;
-        cursor: not-allowed;
-        background-color: transparent;
-        border-color: transparent;
+      /* Loại bỏ style của .page-link disabled khỏi .page-item disabled để ellipsis trông đẹp hơn */
+      &.page-item:not(:has(.page-link[disabled])) {
+         .page-link {
+            color: #606266;
+            pointer-events: none;
+            background-color: transparent;
+            border-color: transparent;
+            cursor: default;
+         }
       }
+      
+      /* Style riêng cho nút Previous/Next bị disabled */
+       .page-link[disabled] {
+          color: #c0c4cc;
+          background-color: #f4f4f5;
+          border-color: #e4e7ed;
+       }
     }
   }
 }

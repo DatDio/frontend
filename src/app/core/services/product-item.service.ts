@@ -5,8 +5,7 @@ import { finalize } from 'rxjs/operators';
 import { LoaderService } from './loader.service';
 import { ProductItem, ProductItemCreate, ProductItemFilter } from '../models/product-item.model';
 import { ApiResponse, PaginatedResponse } from '../models/common.model';
-
-const API_URL = '/api/admin/product-items';
+import { AdminProductItemApi } from '../../Utils/apis/product-items/admin-product-item.api';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +18,7 @@ export class ProductItemService {
    * Get list of product items with pagination
    */
   list(productId: number | string, filter?: ProductItemFilter): Observable<ApiResponse<PaginatedResponse<ProductItem>>> {
-    this.loaderService.show();
+   
 
     let params = new HttpParams()
       .set('productId', productId.toString())
@@ -30,20 +29,10 @@ export class ProductItemService {
     if (filter?.sold !== undefined) params = params.set('sold', filter.sold.toString());
 
     return this.httpClient
-      .get<ApiResponse<PaginatedResponse<ProductItem>>>(`${API_URL}/search`, { params })
-      .pipe(finalize(() => this.loaderService.hide()));
+      .get<ApiResponse<PaginatedResponse<ProductItem>>>(AdminProductItemApi.SEARCH, { params })
   }
 
-  /**
-   * Get product item by ID
-   */
-  getById(id: number | string): Observable<ApiResponse<ProductItem>> {
-    this.loaderService.show();
 
-    return this.httpClient
-      .get<ApiResponse<ProductItem>>(`${API_URL}/${id}`)
-      .pipe(finalize(() => this.loaderService.hide()));
-  }
 
   /**
    * Create single product item
@@ -52,29 +41,29 @@ export class ProductItemService {
     this.loaderService.show();
 
     return this.httpClient
-      .post<ApiResponse<ProductItem>>(`${API_URL}`, data)
+      .post<ApiResponse<ProductItem>>(AdminProductItemApi.CREATE, data)
       .pipe(finalize(() => this.loaderService.hide()));
   }
 
   /**
    * Bulk create multiple product items
    */
-  bulkCreate(items: ProductItemCreate[]): Observable<ApiResponse<ProductItem[]>> {
-    this.loaderService.show();
+  // bulkCreate(items: ProductItemCreate[]): Observable<ApiResponse<ProductItem[]>> {
+  //   this.loaderService.show();
 
-    return this.httpClient
-      .post<ApiResponse<ProductItem[]>>(`${API_URL}/bulk`, { items })
-      .pipe(finalize(() => this.loaderService.hide()));
-  }
+  //   return this.httpClient
+  //     .post<ApiResponse<ProductItem[]>>(`${API_URL}/bulk`, { items })
+  //     .pipe(finalize(() => this.loaderService.hide()));
+  // }
 
   /**
    * Delete product item
    */
-  delete(id: number | string): Observable<ApiResponse<void>> {
+  delete(id: number): Observable<ApiResponse<void>> {
     this.loaderService.show();
 
     return this.httpClient
-      .delete<ApiResponse<void>>(`${API_URL}/${id}`)
+      .delete<ApiResponse<void>>(AdminProductItemApi.DELETE(id))
       .pipe(finalize(() => this.loaderService.hide()));
   }
 }

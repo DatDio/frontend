@@ -1,80 +1,158 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Order } from '../../../../core/models/order.model';
 import { OrderService } from '../../../../core/services/order.service';
 import { NotificationService } from '../../../../core/services/notification.service';
-import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
+import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
+import { PaginationService } from '../../../../shared/services/pagination.service';
 import { OrderDetailModalComponent } from '../order-detail-modal/order-detail-modal.component';
+
+interface OrderSearchFilter {
+  orderNumber?: string;
+  userEmail?: string;
+  orderStatus?: string;
+  pagination?: any;
+}
 
 @Component({
   selector: 'app-order-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, PaginationComponent, OrderDetailModalComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, PaginationComponent, OrderDetailModalComponent],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss'
 })
 export class OrderListComponent implements OnInit {
   private readonly orderService = inject(OrderService);
   private readonly notificationService = inject(NotificationService);
+  private readonly fb = inject(FormBuilder);
+  private readonly paginationService = inject(PaginationService);
 
   orders: Order[] = [];
-  currentPage = 0;
-  pageSize = 10;
-  totalPages = 0;
-  totalElements = 0;
+  
+  paginationConfig: PaginationConfig = {
+    currentPage: 0,
+    totalPages: 1,
+    pageSize: 10,
+    totalElements: 0
+  };
 
-  searchOrderNumber = '';
-  searchEmail = '';
-  searchStatus = '';
+  dataFormSearch: OrderSearchFilter = {};
+  formSearch!: FormGroup;
 
   selectedOrder: Order | null = null;
   showDetailModal = false;
 
   ngOnInit(): void {
+    this.initForm();
     this.loadOrders();
   }
 
-  loadOrders(): void {
-    this.orderService
-      .list({
-        page: this.currentPage,
-        limit: this.pageSize,
-        sort: 'id,desc',
-        orderNumber: this.searchOrderNumber || undefined,
-        userEmail: this.searchEmail || undefined,
-        orderStatus: this.searchStatus || undefined
-      })
-      .subscribe({
-        next: (response: any) => {
-          if (response.success && response.data?.content) {
-            this.orders = response.data.content;
-            this.totalElements = response.data.totalElements || 0;
-            this.totalPages = response.data.totalPages || 0;
-          }
-        },
-        error: (error: any) => {
-          console.error('Error loading orders:', error);
-          this.notificationService.error('Lỗi', 'Lỗi khi tải danh sách đơn hàng');
+  private initForm(): void {
+    this.formSearch = this.createSearchForm();
+  }
+
+  private createSearchForm(): FormGroup {
+    return this.fb.group({
+      orderNumber: new FormControl(''),
+      userEmail: new FormControl(''),
+      orderStatus: new FormControl(''),
+      searchPage: new FormControl('')
+    });
+  }
+
+  handleSearch(): void {
+    this.paginationConfig.currentPage = 0;
+    this.dataFormSearch = {
+      ...this.formSearch.getRawValue(),
+      pagination: this.paginationConfig
+    };
+    this.loadOrders();
+  }
+
+  handleSearchPage(): void {
+    const pageNum = this.formSearch.get('searchPage')?.value;
+    if (!pageNum) {
+      return;
+    }
+    
+    if (pageNum > this.paginationConfig.totalPages || pageNum < 1) {
+      this.notificationService.error(`Page must be between 1 and ${this.paginationConfig.totalPages}`);
+    } else {
+      this.paginationConfig.currentPage = pageNum - 1;
+      this.dataFormSearch = {
+        ...this.formSearch.getRawValue(),
+        pagination: this.paginationConfig
+      };
+      this.loadOrders();
+      this.formSearch.get('searchPage')?.reset();
+    }
+  }
+
+  selectPageSize(pageSize: number): void {
+    this.paginationConfig.currentPage = 0;
+    this.paginationConfig.pageSize = pageSize;
+    this.dataFormSearch = {
+      ...this.formSearch.getRawValue(),
+      pagination: this.paginationConfig
+    };
+    this.loadOrders();
+  }
+
+  handlePageChange(page: number): void {
+    this.paginationConfig.currentPage = page;
+    this.dataFormSearch = {
+      ...this.formSearch.getRawValue(),
+      pagination: this.paginationConfig
+    };
+    this.loadOrders();
+  }
+
+  clearForm(): void {
+    this.formSearch = this.createSearchForm();
+    this.paginationConfig.currentPage = 0;
+    this.dataFormSearch = {};
+    this.loadOrders();
+  }
+
+  private loadOrders(): void {
+    const params: any = {
+      page: this.paginationConfig.currentPage,
+      limit: this.paginationConfig.pageSize,
+      sort: 'id,desc'
+    };
+    
+    if (this.dataFormSearch.orderNumber) {
+      params.orderNumber = this.dataFormSearch.orderNumber;
+    }
+    if (this.dataFormSearch.userEmail) {
+      params.userEmail = this.dataFormSearch.userEmail;
+    }
+    if (this.dataFormSearch.orderStatus) {
+      params.orderStatus = this.dataFormSearch.orderStatus;
+    }
+
+    this.orderService.list(params).subscribe({
+      next: (response: any) => {
+        if (response.success && response.data?.content) {
+          this.orders = response.data.content;
+          
+          // Extract pagination từ backend
+          const paginationInfo = this.paginationService.extractPaginationInfo(response.data);
+          this.paginationConfig = {
+            currentPage: paginationInfo.currentPage,
+            pageSize: paginationInfo.pageSize,
+            totalElements: paginationInfo.totalElements,
+            totalPages: paginationInfo.totalPages
+          };
         }
-      });
-  }
-
-  onSearch(): void {
-    this.currentPage = 0;
-    this.loadOrders();
-  }
-
-  onPageChange(page: number): void {
-    this.currentPage = page;
-    this.loadOrders();
-  }
-
-  onPageSizeChange(newSize: number): void {
-    this.pageSize = newSize;
-    this.currentPage = 0;
-    this.loadOrders();
+      },
+      error: (error: any) => {
+        console.error('Error loading orders:', error);
+        this.notificationService.error('Lỗi khi tải danh sách đơn hàng');
+      }
+    });
   }
 
   onViewDetail(order: Order): void {
@@ -91,12 +169,12 @@ export class OrderListComponent implements OnInit {
     if (confirm('Bạn có chắc muốn xóa đơn hàng này?')) {
       this.orderService.delete(id).subscribe({
         next: () => {
-          this.notificationService.success('Thành công', 'Xóa đơn hàng thành công');
+          this.notificationService.success('Xóa đơn hàng thành công');
           this.loadOrders();
         },
         error: (error: any) => {
           console.error('Error deleting order:', error);
-          this.notificationService.error('Lỗi', 'Lỗi khi xóa đơn hàng');
+          this.notificationService.error('Lỗi khi xóa đơn hàng');
         }
       });
     }

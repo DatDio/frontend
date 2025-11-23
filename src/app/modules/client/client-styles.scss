@@ -1,0 +1,554 @@
+/* ==================== CLIENT MODULES GLOBAL STYLES ==================== */
+
+// Colors
+$primary-color: #007bff;
+$secondary-color: #6c757d;
+$warning-color: #ffc107;
+$success-color: #28a745;
+$danger-color: #dc3545;
+$info-color: #17a2b8;
+
+$bg-light: #f8f9fa;
+$bg-white: #ffffff;
+$text-dark: #1a1a1a;
+$text-muted: #6c757d;
+$border-color: #dee2e6;
+
+// Spacing
+$spacing-unit: 1rem;
+$spacing-xs: 0.25rem;
+$spacing-sm: 0.5rem;
+$spacing-md: 1rem;
+$spacing-lg: 1.5rem;
+$spacing-xl: 2rem;
+
+// Border radius
+$border-radius-sm: 4px;
+$border-radius-md: 6px;
+$border-radius-lg: 8px;
+
+// Shadows
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+$shadow-md: 0 2px 8px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+/* ==================== PAGE HEADER ==================== */
+
+.page-header {
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid $border-color;
+
+  .page-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: $text-dark;
+    margin-bottom: 0.5rem;
+  }
+
+  .page-description {
+    font-size: 1rem;
+    color: $text-muted;
+    margin-bottom: 0;
+  }
+
+  .page-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: $border-radius-md;
+    }
+  }
+
+  @media (max-width: 768px) {
+    display: flex;
+    flex-direction: column;
+
+    .page-title {
+      font-size: 1.5rem;
+    }
+
+    .page-actions {
+      margin-left: 0;
+      margin-top: 1rem;
+    }
+  }
+}
+
+/* ==================== SEARCH & FILTER SECTION ==================== */
+
+.search-section {
+  background: $bg-white;
+  padding: 1.5rem;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-sm;
+  margin-bottom: 2rem;
+
+  .search-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: $text-dark;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .form-control,
+  .form-select {
+    border: 1px solid $border-color;
+    border-radius: $border-radius-md;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    transition: all 0.3s ease;
+
+    &:focus {
+      border-color: $primary-color;
+      box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.25);
+      outline: none;
+    }
+
+    &::placeholder {
+      color: $text-muted;
+    }
+  }
+
+  .btn-search {
+    background-color: $primary-color;
+    color: white;
+    border: none;
+    border-radius: $border-radius-md;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    &:hover {
+      background-color: darken($primary-color, 10%);
+      transform: translateY(-2px);
+      box-shadow: $shadow-md;
+    }
+
+    i {
+      margin-right: 0.5rem;
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .btn-search {
+      width: 100%;
+    }
+  }
+}
+
+/* ==================== EMPTY STATE ==================== */
+
+.empty-state {
+  background: $bg-light;
+  padding: 3rem 2rem;
+  border-radius: $border-radius-lg;
+  text-align: center;
+  margin: 2rem 0;
+
+  .empty-icon {
+    font-size: 3rem;
+    color: $text-muted;
+    margin-bottom: 1rem;
+  }
+
+  .empty-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $text-dark;
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-description {
+    color: $text-muted;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+  }
+
+  .btn {
+    min-width: 150px;
+  }
+}
+
+/* ==================== CARD STYLES ==================== */
+
+.card-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card-item {
+  background: $bg-white;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: $shadow-sm;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    box-shadow: $shadow-lg;
+    transform: translateY(-4px);
+    border-color: $primary-color;
+  }
+
+  .card-header {
+    background: $bg-light;
+    padding: 1rem;
+    border-bottom: 1px solid $border-color;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: $text-dark;
+      margin: 0;
+      flex: 1;
+    }
+
+    .card-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      white-space: nowrap;
+
+      &.badge-success {
+        background-color: rgba($success-color, 0.1);
+        color: $success-color;
+      }
+
+      &.badge-warning {
+        background-color: rgba($warning-color, 0.1);
+        color: darken($warning-color, 20%);
+      }
+
+      &.badge-info {
+        background-color: rgba($info-color, 0.1);
+        color: $info-color;
+      }
+
+      &.badge-danger {
+        background-color: rgba($danger-color, 0.1);
+        color: $danger-color;
+      }
+    }
+  }
+
+  .card-body {
+    padding: 1.25rem;
+    flex: 1;
+
+    .card-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+
+      .meta-item {
+        .meta-label {
+          font-size: 0.75rem;
+          font-weight: 600;
+          color: $text-muted;
+          text-transform: uppercase;
+          margin-bottom: 0.25rem;
+        }
+
+        .meta-value {
+          font-size: 1.125rem;
+          font-weight: 600;
+          color: $text-dark;
+
+          &.text-primary {
+            color: $primary-color;
+          }
+        }
+      }
+    }
+
+    .card-description {
+      font-size: 0.875rem;
+      color: $text-muted;
+      line-height: 1.5;
+    }
+  }
+
+  .card-footer {
+    background: $bg-light;
+    padding: 1rem;
+    border-top: 1px solid $border-color;
+    display: flex;
+    gap: 0.5rem;
+
+    .btn {
+      flex: 1;
+      padding: 0.5rem 1rem;
+      border-radius: $border-radius-md;
+      font-size: 0.875rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: none;
+      cursor: pointer;
+
+      &.btn-primary {
+        background-color: $primary-color;
+        color: white;
+
+        &:hover {
+          background-color: darken($primary-color, 10%);
+        }
+      }
+
+      &.btn-secondary {
+        background-color: $secondary-color;
+        color: white;
+
+        &:hover {
+          background-color: darken($secondary-color, 10%);
+        }
+      }
+
+      &.btn-outline {
+        background-color: transparent;
+        border: 1px solid $primary-color;
+        color: $primary-color;
+
+        &:hover {
+          background-color: $primary-color;
+          color: white;
+        }
+      }
+
+      i {
+        margin-right: 0.25rem;
+      }
+    }
+  }
+}
+
+/* ==================== TABLE STYLES ==================== */
+
+.table-container {
+  background: $bg-white;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-sm;
+  overflow: hidden;
+  margin-bottom: 2rem;
+
+  table {
+    margin: 0;
+
+    thead {
+      background-color: $bg-light;
+      border-bottom: 2px solid $border-color;
+
+      th {
+        padding: 1rem;
+        font-weight: 600;
+        color: $text-dark;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border: none;
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid $border-color;
+        transition: background-color 0.2s ease;
+
+        &:hover {
+          background-color: $bg-light;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        td {
+          padding: 1rem;
+          color: $text-dark;
+          font-size: 0.875rem;
+          vertical-align: middle;
+        }
+      }
+    }
+
+    .badge {
+      padding: 0.35rem 0.65rem;
+      border-radius: $border-radius-sm;
+      font-size: 0.75rem;
+      font-weight: 600;
+
+      &.badge-success {
+        background-color: $success-color;
+        color: white;
+      }
+
+      &.badge-warning {
+        background-color: $warning-color;
+        color: #000;
+      }
+
+      &.badge-danger {
+        background-color: $danger-color;
+        color: white;
+      }
+
+      &.badge-info {
+        background-color: $info-color;
+        color: white;
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    .table-responsive {
+      font-size: 0.75rem;
+
+      table {
+        th,
+        td {
+          padding: 0.75rem 0.5rem;
+        }
+      }
+    }
+  }
+}
+
+/* ==================== BUTTON STYLES ==================== */
+
+.btn-primary,
+.btn-secondary,
+.btn-outline-primary,
+.btn-outline-secondary {
+  border-radius: $border-radius-md;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+
+  i {
+    margin-right: 0.5rem;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+/* ==================== ALERT STYLES ==================== */
+
+.alert {
+  border-radius: $border-radius-lg;
+  padding: 1.25rem;
+  border: 1px solid;
+  font-size: 0.875rem;
+  margin-bottom: 1.5rem;
+
+  i {
+    margin-right: 0.5rem;
+  }
+
+  &.alert-info {
+    background-color: rgba($info-color, 0.1);
+    border-color: $info-color;
+    color: $info-color;
+  }
+
+  &.alert-warning {
+    background-color: rgba($warning-color, 0.1);
+    border-color: $warning-color;
+    color: darken($warning-color, 20%);
+  }
+
+  &.alert-success {
+    background-color: rgba($success-color, 0.1);
+    border-color: $success-color;
+    color: $success-color;
+  }
+
+  &.alert-danger {
+    background-color: rgba($danger-color, 0.1);
+    border-color: $danger-color;
+    color: $danger-color;
+  }
+}
+
+/* ==================== PAGINATION ==================== */
+
+.pagination-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+/* ==================== GENERAL UTILITIES ==================== */
+
+.page-container {
+  padding: 2rem 0;
+  min-height: calc(100vh - 300px);
+}
+
+.section-divider {
+  height: 1px;
+  background-color: $border-color;
+  margin: 2rem 0;
+}
+
+.text-primary {
+  color: $primary-color;
+}
+
+.text-muted {
+  color: $text-muted;
+}
+
+.text-dark {
+  color: $text-dark;
+}
+
+.bg-light {
+  background-color: $bg-light;
+}
+
+.shadow-sm {
+  box-shadow: $shadow-sm;
+}
+
+.shadow-md {
+  box-shadow: $shadow-md;
+}
+
+.shadow-lg {
+  box-shadow: $shadow-lg;
+}

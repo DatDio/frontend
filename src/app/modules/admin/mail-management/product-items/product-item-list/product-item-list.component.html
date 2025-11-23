@@ -6,12 +6,47 @@
     </button>
   </div>
 
+  <!-- Search Form -->
+  <div class="card mb-4 shadow-sm">
+    <div class="card-body">
+      <form [formGroup]="searchForm">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label for="accountData" class="form-label">Dữ liệu tài khoản</label>
+            <input
+              id="accountData"
+              type="text"
+              class="form-control"
+              formControlName="accountData"
+              placeholder="Nhập dữ liệu tài khoản...">
+          </div>
+          <div class="col-md-4">
+            <label for="sold" class="form-label">Đã bán</label>
+            <select id="sold" class="form-select" formControlName="sold">
+              <option value="">-- Tất cả --</option>
+              <option value="true">Có</option>
+              <option value="false">Không</option>
+            </select>
+          </div>
+          <div class="col-md-4 d-flex align-items-end gap-2">
+            <button type="button" class="btn btn-primary flex-grow-1" (click)="handleSearch()">
+              <i class="bi bi-search"></i> Tìm kiếm
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="clearForm()">
+              <i class="bi bi-arrow-clockwise"></i> Đặt lại
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- Items Table -->
   <div class="table-responsive bg-white rounded shadow-sm">
     <table class="table table-hover mb-0">
       <thead class="table-light">
         <tr>
-          <th>ID</th>
+          <th>STT</th>
           <th>Dữ liệu tài khoản</th>
           <th>Đã bán</th>
           <th>Người mua</th>
@@ -25,9 +60,9 @@
             <td colspan="6" class="text-center text-muted py-4">Không có dữ liệu</td>
           </tr>
         }
-        @for (item of items; track item.id) {
+        @for (item of items; track item.id; let i = $index) {
           <tr>
-            <td>{{ item.id }}</td>
+            <td>{{ i + 1 + (currentPage * pageSize) }}</td>
             <td class="text-monospace">{{ item.accountData }}</td>
             <td>
               <span [ngClass]="item.sold ? 'badge bg-success' : 'badge bg-secondary'">
@@ -64,7 +99,7 @@
 @if (showImportModal) {
   <app-bulk-import-modal
     [productId]="productId"
-    (close)="onModalClose()"
-    (success)="onImportSuccess()">
+    (closeModal)="onModalClose()"
+    (successImport)="onImportSuccess()">
   </app-bulk-import-modal>
 }

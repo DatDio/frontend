@@ -1,7 +1,7 @@
 import { PageFilter } from "./common.model";
 
 export interface Product {
-     id: number;
+  id: number;
   name: string;
   description: string;
   price: number;

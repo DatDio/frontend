@@ -3,19 +3,32 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { SeoService } from '../../../core/services/seo.service';
 import { AuthService } from '../../../core/services/auth.service';
+import { CategoryService } from '../../../core/services/category.service';
+import { NotificationService } from '../../../core/services/notification.service';
+import { PaginationComponent, PaginationConfig } from '../../../shared/components/pagination/pagination.component';
+import { PaginationService } from '../../../shared/services/pagination.service';
+import { Category } from '../../../core/models/category.model';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, PaginationComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
   private readonly seoService = inject(SeoService);
-  private readonly authService = inject(AuthService);
+  private readonly categoryService = inject(CategoryService);
+  private readonly notificationService = inject(NotificationService);
+  private readonly paginationService = inject(PaginationService);
 
-  isAuthenticated = false;
+  categories: Category[] = [];
+  paginationConfig: PaginationConfig = {
+    currentPage: 0,
+    totalPages: 1,
+    pageSize: 10,
+    totalElements: 0
+  };
 
   services = [
     {
@@ -76,58 +89,10 @@ export class HomeComponent implements OnInit {
     }
   ];
 
-  productGroup1 = [
-    {
-      id: 1,
-      name: 'Hotmail Nạp',
-      description: 'Tài khoản Hotmail với độ tuổi tối thiểu 3-5 giây',
-      duration: '3-5 giây',
-      price: '40 VNĐ',
-      quantity: '0'
-    },
-    {
-      id: 2,
-      name: 'Outlook Nạp',
-      description: 'Tài khoản Outlook với độ tuổi tối thiểu 3-5 giây',
-      duration: '3-5 giây',
-      price: '1222',
-      quantity: '0'
-    },
-    {
-      id: 3,
-      name: 'Hotmail Trusted',
-      description: 'Tài khoản Hotmail Trusted với độ tuổi tối thiểu 6-12 Tháng',
-      duration: '6-12 Tháng',
-      price: '250 VNĐ',
-      quantity: '0'
-    },
-    {
-      id: 4,
-      name: 'Outlook Trusted',
-      description: 'Tài khoản Outlook Trusted với độ tuổi tối thiểu 6-12 Tháng',
-      duration: '6-12 Tháng',
-      price: '250 VNĐ',
-      quantity: '0'
-    }
-  ];
 
-  productGroup2 = [
-    {
-      id: 5,
-      name: 'Outlook PVA - chưa thêm khóa phụ',
-      description: 'Tài khoản cá nhân, ChuSẵn Outlook PVA chưa thêm khóa phụ',
-      duration: '12-36 Tháng',
-      price: '100 VNĐ',
-      quantity: '0'
-    }
-  ];
-
-  constructor() {}
+  constructor() { }
 
   ngOnInit(): void {
-    this.authService.isAuthenticated$.subscribe((isAuth) => {
-      this.isAuthenticated = isAuth;
-    });
 
     this.seoService.setTitle('MailShop - Chuyên cung cấp tài nguyên marketing');
     this.seoService.setMetaDescription('Cung cấp tài khoản email uy tín, chất lượng cao cho marketing, quảng cáo.');
@@ -137,5 +102,42 @@ export class HomeComponent implements OnInit {
       image: '/assets/images/og-home.jpg',
       url: 'https://mailshop.com'
     });
+    this.loadCategories();
+
+  }
+
+  loadCategories(): void {
+    this.categoryService.list({ 
+      page: this.paginationConfig.currentPage, 
+      limit: this.paginationConfig.pageSize 
+    }).subscribe({
+      next: res => {
+        if (res.success && res.data?.content) {
+          this.categories = res.data.content;
+          // Lấy pagination info từ backend trực tiếp
+          const paginationInfo = this.paginationService.extractPaginationInfo(res.data);
+          this.paginationConfig = {
+            currentPage: paginationInfo.currentPage,
+            pageSize: paginationInfo.pageSize,
+            totalElements: paginationInfo.totalElements,
+            totalPages: paginationInfo.totalPages
+          };
+        }
+      },
+      error: err => {
+        this.notificationService.error('Error', err.error?.message || 'Failed to load categories');
+      }
+    });
+  }
+
+  onPageChange(page: number): void {
+    this.paginationConfig.currentPage = page;
+    this.loadCategories();
+  }
+
+  onPageSizeChange(size: number): void {
+    this.paginationConfig.pageSize = size;
+    this.paginationConfig.currentPage = 0;
+    this.loadCategories();
   }
 }

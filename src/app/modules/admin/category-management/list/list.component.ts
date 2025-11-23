@@ -35,14 +35,14 @@ export class CategoryListComponent implements OnInit {
         if (response.success) {
           const data = response.data;
           this.categories = this.extractCategories(data);
-          this.#notificationService.success('Success', 'Categories loaded');
+          this.#notificationService.success('Categories loaded');
         } else {
-          this.#notificationService.error('Error', response.message || 'Failed to load categories');
+          this.#notificationService.error(response.message || 'Failed to load categories');
         }
         this.loading = false;
       },
       error: (error) => {
-        this.#notificationService.error('Error', error.error?.message || 'An error occurred');
+        this.#notificationService.error(error.error?.message || 'An error occurred');
         this.loading = false;
       }
     });
@@ -84,14 +84,14 @@ export class CategoryListComponent implements OnInit {
       this.#categoryService.delete(id).subscribe({
         next: (response) => {
           if (response.success) {
-            this.#notificationService.success('Success', 'Category deleted successfully');
+            this.#notificationService.success('Category deleted successfully');
             this.loadCategories();
           } else {
-            this.#notificationService.error('Error', response.message || 'Failed to delete category');
+            this.#notificationService.error(response.message || 'Failed to delete category');
           }
         },
         error: (error) => {
-          this.#notificationService.error('Error', error.error?.message || 'An error occurred');
+          this.#notificationService.error(error.error?.message || 'An error occurred');
         }
       });
     }

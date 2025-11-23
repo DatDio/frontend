@@ -17,7 +17,6 @@ export class UserService {
 
   // ===== SEARCH USERS =====
   list(filter?: UserFilter): Observable<ApiResponse<PaginatedResponse<User>>> {
-    this.loaderService.show();
 
     const params = this.createUserFilter(filter);
 
@@ -25,9 +24,6 @@ export class UserService {
       .get<ApiResponse<PaginatedResponse<User>>>(AdminUserApi.SEARCH, {
         params: params
       })
-      .pipe(
-        finalize(() => this.loaderService.hide())
-      );
   }
 
   // ===== GET BY ID =====
@@ -64,15 +60,15 @@ export class UserService {
   }
 
   // ===== DELETE MULTIPLE =====
-  delete(ids: number[]): Observable<ApiResponse<void>> {
-    this.loaderService.show();
+ delete(id: number): Observable<ApiResponse<void>> {
+  this.loaderService.show();
 
-    return this.httpClient
-      .post<ApiResponse<void>>(AdminUserApi.DELETE, { ids: ids.join(',') })
-      .pipe(
-        finalize(() => this.loaderService.hide())
-      );
-  }
+  return this.httpClient
+    .delete<ApiResponse<void>>(`${AdminUserApi.DELETE}/${id}`)
+    .pipe(
+      finalize(() => this.loaderService.hide())
+    );
+}
 
   // ===== BULK UPDATE STATUS =====
   bulkUpdateStatus(ids: number[], status: string): Observable<ApiResponse<void>> {

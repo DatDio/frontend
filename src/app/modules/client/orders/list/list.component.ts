@@ -52,7 +52,7 @@ export class ClientOrderListComponent implements OnInit {
         },
         error: (error: any) => {
           console.error('Error loading orders:', error);
-          this.notificationService.error('Lỗi', 'Lỗi khi tải danh sách đơn hàng');
+          this.notificationService.error('Lỗi khi tải danh sách đơn hàng');
         }
       });
   }

@@ -25,7 +25,7 @@ export class NotificationService {
 
   show(notification: ToastNotification): void {
     this.notificationSubject.next(notification);
-    
+
     // Auto hide after duration (default 3000ms)
     const duration = notification.duration || 3000;
     setTimeout(() => {
@@ -33,9 +33,9 @@ export class NotificationService {
     }, duration);
   }
 
-  success(title: string, content: string, duration?: number): void {
+  success(content: string, duration: number = 3000): void {
     this.show({
-      title,
+      title: 'Thành công',
       content,
       status: NOTI_TYPE_ENUM.SUCCESS,
       isShowBtn: false,
@@ -43,9 +43,9 @@ export class NotificationService {
     });
   }
 
-  error(title: string, content: string, duration?: number): void {
+  error(content: string, duration: number = 4000): void {
     this.show({
-      title,
+      title: 'Lỗi',
       content,
       status: NOTI_TYPE_ENUM.ERROR,
       isShowBtn: false,
@@ -53,9 +53,9 @@ export class NotificationService {
     });
   }
 
-  warning(title: string, content: string, duration?: number): void {
+  warning(content: string, duration: number = 3500): void {
     this.show({
-      title,
+      title: 'Cảnh báo',
       content,
       status: NOTI_TYPE_ENUM.WARNING,
       isShowBtn: false,
@@ -63,15 +63,16 @@ export class NotificationService {
     });
   }
 
-  info(title: string, content: string, duration?: number): void {
+  info(content: string, duration: number = 3000): void {
     this.show({
-      title,
+      title: 'Thông tin',
       content,
       status: NOTI_TYPE_ENUM.INFO,
       isShowBtn: false,
       duration
     });
   }
+
 
   hide(): void {
     this.notificationSubject.next(null);

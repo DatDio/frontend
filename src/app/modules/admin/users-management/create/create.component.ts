@@ -44,7 +44,7 @@ export class UsersCreateComponent implements OnInit {
 
   onSubmit(): void {
     if (this.form.invalid) {
-      this.#notificationService.warning('Warning', 'Please fill in all required fields correctly');
+      this.#notificationService.warning( 'Please fill in all required fields correctly');
       return;
     }
 
@@ -65,15 +65,15 @@ export class UsersCreateComponent implements OnInit {
     this.#userService.create(request).subscribe({
       next: (response) => {
         if (response.success) {
-          this.#notificationService.success('Success', 'User created successfully');
+          this.#notificationService.success( 'User created successfully');
           this.#router.navigate(['/admin/users']);
         } else {
-          this.#notificationService.error('Error', response.message || 'Failed to create user');
+          this.#notificationService.error( response.message || 'Failed to create user');
         }
         this.loading = false;
       },
       error: (error) => {
-        this.#notificationService.error('Error', error.error?.message || 'An error occurred while creating user');
+        this.#notificationService.error( error.error?.message || 'An error occurred while creating user');
         this.loading = false;
       }
     });

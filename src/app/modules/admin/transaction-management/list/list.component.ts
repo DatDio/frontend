@@ -1,78 +1,159 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TransactionResponse } from '../../../../core/models/transaction.model';
 import { TransactionService } from '../../../../core/services/transaction.service';
 import { NotificationService } from '../../../../core/services/notification.service';
-import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
+import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
+import { PaginationService } from '../../../../shared/services/pagination.service';
+
+interface TransactionSearchFilter {
+  transactionCode?: string;
+  status?: string;
+  minAmount?: number;
+  maxAmount?: number;
+  pagination?: any;
+}
 
 @Component({
   selector: 'app-transaction-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, PaginationComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, PaginationComponent],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss'
 })
 export class TransactionListComponent implements OnInit {
   private readonly transactionService = inject(TransactionService);
   private readonly notificationService = inject(NotificationService);
+  private readonly fb = inject(FormBuilder);
+  private readonly paginationService = inject(PaginationService);
 
   transactions: TransactionResponse[] = [];
-  currentPage = 0;
-  pageSize = 10;
-  totalPages = 0;
-  totalElements = 0;
+  
+  paginationConfig: PaginationConfig = {
+    currentPage: 0,
+    totalPages: 1,
+    pageSize: 10,
+    totalElements: 0
+  };
 
-  searchCode = '';
-  searchStatus = '';
-  minAmount = '';
-  maxAmount = '';
+  dataFormSearch: TransactionSearchFilter = {};
+  formSearch!: FormGroup;
 
   ngOnInit(): void {
+    this.initForm();
     this.loadTransactions();
   }
 
-  loadTransactions(): void {
-    this.transactionService
-      .list({
-        page: this.currentPage,
-        limit: this.pageSize,
-        sort: 'id,desc',
-        transactionCode: this.searchCode || undefined,
-        status: this.searchStatus || undefined,
-        minAmount: this.minAmount ? Number.parseFloat(this.minAmount) : undefined,
-        maxAmount: this.maxAmount ? Number.parseFloat(this.maxAmount) : undefined
-      })
-      .subscribe({
-        next: (response: any) => {
-          if (response.success && response.data?.content) {
-            this.transactions = response.data.content;
-            this.totalElements = response.data.totalElements || 0;
-            this.totalPages = response.data.totalPages || 0;
-          }
-        },
-        error: (error: any) => {
-          console.error('Error loading transactions:', error);
-          this.notificationService.error('Lỗi', 'Lỗi khi tải danh sách giao dịch');
+  private initForm(): void {
+    this.formSearch = this.createSearchForm();
+  }
+
+  private createSearchForm(): FormGroup {
+    return this.fb.group({
+      transactionCode: new FormControl(''),
+      status: new FormControl(''),
+      minAmount: new FormControl(''),
+      maxAmount: new FormControl(''),
+      searchPage: new FormControl('')
+    });
+  }
+
+  handleSearch(): void {
+    this.paginationConfig.currentPage = 0;
+    this.dataFormSearch = {
+      ...this.formSearch.getRawValue(),
+      pagination: this.paginationConfig
+    };
+    this.loadTransactions();
+  }
+
+  handleSearchPage(): void {
+    const pageNum = this.formSearch.get('searchPage')?.value;
+    if (!pageNum) {
+      return;
+    }
+    
+    if (pageNum > this.paginationConfig.totalPages || pageNum < 1) {
+      this.notificationService.error(`Page must be between 1 and ${this.paginationConfig.totalPages}`);
+    } else {
+      this.paginationConfig.currentPage = pageNum - 1;
+      this.dataFormSearch = {
+        ...this.formSearch.getRawValue(),
+        pagination: this.paginationConfig
+      };
+      this.loadTransactions();
+      this.formSearch.get('searchPage')?.reset();
+    }
+  }
+
+  selectPageSize(pageSize: number): void {
+    this.paginationConfig.currentPage = 0;
+    this.paginationConfig.pageSize = pageSize;
+    this.dataFormSearch = {
+      ...this.formSearch.getRawValue(),
+      pagination: this.paginationConfig
+    };
+    this.loadTransactions();
+  }
+
+  handlePageChange(page: number): void {
+    this.paginationConfig.currentPage = page;
+    this.dataFormSearch = {
+      ...this.formSearch.getRawValue(),
+      pagination: this.paginationConfig
+    };
+    this.loadTransactions();
+  }
+
+  clearForm(): void {
+    this.formSearch = this.createSearchForm();
+    this.paginationConfig.currentPage = 0;
+    this.dataFormSearch = {};
+    this.loadTransactions();
+  }
+
+  private loadTransactions(): void {
+    const params: any = {
+      page: this.paginationConfig.currentPage,
+      limit: this.paginationConfig.pageSize,
+      sort: 'id,desc'
+    };
+    
+    if (this.dataFormSearch.transactionCode) {
+      params.transactionCode = this.dataFormSearch.transactionCode;
+    }
+    if (this.dataFormSearch.status) {
+      params.status = this.dataFormSearch.status;
+    }
+    if (this.dataFormSearch.minAmount) {
+      params.minAmount = Number.parseFloat(this.dataFormSearch.minAmount as any);
+    }
+    if (this.dataFormSearch.maxAmount) {
+      params.maxAmount = Number.parseFloat(this.dataFormSearch.maxAmount as any);
+    }
+
+    this.transactionService.list(params).subscribe({
+      next: (response: any) => {
+        if (response.success && response.data?.content) {
+          this.transactions = response.data.content;
+          
+          // Extract pagination từ backend
+          const paginationInfo = this.paginationService.extractPaginationInfo(response.data);
+          this.paginationConfig = {
+            currentPage: paginationInfo.currentPage,
+            pageSize: paginationInfo.pageSize,
+            totalElements: paginationInfo.totalElements,
+            totalPages: paginationInfo.totalPages
+          };
         }
-      });
-  }
-
-  onSearch(): void {
-    this.currentPage = 0;
-    this.loadTransactions();
-  }
-
-  onPageChange(page: number): void {
-    this.currentPage = page;
-    this.loadTransactions();
-  }
-
-  onPageSizeChange(newSize: number): void {
-    this.pageSize = newSize;
-    this.currentPage = 0;
-    this.loadTransactions();
+      },
+      error: (error: any) => {
+        console.error('Error loading transactions:', error);
+        this.notificationService.error('Lỗi khi tải danh sách giao dịch');
+      }
+    });
   }
 
   getTypeLabel(type: string): string {
@@ -98,20 +179,20 @@ export class TransactionListComponent implements OnInit {
   getStatusLabel(status: string): string {
     const statusMap: { [key: string]: string } = {
       pending: 'Chờ xử lý',
+      processing: 'Đang xử lý',
       completed: 'Hoàn thành',
-      failed: 'Thất bại',
-      cancelled: 'Hủy'
+      failed: 'Thất bại'
     };
     return statusMap[status] || status;
   }
 
   getStatusClass(status: string): string {
     const classMap: { [key: string]: string } = {
-      pending: 'badge-warning',
-      completed: 'badge-success',
-      failed: 'badge-danger',
-      cancelled: 'badge-secondary'
+      pending: 'bg-warning',
+      processing: 'bg-info',
+      completed: 'bg-success',
+      failed: 'bg-danger'
     };
-    return classMap[status] || 'badge-secondary';
+    return classMap[status] || 'bg-secondary';
   }
 }

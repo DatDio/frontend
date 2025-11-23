@@ -1,73 +1,112 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light client-navbar">
+<!-- ================= app-layout.component.html ================= -->
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg client-navbar">
   <div class="container">
     <a class="navbar-brand" routerLink="/">
-      <strong>MailShop</strong>
+      MailShop
     </a>
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
       <span class="navbar-toggler-icon"></span>
     </button>
+
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav ms-auto">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
         <li class="nav-item">
-          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+          <a class="nav-link" routerLink="/" routerLinkActive="active"
+            [routerLinkActiveOptions]="{exact: true}">Home</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" routerLink="/pricing" routerLinkActive="active">Tài liệu</a>
         </li>
+
         @if (authService.isAuthenticated$ | async) {
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/mail-accounts" routerLinkActive="active">My Accounts</a>
-          </li>
-          <li class="nav-item dropdown">
-            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-              {{ (authService.currentUser$ | async)?.email }}
-            </a>
-            <ul class="dropdown-menu dropdown-menu-end">
-              <li><a class="dropdown-item" routerLink="/profile">Profile</a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item" (click)="logout()" style="cursor: pointer;">Logout</a></li>
-            </ul>
-          </li>
+        <li class="nav-item d-flex align-items-center">
+          <div class="balance-info-navbar">
+            <i class="fas fa-wallet me-1"></i>
+            0 VNĐ
+          </div>
+        </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+            {{ (authService.currentUser$ | async)?.email }}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" routerLink="/profile">Profile</a></li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li><a class="dropdown-item" (click)="logout()">Logout</a></li>
+          </ul>
+        </li>
         } @else {
-          <li class="nav-item">
-            <a class="nav-link" routerLink="/auth/login">Login</a>
-          </li>
-          <li class="nav-item">
-            <a class="btn btn-primary btn-sm" routerLink="/auth/register">Sign Up</a>
-          </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/auth/login">Login</a>
+        </li>
+        <li class="nav-item">
+          <a class="btn btn-primary btn-sm" routerLink="/auth/register">Sign Up</a>
+        </li>
         }
       </ul>
     </div>
   </div>
 </nav>
 
-<main class="client-main">
+<!-- HERO SECTION -->
+<section class="hero-section" *ngIf="authService.isAuthenticated$ | async">
+  <div class="container">
+    <div class="hero-menu">
+      <a routerLink="/" class="hero-link">
+        <i class="fas fa-home"></i>
+        <span>Trang chủ</span>
+      </a>
+      <a routerLink="/profile" class="hero-link">
+        <i class="fas fa-user"></i>
+        <span>Tài khoản</span>
+      </a>
+      <a routerLink="/wallet" class="hero-link">
+        <i class="fas fa-credit-card"></i>
+        <span>Nạp tiền</span>
+      </a>
+      <a routerLink="/orders" class="hero-link">
+        <i class="fas fa-shopping-cart"></i>
+        <span>Lịch sử</span>
+      </a>
+      <a routerLink="/support" class="hero-link">
+        <i class="fas fa-headset"></i>
+        <span>Hỗ trợ</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<main class="client-main container my-4">
   <router-outlet></router-outlet>
 </main>
 
-<footer class="client-footer bg-dark text-white py-4 mt-5">
+<footer class="client-footer">
   <div class="container">
-    <div class="row">
-      <div class="col-md-4">
+    <div class="row text-center text-md-start">
+      <div class="col-md-4 mb-3">
         <h5>MailShop</h5>
-        <p>Your trusted mail account marketplace</p>
+        <p>Shop bán mail uy tín, chuyên nghiệp</p>
       </div>
-      <div class="col-md-4">
+      <div class="col-md-4 mb-3">
         <h6>Quick Links</h6>
         <ul class="list-unstyled">
-          <li><a routerLink="/" class="text-white">Home</a></li>
-          <li><a routerLink="/pricing" class="text-white">Pricing</a></li>
-          <li><a routerLink="/blog" class="text-white">Blog</a></li>
+          <li><a routerLink="/">Home</a></li>
+          <li><a routerLink="/terms-of-service">Điều khoản sử dụng</a></li>
+          <li><a routerLink="/policy">Chính sách bảo mật</a></li>
         </ul>
       </div>
-      <div class="col-md-4">
-        <h6>Contact</h6>
-        <p>Email: support&#64;mailshop.com</p>
+      <div class="col-md-4 mb-3">
+        <h6>Liên hệ</h6>
+        <p>Email: supportmailshop.com</p>
       </div>
     </div>
-    <hr class="bg-white">
-    <div class="text-center">
-      <small>&copy; 2025 MailShop. All rights reserved.</small>
-    </div>
+    <hr>
+    <div class="text-center"><small>© 2025 MailShop</small></div>
   </div>
 </footer>

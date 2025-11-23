@@ -50,7 +50,7 @@ export class ClientTransactionListComponent implements OnInit {
         },
         error: (error: any) => {
           console.error('Error loading transactions:', error);
-          this.notificationService.error('Lỗi', 'Lỗi khi tải danh sách giao dịch');
+          this.notificationService.error('Lỗi khi tải danh sách giao dịch');
         }
       });
   }

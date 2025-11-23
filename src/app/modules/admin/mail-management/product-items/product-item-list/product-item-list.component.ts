@@ -1,23 +1,25 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, ActivatedRoute } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { ProductItem } from '../../../../core/models/product-item.model';
-import { ProductItemService } from '../../../../core/services/product-item.service';
-import { NotificationService } from '../../../../core/services/notification.service';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { ProductItem } from '../../../../../core/models/product-item.model';
+import { ProductItemService } from '../../../../../core/services/product-item.service';
+import { NotificationService } from '../../../../../core/services/notification.service';
 import { BulkImportModalComponent } from '../bulk-import-modal/bulk-import-modal.component';
+import { PaginationComponent } from '../../../../../shared/components/pagination/pagination.component';
 
 @Component({
-  selector: 'app-product-detail',
+  selector: 'app-product-item-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, BulkImportModalComponent],
-  templateUrl: './product-detail.component.html',
-  styleUrl: './product-detail.component.scss'
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, BulkImportModalComponent, PaginationComponent],
+  templateUrl: './product-item-list.component.html',
+  styleUrl: './product-item-list.component.scss'
 })
-export class ProductDetailComponent implements OnInit {
+export class ProductItemListComponent implements OnInit {
   private readonly productItemService = inject(ProductItemService);
   private readonly notificationService = inject(NotificationService);
   private readonly route = inject(ActivatedRoute);
+  private readonly fb = inject(FormBuilder);
 
   productId: number | null = null;
   items: ProductItem[] = [];
@@ -26,10 +28,12 @@ export class ProductDetailComponent implements OnInit {
   totalPages = 0;
   totalElements = 0;
   showImportModal = false;
+  searchForm!: FormGroup;
 
   ngOnInit(): void {
+    this.initSearchForm();
     this.route.paramMap.subscribe((params) => {
-        const id = params.get('id');
+      const id = params.get('id');
       if (id) {
         this.productId = Number.parseInt(id, 10);
         this.loadItems();
@@ -37,15 +41,33 @@ export class ProductDetailComponent implements OnInit {
     });
   }
 
+  initSearchForm(): void {
+    this.searchForm = this.fb.group({
+      accountData: [''],
+      sold: ['']
+    });
+  }
+
   loadItems(): void {
     if (!this.productId) return;
 
+    const params: any = {
+      page: this.currentPage,
+      limit: this.pageSize,
+    };
+
+    const accountData = this.searchForm.get('accountData')?.value;
+    const sold = this.searchForm.get('sold')?.value;
+
+    if (accountData) {
+      params.accountData = accountData;
+    }
+    if (sold !== '') {
+      params.sold = sold === 'true';
+    }
+
     this.productItemService
-      .list(this.productId, {
-        page: this.currentPage,
-        limit: this.pageSize,
-        sort: 'id,desc'
-      })
+      .list(this.productId, params)
       .subscribe({
         next: (response: any) => {
           if (response.success && response.data) {
@@ -56,7 +78,7 @@ export class ProductDetailComponent implements OnInit {
         },
         error: (error: any) => {
           console.error('Error loading items:', error);
-          this.notificationService.error('Lỗi', 'Lỗi khi tải danh sách tài khoản');
+          this.notificationService.error('Lỗi khi tải danh sách tài khoản');
         }
       });
   }
@@ -75,6 +97,17 @@ export class ProductDetailComponent implements OnInit {
     }
   }
 
+  onPageChange(page: number): void {
+    this.currentPage = page;
+    this.loadItems();
+  }
+
+  onPageSizeChange(newSize: number): void {
+    this.pageSize = newSize;
+    this.currentPage = 0;
+    this.loadItems();
+  }
+
   onImportClick(): void {
     this.showImportModal = true;
   }
@@ -87,21 +120,32 @@ export class ProductDetailComponent implements OnInit {
     this.showImportModal = false;
     this.currentPage = 0;
     this.loadItems();
-    this.notificationService.success('Thành công', 'Nhập tài khoản thành công');
+    this.notificationService.success( 'Nhập tài khoản thành công');
   }
 
   onDeleteItem(id: number): void {
     if (confirm('Bạn có chắc muốn xóa tài khoản này?')) {
       this.productItemService.delete(id).subscribe({
         next: () => {
-          this.notificationService.success('Thành công', 'Xóa tài khoản thành công');
+          this.notificationService.success('Xóa tài khoản thành công');
           this.loadItems();
         },
         error: (error: any) => {
           console.error('Error deleting item:', error);
-          this.notificationService.error('Lỗi', 'Lỗi khi xóa tài khoản');
+          this.notificationService.error('Lỗi khi xóa tài khoản');
         }
       });
     }
+  }
+
+  handleSearch(): void {
+    this.currentPage = 0;
+    this.loadItems();
+  }
+
+  clearForm(): void {
+    this.searchForm.reset();
+    this.currentPage = 0;
+    this.loadItems();
   }
 }

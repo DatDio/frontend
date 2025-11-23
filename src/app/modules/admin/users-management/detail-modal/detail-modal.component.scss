@@ -1,0 +1,81 @@
+.user-detail-content {
+  padding: 10px 0;
+}
+
+.user-header {
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.user-avatar-large {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 2rem;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.user-header {
+  h4 {
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+  }
+
+  p {
+    margin: 4px 0;
+    font-size: 0.95rem;
+  }
+
+  .badge {
+    font-size: 0.85rem;
+    padding: 6px 12px;
+  }
+}
+
+.detail-item {
+  .detail-label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: #666;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+  }
+
+  .detail-value {
+    font-size: 0.95rem;
+    color: #333;
+    margin: 0;
+    word-break: break-word;
+
+    .badge {
+      display: inline-block;
+      font-size: 0.8rem;
+      padding: 4px 8px;
+    }
+  }
+}
+
+.modal-header {
+  border-bottom: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+
+  .modal-title {
+    font-weight: 600;
+    color: #333;
+  }
+}
+
+.modal-footer {
+  border-top: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+}

@@ -1,0 +1,86 @@
+<div class="modal-overlay" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h5 class="modal-title">Cập nhật sản phẩm</h5>
+      <button type="button" class="btn-close" (click)="onClose()"></button>
+    </div>
+
+    <div class="modal-body">
+      <form [formGroup]="updateForm">
+        <div class="mb-3">
+          <label for="name" class="form-label">Tên sản phẩm <span class="text-danger">*</span></label>
+          <input
+            id="name"
+            type="text"
+            class="form-control"
+            formControlName="name"
+            placeholder="Nhập tên sản phẩm...">
+          @if (updateForm.get('name')?.invalid && updateForm.get('name')?.touched) {
+            <div class="text-danger small mt-1">Tên phải ít nhất 3 ký tự</div>
+          }
+        </div>
+
+        <div class="mb-3">
+          <label for="description" class="form-label">Mô tả</label>
+          <textarea
+            id="description"
+            class="form-control"
+            formControlName="description"
+            rows="3"
+            placeholder="Nhập mô tả sản phẩm..."></textarea>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="price" class="form-label">Giá <span class="text-danger">*</span></label>
+            <input
+              id="price"
+              type="number"
+              class="form-control"
+              formControlName="price"
+              placeholder="Nhập giá..."
+              min="0">
+            @if (updateForm.get('price')?.invalid && updateForm.get('price')?.touched) {
+              <div class="text-danger small mt-1">Giá phải >= 0</div>
+            }
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="categoryId" class="form-label">Danh mục <span class="text-danger">*</span></label>
+            <select id="categoryId" class="form-select" formControlName="categoryId">
+              <option value="">-- Chọn danh mục --</option>
+              @for (category of categories; track category.id) {
+                <option [value]="category.id">{{ category.name }}</option>
+              }
+            </select>
+            @if (updateForm.get('categoryId')?.invalid && updateForm.get('categoryId')?.touched) {
+              <div class="text-danger small mt-1">Vui lòng chọn danh mục</div>
+            }
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="status" class="form-label">Trạng thái <span class="text-danger">*</span></label>
+          <select id="status" class="form-select" formControlName="status">
+            <option value="active">Hoạt động</option>
+            <option value="inactive">Vô hiệu</option>
+          </select>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="onClose()">Hủy</button>
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="onSubmit()"
+        [disabled]="isLoading">
+        @if (isLoading) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+        }
+        Cập nhật sản phẩm
+      </button>
+    </div>
+  </div>
+</div>

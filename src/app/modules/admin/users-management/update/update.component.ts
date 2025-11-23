@@ -66,12 +66,12 @@ export class UsersUpdateComponent implements OnInit {
             status: user.status || 'ACTIVE'
           });
         } else {
-          this.#notificationService.error('Error', response.message || 'Failed to load user');
+          this.#notificationService.error( response.message || 'Failed to load user');
         }
         this.loading = false;
       },
       error: (error) => {
-        this.#notificationService.error('Error', error.error?.message || 'An error occurred while loading user');
+        this.#notificationService.error(error.error?.message || 'An error occurred while loading user');
         this.loading = false;
       }
     });
@@ -79,7 +79,7 @@ export class UsersUpdateComponent implements OnInit {
 
   onSubmit(): void {
     if (this.form.invalid || !this.userId) {
-      this.#notificationService.warning('Warning', 'Please fill in all required fields correctly');
+      this.#notificationService.warning( 'Please fill in all required fields correctly');
       return;
     }
 
@@ -100,15 +100,15 @@ export class UsersUpdateComponent implements OnInit {
     this.#userService.update(request).subscribe({
       next: (response) => {
         if (response.success) {
-          this.#notificationService.success('Success', 'User updated successfully');
+          this.#notificationService.success('User updated successfully');
           this.#router.navigate(['/admin/users', this.userId]);
         } else {
-          this.#notificationService.error('Error', response.message || 'Failed to update user');
+          this.#notificationService.error( response.message || 'Failed to update user');
         }
         this.loading = false;
       },
       error: (error) => {
-        this.#notificationService.error('Error', error.error?.message || 'An error occurred while updating user');
+        this.#notificationService.error( error.error?.message || 'An error occurred while updating user');
         this.loading = false;
       }
     });

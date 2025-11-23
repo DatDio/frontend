@@ -14,20 +14,6 @@ export const routes: Routes = [
         loadComponent: () => import('./modules/client/home/home.component').then(m => m.HomeComponent)
       },
       {
-        path: 'mail-accounts',
-        canActivate: [authGuard],
-        children: [
-          {
-            path: '',
-            loadComponent: () => import('./modules/client/mail-accounts/list/list.component').then(m => m.MailAccountListComponent)
-          },
-          {
-            path: ':id',
-            loadComponent: () => import('./modules/client/mail-accounts/detail/detail.component').then(m => m.MailAccountDetailComponent)
-          }
-        ]
-      },
-      {
         path: 'orders',
         canActivate: [authGuard],
         loadComponent: () => import('./modules/client/orders/list/list.component').then(m => m.ClientOrderListComponent)
@@ -78,10 +64,6 @@ export const routes: Routes = [
             loadComponent: () => import('./modules/admin/users-management/create/create.component').then(m => m.UsersCreateComponent)
           },
           {
-            path: ':id',
-            loadComponent: () => import('./modules/admin/users-management/detail/detail.component').then(m => m.UsersDetailComponent)
-          },
-          {
             path: 'edit/:id',
             loadComponent: () => import('./modules/admin/users-management/update/update.component').then(m => m.UsersUpdateComponent)
           }
@@ -92,11 +74,11 @@ export const routes: Routes = [
         children: [
           {
             path: '',
-            loadComponent: () => import('./modules/admin/mail-management/list/list.component').then(m => m.MailManagementListComponent)
+            loadComponent: () => import('./modules/admin/mail-management/product/list/list.component').then(m => m.MailManagementListComponent)
           },
           {
             path: ':id/items',
-            loadComponent: () => import('./modules/admin/mail-management/product-item-list/product-item-list.component').then(m => m.ProductItemListComponent)
+            loadComponent: () => import('./modules/admin/mail-management/product-items/product-item-list/product-item-list.component').then(m => m.ProductItemListComponent)
           }
         ]
       },

@@ -45,7 +45,7 @@ export class CategoryModalComponent implements OnInit {
 
   onSubmit(): void {
     if (this.form.invalid) {
-      this.#notificationService.warning('Warning', 'Please fill in all required fields');
+      this.#notificationService.warning('Please fill in all required fields');
       return;
     }
 
@@ -63,15 +63,15 @@ export class CategoryModalComponent implements OnInit {
       this.#categoryService.create(request).subscribe({
         next: (response) => {
           if (response.success) {
-            this.#notificationService.success('Success', 'Category created successfully');
+            this.#notificationService.success( 'Category created successfully');
             this.closed.emit(response.data);
           } else {
-            this.#notificationService.error('Error', response.message || 'Failed to create category');
+            this.#notificationService.error( response.message || 'Failed to create category');
           }
           this.loading = false;
         },
         error: (error) => {
-          this.#notificationService.error('Error', error.error?.message || 'An error occurred');
+          this.#notificationService.error( error.error?.message || 'An error occurred');
           this.loading = false;
         }
       });
@@ -88,15 +88,15 @@ export class CategoryModalComponent implements OnInit {
       this.#categoryService.update(request).subscribe({
         next: (response) => {
           if (response.success) {
-            this.#notificationService.success('Success', 'Category updated successfully');
+            this.#notificationService.success( 'Category updated successfully');
             this.closed.emit(response.data);
           } else {
-            this.#notificationService.error('Error', response.message || 'Failed to update category');
+            this.#notificationService.error( response.message || 'Failed to update category');
           }
           this.loading = false;
         },
         error: (error) => {
-          this.#notificationService.error('Error', error.error?.message || 'An error occurred');
+          this.#notificationService.error( error.error?.message || 'An error occurred');
           this.loading = false;
         }
       });

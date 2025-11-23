@@ -1,146 +1,80 @@
 <div class="home-page">
-  <!-- Hero Section with Navigation Menu -->
-  <section class="hero-section">
-    <div class="container-fluid hero-top">
-      <div class="nav-menu">
-        <a href="#" class="nav-link">
-          <i class="fas fa-home me-2"></i> Trang chủ
-        </a>
-        <a href="#" class="nav-link">
-          <i class="fas fa-info-circle me-2"></i> Thông tin tài khoản
-        </a>
-        <a href="#" class="nav-link">
-          <i class="fas fa-credit-card me-2"></i> Nạp tiền
-        </a>
-        <a href="#" class="nav-link">
-          <i class="fas fa-shopping-cart me-2"></i> Lịch sử mua
-        </a>
-        <a href="#" class="nav-link">
-          <i class="fas fa-headset me-2"></i> Hỗ trợ
-        </a>
-      </div>
 
-      @if (isAuthenticated) {
-        <div class="user-section">
-          <div class="balance-info">
-            <div class="label">
-              <i class="fas fa-wallet me-2"></i> Số dư
-            </div>
-            <div class="amount">0 VNĐ</div>
-          </div>
-          <div class="quick-buttons">
-            <button routerLink="/orders" class="btn-quick">
-              <i class="fas fa-shopping-bag me-1"></i> Đơn hàng
-            </button>
-            <button routerLink="/transactions" class="btn-quick">
-              <i class="fas fa-history me-1"></i> Lịch sử
-            </button>
-          </div>
-        </div>
-      }
-    </div>
-
-    <div class="hero-content">
-      <div class="container">
-        <h1>Chuyên cung cấp tài nguyên marketing, quảng cáo uy tín, chất lượng cao!</h1>
-        <p>
-          Mailshop cung cấp các tài khoản email chất lượng cao cho mục đích marketing và quảng cáo.
-        </p>
-        <button class="cta-button">
-          <i class="fas fa-arrow-down me-2"></i> Bắt đầu ngay
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <!-- Service Cards Section -->
-  <section class="services-section">
+  <!-- HERO -->
+  <div class="hero-content">
     <div class="container">
-      <h2 class="section-title">Dịch vụ cấp tài nguyên</h2>
-      <div class="services-grid">
-        @for (service of services; track service.id) {
-          <div class="service-card" [ngClass]="'service-card--' + service.color">
-            <div class="icon">
-              <i [class]="'fas fa-' + service.icon"></i>
-            </div>
-            <div class="name">{{ service.name }}</div>
-            <div class="rating">
-              <i class="fas fa-star"></i> {{ service.rating }}
-            </div>
-          </div>
-        }
-      </div>
+      <h1>Chuyên cung cấp tài nguyên marketing, quảng cáo uy tín, chất lượng cao!</h1>
+      <p>
+        Mailshop cung cấp các tài khoản email chất lượng cao cho mục đích marketing và quảng cáo.
+      </p>
+      <button class="cta-button">
+        <i class="fas fa-arrow-down me-2"></i> Bắt đầu ngay
+      </button>
     </div>
-  </section>
+  </div>
 
-  <!-- Products/Pricing Section -->
+  <!-- CATEGORY + PRODUCTS -->
   <section class="products-section">
     <div class="container">
-      <!-- Product Group 1 -->
+
+      @for (category of categories; track category.id) {
+
       <div class="product-group">
+
+        <!-- TITLE CATEGORY -->
         <h3 class="group-title">
-          <i class="fas fa-envelope me-2"></i> Mail Facebook
+          <i class="fas fa-layer-group me-2"></i>
+          {{ category.name }}
         </h3>
 
+        <p class="category-desc">{{ category.description }}</p>
+
+        <!-- LIST PRODUCT -->
         <div class="product-list">
-          @for (item of productGroup1; track item.id) {
-            <div class="product-item">
-              <div class="checkbox-col">
-                <input type="checkbox">
-              </div>
-              <div class="info-col">
-                <div class="product-name">{{ item.name }}</div>
-                <div class="product-desc">{{ item.description }}</div>
-              </div>
-              <div class="duration-col">{{ item.duration }}</div>
-              <div class="price-col">
-                <div class="price">{{ item.price }}</div>
-              </div>
-              <div class="qty-col">
-                <input type="number" class="qty-input" [value]="item.quantity" disabled>
-              </div>
-              <div class="action-col">
-                <button class="buy-btn">
-                  <i class="fas fa-plus me-1"></i> Mua
-                </button>
-              </div>
+
+          @for (product of category.products; track product.id) {
+
+          <div class="product-item">
+
+            <div class="info-col">
+              <div class="product-name">{{ product.name }}</div>
+              <div class="product-desc">{{ product.description }}</div>
+            </div>
+
+            <div class="price-col">
+              <div class="price">{{ product.price | number }} VNĐ</div>
+            </div>
+
+            <div class="action-col">
+              <button class="buy-btn">
+                <i class="fas fa-plus me-1"></i> Mua
+              </button>
+            </div>
+
+          </div>
+
+          }
+
+          @if (category.products.length === 0) {
+            <div class="empty-product">
+              Chưa có sản phẩm trong danh mục này
             </div>
           }
+
         </div>
       </div>
 
-      <!-- Product Group 2 -->
-      <div class="product-group">
-        <h3 class="group-title">
-          <i class="fas fa-envelope me-2"></i> Mail PVA
-        </h3>
+      }
 
-        <div class="product-list">
-          @for (item of productGroup2; track item.id) {
-            <div class="product-item">
-              <div class="checkbox-col">
-                <input type="checkbox">
-              </div>
-              <div class="info-col">
-                <div class="product-name">{{ item.name }}</div>
-                <div class="product-desc">{{ item.description }}</div>
-              </div>
-              <div class="duration-col">{{ item.duration }}</div>
-              <div class="price-col">
-                <div class="price">{{ item.price }}</div>
-              </div>
-              <div class="qty-col">
-                <input type="number" class="qty-input" [value]="item.quantity" disabled>
-              </div>
-              <div class="action-col">
-                <button class="buy-btn">
-                  <i class="fas fa-plus me-1"></i> Mua
-                </button>
-              </div>
-            </div>
-          }
-        </div>
+      <!-- PAGINATION -->
+      <div class="pagination-wrapper mt-5">
+        <app-pagination 
+          [config]="paginationConfig"
+          (pageChange)="onPageChange($event)"
+          (pageSizeChange)="onPageSizeChange($event)">
+        </app-pagination>
       </div>
+
     </div>
   </section>
 </div>

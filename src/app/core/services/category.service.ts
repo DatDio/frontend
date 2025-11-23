@@ -6,6 +6,7 @@ import { LoaderService } from './loader.service';
 import { Category, CategoryCreate, CategoryFilter, CategoryUpdate } from '../models/category.model';
 import { ApiResponse, PaginatedResponse } from '../models/common.model';
 import { AdminCategoryApi } from '../../Utils/apis/categories/admin-category.api';
+import { CategoryApi } from '../../Utils/apis/categories/client-category.api';
 
 @Injectable({
     providedIn: 'root'
@@ -23,7 +24,7 @@ export class CategoryService {
         const params = this.createCategoryFilter(filter);
 
         return this.httpClient
-            .get<ApiResponse<PaginatedResponse<Category>>>(AdminCategoryApi.SEARCH, {
+            .get<ApiResponse<PaginatedResponse<Category>>>(CategoryApi.SEARCH, {
                 params: params
             })
             .pipe(
@@ -40,13 +41,14 @@ export class CategoryService {
         if (filter.name) params = params.set('name', filter.name);
         if (filter.status) params = params.set('status', filter.status);
 
-        params = params
-            .set('page', (filter.page ?? null).toString())
-            .set('limit', (filter.limit ?? null).toString())
-            .set('sort', filter.sort ?? 'createdAt,desc');
+        if (filter.page != null) params = params.set('page', filter.page.toString());
+        if (filter.limit != null) params = params.set('limit', filter.limit.toString());
+
+        //params = params.set('sort', filter.sort ?? 'createdAt,desc');
 
         return params;
     }
+
     /**
      * Get category by ID
      */

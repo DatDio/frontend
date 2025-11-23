@@ -3,6 +3,8 @@ import { CommonApi } from "../commom.api";
 export class AdminProductApi {
     public static readonly BASE = CommonApi.ADMIN_CONTEXT_PATH + '/products';
 
+    public static readonly LIST = AdminProductApi.BASE;
+
     public static readonly CREATE = AdminProductApi.BASE + '/create';
     
     public static readonly UPDATE = (id: number) =>

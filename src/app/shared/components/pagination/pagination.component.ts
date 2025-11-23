@@ -1,6 +1,7 @@
-import { Component, Input, Output, EventEmitter, OnInit, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { PaginationService } from '../../services/pagination.service';
 
 export interface PaginationConfig {
   currentPage: number;
@@ -21,7 +22,7 @@ export interface PageSizeOption {
   templateUrl: './pagination.component.html',
   styleUrl: './pagination.component.scss'
 })
-export class PaginationComponent implements OnInit {
+export class PaginationComponent implements OnInit, OnChanges {
   @Input() config: PaginationConfig = {
     currentPage: 0,
     totalPages: 1,
@@ -39,14 +40,32 @@ export class PaginationComponent implements OnInit {
   @Output() pageSizeChange = new EventEmitter<number>();
 
   private readonly fb = inject(FormBuilder);
+  private readonly paginationService = inject(PaginationService);
+  
   formSearch!: FormGroup;
   searchPageInput = '';
+  visiblePages: number[] = [];
 
   ngOnInit(): void {
     this.formSearch = this.fb.group({
       pageSize: [this.config.pageSize],
       searchPage: ['']
     });
+    this.updateVisiblePages();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['config']) {
+      this.updateVisiblePages();
+    }
+  }
+
+  private updateVisiblePages(): void {
+    this.visiblePages = this.paginationService.getVisiblePages(
+      this.config.currentPage,
+      this.config.totalPages,
+      5
+    );
   }
 
   onPreviousPage(): void {
@@ -79,23 +98,12 @@ export class PaginationComponent implements OnInit {
     }
   }
 
-  getVisiblePages(): number[] {
-    const pages: number[] = [];
-    const maxVisible = 5;
-    const half = Math.floor(maxVisible / 2);
-    
-    let start = Math.max(0, this.config.currentPage - half);
-    let end = Math.min(this.config.totalPages, start + maxVisible);
-    
-    if (end - start < maxVisible) {
-      start = Math.max(0, end - maxVisible);
-    }
+  shouldShowStartEllipsis(): boolean {
+    return this.paginationService.shouldShowStartEllipsis(this.visiblePages);
+  }
 
-    for (let i = start; i < end; i++) {
-      pages.push(i);
-    }
-
-    return pages;
+  shouldShowEndEllipsis(): boolean {
+    return this.paginationService.shouldShowEndEllipsis(this.visiblePages, this.config.totalPages);
   }
 
   getPageSizeLabel(): string {
