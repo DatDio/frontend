@@ -1,63 +1,77 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CategoryService } from '../../../../core/services/category.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { Category } from '../../../../core/models/category.model';
 import { CategoryModalComponent } from '../category-modal/category-modal.component';
+import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
+import { PaginationService } from '../../../../shared/services/pagination.service';
+import { ActiveStatusSelectComponent } from '../../../../shared/components/active-status-select/active-status-select.component';
 
 @Component({
   selector: 'app-category-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, CategoryModalComponent],
+  imports: [CommonModule, ReactiveFormsModule, CategoryModalComponent, PaginationComponent, ActiveStatusSelectComponent],
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss']
 })
 export class CategoryListComponent implements OnInit {
   readonly #categoryService = inject(CategoryService);
   readonly #notificationService = inject(NotificationService);
+  readonly #fb = inject(FormBuilder);
+  readonly #paginationService = inject(PaginationService);
 
   categories: Category[] = [];
   loading = true;
   showModal = false;
   modalMode: 'create' | 'update' = 'create';
   selectedCategory: Category | null = null;
+  searchForm!: FormGroup;
+
+  paginationConfig: PaginationConfig = {
+    currentPage: 0,
+    totalPages: 1,
+    pageSize: 10,
+    totalElements: 0
+  };
 
   ngOnInit(): void {
+    this.initSearchForm();
     this.loadCategories();
+  }
+
+  private initSearchForm(): void {
+    this.searchForm = this.#fb.group({
+      name: [''],
+      status: ['']
+    });
   }
 
   loadCategories(): void {
     this.loading = true;
+    const filter = {
+      name: this.searchForm.get('name')?.value || undefined,
+      status: this.searchForm.get('status')?.value || undefined,
+      page: this.paginationConfig.currentPage,
+      limit: this.paginationConfig.pageSize
+    };
 
-    this.#categoryService.list().subscribe({
+    this.#categoryService.list(filter).subscribe({
       next: (response) => {
         if (response.success) {
-          const data = response.data;
-          this.categories = this.extractCategories(data);
-          this.#notificationService.success('Categories loaded');
+          this.categories = response.data.content || [];
+          this.paginationConfig = this.#paginationService.extractPaginationInfo(response.data);
         } else {
-          this.#notificationService.error(response.message || 'Failed to load categories');
+          this.#notificationService.error(response.message || 'Có lỗi xảy ra khi tải danh mục');
         }
         this.loading = false;
       },
       error: (error) => {
-        this.#notificationService.error(error.error?.message || 'An error occurred');
+        this.#notificationService.error(error.error?.message || 'Có lỗi xảy ra khi tải danh mục');
         this.loading = false;
       }
     });
-  }
-
-  private extractCategories(data: any): Category[] {
-    if (Array.isArray(data)) {
-      return data;
-    }
-    if (data && typeof data === 'object') {
-      if ('items' in data) {
-        return data.items as Category[];
-      }
-    }
-    return [];
   }
 
   openCreateModal(): void {
@@ -95,5 +109,27 @@ export class CategoryListComponent implements OnInit {
         }
       });
     }
+  }
+
+  handleSearch(): void {
+    this.paginationConfig.currentPage = 0;
+    this.loadCategories();
+  }
+
+  clearForm(): void {
+    this.searchForm.reset();
+    this.paginationConfig.currentPage = 0;
+    this.loadCategories();
+  }
+
+  handlePageChange(page: number): void {
+    this.paginationConfig.currentPage = page;
+    this.loadCategories();
+  }
+
+  selectPageSize(pageSize: number): void {
+    this.paginationConfig.pageSize = pageSize;
+    this.paginationConfig.currentPage = 0;
+    this.loadCategories();
   }
 }

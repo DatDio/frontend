@@ -19,7 +19,6 @@ export class CategoryService {
      * Get list of categories
      */
     list(filter?: CategoryFilter): Observable<ApiResponse<PaginatedResponse<Category>>> {
-        this.loaderService.show();
 
         const params = this.createCategoryFilter(filter);
 
@@ -27,9 +26,6 @@ export class CategoryService {
             .get<ApiResponse<PaginatedResponse<Category>>>(CategoryApi.SEARCH, {
                 params: params
             })
-            .pipe(
-                finalize(() => this.loaderService.hide())
-            );
     }
 
     // ===== FILTER BUILDER =====

@@ -11,6 +11,7 @@ import { PaginationComponent, PaginationConfig } from '../../../../../shared/com
 import { PaginationService } from '../../../../../shared/services/pagination.service';
 import { ProductCreateModalComponent } from '../create-modal/create-modal.component';
 import { ProductUpdateModalComponent } from '../update-modal/update-modal.component';
+import { ActiveStatusSelectComponent } from '../../../../../shared/components/active-status-select/active-status-select.component';
 
 interface ProductSearchFilter {
   name?: string;
@@ -29,7 +30,8 @@ interface ProductSearchFilter {
     ReactiveFormsModule,
     PaginationComponent,
     ProductCreateModalComponent,
-    ProductUpdateModalComponent
+    ProductUpdateModalComponent,
+    ActiveStatusSelectComponent
   ],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss'

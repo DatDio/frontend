@@ -17,7 +17,9 @@
           <ul class="dropdown-menu dropdown-menu-end">
             <li><a class="dropdown-item" routerLink="/admin/profile">Profile</a></li>
             <li><a class="dropdown-item" routerLink="/admin/settings">Settings</a></li>
-            <li><hr class="dropdown-divider"></li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
             <li><a class="dropdown-item" (click)="logout()" style="cursor: pointer;">Logout</a></li>
           </ul>
         </li>
@@ -31,23 +33,32 @@
       <nav class="nav flex-column">
         <a class="nav-link" routerLink="/admin/dashboard" routerLinkActive="active">
           <i class="bi bi-speedometer2"></i>
-          <span>Dashboard</span>
+          <span>Trang chủ</span>
         </a>
-        <a class="nav-link" routerLink="/admin/users-management" routerLinkActive="active">
-          <i class="bi bi-people"></i>
-          <span>Users Management</span>
-        </a>
+
         <a class="nav-link" routerLink="/admin/mail-management" routerLinkActive="active">
           <i class="bi bi-envelope"></i>
-          <span>Mail Management</span>
+          <span>Quản lý sản phẩm</span>
         </a>
-        <a class="nav-link" routerLink="/admin/analytics" routerLinkActive="active">
-          <i class="bi bi-graph-up"></i>
-          <span>Analytics</span>
+
+        <a class="nav-link" routerLink="/admin/categories-management" routerLinkActive="active">
+          <i class="bi bi-envelope"></i>
+          <span>Quản lý danh mục</span>
         </a>
+
+        <a class="nav-link" routerLink="/admin/users-management" routerLinkActive="active">
+          <i class="bi bi-people"></i>
+          <span>Quản lý người dùng</span>
+        </a>
+
+        <a class="nav-link" routerLink="/admin/orders-management" routerLinkActive="active">
+          <i class="bi bi-envelope"></i>
+          <span>Quản lý đơn hàng</span>
+        </a>
+
         <a class="nav-link" routerLink="/admin/settings" routerLinkActive="active">
           <i class="bi bi-gear"></i>
-          <span>Settings</span>
+          <span>Cài đặt</span>
         </a>
         <hr>
         <a class="nav-link" routerLink="/">

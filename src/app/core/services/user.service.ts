@@ -60,15 +60,15 @@ export class UserService {
   }
 
   // ===== DELETE MULTIPLE =====
- delete(id: number): Observable<ApiResponse<void>> {
-  this.loaderService.show();
+  delete(id: number): Observable<ApiResponse<void>> {
+    this.loaderService.show();
 
-  return this.httpClient
-    .delete<ApiResponse<void>>(`${AdminUserApi.DELETE}/${id}`)
-    .pipe(
-      finalize(() => this.loaderService.hide())
-    );
-}
+    return this.httpClient
+      .delete<ApiResponse<void>>(`${AdminUserApi.DELETE}/${id}`)
+      .pipe(
+        finalize(() => this.loaderService.hide())
+      );
+  }
 
   // ===== BULK UPDATE STATUS =====
   bulkUpdateStatus(ids: number[], status: string): Observable<ApiResponse<void>> {
@@ -100,24 +100,24 @@ export class UserService {
 
   // ===== FILTER BUILDER =====
   private createUserFilter(filter?: UserFilter): HttpParams {
-  let params = new HttpParams()
-    .set('page', '0')
-    .set('limit', '20');
+    let params = new HttpParams()
+      .set('page', '0')
+      .set('limit', '20');
 
-  if (!filter) return params;
+    if (!filter) return params;
 
-  if (filter.email) params = params.set('email', filter.email);
-  if (filter.username) params = params.set('username', filter.username);
-  if (filter.role) params = params.set('role', filter.role);
-  if (filter.status) params = params.set('status', filter.status);
+    if (filter.email) params = params.set('email', filter.email);
+    if (filter.username) params = params.set('username', filter.username);
+    if (filter.role) params = params.set('role', filter.role);
+    if (filter.status) params = params.set('status', filter.status);
 
-  params = params
-    .set('page', (filter.page ?? 0).toString())
-    .set('limit', (filter.limit ?? 10).toString())
-    .set('sort', filter.sort ?? 'createdAt,desc');
+    params = params
+      .set('page', (filter.page ?? 0).toString())
+      .set('limit', (filter.limit ?? 10).toString())
+    if (filter.sort) params = params.set('sort', filter.sort);
 
-  return params;
-}
+    return params;
+  }
 
 
 }

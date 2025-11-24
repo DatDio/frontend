@@ -1,8 +1,8 @@
 <div class="users-management">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Users Management</h1>
+    <h1>Quản lý người dùng</h1>
     <button class="btn btn-primary" (click)="onCreate()">
-      <i class="bi bi-plus-circle"></i> Add User
+      <i class="bi bi-plus-circle"></i> Thêm người dùng
     </button>
   </div>
 
@@ -20,13 +20,11 @@
             formControlName="email">
         </div>
         <div class="col-md-4">
-          <label for="statusSelect" class="form-label">Status</label>
-          <select id="statusSelect" class="form-select" formControlName="status">
-            <option value="">All Status</option>
-            <option value="ACTIVE">Active</option>
-            <option value="INACTIVE">Inactive</option>
-            <option value="PENDING">Pending</option>
-          </select>
+          <label for="statusSelect" class="form-label">Trạng thái</label>
+          <app-active-status-select
+            id="statusSelect"
+            formControlName="status">
+          </app-active-status-select>
         </div>
         <div class="col-md-4 d-flex align-items-end gap-2">
           <button 

@@ -8,6 +8,7 @@ import { PaginationComponent, PaginationConfig } from '../../../../shared/compon
 import { PaginationService } from '../../../../shared/services/pagination.service';
 import { UserDetailModalComponent } from '../detail-modal/detail-modal.component';
 import { User } from '../../../../core/models/user.model';
+import { ActiveStatusSelectComponent } from '../../../../shared/components/active-status-select/active-status-select.component';
 
 interface UserSearchFilter {
   email?: string;
@@ -18,7 +19,7 @@ interface UserSearchFilter {
 @Component({
   selector: 'app-users-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, PaginationComponent, UserDetailModalComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, PaginationComponent, UserDetailModalComponent, ActiveStatusSelectComponent],
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss']
 })

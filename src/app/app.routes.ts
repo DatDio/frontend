@@ -1,29 +1,15 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
 import { ClientLayoutComponent } from './layouts/client-layout/client-layout.component';
 import { AdminLayoutComponent } from './layouts/admin-layout/admin-layout.component';
+import { adminRoutes } from './layouts/admin-layout/admin.routes';
+import { clientRoutes } from './layouts/client-layout/client.routes';
 
 export const routes: Routes = [
   {
     path: '',
     component: ClientLayoutComponent,
-    children: [
-      {
-        path: '',
-        loadComponent: () => import('./modules/client/home/home.component').then(m => m.HomeComponent)
-      },
-      {
-        path: 'orders',
-        canActivate: [authGuard],
-        loadComponent: () => import('./modules/client/orders/list/list.component').then(m => m.ClientOrderListComponent)
-      },
-      {
-        path: 'transactions',
-        canActivate: [authGuard],
-        loadComponent: () => import('./modules/client/transactions/list/list.component').then(m => m.ClientTransactionListComponent)
-      }
-    ]
+    children: clientRoutes
   },
   {
     path: 'auth',
@@ -42,59 +28,7 @@ export const routes: Routes = [
     path: 'admin',
     component: AdminLayoutComponent,
     canActivate: [adminGuard],
-    children: [
-      {
-        path: '',
-        redirectTo: 'dashboard',
-        pathMatch: 'full'
-      },
-      {
-        path: 'dashboard',
-        loadComponent: () => import('./modules/admin/dashboard/dashboard.component').then(m => m.DashboardComponent)
-      },
-      {
-        path: 'users-management',
-        children: [
-          {
-            path: '',
-            loadComponent: () => import('./modules/admin/users-management/list/list.component').then(m => m.UsersListComponent)
-          },
-          {
-            path: 'create',
-            loadComponent: () => import('./modules/admin/users-management/create/create.component').then(m => m.UsersCreateComponent)
-          },
-          {
-            path: 'edit/:id',
-            loadComponent: () => import('./modules/admin/users-management/update/update.component').then(m => m.UsersUpdateComponent)
-          }
-        ]
-      },
-      {
-        path: 'mail-management',
-        children: [
-          {
-            path: '',
-            loadComponent: () => import('./modules/admin/mail-management/product/list/list.component').then(m => m.MailManagementListComponent)
-          },
-          {
-            path: ':id/items',
-            loadComponent: () => import('./modules/admin/mail-management/product-items/product-item-list/product-item-list.component').then(m => m.ProductItemListComponent)
-          }
-        ]
-      },
-      {
-        path: 'categories',
-        loadComponent: () => import('./modules/admin/category-management/list/list.component').then(m => m.CategoryListComponent)
-      },
-      {
-        path: 'orders',
-        loadComponent: () => import('./modules/admin/order-management/list/list.component').then(m => m.OrderListComponent)
-      },
-      {
-        path: 'transactions',
-        loadComponent: () => import('./modules/admin/transaction-management/list/list.component').then(m => m.TransactionListComponent)
-      }
-    ]
+    children: adminRoutes
   },
   {
     path: '**',

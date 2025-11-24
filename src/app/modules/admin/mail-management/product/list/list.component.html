@@ -30,11 +30,10 @@
         </div>
         <div class="col-md-3">
           <label for="statusSelect" class="form-label">Trạng thái</label>
-          <select id="statusSelect" class="form-select" formControlName="status">
-            <option value="">Tất cả trạng thái</option>
-            <option value="active">Hoạt động</option>
-            <option value="inactive">Vô hiệu</option>
-          </select>
+          <app-active-status-select
+            id="statusSelect"
+            formControlName="status">
+          </app-active-status-select>
         </div>
         <div class="col-md-3 d-flex align-items-end gap-2">
           <button 

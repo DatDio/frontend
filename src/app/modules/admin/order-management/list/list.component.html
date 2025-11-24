@@ -60,26 +60,7 @@
         <div class="col-md-6">
           <span class="text-muted">Tổng: {{ paginationConfig.totalElements }} đơn hàng</span>
         </div>
-        <div class="col-md-6 text-end">
-          <div class="d-inline-flex gap-2 align-items-center">
-            <label for="pageInput" class="form-label mb-0">Tới trang:</label>
-            <input 
-              id="pageInput"
-              type="number" 
-              class="form-control form-control-sm" 
-              style="width: 80px"
-              formControlName="searchPage"
-              placeholder="Trang #"
-              min="1"
-              [max]="paginationConfig.totalPages"
-              (keyup.enter)="handleSearchPage()">
-            <button 
-              class="btn btn-sm btn-outline-primary"
-              (click)="handleSearchPage()">
-              <i class="fas fa-arrow-right"></i>
-            </button>
-          </div>
-        </div>
+        
       </div>
     </div>
     <div class="table-responsive">
