@@ -12,7 +12,7 @@ import { PaginationService } from '../../../../../shared/services/pagination.ser
 import { ProductCreateModalComponent } from '../create-modal/create-modal.component';
 import { ProductUpdateModalComponent } from '../update-modal/update-modal.component';
 import { ActiveStatusSelectComponent } from '../../../../../shared/components/active-status-select/active-status-select.component';
-
+import { ActiveStatusBadgeComponent } from '../../../../../shared/components/active-status-badge/active-status-badge.component';
 interface ProductSearchFilter {
   name?: string;
   categoryId?: number;
@@ -31,7 +31,8 @@ interface ProductSearchFilter {
     PaginationComponent,
     ProductCreateModalComponent,
     ProductUpdateModalComponent,
-    ActiveStatusSelectComponent
+    ActiveStatusSelectComponent,
+    ActiveStatusBadgeComponent
   ],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss'

@@ -5,7 +5,7 @@ export interface Category {
   id: number;
   name: string;
   description?: string;
-  status: string;
+  status: number;
   products: Product[]; 
   createdAt: Date;
   updatedAt: Date;
@@ -13,12 +13,13 @@ export interface Category {
 export interface CategoryCreate {
   name: string;
   description?: string;
+  status?: string;
 }
 export interface CategoryUpdate {
   id: number;
   name: string;
   description?: string;
-  status: string;
+  status: number;
 }
 
 export interface CategoryFilter extends PageFilter {

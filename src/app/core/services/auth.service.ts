@@ -1,4 +1,4 @@
-import { Injectable, inject, PLATFORM_ID } from '@angular/core';
+﻿import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, Observable, of } from 'rxjs';
@@ -84,6 +84,22 @@ export class AuthService {
       );
   }
 
+  // ========= GOOGLE LOGIN =========
+  googleLogin(idToken: string): Observable<ApiResponse<LoginResponse>> {
+    this.loaderService.show();
+
+    return this.httpClient
+      .post<ApiResponse<LoginResponse>>(AuthApi.GOOGLE_LOGIN, { idToken })
+      .pipe(
+        tap(response => {
+          if (response.success && response.data) {
+            this.setAuthData(response.data);
+          }
+        }),
+        finalize(() => this.loaderService.hide())
+      );
+  }
+
   // ========= LOGOUT =========
   logout(): void {
     if (isPlatformBrowser(this.platformId)) {
@@ -109,6 +125,13 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     return this.isAuthenticatedSubject.value;
+  }
+  
+  /**
+   * Public restore để guard/component gọi lại khi reload.
+   */
+  restoreFromStorage(): void {
+    this.loadUserFromStorage();
   }
 
   getAccessToken(): string | null {
@@ -148,17 +171,23 @@ export class AuthService {
       return;
     }
 
-    const userJson = localStorage.getItem('currentUser');
     const token = localStorage.getItem('accessToken');
+    const userJson = localStorage.getItem('currentUser');
 
-    if (userJson && token) {
+    if (token) {
       try {
-        const user = JSON.parse(userJson) as User;
+        const user = userJson ? (JSON.parse(userJson) as User) : null;
         this.currentUserSubject.next(user);
         this.isAuthenticatedSubject.next(true);
       } catch {
-        this.logout();
+        // Nếu parse lỗi, chỉ xóa dữ liệu và giữ state chưa đăng nhập, tránh navigate đột ngột
+        localStorage.removeItem('currentUser');
+        this.currentUserSubject.next(null);
+        this.isAuthenticatedSubject.next(false);
       }
+    } else {
+      this.currentUserSubject.next(null);
+      this.isAuthenticatedSubject.next(false);
     }
   }
 }

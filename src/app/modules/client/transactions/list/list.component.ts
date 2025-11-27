@@ -1,114 +1,280 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { TransactionResponse } from '../../../../core/models/transaction.model';
-import { TransactionService } from '../../../../core/services/transaction.service';
+import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { TransactionFilter, TransactionResponse } from '../../../../core/models/transaction.model';
+import { TransactionService } from '../../../../core/services/wallet.service';
 import { NotificationService } from '../../../../core/services/notification.service';
-import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
+import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
+import { PaginationService } from '../../../../shared/services/pagination.service';
+import { convertToISO } from '../../../../Utils/functions/date-time-utils';
+
+declare global {
+  interface Window {
+    PayOSCheckout: any;
+  }
+}
 
 @Component({
   selector: 'app-client-transaction-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, PaginationComponent],
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    ReactiveFormsModule,
+    PaginationComponent
+  ],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss'
 })
 export class ClientTransactionListComponent implements OnInit {
+
   private readonly transactionService = inject(TransactionService);
   private readonly notificationService = inject(NotificationService);
+  private readonly fb = inject(FormBuilder);
+  private readonly paginationService = inject(PaginationService);
 
   transactions: TransactionResponse[] = [];
-  currentPage = 0;
-  pageSize = 10;
-  totalPages = 0;
-  totalElements = 0;
+  loading = true;
 
-  searchCode = '';
-  searchStatus = '';
+  paginationConfig: PaginationConfig = {
+    currentPage: 0,
+    totalPages: 1,
+    pageSize: 10,
+    totalElements: 0
+  };
+
+  dataFormSearch: TransactionFilter = {};
+  formSearch!: FormGroup;
+
+  // ========== DEPOSIT ==========
+  depositAmount: number = 10000;
 
   ngOnInit(): void {
+    this.initForm();
     this.loadTransactions();
   }
 
-  loadTransactions(): void {
-    this.transactionService
-      .list({
-        page: this.currentPage,
-        limit: this.pageSize,
-        sort: 'id,desc',
-        transactionCode: this.searchCode || undefined,
-        status: this.searchStatus || undefined
-      })
-      .subscribe({
-        next: (response: any) => {
-          if (response.success && response.data?.content) {
-            this.transactions = response.data.content;
-            this.totalElements = response.data.totalElements || 0;
-            this.totalPages = response.data.totalPages || 0;
-          }
-        },
-        error: (error: any) => {
-          console.error('Error loading transactions:', error);
-          this.notificationService.error('Lỗi khi tải danh sách giao dịch');
+  private initForm(): void {
+    this.formSearch = this.fb.group({
+      transactionCode: new FormControl(''),
+      status: new FormControl(''),
+      dateFrom: new FormControl(''),
+      dateTo: new FormControl(''),
+      searchPage: new FormControl('')
+    });
+  }
+
+  // ================== CREATE DEPOSIT ==================
+  createDeposit(): void {
+    if (!this.depositAmount || this.depositAmount < 10000) {
+      this.notificationService.error('Số tiền tối thiểu là 10.000đ');
+      return;
+    }
+
+    this.transactionService.createDeposit(this.depositAmount).subscribe({
+      next: (res: any) => {
+        console.log('✅ Backend Response:', res);
+
+        if (res.success && res.data?.checkoutUrl) {
+          this.openPayOSPopup(res.data.checkoutUrl);
+        } else {
+          this.notificationService.error('Không thể tạo giao dịch PayOS');
         }
-      });
+      },
+      error: (error) => {
+        console.error('❌ Create Deposit Error:', error);
+        this.notificationService.error(
+          error.error?.message || 'Lỗi khi tạo yêu cầu thanh toán'
+        );
+      }
+    });
   }
 
-  onSearch(): void {
-    this.currentPage = 0;
+  // ================== PAYOS POPUP ==================
+  private openPayOSPopup(checkoutUrl: string): void {
+    if (!window.PayOSCheckout) {
+      this.notificationService.error('PayOS SDK chưa được load. Vui lòng tải lại trang.');
+      return;
+    }
+
+    try {
+      const payOSConfig = {
+        RETURN_URL: "http://localhost:4200/transactions",
+        ELEMENT_ID: 'payos-modal',
+        CHECKOUT_URL: checkoutUrl,
+        embedded: false,
+
+        onSuccess: (event: any) => {
+          console.log('✅ PayOS Success:', event);
+          this.notificationService.success('Nạp tiền thành công!');
+          this.loadTransactions();
+          this.transactionService.refreshBalance();
+        },
+
+        onCancel: (event: any) => {
+          this.notificationService.warning('Bạn đã hủy thanh toán');
+
+        },
+
+        onExit: (event: any) => {
+          console.log('🚪 PayOS Exit:', event);
+        }
+      };
+
+      const { open, exit } = window.PayOSCheckout.usePayOS(payOSConfig);
+      open();
+
+    } catch (error) {
+      this.notificationService.error('Không thể mở cửa sổ thanh toán. Vui lòng thử lại.');
+    }
+  }
+
+  // ================= SEARCH =================
+  handleSearch(): void {
+    this.paginationConfig.currentPage = 0;
+    this.dataFormSearch = {
+      ...this.formSearch.getRawValue(),
+      pagination: this.paginationConfig
+    };
     this.loadTransactions();
   }
 
-  onPageChange(page: number): void {
-    this.currentPage = page;
+  handleSearchPage(): void {
+    const pageNum = this.formSearch.get('searchPage')?.value;
+    if (!pageNum) return;
+
+    if (pageNum > this.paginationConfig.totalPages || pageNum < 1) {
+      this.notificationService.error(`Page must be between 1 and ${this.paginationConfig.totalPages}`);
+    } else {
+      this.paginationConfig.currentPage = pageNum - 1;
+      this.dataFormSearch = {
+        ...this.formSearch.getRawValue(),
+        pagination: this.paginationConfig
+      };
+      this.loadTransactions();
+      this.formSearch.get('searchPage')?.reset();
+    }
+  }
+
+  selectPageSize(pageSize: number): void {
+    this.paginationConfig.currentPage = 0;
+    this.paginationConfig.pageSize = pageSize;
+    this.dataFormSearch = {
+      ...this.formSearch.getRawValue(),
+      pagination: this.paginationConfig
+    };
     this.loadTransactions();
   }
 
-  onPageSizeChange(newSize: number): void {
-    this.pageSize = newSize;
-    this.currentPage = 0;
+  handlePageChange(page: number): void {
+    this.paginationConfig.currentPage = page;
+    this.dataFormSearch = {
+      ...this.formSearch.getRawValue(),
+      pagination: this.paginationConfig
+    };
     this.loadTransactions();
   }
 
+  clearForm(): void {
+    this.formSearch.reset();
+    this.paginationConfig.currentPage = 0;
+    this.dataFormSearch = {};
+    this.loadTransactions();
+  }
+
+  // ================= LOAD DATA =================
+  private loadTransactions(): void {
+    this.loading = true;
+
+    const raw = this.dataFormSearch;
+
+    const params: any = {
+      page: this.paginationConfig.currentPage,
+      limit: this.paginationConfig.pageSize
+    };
+
+    if (raw.transactionCode) params.transactionCode = raw.transactionCode;
+    if (raw.status) params.status = raw.status;
+    if (raw.dateFrom) params.dateFrom = convertToISO(raw.dateFrom);
+    if (raw.dateTo) params.dateTo = convertToISO(raw.dateTo);
+
+    this.transactionService.list(params).subscribe({
+      next: (response) => {
+        if (response.success) {
+
+          this.transactions = response.data.content;
+
+          const p = this.paginationService.extractPaginationInfo(response.data);
+
+          this.paginationConfig = {
+            currentPage: p.currentPage,
+            pageSize: p.pageSize,
+            totalElements: p.totalElements,
+            totalPages: p.totalPages
+          };
+        } else {
+          this.notificationService.error(response.message || 'Có lỗi xảy ra');
+        }
+
+        this.loading = false;
+      },
+      error: (error) => {
+        this.notificationService.error(error.error?.message || 'Có lỗi xảy ra');
+        this.loading = false;
+      }
+    });
+  }
+
+  deleteTransaction(id: number): void {
+    this.transactionService.delete(id).subscribe({
+      next: (response: any) => {
+        if (response.success) {
+          this.loadTransactions();
+        }
+      },
+    });
+  }
+  // ================= UI HELPERS =================
   getTypeLabel(type: string): string {
-    const typeMap: { [key: string]: string } = {
+    const map: Record<string, string> = {
       deposit: 'Nạp tiền',
       withdrawal: 'Rút tiền',
       purchase: 'Mua hàng',
       refund: 'Hoàn tiền'
     };
-    return typeMap[type] || type;
+    return map[type] || type;
   }
 
   getTypeClass(type: string): string {
-    const classMap: { [key: string]: string } = {
+    const map: Record<string, string> = {
       deposit: 'badge-success',
       withdrawal: 'badge-warning',
       purchase: 'badge-danger',
       refund: 'badge-info'
     };
-    return classMap[type] || 'badge-secondary';
+    return map[type] || 'badge-secondary';
   }
 
   getStatusLabel(status: string): string {
-    const statusMap: { [key: string]: string } = {
+    const map: Record<string, string> = {
       pending: 'Chờ xử lý',
       completed: 'Hoàn thành',
       failed: 'Thất bại',
       cancelled: 'Hủy'
     };
-    return statusMap[status] || status;
+    return map[status] || status;
   }
 
   getStatusClass(status: string): string {
-    const classMap: { [key: string]: string } = {
+    const map: Record<string, string> = {
       pending: 'badge-warning',
       completed: 'badge-success',
       failed: 'badge-danger',
       cancelled: 'badge-secondary'
     };
-    return classMap[status] || 'badge-secondary';
+    return map[status] || 'badge-secondary';
   }
 
   getAmountColor(type: string): string {

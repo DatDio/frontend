@@ -1,8 +1,8 @@
 import { inject } from '@angular/core';
-import { Router, CanActivateFn } from '@angular/router';
+import { Router, CanActivateFn, UrlTree } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
-export const adminGuard: CanActivateFn = (route, state) => {
+export const adminGuard: CanActivateFn = (route, state): boolean | UrlTree => {
   const authService = inject(AuthService);
   const router = inject(Router);
 
@@ -11,10 +11,8 @@ export const adminGuard: CanActivateFn = (route, state) => {
   }
 
   if (authService.isAuthenticated()) {
-    router.navigate(['/']);
-  } else {
-    router.navigate(['/auth/login'], { queryParams: { returnUrl: state.url } });
+    return router.parseUrl('/');
   }
-  
-  return false;
+
+  return router.parseUrl(`/auth/login?returnUrl=${encodeURIComponent(state.url)}`);
 };

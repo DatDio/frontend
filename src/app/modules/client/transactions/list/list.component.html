@@ -1,88 +1,178 @@
-<div class="container py-5">
-  <div class="row mb-4">
-    <div class="col-12">
-      <h1 class="mb-2">Lịch sử giao dịch</h1>
-      <p class="text-muted">Xem chi tiết các giao dịch của bạn</p>
-    </div>
+<div class="transactions-management">
+  
+  <div id="payos-modal"></div> 
+  
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Lịch sử giao dịch</h1>
   </div>
+  
+  <div class="card deposit-card mb-5 p-4">
+    <h3 class="mb-4 text-center">Nạp tiền vào tài khoản</h3>
+    <div class="payment-form text-center">
+      
+      <div class="d-flex justify-content-center mb-4">
+        <div class="bank-box p-3 rounded d-flex align-items-center gap-3 border">
+          <i class="fas fa-credit-card text-primary-blue fa-2x"></i>
+          <strong>Thanh toán qua Ngân Hàng</strong>
+        </div>
+      </div>
 
-  <!-- Search & Filter -->
-  <div class="row mb-4">
-    <div class="col-md-4">
-      <input type="text" class="form-control" placeholder="Tìm kiếm mã giao dịch..." [(ngModel)]="searchCode">
-    </div>
-    <div class="col-md-4">
-      <select class="form-select" [(ngModel)]="searchStatus">
-        <option value="">-- Tất cả trạng thái --</option>
-        <option value="pending">Chờ xử lý</option>
-        <option value="completed">Hoàn thành</option>
-        <option value="failed">Thất bại</option>
-        <option value="cancelled">Hủy</option>
-      </select>
-    </div>
-    <div class="col-md-4">
-      <button class="btn btn-primary w-100" (click)="onSearch()">
-        <i class="fas fa-search"></i> Tìm kiếm
+      <div class="d-flex justify-content-center gap-2 align-items-center mb-4">
+        <input
+          type="number"
+          class="form-control deposit-input text-end"
+          [(ngModel)]="depositAmount"
+          placeholder="Nhập số tiền">
+
+        <span class="currency-badge">VNĐ</span>
+      </div>
+
+      <button class="btn btn-primary-action px-5 py-2 fw-bold"
+              (click)="createDeposit()">
+        Thanh toán ngay
       </button>
+
     </div>
   </div>
 
-  <!-- Transactions Table -->
-  @if (transactions.length === 0) {
-    <div class="alert alert-info" role="alert">
-      <i class="fas fa-info-circle me-2"></i>
-      Bạn chưa có giao dịch nào
-    </div>
-  } @else {
-    <div class="table-responsive bg-white rounded shadow-sm">
-      <table class="table table-hover mb-0">
-        <thead class="table-light">
-          <tr>
-            <th>Mã giao dịch</th>
-            <th>Loại</th>
-            <th>Số tiền</th>
-            <th>Trạng thái</th>
-            <th>Phương thức</th>
-            <th>Ngày tạo</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (transaction of transactions; track transaction.id) {
-            <tr>
-              <td class="fw-bold">{{ transaction.transactionCode }}</td>
-              <td>
-                <span [ngClass]="'badge ' + getTypeClass(transaction.type)">
-                  {{ getTypeLabel(transaction.type) }}
-                </span>
-              </td>
-              <td [ngClass]="'text-end fw-bold ' + getAmountColor(transaction.type)">
-                {{ transaction.type === 'withdrawal' ? '-' : '+' }}{{ transaction.amount | number: '1.0-0' }}
-              </td>
-              <td>
-                <span [ngClass]="'badge ' + getStatusClass(transaction.status)">
-                  {{ getStatusLabel(transaction.status) }}
-                </span>
-              </td>
-              <td>{{ transaction.paymentMethod || '-' }}</td>
-              <td>{{ transaction.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
-            </tr>
-          }
-        </tbody>
-      </table>
-    </div>
-  }
 
-  <!-- Pagination -->
-  @if (transactions.length > 0) {
-    <app-pagination
-      [config]="{
-        currentPage: currentPage,
-        totalPages: totalPages,
-        pageSize: pageSize,
-        totalElements: totalElements
-      }"
-      (pageChange)="onPageChange($event)"
-      (pageSizeChange)="onPageSizeChange($event)">
-    </app-pagination>
-  }
+  <div class="card search-card mb-4">
+    <div class="card-body">
+      <form [formGroup]="formSearch" class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">Mã giao dịch</label>
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Nhập mã giao dịch..."
+            formControlName="transactionCode">
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Trạng thái</label>
+          <select class="form-select" formControlName="status">
+            <option value="">-- Tất cả --</option>
+            <option value="pending">Chờ xử lý</option>
+            <option value="completed">Hoàn thành</option>
+            <option value="failed">Thất bại</option>
+            <option value="cancelled">Hủy</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Từ ngày</label>
+          <input type="datetime-local" class="form-control" formControlName="dateFrom">
+        </div>
+
+        <div class="col-md-3">
+          <label class="form-label">Đến ngày</label>
+          <input type="datetime-local" class="form-control" formControlName="dateTo">
+        </div>
+
+        <div class="col-md-6 d-flex align-items-end gap-2 mt-4">
+          <button 
+            type="button" 
+            class="btn btn-search w-50"
+            (click)="handleSearch()">
+            <i class="fas fa-search"></i> Tìm kiếm
+          </button>
+
+          <button 
+            type="button" 
+            class="btn btn-refresh w-50"
+            (click)="clearForm()">
+            <i class="fas fa-redo"></i> Làm mới
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <div class="card transaction-table-card">
+    <div class="card-header">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <span class="text-muted">
+            Tổng giao dịch: {{ paginationConfig.totalElements }}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body p-0">
+      @if (loading) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary"></div>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th style="width: 50px; text-align:center;">#</th>
+                <th>Mã GD</th>
+                <th>Loại</th>
+                <th>Số tiền</th>
+                <th>Trạng thái</th>
+                <th>Ngày tạo</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (transaction of transactions; track transaction.id; let i = $index) {
+                <tr>
+                  <td class="text-center fw-bold">
+                    {{ i + 1 + (paginationConfig.currentPage * paginationConfig.pageSize) }}
+                  </td>
+
+                  <td class="fw-semibold">
+                    {{ transaction.transactionCode }}
+                  </td>
+
+                  <td>
+                    <span class="badge" [ngClass]="getTypeClass(transaction.type)">
+                      {{ getTypeLabel(transaction.type) }}
+                    </span>
+                  </td>
+
+                  <td class="fw-bold"
+                      [ngClass]="getAmountColor(transaction.type)">
+                    {{ transaction.amount | number:'1.0-0' }} VNĐ
+                  </td>
+
+                  <td>
+                    <span class="badge" [ngClass]="getStatusClass(transaction.status)">
+                      {{ getStatusLabel(transaction.status) }}
+                    </span>
+                  </td>
+
+                  <td>
+                    {{ transaction.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                  </td>
+                </tr>
+              }
+
+              @if (transactions.length === 0) {
+                <tr>
+                  <td colspan="6" class="text-center py-4 text-muted">
+                    Không có giao dịch nào
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+
+    @if (paginationConfig.totalPages > 0) {
+      <div class="card-footer">
+        <app-pagination
+          [config]="paginationConfig"
+          (pageChange)="handlePageChange($event)"
+          (pageSizeChange)="selectPageSize($event)">
+        </app-pagination>
+      </div>
+    }
+  </div>
 </div>

@@ -1,6 +1,3 @@
-<!-- ================= app-layout.component.html ================= -->
-
-<!-- NAVBAR -->
 <nav class="navbar navbar-expand-lg client-navbar">
   <div class="container">
     <a class="navbar-brand" routerLink="/">
@@ -13,19 +10,18 @@
 
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
+        <!-- <li class="nav-item">
+          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+        </li> -->
         <li class="nav-item">
-          <a class="nav-link" routerLink="/" routerLinkActive="active"
-            [routerLinkActiveOptions]="{exact: true}">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" routerLink="/pricing" routerLinkActive="active">Tài liệu</a>
+          <a class="nav-link" routerLink="/pricing" routerLinkActive="active">Tài liệu API</a>
         </li>
 
         @if (authService.isAuthenticated$ | async) {
         <li class="nav-item d-flex align-items-center">
-          <div class="balance-info-navbar">
+          <div class="balance-info-navbar" *ngIf="authService.isAuthenticated$ | async">
             <i class="fas fa-wallet me-1"></i>
-            0 VNĐ
+            {{ balance$ | async | number }} VNĐ
           </div>
         </li>
 
@@ -43,10 +39,10 @@
         </li>
         } @else {
         <li class="nav-item">
-          <a class="nav-link" routerLink="/auth/login">Login</a>
+          <a class="nav-link" routerLink="/auth/login">Đăng nhập</a>
         </li>
         <li class="nav-item">
-          <a class="btn btn-primary btn-sm" routerLink="/auth/register">Sign Up</a>
+          <a class="btn custom-signup-btn btn-sm" routerLink="/auth/register">Đăng ký</a>
         </li>
         }
       </ul>
@@ -54,27 +50,26 @@
   </div>
 </nav>
 
-<!-- HERO SECTION -->
 <section class="hero-section" *ngIf="authService.isAuthenticated$ | async">
   <div class="container">
     <div class="hero-menu">
-      <a routerLink="/" class="hero-link">
+      <a routerLink="/" class="hero-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <i class="fas fa-home"></i>
         <span>Trang chủ</span>
       </a>
-      <a routerLink="/profile" class="hero-link">
+      <a routerLink="/profile" class="hero-link" routerLinkActive="active">
         <i class="fas fa-user"></i>
         <span>Tài khoản</span>
       </a>
-      <a routerLink="/wallet" class="hero-link">
+      <a routerLink="/transactions" class="hero-link" routerLinkActive="active">
         <i class="fas fa-credit-card"></i>
         <span>Nạp tiền</span>
       </a>
-      <a routerLink="/orders" class="hero-link">
+      <a routerLink="/orders" class="hero-link" routerLinkActive="active">
         <i class="fas fa-shopping-cart"></i>
-        <span>Lịch sử</span>
+        <span>Lịch sử mua hàng</span>
       </a>
-      <a routerLink="/support" class="hero-link">
+      <a routerLink="/support" class="hero-link" routerLinkActive="active">
         <i class="fas fa-headset"></i>
         <span>Hỗ trợ</span>
       </a>

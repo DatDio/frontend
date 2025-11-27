@@ -1,4 +1,4 @@
-<div class="users-management">
+﻿<div class="users-management">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Quản lý người dùng</h1>
     <button class="btn btn-primary" (click)="onCreate()">
@@ -6,7 +6,6 @@
     </button>
   </div>
 
-  <!-- Search Form -->
   <div class="card mb-3">
     <div class="card-body">
       <form [formGroup]="formSearch" class="row g-3">
@@ -16,7 +15,7 @@
             id="emailInput"
             type="email"
             class="form-control"
-            placeholder="Search by email..."
+            placeholder="Tìm kiếm theo email..."
             formControlName="email">
         </div>
         <div class="col-md-4">
@@ -31,13 +30,13 @@
             type="button"
             class="btn btn-primary w-50"
             (click)="handleSearch()">
-            <i class="bi bi-search"></i> Search
+            <i class="bi bi-search"></i> Tìm kiếm
           </button>
           <button 
             type="button"
             class="btn btn-outline-secondary w-50"
             (click)="clearForm()">
-            <i class="bi bi-arrow-clockwise"></i> Clear
+            <i class="bi bi-arrow-clockwise"></i> Làm mới
           </button>
         </div>
       </form>
@@ -48,18 +47,18 @@
     <div class="card-header">
       <div class="row align-items-center">
         <div class="col-md-6">
-          <span class="text-muted">Total: {{ paginationConfig.totalElements }} users</span>
+          <span class="text-muted">Tổng số: {{ paginationConfig.totalElements }} người dùng</span>
         </div>
         <div class="col-md-6 text-end">
           <div class="d-inline-flex gap-2 align-items-center">
-            <label for="pageInput" class="form-label mb-0">Go to page:</label>
+            <label for="pageInput" class="form-label mb-0">Đến trang:</label>
             <input 
               id="pageInput"
               type="number" 
               class="form-control form-control-sm" 
               style="width: 80px"
               formControlName="searchPage"
-              placeholder="Page #"
+              placeholder="Trang..."
               min="1"
               [max]="paginationConfig.totalPages"
               (keyup.enter)="handleSearchPage()">
@@ -83,12 +82,12 @@
             <thead>
               <tr>
                 <th style="width: 50px; text-align: center;">STT</th>
-                <th>User</th>
+                <th>Người dùng</th>
                 <th>Email</th>
-                <th>Roles</th>
-                <th>Status</th>
-                <th>Joined</th>
-                <th style="width: 120px; text-align: center;">Actions</th>
+                <th>Vai trò</th>
+                <th>Trạng thái</th>
+                <th>Ngày tham gia</th>
+                <th style="width: 120px; text-align: center;">Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -115,20 +114,18 @@
                     }
                   </td>
                   <td>
-                    <span class="badge" [ngClass]="user.status === 'ACTIVE' ? 'bg-success' : 'bg-warning'">
-                      {{ user.status }}
-                    </span>
+                      <app-active-status-badge [status]="user.status"></app-active-status-badge>
                   </td>
-                  <td>{{ user.createdAt | date: 'MMM d, y' }}</td>
+                  <td>{{ user.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
                   <td style="text-align: center;">
                     <div class="action-buttons">
-                      <button (click)="onView(user.id)" class="btn btn-icon btn-primary" title="View" data-bs-toggle="tooltip">
+                      <button (click)="onView(user.id)" class="icon-btn info" title="Xem chi tiết" data-bs-toggle="tooltip">
                         <i class="bi bi-eye"></i>
                       </button>
-                      <button (click)="onEdit(user.id)" class="btn btn-icon btn-info" title="Edit" data-bs-toggle="tooltip">
+                      <button (click)="onEdit(user.id)" class="icon-btn warning" title="Chỉnh sửa" data-bs-toggle="tooltip">
                         <i class="bi bi-pencil"></i>
                       </button>
-                      <button (click)="deleteUser(user.id)" class="btn btn-icon btn-danger" title="Delete" data-bs-toggle="tooltip">
+                      <button (click)="deleteUser(user.id)" class="icon-btn danger" title="Xóa" data-bs-toggle="tooltip">
                         <i class="bi bi-trash"></i>
                       </button>
                     </div>
@@ -139,7 +136,7 @@
               @if (users.length === 0) {
                 <tr>
                   <td colspan="7" class="text-center py-4 text-muted">
-                    No users found
+                    Không tìm thấy người dùng nào
                   </td>
                 </tr>
               }
@@ -149,7 +146,6 @@
       }
     </div>
 
-    <!-- Pagination -->
     @if (paginationConfig.totalPages > 0) {
       <div class="card-footer">
         <app-pagination 
@@ -162,5 +158,4 @@
   </div>
 </div>
 
-<!-- User Detail Modal -->
 <app-user-detail-modal #userDetailModal></app-user-detail-modal>

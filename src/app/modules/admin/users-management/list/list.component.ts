@@ -9,7 +9,7 @@ import { PaginationService } from '../../../../shared/services/pagination.servic
 import { UserDetailModalComponent } from '../detail-modal/detail-modal.component';
 import { User } from '../../../../core/models/user.model';
 import { ActiveStatusSelectComponent } from '../../../../shared/components/active-status-select/active-status-select.component';
-
+import { ActiveStatusBadgeComponent } from '../../../../shared/components/active-status-badge/active-status-badge.component';
 interface UserSearchFilter {
   email?: string;
   status?: string;
@@ -19,7 +19,7 @@ interface UserSearchFilter {
 @Component({
   selector: 'app-users-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, PaginationComponent, UserDetailModalComponent, ActiveStatusSelectComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, PaginationComponent, UserDetailModalComponent, ActiveStatusSelectComponent,ActiveStatusBadgeComponent],
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss']
 })

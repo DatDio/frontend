@@ -1,91 +1,158 @@
-<div class="container py-5">
-  <div class="row mb-4">
-    <div class="col-12">
-      <h1 class="mb-2">Đơn hàng của tôi</h1>
-      <p class="text-muted">Quản lý và xem chi tiết các đơn hàng của bạn</p>
+﻿<div class="orders-management">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Đơn hàng của tôi</h1>
+  </div>
+
+  <div class="card search-card mb-4">
+    <div class="card-body">
+      <form [formGroup]="formSearch" class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label">Mã đơn hàng</label>
+          <input 
+            type="text"
+            class="form-control"
+            placeholder="Nhập mã đơn hàng..."
+            formControlName="orderNumber"
+            (keyup.enter)="handleSearch()">
+        </div>
+        <div class="col-md-4 d-flex align-items-end gap-2">
+          <button 
+            type="button"
+            class="btn btn-search flex-grow-1"
+            (click)="handleSearch()">
+            <i class="fas fa-search"></i> Tìm kiếm
+          </button>
+
+          <button 
+            type="button"
+            class="btn btn-refresh flex-grow-1"
+            (click)="clearForm()">
+            <i class="fas fa-redo"></i> Làm mới
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 
-  <!-- Search -->
-  <div class="row mb-4">
-    <div class="col-md-6">
-      <div class="input-group">
-        <input type="text" class="form-control" placeholder="Tìm kiếm mã đơn hàng..." [(ngModel)]="searchOrderNumber">
-        <button class="btn btn-outline-primary" type="button" (click)="onSearch()">
-          <i class="fas fa-search"></i>
-        </button>
+  <div class="card order-table-card">
+    <div class="card-header">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <span class="text-muted">
+            Tổng đơn hàng: {{ paginationConfig.totalElements }}
+          </span>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Orders Grid/Table -->
-  @if (orders.length === 0) {
-    <div class="alert alert-info" role="alert">
-      <i class="fas fa-info-circle me-2"></i>
-      Bạn chưa có đơn hàng nào
-    </div>
-  } @else {
-    <div class="row">
-      @for (order of orders; track order.id) {
-        <div class="col-lg-6 mb-4">
-          <div class="card order-card h-100">
-            <div class="card-header bg-light d-flex justify-content-between align-items-center">
-              <div>
-                <h6 class="mb-0">Đơn hàng #{{ order.orderNumber }}</h6>
-                <small class="text-muted">{{ order.createdAt | date: 'dd/MM/yyyy HH:mm' }}</small>
-              </div>
-              <span [ngClass]="'badge ' + getStatusClass(order.orderStatus)">
-                {{ getStatusLabel(order.orderStatus) }}
-              </span>
-            </div>
-            <div class="card-body">
-              <div class="row mb-3">
-                <div class="col-6">
-                  <small class="text-muted d-block">Tổng tiền</small>
-                  <strong class="text-primary">${{ order.totalAmount | number: '1.2-2' }}</strong>
-                </div>
-                <div class="col-6">
-                  <small class="text-muted d-block">Số tài khoản</small>
-                  <strong>{{ order.orderItems.length }}</strong>
-                </div>
-              </div>
-              @if (order.notes) {
-                <div class="mb-3">
-                  <small class="text-muted">Ghi chú:</small>
-                  <p class="mb-0 small">{{ order.notes }}</p>
-                </div>
+    <div class="card-body p-0">
+      @if (loading) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary"></div>
+        </div>
+      } @else {
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+              <tr>
+                <th style="width: 50px; text-align:center;">#</th>
+                <th>Mã đơn hàng</th>
+                <th>Sản phẩm</th>
+                <th>Số lượng</th>
+                <th>Danh sách tài khoản</th>
+                <th>Trạng thái</th>
+                <th>Tổng tiền</th>
+                <th>Ngày tạo</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of orders; track order.id; let i = $index) {
+                <tr>
+                  <td class="text-center fw-bold">
+                    {{ i + 1 + (paginationConfig.currentPage * paginationConfig.pageSize) }}
+                  </td>
+
+                  <td class="fw-semibold order-number-cell">
+                    {{ order.orderNumber }}
+                  </td>
+
+                  <td class="product-name-cell">
+                    {{ order.productName }}
+                  </td>
+
+                  <td class="text-center">
+                    <span class="badge badge-quantity">
+                      {{ order.accountData?.length || 0 }}
+                    </span>
+                  </td>
+
+                  <td class="account-data-cell">
+                    @if(!order.accountData || order.accountData.length === 0) {
+                      <span class="no-data-text">
+                        <i class="bi bi-info-circle me-1"></i>Chưa có dữ liệu
+                      </span>
+                    } @else {
+                      <div class="account-preview-wrapper">
+                        <textarea 
+                          class="form-control account-preview" 
+                          rows="2"
+                          readonly
+                          [value]="order.accountData.join('\n')">
+                        </textarea>
+                        <button 
+                          class="btn btn-sm btn-copy"
+                          [class.copied]="copiedOrderId === order.id"
+                          (click)="copyAccounts(order)">
+                          @if(copiedOrderId === order.id) {
+                            <i class="bi bi-check-circle-fill"></i>
+                          } @else {
+                            <i class="bi bi-clipboard"></i>
+                          }
+                        </button>
+                      </div>
+                    }
+                  </td>
+
+                  <td>
+                    <span class="badge" [ngClass]="getStatusClass(order.orderStatus)">
+                      {{ getStatusLabel(order.orderStatus) }}
+                    </span>
+                  </td>
+
+                  <td class="fw-bold amount-cell">
+                    {{ order.totalAmount | number:'1.0-0' }} VND
+                  </td>
+
+                  <td class="date-cell">
+                    {{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                  </td>
+                </tr>
               }
-            </div>
-            <div class="card-footer bg-white">
-              <button class="btn btn-sm btn-primary w-100" (click)="onViewDetail(order)">
-                <i class="fas fa-eye me-2"></i> Xem chi tiết
-              </button>
-            </div>
-          </div>
+
+              @if (orders.length === 0) {
+                <tr>
+                  <td colspan="8" class="text-center py-4 text-muted">
+                    <div class="empty-state-inline">
+                      <i class="bi bi-inbox"></i>
+                      <p class="mb-0 mt-2">Chưa có đơn hàng nào</p>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
       }
     </div>
-  }
 
-  <!-- Pagination -->
-  @if (orders.length > 0) {
-    <app-pagination
-      [config]="{
-        currentPage: currentPage,
-        totalPages: totalPages,
-        pageSize: pageSize,
-        totalElements: totalElements
-      }"
-      (pageChange)="onPageChange($event)"
-      (pageSizeChange)="onPageSizeChange($event)">
-    </app-pagination>
-  }
+    @if (paginationConfig.totalPages > 0) {
+      <div class="card-footer">
+        <app-pagination
+          [config]="paginationConfig"
+          (pageChange)="handlePageChange($event)"
+          (pageSizeChange)="selectPageSize($event)">
+        </app-pagination>
+      </div>
+    }
+  </div>
 </div>
-
-<!-- Detail Modal -->
-@if (showDetailModal && selectedOrder) {
-  <app-order-detail-modal
-    [order]="selectedOrder"
-    (closeModal)="onModalClose()">
-  </app-order-detail-modal>
-}

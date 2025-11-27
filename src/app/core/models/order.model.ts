@@ -4,21 +4,22 @@ import { OrderItem } from "./order-item.model";
 export interface Order {
   id: number;
   orderNumber: string;
+
   userId: number;
   userEmail: string;
 
-  orderStatus: string;  
+  orderStatus: string;
   totalAmount: number;
 
-  notes?: string;
+  productId: number;
+  productName: string;
 
-  orderItems: OrderItem[];
+  accountData: string[];
 
-  status: string;
-
-  createdAt: string; 
-  updatedAt: string; 
+  createdAt: string;
 }
+
+
 
 export interface OrderCreate {
     productId:number;

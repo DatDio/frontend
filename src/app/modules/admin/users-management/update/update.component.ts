@@ -115,7 +115,7 @@ export class UsersUpdateComponent implements OnInit {
   }
 
   onCancel(): void {
-    this.#router.navigate(['/admin/users', this.userId]);
+    this.#router.navigate(['/admin/users-management']);
   }
 
   get email() {

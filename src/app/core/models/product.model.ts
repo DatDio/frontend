@@ -5,9 +5,11 @@ export interface Product {
   name: string;
   description: string;
   price: number;
+  liveTime?:string;
+  country? : string;
   categoryId: number;
   categoryName: string;
-  status: string;
+  status: number;
   quantity: number;
 }
 
@@ -15,6 +17,8 @@ export interface ProductCreate {
   name: string;
   description?: string;
   price: number;
+  liveTime?: string;
+  country?: string;
   categoryId: number;
 }
 
@@ -23,6 +27,8 @@ export interface ProductUpdate {
   name?: string;
   description?: string;
   price?: number;
+  liveTime?: string;
+  country?: string;
   categoryId?: number;
   status?: string;
 }

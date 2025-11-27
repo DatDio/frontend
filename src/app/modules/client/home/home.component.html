@@ -1,6 +1,5 @@
-<div class="home-page">
+﻿<div class="home-page">
 
-  <!-- HERO -->
   <div class="hero-content">
     <div class="container">
       <h1>Chuyên cung cấp tài nguyên marketing, quảng cáo uy tín, chất lượng cao!</h1>
@@ -13,15 +12,12 @@
     </div>
   </div>
 
-  <!-- CATEGORY + PRODUCTS -->
   <section class="products-section">
     <div class="container">
 
       @for (category of categories; track category.id) {
-
       <div class="product-group">
 
-        <!-- TITLE CATEGORY -->
         <h3 class="group-title">
           <i class="fas fa-layer-group me-2"></i>
           {{ category.name }}
@@ -29,11 +25,18 @@
 
         <p class="category-desc">{{ category.description }}</p>
 
-        <!-- LIST PRODUCT -->
         <div class="product-list">
 
-          @for (product of category.products; track product.id) {
+          <div class="product-header">
+            <div class="col-name"><i class="fas fa-envelope me-2"></i>Sản phẩm</div>
+            <div class="col-live"><i class="fas fa-hourglass-half me-2"></i>LiveTime</div>
+            <div class="col-country"><i class="fas fa-globe me-2"></i>Quốc gia</div>
+            <div class="col-price"><i class="fas fa-tag me-2"></i>Giá</div>
+            <div class="col-quantity"><i class="fas fa-shopping-cart me-2"></i>Số lượng</div>
+            <div class="col-action"></div>
+          </div>
 
+          @for (product of category.products; track product.id) {
           <div class="product-item">
 
             <div class="info-col">
@@ -41,40 +44,103 @@
               <div class="product-desc">{{ product.description }}</div>
             </div>
 
+            <div class="live-col">
+              <span class="live-chip">{{ product.liveTime || '—' }}</span>
+            </div>
+
+            <div class="country-col">
+              <span class="country-chip">
+                <i class="fas fa-flag me-1"></i>{{ product.country || '—' }}
+              </span>
+            </div>
+
             <div class="price-col">
               <div class="price">{{ product.price | number }} VNĐ</div>
             </div>
 
+            <div class="quantity-col">
+              <div class="quantity-box">{{ product.quantity | number }}</div>
+            </div>
+
             <div class="action-col">
-              <button class="buy-btn">
+              <button class="buy-btn" (click)="prepareOrder(product)">
                 <i class="fas fa-plus me-1"></i> Mua
               </button>
             </div>
 
           </div>
-
           }
 
           @if (category.products.length === 0) {
-            <div class="empty-product">
-              Chưa có sản phẩm trong danh mục này
-            </div>
+          <div class="empty-product">
+            Chưa có sản phẩm trong danh mục này
+          </div>
           }
 
         </div>
       </div>
-
       }
 
-      <!-- PAGINATION -->
+      @if(paginationConfig.totalPages > 1){
       <div class="pagination-wrapper mt-5">
-        <app-pagination 
-          [config]="paginationConfig"
-          (pageChange)="onPageChange($event)"
+        <app-pagination [config]="paginationConfig" (pageChange)="onPageChange($event)"
           (pageSizeChange)="onPageSizeChange($event)">
         </app-pagination>
       </div>
+      }
 
     </div>
   </section>
+</div>
+
+<div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <h5 class="modal-title" id="orderModalLabel">
+          <i class="fas fa-shopping-cart me-2"></i>Xác nhận đơn hàng
+        </h5>
+        <button type="button" class="btn-close" (click)="closeOrderModal()" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body" *ngIf="selectedProduct">
+        <div class="alert alert-info mb-4">
+          <div class="fw-bold">{{ selectedProduct.name }}</div>
+          <div class="small">Đơn giá: {{ selectedProduct.price | number }} VNĐ</div>
+        </div>
+
+        <form [formGroup]="orderForm" (ngSubmit)="onSubmitOrder()">
+          <div class="mb-3">
+            <label for="quantity" class="form-label">Số lượng mua:</label>
+            <input type="number" id="quantity" class="form-control" formControlName="quantity" 
+                   min="1" max="1000" 
+                   [class.is-invalid]="orderForm.get('quantity')?.invalid && orderForm.get('quantity')?.touched">
+            
+            <div class="invalid-feedback d-block" *ngIf="orderForm.get('quantity')?.errors?.['required'] && orderForm.get('quantity')?.touched">
+              Vui lòng nhập số lượng.
+            </div>
+            <div class="invalid-feedback d-block" *ngIf="orderForm.get('quantity')?.errors?.['min']">
+              Số lượng tối thiểu là 1.
+            </div>
+          </div>
+
+          <div class="bg-light p-3 rounded d-flex justify-content-between align-items-center">
+            <span class="fw-bold text-dark">Thành tiền:</span>
+            <span class="fw-bold text-primary fs-5">{{ totalPrice | number }} VNĐ</span>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeOrderModal()">Hủy bỏ</button>
+        <button type="button" class="btn btn-primary" [disabled]="orderForm.invalid || orderLoading" (click)="onSubmitOrder()">
+          <span *ngIf="orderLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          <i class="fas fa-check me-2" *ngIf="!orderLoading"></i> 
+          {{ orderLoading ? 'Đang xử lý...' : 'Xác nhận mua' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
 </div>

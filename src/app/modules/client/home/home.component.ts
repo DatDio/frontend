@@ -1,27 +1,39 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { finalize } from 'rxjs/operators';
+
 import { SeoService } from '../../../core/services/seo.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { CategoryService } from '../../../core/services/category.service';
+import { OrderService } from '../../../core/services/order.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { PaginationComponent, PaginationConfig } from '../../../shared/components/pagination/pagination.component';
 import { PaginationService } from '../../../shared/services/pagination.service';
+
 import { Category } from '../../../core/models/category.model';
+import { Product } from '../../../core/models/product.model';
+import { OrderCreate } from '../../../core/models/order.model';
+
+declare var bootstrap: any;
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, PaginationComponent],
+  imports: [CommonModule, RouterModule, PaginationComponent, ReactiveFormsModule],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit {
   private readonly seoService = inject(SeoService);
   private readonly categoryService = inject(CategoryService);
+  private readonly orderService = inject(OrderService);
   private readonly notificationService = inject(NotificationService);
   private readonly paginationService = inject(PaginationService);
-
+  private readonly formBuilder = inject(FormBuilder);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
   categories: Category[] = [];
   paginationConfig: PaginationConfig = {
     currentPage: 0,
@@ -30,103 +42,38 @@ export class HomeComponent implements OnInit {
     totalElements: 0
   };
 
-  services = [
-    {
-      id: 1,
-      name: 'Check Mail',
-      icon: 'check-circle',
-      color: 'blue',
-      rating: '4.8/5'
-    },
-    {
-      id: 2,
-      name: 'Biết Code',
-      icon: 'code',
-      color: 'yellow',
-      rating: '4.9/5'
-    },
-    {
-      id: 3,
-      name: 'Đơc khoá thư',
-      icon: 'unlock',
-      color: 'purple',
-      rating: '4.7/5'
-    },
-    {
-      id: 4,
-      name: 'Dùng Lý phần',
-      icon: 'mobile-alt',
-      color: 'teal',
-      rating: '4.8/5'
-    },
-    {
-      id: 5,
-      name: 'Giải 24h',
-      icon: 'clock',
-      color: 'green',
-      rating: '4.9/5'
-    },
-    {
-      id: 6,
-      name: 'Dùng Lý Homiball',
-      icon: 'star',
-      color: 'purple',
-      rating: '4.8/5'
-    },
-    {
-      id: 7,
-      name: 'Unlock Homiball',
-      icon: 'lock-open',
-      color: 'orange',
-      rating: '4.9/5'
-    },
-    {
-      id: 8,
-      name: 'Dùng Lý yellow',
-      icon: 'star',
-      color: 'green',
-      rating: '4.8/5'
-    }
-  ];
-
+  orderForm!: FormGroup;
+  selectedProduct: Product | null = null;
+  orderLoading = false;
+  private modalInstance: any;
 
   constructor() { }
 
   ngOnInit(): void {
-
     this.seoService.setTitle('MailShop - Chuyên cung cấp tài nguyên marketing');
-    this.seoService.setMetaDescription('Cung cấp tài khoản email uy tín, chất lượng cao cho marketing, quảng cáo.');
-    this.seoService.setOpenGraph({
-      title: 'MailShop - Cung cấp tài nguyên',
-      description: 'Marketplace tài khoản email marketing',
-      image: '/assets/images/og-home.jpg',
-      url: 'https://mailshop.com'
-    });
+    this.initOrderForm();
     this.loadCategories();
+  }
 
+  private initOrderForm(): void {
+    this.orderForm = this.formBuilder.group({
+      quantity: [1, [Validators.required, Validators.min(1), Validators.max(1000)]]
+    });
   }
 
   loadCategories(): void {
-    this.categoryService.list({ 
-      page: this.paginationConfig.currentPage, 
-      limit: this.paginationConfig.pageSize 
+    this.categoryService.list({
+      page: this.paginationConfig.currentPage,
+      limit: this.paginationConfig.pageSize
     }).subscribe({
       next: res => {
         if (res.success && res.data?.content) {
           this.categories = res.data.content;
-          // Lấy pagination info từ backend trực tiếp
           const paginationInfo = this.paginationService.extractPaginationInfo(res.data);
-          this.paginationConfig = {
-            currentPage: paginationInfo.currentPage,
-            pageSize: paginationInfo.pageSize,
-            totalElements: paginationInfo.totalElements,
-            totalPages: paginationInfo.totalPages
-          };
+          this.paginationConfig = { ...this.paginationConfig, ...paginationInfo };
         }
       },
-      error: err => {
-        this.notificationService.error('Error', err.error?.message || 'Failed to load categories');
-      }
+      error: err => this.notificationService.error('Không thể tải danh sách sản phẩm')
     });
   }
 
@@ -139,5 +86,81 @@ export class HomeComponent implements OnInit {
     this.paginationConfig.pageSize = size;
     this.paginationConfig.currentPage = 0;
     this.loadCategories();
+  }
+
+  // --- LOGIC MODAL & MUA HÀNG ---
+
+  prepareOrder(product: Product): void {
+    if (!this.authService.isAuthenticated()) {
+      this.notificationService.warning('Vui lòng đăng nhập để mua hàng');
+      return;
+    }
+
+    this.selectedProduct = product;
+    this.orderForm.patchValue({ quantity: 1 });
+
+    const modalElement = document.getElementById('orderModal');
+    if (modalElement) {
+      this.modalInstance = new bootstrap.Modal(modalElement, {
+        backdrop: 'static',
+        keyboard: false
+      });
+      this.modalInstance.show();
+    }
+  }
+
+  onSubmitOrder(): void {
+    if (this.orderForm.invalid || !this.selectedProduct) return;
+
+    this.orderLoading = true;
+    const quantity = this.orderForm.get('quantity')?.value;
+
+    const orderRequest: OrderCreate = {
+      productId: this.selectedProduct.id,
+      quantity: quantity
+    };
+
+    this.orderService.buy(orderRequest)
+      .pipe(finalize(() => this.orderLoading = false))
+      .subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.notificationService.success('Đặt hàng thành công!');
+            this.closeOrderModal();
+            this.router.navigate(['/orders']);
+          } else {
+            this.notificationService.error(response.message || 'Đặt hàng thất bại');
+          }
+        },
+        error: (error) => {
+          this.notificationService.error(error.error?.message || 'Đã xảy ra lỗi hệ thống');
+        }
+      });
+  }
+
+  closeOrderModal(): void {
+    if (this.modalInstance) {
+      this.modalInstance.hide();
+    }
+
+    // Cleanup thủ công backdrop nếu bị kẹt
+    const backdrops = document.getElementsByClassName('modal-backdrop');
+    while (backdrops.length > 0) {
+      backdrops[0].parentNode?.removeChild(backdrops[0]);
+    }
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+
+    setTimeout(() => {
+      this.selectedProduct = null;
+      this.orderForm.reset({ quantity: 1 });
+    }, 200);
+  }
+
+  get totalPrice(): number {
+    if (!this.selectedProduct) return 0;
+    const quantity = this.orderForm.get('quantity')?.value || 0;
+    return this.selectedProduct.price * quantity;
   }
 }

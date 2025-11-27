@@ -1,8 +1,8 @@
-<div class="auth-container">
+﻿<div class="auth-container">
   <div class="auth-card">
     <div class="text-center mb-4">
-      <h2 class="auth-card__title">Welcome Back</h2>
-      <p class="text-muted">Sign in to your account</p>
+      <h2 class="auth-card__title">Chào mừng quay trở lại</h2>
+      <p class="text-muted">Đăng nhập vào tài khoản của bạn</p>
     </div>
 
     @if (errorMessage) {
@@ -13,44 +13,44 @@
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="mb-3">
-        <label for="email" class="form-label">Email Address</label>
+        <label for="email" class="form-label">Email </label>
         <input
           type="email"
           class="form-control"
           id="email"
           formControlName="email"
-          placeholder="Enter your email"
+          placeholder="Nhập email của bạn"
           [class.is-invalid]="email?.invalid && email?.touched"
         >
         @if (email?.invalid && email?.touched) {
           <div class="invalid-feedback">
             @if (email?.errors?.['required']) {
-              <span>Email is required</span>
+              <span>Email là bắt buộc</span>
             }
             @if (email?.errors?.['email']) {
-              <span>Please enter a valid email</span>
+              <span>Vui lòng nhập email hợp lệ</span>
             }
           </div>
         }
       </div>
 
       <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
+        <label for="password" class="form-label">Mật khẩu</label>
         <input
           type="password"
           class="form-control"
           id="password"
           formControlName="password"
-          placeholder="Enter your password"
+          placeholder="Nhập mật khẩu của bạn"
           [class.is-invalid]="password?.invalid && password?.touched"
         >
         @if (password?.invalid && password?.touched) {
           <div class="invalid-feedback">
             @if (password?.errors?.['required']) {
-              <span>Password is required</span>
+              <span>Mật khẩu là bắt buộc</span>
             }
             @if (password?.errors?.['minlength']) {
-              <span>Password must be at least 6 characters</span>
+              <span>Mật khẩu phải có ít nhất 6 ký tự</span>
             }
           </div>
         }
@@ -60,17 +60,25 @@
         <button type="submit" class="btn btn-primary" [disabled]="loading">
           @if (loading) {
             <span class="spinner-border spinner-border-sm me-2"></span>
-            Signing in...
+            Đang đăng nhập...
           } @else {
-            Sign In
+            Đăng nhập
           }
         </button>
       </div>
 
+      <div class="text-center mb-3">
+        <span class="text-muted small">Hoặc</span>
+      </div>
+
+      <div class="text-center mb-3">
+        <div id="googleSignInButton" class="d-inline-block"></div>
+      </div>
+
       <div class="text-center">
         <p class="mb-0">
-          Don't have an account?
-          <a routerLink="/auth/register" class="text-decoration-none">Sign Up</a>
+          Bạn chưa có tài khoản?
+          <a routerLink="/auth/register" class="text-decoration-none">Đăng ký</a>
         </p>
       </div>
     </form>

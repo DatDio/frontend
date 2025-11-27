@@ -1,10 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+﻿import { Component, Inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterModule, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { SeoService } from '../../../core/services/seo.service';
 import { Role } from '../../../Utils/enums/commom.enum';
+import { environment } from '../../../../environments/environment';
+
+declare const google: any;
 
 @Component({
   selector: 'app-login',
@@ -18,13 +21,16 @@ export class LoginComponent implements OnInit {
   loading = false;
   errorMessage = '';
   returnUrl = '/';
+  googleClientId = environment.googleClientId;
+  private googleInitialized = false;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
     private route: ActivatedRoute,
-    private seoService: SeoService
+    private seoService: SeoService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -40,10 +46,14 @@ export class LoginComponent implements OnInit {
     );
 
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
-    
+
+    this.authService.restoreFromStorage();
     if (this.authService.isAuthenticated()) {
       this.router.navigate([this.returnUrl]);
+      return;
     }
+
+    this.initGoogleIdentity();
   }
 
   onSubmit(): void {
@@ -58,12 +68,7 @@ export class LoginComponent implements OnInit {
     this.authService.login(this.loginForm.value).subscribe({
       next: (response) => {
         if (response.success) {
-          const user = this.authService.getCurrentUser();
-          if (user?.roles.includes(Role.ADMIN)) {
-            this.router.navigate(['/admin/dashboard']);
-          } else {
-            this.router.navigate([this.returnUrl]);
-          }
+          this.handleLoginSuccess();
         } else {
           this.errorMessage = response.message || 'Đăng nhập thất bại';
           this.loading = false;
@@ -82,5 +87,89 @@ export class LoginComponent implements OnInit {
 
   get password() {
     return this.loginForm.get('password');
+  }
+
+  onGoogleCredential(idToken: string): void {
+    if (!idToken) {
+      this.errorMessage = 'Google sign-in failed. Please try again.';
+      return;
+    }
+
+    this.loading = true;
+    this.errorMessage = '';
+
+    this.authService.googleLogin(idToken).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.handleLoginSuccess();
+        } else {
+          this.errorMessage = response.message || 'Google sign-in failed';
+          this.loading = false;
+        }
+      },
+      error: (error) => {
+        this.errorMessage = error.error?.message || 'Google sign-in failed';
+        this.loading = false;
+      }
+    });
+  }
+
+  private initGoogleIdentity(): void {
+    if (!this.googleClientId || !isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
+    const existingScript = document.getElementById('google-identity-script') as HTMLScriptElement | null;
+    const initialize = () => {
+      if (this.googleInitialized || typeof google === 'undefined') {
+        return;
+      }
+
+      google.accounts.id.initialize({
+        client_id: this.googleClientId,
+        callback: (response: { credential: string }) => this.onGoogleCredential(response.credential)
+      });
+
+      const buttonEl = document.getElementById('googleSignInButton');
+      if (buttonEl) {
+        google.accounts.id.renderButton(buttonEl, {
+          theme: 'outline',
+          size: 'large',
+          text: 'continue_with',
+          shape: 'pill'
+        });
+      }
+
+      google.accounts.id.prompt();
+      this.googleInitialized = true;
+    };
+
+    if (existingScript) {
+      if (typeof google !== 'undefined') {
+        initialize();
+      } else {
+        existingScript.addEventListener('load', initialize);
+      }
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://accounts.google.com/gsi/client';
+    script.async = true;
+    script.defer = true;
+    script.id = 'google-identity-script';
+    script.onload = () => initialize();
+
+    document.head.appendChild(script);
+  }
+
+  private handleLoginSuccess(): void {
+    this.loading = false;
+    const user = this.authService.getCurrentUser();
+    if (user?.roles.includes(Role.ADMIN)) {
+      this.router.navigate(['/admin/dashboard']);
+    } else {
+      this.router.navigate([this.returnUrl]);
+    }
   }
 }

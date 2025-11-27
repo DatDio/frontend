@@ -25,11 +25,9 @@ export class RegisterComponent implements OnInit {
   ) {
     this.registerForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      username: ['', [Validators.required, Validators.minLength(3)]],
+      fullName: ['', [Validators.required, Validators.minLength(3)]],
       password: ['', [Validators.required, Validators.minLength(6)]],
-      confirmPassword: ['', [Validators.required]],
-      firstName: [''],
-      lastName: ['']
+      confirmPassword: ['', [Validators.required]]
     }, { validators: this.passwordMatchValidator });
   }
 
@@ -86,8 +84,8 @@ export class RegisterComponent implements OnInit {
     return this.registerForm.get('email');
   }
 
-  get username() {
-    return this.registerForm.get('username');
+  get fullName() {
+    return this.registerForm.get('fullName');
   }
 
   get password() {

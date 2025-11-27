@@ -3,10 +3,10 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { LoaderService } from './loader.service';
-import { Order, OrderFilter } from '../models/order.model';
+import { Order, OrderCreate, OrderFilter } from '../models/order.model';
 import { ApiResponse, PaginatedResponse } from '../models/common.model';
-
-const API_URL = '/api/admin/orders';
+import { AdminOrderApi } from '../../Utils/apis/orders/admin-order.api';
+import { OrderApi } from '../../Utils/apis/orders/client-order.api';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +19,6 @@ export class OrderService {
    * Get list of orders with pagination
    */
   list(filter?: OrderFilter): Observable<ApiResponse<PaginatedResponse<Order>>> {
-    this.loaderService.show();
 
     let params = new HttpParams()
       .set('page', (filter?.page ?? 0).toString())
@@ -31,8 +30,34 @@ export class OrderService {
     if (filter?.orderStatus) params = params.set('orderStatus', filter.orderStatus);
 
     return this.httpClient
-      .get<ApiResponse<PaginatedResponse<Order>>>(`${API_URL}/search`, { params })
+      .get<ApiResponse<PaginatedResponse<Order>>>(AdminOrderApi.SEARCH, { params })
+      
+  }
+
+  /**
+ * Client: Get current user's orders
+ */
+  searchMyOrders(filter?: OrderFilter): Observable<ApiResponse<PaginatedResponse<Order>>> {
+    this.loaderService.show();
+
+    let params = new HttpParams()
+      .set('page', (filter?.page ?? 0).toString())
+      .set('limit', (filter?.limit ?? 10).toString())
+      .set('sort', filter?.sort ?? 'id,desc');
+
+    if (filter?.orderNumber) params = params.set('orderNumber', filter.orderNumber);
+    if (filter?.orderStatus) params = params.set('orderStatus', filter.orderStatus);
+
+    return this.httpClient
+      .get<ApiResponse<PaginatedResponse<Order>>>(OrderApi.SEARCH, { params })
       .pipe(finalize(() => this.loaderService.hide()));
+  }
+
+  buy(request: OrderCreate): Observable<ApiResponse<Order>> {
+    return this.httpClient.post<ApiResponse<Order>>(
+      OrderApi.BUY,
+      request
+    );
   }
 
   /**
@@ -42,7 +67,7 @@ export class OrderService {
     this.loaderService.show();
 
     return this.httpClient
-      .get<ApiResponse<Order>>(`${API_URL}/${id}`)
+      .get<ApiResponse<Order>>(AdminOrderApi.GET_BY_ID(id))
       .pipe(finalize(() => this.loaderService.hide()));
   }
 
@@ -53,7 +78,7 @@ export class OrderService {
     this.loaderService.show();
 
     return this.httpClient
-      .delete<ApiResponse<void>>(`${API_URL}/${id}`)
+      .delete<ApiResponse<void>>(AdminOrderApi.DELETE(id))
       .pipe(finalize(() => this.loaderService.hide()));
   }
 }

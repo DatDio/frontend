@@ -1,105 +1,219 @@
-import { Component, OnInit, inject } from '@angular/core';
+﻿import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { Order } from '../../../../core/models/order.model';
+import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { Order, OrderFilter } from '../../../../core/models/order.model';
 import { OrderService } from '../../../../core/services/order.service';
 import { NotificationService } from '../../../../core/services/notification.service';
-import { PaginationComponent } from '../../../../shared/components/pagination/pagination.component';
-import { OrderDetailModalComponent } from '../order-detail-modal/order-detail-modal.component';
+import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
+import { PaginationService } from '../../../../shared/services/pagination.service';
+
+interface OrderSearchFilter extends OrderFilter {
+  pagination?: PaginationConfig;
+}
 
 @Component({
   selector: 'app-client-order-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, PaginationComponent, OrderDetailModalComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, PaginationComponent],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss'
 })
-export class ClientOrderListComponent implements OnInit {
+export class ClientOrderListComponent implements OnInit, OnDestroy {
   private readonly orderService = inject(OrderService);
   private readonly notificationService = inject(NotificationService);
+  private readonly paginationService = inject(PaginationService);
+  private readonly fb = inject(FormBuilder);
 
   orders: Order[] = [];
-  currentPage = 0;
-  pageSize = 10;
-  totalPages = 0;
-  totalElements = 0;
+  loading = true;
+  formSearch!: FormGroup;
+  dataFormSearch: OrderSearchFilter = {};
+  
+  // Tracking copy state
+  copiedOrderId: number | null = null;
+  private copyTimeout: any;
 
-  searchOrderNumber = '';
-
-  selectedOrder: Order | null = null;
-  showDetailModal = false;
+  paginationConfig: PaginationConfig = {
+    currentPage: 0,
+    pageSize: 10,
+    totalPages: 1,
+    totalElements: 0
+  };
 
   ngOnInit(): void {
+    this.initForm();
     this.loadOrders();
   }
 
-  loadOrders(): void {
-    this.orderService
-      .list({
-        page: this.currentPage,
-        limit: this.pageSize,
-        sort: 'id,desc',
-        orderNumber: this.searchOrderNumber || undefined
-      })
-      .subscribe({
-        next: (response: any) => {
-          if (response.success && response.data?.content) {
-            this.orders = response.data.content;
-            this.totalElements = response.data.totalElements || 0;
-            this.totalPages = response.data.totalPages || 0;
-          }
-        },
-        error: (error: any) => {
-          console.error('Error loading orders:', error);
-          this.notificationService.error('Lỗi khi tải danh sách đơn hàng');
+  ngOnDestroy(): void {
+    if (this.copyTimeout) {
+      clearTimeout(this.copyTimeout);
+    }
+  }
+
+  private initForm(): void {
+    this.formSearch = this.fb.group({
+      orderNumber: new FormControl(''),
+      orderStatus: new FormControl(''),
+      searchPage: new FormControl('')
+    });
+  }
+
+  private loadOrders(): void {
+    this.loading = true;
+
+    const params: any = {
+      page: this.paginationConfig.currentPage,
+      limit: this.paginationConfig.pageSize,
+      sort: 'id,desc'
+    };
+
+    if (this.dataFormSearch.orderNumber) {
+      params.orderNumber = this.dataFormSearch.orderNumber;
+    }
+
+    if (this.dataFormSearch.orderStatus) {
+      params.orderStatus = this.dataFormSearch.orderStatus;
+    }
+
+    this.orderService.searchMyOrders(params).subscribe({
+      next: (response: any) => {
+        if (response.success) {
+          this.orders = response.data?.content || [];
+
+          const paginationInfo = this.paginationService.extractPaginationInfo(response.data);
+          this.paginationConfig = {
+            currentPage: paginationInfo.currentPage,
+            pageSize: paginationInfo.pageSize,
+            totalElements: paginationInfo.totalElements,
+            totalPages: paginationInfo.totalPages
+          };
+        } else {
+          this.orders = [];
+          this.paginationConfig = {
+            ...this.paginationConfig,
+            totalElements: 0,
+            totalPages: 1,
+            currentPage: 0
+          };
+          this.notificationService.error(response.message || 'Lỗi khi tải danh sách đơn hàng');
         }
-      });
+
+        this.loading = false;
+      },
+      error: (error: any) => {
+        this.loading = false;
+        console.error(error);
+        this.notificationService.error(error.error?.message || 'Lỗi khi tải danh sách đơn hàng');
+      }
+    });
   }
 
-  onSearch(): void {
-    this.currentPage = 0;
+  handleSearch(): void {
+    this.paginationConfig.currentPage = 0;
+    this.dataFormSearch = {
+      ...this.formSearch.getRawValue(),
+      pagination: this.paginationConfig
+    };
     this.loadOrders();
   }
 
-  onPageChange(page: number): void {
-    this.currentPage = page;
+  handlePageChange(page: number): void {
+    this.paginationConfig.currentPage = page;
+    this.dataFormSearch = {
+      ...this.formSearch.getRawValue(),
+      pagination: this.paginationConfig
+    };
     this.loadOrders();
   }
 
-  onPageSizeChange(newSize: number): void {
-    this.pageSize = newSize;
-    this.currentPage = 0;
+  selectPageSize(pageSize: number): void {
+    this.paginationConfig.pageSize = pageSize;
+    this.paginationConfig.currentPage = 0;
+    this.dataFormSearch = {
+      ...this.formSearch.getRawValue(),
+      pagination: this.paginationConfig
+    };
     this.loadOrders();
   }
 
-  onViewDetail(order: Order): void {
-    this.selectedOrder = order;
-    this.showDetailModal = true;
+  clearForm(): void {
+    this.formSearch.reset();
+    this.paginationConfig.currentPage = 0;
+    this.dataFormSearch = {};
+    this.loadOrders();
   }
 
-  onModalClose(): void {
-    this.showDetailModal = false;
-    this.selectedOrder = null;
+  handleSearchPage(): void {
+    const pageNum = this.formSearch.get('searchPage')?.value;
+    if (!pageNum) return;
+
+    if (pageNum > this.paginationConfig.totalPages || pageNum < 1) {
+      this.notificationService.error(`Page must be between 1 and ${this.paginationConfig.totalPages}`);
+    } else {
+      this.paginationConfig.currentPage = pageNum - 1;
+      this.dataFormSearch = {
+        ...this.formSearch.getRawValue(),
+        pagination: this.paginationConfig
+      };
+      this.loadOrders();
+      this.formSearch.get('searchPage')?.reset();
+    }
   }
 
+  /**
+   * Copy accounts voi hieu ung "Da copy"
+   */
+  copyAccounts(order: Order): void {
+    if (!order.accountData || order.accountData.length === 0) {
+      this.notificationService.warning('Không có tài khoản để copy');
+      return;
+    }
+
+    const content = order.accountData.join('\n');
+
+    navigator.clipboard.writeText(content).then(() => {
+      if (this.copyTimeout) {
+        clearTimeout(this.copyTimeout);
+      }
+
+      this.copiedOrderId = order.id;
+      this.notificationService.success('Đã copy danh sách tài khoản!');
+
+      this.copyTimeout = setTimeout(() => {
+        this.copiedOrderId = null;
+      }, 2000);
+    }).catch(err => {
+      this.notificationService.error('Lỗi copy, vui lòng thử lại');
+    });
+  }
+
+  /**
+   * Get label hien thi cho trang thai
+   */
   getStatusLabel(status: string): string {
     const statusMap: { [key: string]: string } = {
-      pending: 'Chờ xử lý',
-      processing: 'Đang xử lý',
-      completed: 'Hoàn thành',
-      cancelled: 'Hủy'
+      'PENDING': 'Chờ xử lý',
+      'PROCESSING': 'Đang xử lý',
+      'COMPLETED': 'Hoàn thành',
+      'CANCELLED': 'Đã hủy',
+      'REFUNDED': 'Hoàn tiền'
     };
-    return statusMap[status] || status;
+    return statusMap[status?.toUpperCase()] || status;
   }
 
+  /**
+   * Get class CSS cho badge trang thai
+   */
   getStatusClass(status: string): string {
     const classMap: { [key: string]: string } = {
-      pending: 'bg-warning',
-      processing: 'bg-info',
-      completed: 'bg-success',
-      cancelled: 'bg-danger'
+      'PENDING': 'badge-warning',
+      'PROCESSING': 'badge-info',
+      'COMPLETED': 'badge-success',
+      'CANCELLED': 'badge-danger',
+      'REFUNDED': 'badge-secondary'
     };
-    return classMap[status] || 'bg-secondary';
+    return classMap[status?.toUpperCase()] || 'badge-secondary';
   }
 }

@@ -10,9 +10,9 @@ export interface User {
 
   authProvider?: string | null;
   emailVerified: boolean;
-
+  
   roles: string[];
-  status?: string;
+  status: number;
 
   createdAt: string; // hoặc Date nếu bạn map sang Date
   updatedAt: string; // hoặc Date
@@ -35,7 +35,7 @@ export interface UpdateUserRequest {
   phone?: string;
   address?: string;
   roles: string[];
-  status?: string;
+  status: number;
 }
 
 export interface UserFilter extends PageFilter {
@@ -58,8 +58,6 @@ export interface LoginResponse {
 
 export interface RegisterRequest {
   email: string;
-  username: string;
+  fullName: string;
   password: string;
-  firstName?: string;
-  lastName?: string;
 }

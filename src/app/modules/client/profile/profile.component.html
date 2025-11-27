@@ -1,0 +1,386 @@
+<div class="modal fade" id="apiKeyModal" tabindex="-1" aria-labelledby="apiKeyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="apiKeyModalLabel"><i class="bi bi-shield-lock me-2"></i>API Key mới (Lưu ý)</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning">
+          <p class="fw-bold m-0">⚠️ Key này chỉ hiển thị một lần. Hãy sao chép ngay!</p>
+        </div>
+        
+        <div class="form-label mt-3">Plaintext Key:</div>
+        <div class="input-group">
+          <input type="text" 
+                 class="form-control fw-bold" 
+                 [value]="newlyGeneratedKey.key" 
+                 id="plaintextKeyInput" 
+                 readonly>
+          <button type="button" 
+                  class="btn btn-primary" 
+                  (click)="copyKeyToClipboard()" 
+                  id="copyKeyButton">
+            <i class="bi bi-clipboard"></i> Copy
+          </button>
+        </div>
+        <small class="text-muted mt-2 d-block">{{ newlyGeneratedKey.warning }}</small>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đã sao chép & Đóng</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="profile-container">
+  <div class="container py-4">
+    <!-- Modal API Key -->
+    <div class="modal fade" id="apiKeyModal" tabindex="-1" aria-labelledby="apiKeyModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header bg-warning">
+            <h5 class="modal-title" id="apiKeyModalLabel">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              API Key mới (Lưu ý)
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <div class="alert alert-warning mb-3">
+              <i class="bi bi-exclamation-circle me-2"></i>
+              {{ newlyGeneratedKey.warning }}
+            </div>
+            <label class="form-label fw-semibold">Plaintext Key:</label>
+            <div class="input-group">
+              <input 
+                type="text" 
+                class="form-control font-monospace" 
+                id="plaintextKeyInput" 
+                [value]="newlyGeneratedKey.key" 
+                readonly
+              >
+              <button 
+                class="btn btn-outline-secondary" 
+                type="button" 
+                id="copyKeyButton"
+                (click)="copyKeyToClipboard()"
+              >
+                <i class="bi bi-clipboard"></i> Copy
+              </button>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
+              <i class="bi bi-check-circle me-1"></i>
+              Đã sao chép & Đóng
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Layout: Sidebar + Content -->
+    <div class="row g-4">
+      <!-- Sidebar -->
+      <div class="col-lg-3 col-md-4">
+        <div class="profile-sidebar">
+          <div class="profile-avatar mb-4">
+            <div class="avatar-placeholder">
+              {{ currentUser?.fullName?.charAt(0)?.toUpperCase() }}
+            </div>
+            <h5 class="mt-3 mb-1">{{ currentUser?.fullName }}</h5>
+            <small class="text-muted">{{ currentUser?.email }}</small>
+          </div>
+
+          <nav class="profile-nav">
+            <button 
+              class="profile-nav__item" 
+              [class.active]="activeTab === 'profile'"
+              (click)="setActiveTab('profile')"
+            >
+              <i class="bi bi-person"></i>
+              <span>Thông tin cá nhân</span>
+            </button>
+            <button 
+              class="profile-nav__item" 
+              [class.active]="activeTab === 'password'"
+              (click)="setActiveTab('password')"
+            >
+              <i class="bi bi-lock"></i>
+              <span>Đổi mật khẩu</span>
+            </button>
+            <button 
+              class="profile-nav__item" 
+              [class.active]="activeTab === 'apikeys'"
+              (click)="setActiveTab('apikeys')"
+            >
+              <i class="bi bi-key"></i>
+              <span>API Keys</span>
+            </button>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="col-lg-9 col-md-8">
+        <div class="profile-content">
+          <!-- Tab: Profile -->
+          <div *ngIf="activeTab === 'profile'">
+            <h4 class="profile-section__title mb-4">Thông tin cá nhân</h4>
+            <form [formGroup]="profileForm" (ngSubmit)="onUpdateProfile()">
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Họ tên *</label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    formControlName="fullName"
+                    [class.is-invalid]="submitted && fullName?.invalid"
+                  >
+                  <div class="invalid-feedback" [class.d-block]="submitted && fullName?.invalid">
+                    <div *ngIf="fullName?.errors?.['required']">Họ tên là bắt buộc</div>
+                    <div *ngIf="fullName?.errors?.['minlength']">Họ tên phải có ít nhất 2 ký tự</div>
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Email</label>
+                  <input 
+                    type="email" 
+                    class="form-control" 
+                    formControlName="email"
+                  >
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Số điện thoại</label>
+                  <input 
+                    type="tel" 
+                    class="form-control" 
+                    formControlName="phone"
+                  >
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Địa chỉ</label>
+                  <input 
+                    type="text" 
+                    class="form-control" 
+                    formControlName="address"
+                  >
+                </div>
+              </div>
+
+              <div class="profile-section__actions mt-4">
+                <button 
+                  type="submit" 
+                  class="btn btn-primary"
+                  [disabled]="loading"
+                >
+                  <span *ngIf="!loading">
+                    <i class="bi bi-save me-1"></i>
+                    Lưu thay đổi
+                  </span>
+                  <span *ngIf="loading">
+                    <span class="spinner-border spinner-border-sm me-1"></span>
+                    Đang lưu...
+                  </span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Tab: Password -->
+          <div *ngIf="activeTab === 'password'">
+            <h4 class="profile-section__title mb-4">Đổi mật khẩu</h4>
+            <form [formGroup]="changePasswordForm" (ngSubmit)="onChangePassword()">
+              <div class="row">
+                <div class="col-md-12 mb-3">
+                  <label class="form-label">Mật khẩu hiện tại *</label>
+                  <div class="input-group">
+                    <input 
+                      [type]="showCurrentPassword ? 'text' : 'password'" 
+                      class="form-control" 
+                      formControlName="currentPassword"
+                      [class.is-invalid]="passwordSubmitted && currentPassword?.invalid"
+                    >
+                    <button 
+                      class="btn btn-outline-secondary" 
+                      type="button"
+                      (click)="showCurrentPassword = !showCurrentPassword"
+                    >
+                      <i [class]="showCurrentPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                    </button>
+                  </div>
+                  <div class="invalid-feedback" [class.d-block]="passwordSubmitted && currentPassword?.invalid">
+                    <div *ngIf="currentPassword?.errors?.['required']">Mật khẩu hiện tại là bắt buộc</div>
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Mật khẩu mới *</label>
+                  <div class="input-group">
+                    <input 
+                      [type]="showNewPassword ? 'text' : 'password'" 
+                      class="form-control" 
+                      formControlName="newPassword"
+                      [class.is-invalid]="passwordSubmitted && newPassword?.invalid"
+                    >
+                    <button 
+                      class="btn btn-outline-secondary" 
+                      type="button"
+                      (click)="showNewPassword = !showNewPassword"
+                    >
+                      <i [class]="showNewPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                    </button>
+                  </div>
+                  <div class="invalid-feedback" [class.d-block]="passwordSubmitted && newPassword?.invalid">
+                    <div *ngIf="newPassword?.errors?.['required']">Mật khẩu mới là bắt buộc</div>
+                    <div *ngIf="newPassword?.errors?.['minlength']">Mật khẩu phải có ít nhất 6 ký tự</div>
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Xác nhận mật khẩu *</label>
+                  <div class="input-group">
+                    <input 
+                      [type]="showConfirmPassword ? 'text' : 'password'" 
+                      class="form-control" 
+                      formControlName="confirmPassword"
+                      [class.is-invalid]="passwordSubmitted && (confirmPassword?.invalid || changePasswordForm.errors?.['passwordMismatch'])"
+                    >
+                    <button 
+                      class="btn btn-outline-secondary" 
+                      type="button"
+                      (click)="showConfirmPassword = !showConfirmPassword"
+                    >
+                      <i [class]="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
+                    </button>
+                  </div>
+                  <div class="invalid-feedback" [class.d-block]="passwordSubmitted && (confirmPassword?.invalid || changePasswordForm.errors?.['passwordMismatch'])">
+                    <div *ngIf="confirmPassword?.errors?.['required']">Xác nhận mật khẩu là bắt buộc</div>
+                    <div *ngIf="changePasswordForm.errors?.['passwordMismatch']">Mật khẩu không khớp</div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="profile-section__actions mt-4">
+                <button 
+                  type="submit" 
+                  class="btn btn-primary"
+                  [disabled]="loading"
+                >
+                  <span *ngIf="!loading">
+                    <i class="bi bi-shield-check me-1"></i>
+                    Cập nhật mật khẩu
+                  </span>
+                  <span *ngIf="loading">
+                    <span class="spinner-border spinner-border-sm me-1"></span>
+                    Đang cập nhật...
+                  </span>
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Tab: API Keys -->
+          <div *ngIf="activeTab === 'apikeys'">
+            <h4 class="profile-section__title mb-4">Quản lý API Keys</h4>
+            
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle me-2"></i>
+              API Key dùng để truy cập dịch vụ qua API. Hãy lưu trữ key an toàn, key chỉ được hiển thị một lần duy nhất khi tạo.
+            </div>
+
+            <!-- Create API Key Form -->
+            <div class="card mb-4">
+              <div class="card-header bg-light">
+                <h5 class="mb-0">Tạo API Key mới</h5>
+              </div>
+              <div class="card-body">
+                <form [formGroup]="createApiKeyForm" (ngSubmit)="onCreateApiKey()">
+                  <div class="row align-items-end">
+                    <div class="col-md-8 mb-3 mb-md-0">
+                      <label class="form-label">Tên Key (Tùy chọn)</label>
+                      <input 
+                        type="text" 
+                        class="form-control" 
+                        formControlName="name"
+                        placeholder="VD: Production API Key"
+                      >
+                    </div>
+                    <div class="col-md-4">
+                      <button 
+                        type="submit" 
+                        class="btn btn-primary w-100"
+                        [disabled]="apiKeyLoading"
+                      >
+                        <span *ngIf="!apiKeyLoading">
+                          <i class="bi bi-plus-circle me-1"></i>
+                          Tạo Key
+                        </span>
+                        <span *ngIf="apiKeyLoading">
+                          <span class="spinner-border spinner-border-sm me-1"></span>
+                          Đang tạo...
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- API Keys List -->
+            <h5 class="mb-3">Các API Keys hiện có ({{ apiKeys.length }})</h5>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>STT</th>
+                    <th>Tên Key</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày tạo</th>
+                    <th>Hành động</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngIf="apiKeyLoading">
+                    <td colspan="6" class="text-center py-4">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                      </div>
+                      <p class="mt-2 mb-0">Đang tải...</p>
+                    </td>
+                  </tr>
+                  <tr *ngFor="let key of apiKeys; let i = index">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{ key.name || '—' }}</td>
+                    <td>
+                      <app-active-status-badge [status]="key.status"></app-active-status-badge>
+                    </td>
+                    <td>{{ key.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+                    <td>
+                      <button 
+                        class="btn btn-sm btn-danger"
+                        (click)="onDeleteApiKey(key.id)"
+                        [disabled]="apiKeyLoading"
+                      >
+                        <i class="bi bi-trash"></i> Xóa
+                      </button>
+                    </td>
+                  </tr>
+                  <tr *ngIf="!apiKeyLoading && apiKeys.length === 0">
+                    <td colspan="6" class="text-center py-4 text-muted">
+                      Bạn chưa có API Key nào.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

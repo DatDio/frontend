@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, OnInit } from '@angular/core';
+﻿import { Component, Input, Output, EventEmitter, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Category } from '../../../../../core/models/category.model';
@@ -33,8 +33,10 @@ export class ProductCreateModalComponent implements OnInit {
       name: ['', [Validators.required, Validators.minLength(3)]],
       description: [''],
       price: [0, [Validators.required, Validators.min(0)]],
+      liveTime: [''],
+      country: [''],
       categoryId: ['', Validators.required],
-      status: ['active', Validators.required]
+      status: ['1', Validators.required] // default to "Hoat dong"
     });
   }
 
@@ -59,13 +61,13 @@ export class ProductCreateModalComponent implements OnInit {
         this.isLoading = false;
         if (response.success) {
           this.notificationService.success('Tạo sản phẩm thành công');
-          this.createForm.reset({ status: 'active' });
+          this.createForm.reset({ status: '1' });
           this.successCreate.emit();
         }
       },
       error: (error: any) => {
         this.isLoading = false;
-        this.notificationService.error('Lỗi khi tạo sản phẩm');
+        this.notificationService.error('Có lỗi xảy ra: ' + (error.error?.message || 'Không thể tạo sản phẩm'));
       }
     });
   }

@@ -1,32 +1,49 @@
+$primary-blue: #007bff; // Màu xanh chủ đạo
+$dark-background: #1a1a1a; // Màu đen/xám đậm
+
+// ======================= NAVBAR STYLES =======================
 .client-navbar {
   background: #ffffff;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+  padding: 10px 0;
 }
 
 .client-navbar .navbar-brand {
-  color: #0d6efd;
-  font-weight: 700;
+  color: $primary-blue;
+  font-weight: 800;
+  font-size: 24px;
 }
 
 .client-navbar .nav-link {
   color: #333 !important;
+  font-weight: 500;
+  transition: all 0.2s;
+  padding: 8px 12px !important;
+  border-bottom: 2px solid transparent; // Tạo khoảng trống để border-bottom không làm nhảy layout
+}
+
+.client-navbar .nav-link:hover {
+  color: $primary-blue !important;
 }
 
 .client-navbar .nav-link.active {
-  color: #0d6efd !important;
-  border-bottom: 2px solid #0d6efd;
+  color: $primary-blue !important;
+  border-bottom: 2px solid $primary-blue; // Active màu xanh
+  font-weight: 600;
 }
 
 .client-navbar .navbar-toggler {
-  border: 1px solid #0d6efd;
+  border: 1px solid $primary-blue;
 }
 
+// Chỉnh lại icon Toggle cho gọn
 .client-navbar .navbar-toggler-icon {
   background: none;
   position: relative;
   width: 22px;
   height: 2px;
-  background-color: #0d6efd;
+  background-color: $primary-blue;
 }
 
 .client-navbar .navbar-toggler-icon::before,
@@ -36,7 +53,8 @@
   left: 0;
   width: 22px;
   height: 2px;
-  background-color: #0d6efd;
+  background-color: $primary-blue;
+  transition: all 0.2s;
 }
 
 .client-navbar .navbar-toggler-icon::before {
@@ -47,17 +65,35 @@
   top: 6px;
 }
 
+// Styling cho nút Đăng ký (Sign Up)
+.custom-signup-btn {
+    background-color: $primary-blue;
+    color: white;
+    font-weight: 600;
+    padding: 8px 20px;
+    border-radius: 6px;
+    border: none;
+    transition: all 0.3s ease;
+
+    &:hover {
+        background-color: darken($primary-blue, 10%);
+    }
+}
+
 .balance-info-navbar {
-  background: #f1f5ff;
+  background: #e6f0ff; // Nền xanh nhạt
   padding: 6px 14px;
   border-radius: 20px;
   font-weight: 600;
-  color: #0d6efd;
+  color: $primary-blue;
+  border: 1px solid $primary-blue;
 }
 
+// ======================= HERO SECTION (MENU) STYLES =======================
 .hero-section {
-  background: #111;
+  background: $dark-background; // Nền đen đậm
   padding: 15px 0;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 }
 
 .hero-menu {
@@ -70,32 +106,53 @@
 .hero-link {
   display: flex;
   align-items: center;
-  gap: 6px;
-  color: #ffc107;
+  gap: 8px;
+  color: #ccc; // Màu chữ xám nhạt
   text-decoration: none;
-  padding: 8px 12px;
+  padding: 10px 15px;
   border-radius: 6px;
   transition: 0.2s;
+  font-weight: 500;
+}
+
+.hero-link i {
+    font-size: 16px;
 }
 
 .hero-link:hover {
-  background: rgba(255,255,255,0.1);
+  color: white; // Hover sáng hơn
+  background: rgba(255, 255, 255, 0.1);
 }
 
+.hero-link.active {
+    color: $primary-blue; // Link Active màu xanh
+    background: #333; // Nền tối hơn
+    font-weight: 600;
+}
+
+// ======================= FOOTER STYLES =======================
 .client-footer {
-  background: #121212;
+  background: $dark-background; // Nền đen
   color: #ccc;
   padding: 40px 0 20px;
 }
 
+.client-footer h5, .client-footer h6 {
+    color: $primary-blue; // Tiêu đề footer màu xanh
+    font-weight: 700;
+}
+
 .client-footer a {
   color: #aaa;
+  text-decoration: none;
+  transition: color 0.2s;
 }
 
 .client-footer a:hover {
-  color: #fff;
+  color: white;
 }
 
+// ======================= RESPONSIVE =======================
 @media (max-width: 768px) {
   .hero-menu {
     justify-content: space-around;
@@ -103,10 +160,11 @@
 
   .hero-link {
     flex-direction: column;
-    font-size: 12px;
+    font-size: 13px;
+    padding: 8px 10px;
   }
 
-  .hero-link span {
-    font-size: 11px;
+  .hero-link i {
+    font-size: 14px;
   }
 }

@@ -98,6 +98,17 @@ export class UserService {
       );
   }
 
+  // ===== CHANGE PASSWORD =====
+  changePassword(data: { currentPassword: string; newPassword: string }): Observable<ApiResponse<void>> {
+    this.loaderService.show();
+
+    return this.httpClient
+      .post<ApiResponse<void>>(`${AdminUserApi.SEARCH.split('/admin')[0]}/profile/change-password`, data)
+      .pipe(
+        finalize(() => this.loaderService.hide())
+      );
+  }
+
   // ===== FILTER BUILDER =====
   private createUserFilter(filter?: UserFilter): HttpParams {
     let params = new HttpParams()

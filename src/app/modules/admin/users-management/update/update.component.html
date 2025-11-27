@@ -1,10 +1,12 @@
 <div class="container-fluid py-4">
   <div class="row mb-4">
     <div class="col-md-8">
-      <h2>Edit User</h2>
+      <h2>Cập nhật thông tin người dùng</h2>
     </div>
     <div class="col-md-4 text-end">
-      <button class="btn btn-secondary" (click)="onCancel()">Back</button>
+      <button class="btn btn-secondary" (click)="onCancel()">
+        <i class="bi bi-arrow-left me-1"></i> Quay lại
+      </button>
     </div>
   </div>
 
@@ -22,13 +24,13 @@
               [class.is-invalid]="submitted && email?.invalid"
             >
             <div class="invalid-feedback" *ngIf="submitted && email?.invalid">
-              <span *ngIf="email?.errors?.['required']">Email is required</span>
-              <span *ngIf="email?.errors?.['email']">Email must be valid</span>
+              <span *ngIf="email?.errors?.['required']">Vui lòng nhập Email</span>
+              <span *ngIf="email?.errors?.['email']">Email không đúng định dạng</span>
             </div>
           </div>
 
           <div class="col-md-6">
-            <label for="fullName" class="form-label">Full Name <span class="text-danger">*</span></label>
+            <label for="fullName" class="form-label">Họ và tên <span class="text-danger">*</span></label>
             <input 
               type="text" 
               class="form-control" 
@@ -37,15 +39,15 @@
               [class.is-invalid]="submitted && fullName?.invalid"
             >
             <div class="invalid-feedback" *ngIf="submitted && fullName?.invalid">
-              <span *ngIf="fullName?.errors?.['required']">Full name is required</span>
-              <span *ngIf="fullName?.errors?.['minlength']">Full name must be at least 2 characters</span>
+              <span *ngIf="fullName?.errors?.['required']">Vui lòng nhập họ và tên</span>
+              <span *ngIf="fullName?.errors?.['minlength']">Tên phải có ít nhất 2 ký tự</span>
             </div>
           </div>
         </div>
 
         <div class="row mb-3">
           <div class="col-md-6">
-            <label for="phone" class="form-label">Phone</label>
+            <label for="phone" class="form-label">Số điện thoại</label>
             <input 
               type="tel" 
               class="form-control" 
@@ -55,7 +57,7 @@
           </div>
 
           <div class="col-md-6">
-            <label for="status" class="form-label">Status</label>
+            <label for="status" class="form-label">Trạng thái</label>
             <select class="form-select" id="status" formControlName="status">
               <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
             </select>
@@ -64,7 +66,7 @@
 
         <div class="row mb-3">
           <div class="col-md-6">
-            <label for="address" class="form-label">Address</label>
+            <label for="address" class="form-label">Địa chỉ</label>
             <input 
               type="text" 
               class="form-control" 
@@ -76,7 +78,7 @@
 
         <div class="row mb-3">
           <div class="col-md-12">
-            <label for="roles" class="form-label">Roles <span class="text-danger">*</span></label>
+            <label for="roles" class="form-label">Vai trò <span class="text-danger">*</span></label>
             <select 
               multiple 
               class="form-select" 
@@ -87,8 +89,9 @@
               <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
             </select>
             <div class="invalid-feedback" *ngIf="submitted && rolesControl?.invalid">
-              At least one role is required
+              Vui lòng chọn ít nhất một vai trò
             </div>
+            <div class="form-text text-muted">Giữ phím Ctrl (hoặc Cmd) để chọn nhiều dòng.</div>
           </div>
         </div>
 
@@ -99,10 +102,12 @@
               class="btn btn-primary me-2"
               [disabled]="loading"
             >
-              <span *ngIf="!loading">Update User</span>
+              <span *ngIf="!loading">
+                <i class="bi bi-save me-1"></i> Lưu thay đổi
+              </span>
               <span *ngIf="loading">
                 <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                Updating...
+                Đang lưu...
               </span>
             </button>
             <button 
@@ -111,7 +116,7 @@
               (click)="onCancel()"
               [disabled]="loading"
             >
-              Cancel
+              Hủy bỏ
             </button>
           </div>
         </div>

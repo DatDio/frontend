@@ -1,4 +1,4 @@
-<div class="container-fluid p-4">
+﻿<div class="container-fluid p-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Quản lý đơn hàng</h1>
   </div>
@@ -40,13 +40,13 @@
             type="button"
             class="btn btn-primary w-50"
             (click)="handleSearch()">
-            <i class="fas fa-search"></i> Tìm kiếm
+            <i class="bi bi-search"></i> Tìm kiếm
           </button>
           <button 
             type="button"
             class="btn btn-outline-secondary w-50"
             (click)="clearForm()">
-            <i class="fas fa-redo"></i> Xóa
+            <i class="bi bi-arrow-clockwise"></i> Xóa bộ lọc
           </button>
         </div>
       </form>
@@ -87,7 +87,7 @@
             <td>{{ order.id }}</td>
             <td class="fw-bold">{{ order.orderNumber }}</td>
             <td>{{ order.userEmail }}</td>
-            <td>${{ order.totalAmount | number: '1.2-2' }}</td>
+            <td>{{ order.totalAmount | number: '1.2-2' }}</td>
             <td>
               <span [ngClass]="'badge ' + getStatusClass(order.orderStatus)">
                 {{ getStatusLabel(order.orderStatus) }}
@@ -95,12 +95,14 @@
             </td>
             <td>{{ order.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
             <td>
-              <button class="btn btn-sm btn-info me-2" (click)="onViewDetail(order)">
-                <i class="fas fa-eye"></i> Chi tiết
-              </button>
-              <button class="btn btn-sm btn-danger" (click)="onDeleteOrder(order.id)">
-                <i class="fas fa-trash"></i> Xóa
-              </button>
+              <div class="action-buttons">
+                <button class="icon-btn info" (click)="onViewDetail(order)" title="Chi tiết">
+                  <i class="bi bi-eye"></i>
+                </button>
+                <button class="icon-btn danger" (click)="onDeleteOrder(order.id)" title="Xóa">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </div>
             </td>
           </tr>
         }

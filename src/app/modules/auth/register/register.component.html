@@ -1,8 +1,8 @@
 <div class="auth-container">
   <div class="auth-card">
     <div class="text-center mb-4">
-      <h2 class="auth-card__title">Create Account</h2>
-      <p class="text-muted">Sign up to get started</p>
+      <h2 class="auth-card__title">Tạo tài khoản</h2>
+      <p class="text-muted">Đăng ký để bắt đầu</p>
     </div>
 
     @if (errorMessage) {
@@ -13,107 +13,84 @@
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
       <div class="mb-3">
-        <label for="email" class="form-label">Email Address</label>
+        <label for="email" class="form-label">Email</label>
         <input
           type="email"
           class="form-control"
           id="email"
           formControlName="email"
-          placeholder="Enter your email"
+          placeholder="Nhập email của bạn"
           [class.is-invalid]="email?.invalid && email?.touched"
         >
         @if (email?.invalid && email?.touched) {
           <div class="invalid-feedback">
             @if (email?.errors?.['required']) {
-              <span>Email is required</span>
+              <span>Email là bắt buộc</span>
             }
             @if (email?.errors?.['email']) {
-              <span>Please enter a valid email</span>
+              <span>Vui lòng nhập email hợp lệ</span>
             }
           </div>
         }
       </div>
 
       <div class="mb-3">
-        <label for="username" class="form-label">Username</label>
+        <label for="fullName" class="form-label">Tên người dùng</label>
         <input
           type="text"
           class="form-control"
-          id="username"
-          formControlName="username"
-          placeholder="Choose a username"
-          [class.is-invalid]="username?.invalid && username?.touched"
+          id="fullName"
+          formControlName="fullName"
+          placeholder="Chọn tên người dùng"
+          [class.is-invalid]="fullName?.invalid && fullName?.touched"
         >
-        @if (username?.invalid && username?.touched) {
+        @if (fullName?.invalid && fullName?.touched) {
           <div class="invalid-feedback">
-            @if (username?.errors?.['required']) {
-              <span>Username is required</span>
+            @if (fullName?.errors?.['required']) {
+              <span>Tên người dùng là bắt buộc</span>
             }
-            @if (username?.errors?.['minlength']) {
-              <span>Username must be at least 3 characters</span>
+            @if (fullName?.errors?.['minlength']) {
+              <span>Tên người dùng phải có ít nhất 3 ký tự</span>
             }
           </div>
         }
       </div>
 
-      <div class="row">
-        <div class="col-md-6 mb-3">
-          <label for="firstName" class="form-label">First Name</label>
-          <input
-            type="text"
-            class="form-control"
-            id="firstName"
-            formControlName="firstName"
-            placeholder="First name"
-          >
-        </div>
-        <div class="col-md-6 mb-3">
-          <label for="lastName" class="form-label">Last Name</label>
-          <input
-            type="text"
-            class="form-control"
-            id="lastName"
-            formControlName="lastName"
-            placeholder="Last name"
-          >
-        </div>
-      </div>
-
       <div class="mb-3">
-        <label for="password" class="form-label">Password</label>
+        <label for="password" class="form-label">Mật khẩu</label>
         <input
           type="password"
           class="form-control"
           id="password"
           formControlName="password"
-          placeholder="Create a password"
+          placeholder="Nhập mật khẩu của bạn"
           [class.is-invalid]="password?.invalid && password?.touched"
         >
         @if (password?.invalid && password?.touched) {
           <div class="invalid-feedback">
             @if (password?.errors?.['required']) {
-              <span>Password is required</span>
+              <span>Mật khẩu không được để trống</span>
             }
             @if (password?.errors?.['minlength']) {
-              <span>Password must be at least 6 characters</span>
+              <span>Mật khẩu phải có ít nhất 6 ký tự</span>
             }
           </div>
         }
       </div>
 
       <div class="mb-3">
-        <label for="confirmPassword" class="form-label">Confirm Password</label>
+        <label for="confirmPassword" class="form-label">Xác nhận mật khẩu</label>
         <input
           type="password"
           class="form-control"
           id="confirmPassword"
           formControlName="confirmPassword"
-          placeholder="Confirm your password"
+          placeholder="Xác nhận mật khẩu của bạn"
           [class.is-invalid]="(confirmPassword?.invalid && confirmPassword?.touched) || registerForm.errors?.['passwordMismatch']"
         >
         @if (registerForm.errors?.['passwordMismatch'] && confirmPassword?.touched) {
           <div class="invalid-feedback d-block">
-            <span>Passwords do not match</span>
+            <span>Mật khẩu không khớp</span>
           </div>
         }
       </div>
@@ -122,17 +99,17 @@
         <button type="submit" class="btn btn-primary" [disabled]="loading">
           @if (loading) {
             <span class="spinner-border spinner-border-sm me-2"></span>
-            Creating account...
+            Đang tạo tài khoản...
           } @else {
-            Sign Up
+            Đăng ký
           }
         </button>
       </div>
 
       <div class="text-center">
         <p class="mb-0">
-          Already have an account?
-          <a routerLink="/auth/login" class="text-decoration-none">Sign In</a>
+          Bạn đã có tài khoản?
+          <a routerLink="/auth/login" class="text-decoration-none">Đăng nhập</a>
         </p>
       </div>
     </form>

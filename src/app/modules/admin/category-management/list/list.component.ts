@@ -8,11 +8,16 @@ import { CategoryModalComponent } from '../category-modal/category-modal.compone
 import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
 import { PaginationService } from '../../../../shared/services/pagination.service';
 import { ActiveStatusSelectComponent } from '../../../../shared/components/active-status-select/active-status-select.component';
-
+import { ActiveStatusBadgeComponent } from '../../../../shared/components/active-status-badge/active-status-badge.component';
 @Component({
   selector: 'app-category-list',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, CategoryModalComponent, PaginationComponent, ActiveStatusSelectComponent],
+  imports: [CommonModule,
+    ReactiveFormsModule,
+    CategoryModalComponent,
+    PaginationComponent,
+    ActiveStatusSelectComponent,
+    ActiveStatusBadgeComponent],
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss']
 })

@@ -1,4 +1,4 @@
-<div class="modal-overlay" (click)="onClose()">
+﻿<div class="modal-overlay" (click)="onClose()">
   <div class="modal-content" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h5 class="modal-title">Cập nhật sản phẩm</h5>
@@ -59,11 +59,33 @@
           </div>
         </div>
 
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label for="liveTime" class="form-label">LiveTime</label>
+            <input
+              id="liveTime"
+              type="text"
+              class="form-control"
+              formControlName="liveTime"
+              placeholder="Ví dụ: 3-5 giờ hoặc 6-12 Tháng">
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label for="country" class="form-label">Quốc gia</label>
+            <input
+              id="country"
+              type="text"
+              class="form-control"
+              formControlName="country"
+              placeholder="Ví dụ: Việt Nam">
+          </div>
+        </div>
+
         <div class="mb-3">
           <label for="status" class="form-label">Trạng thái <span class="text-danger">*</span></label>
           <select id="status" class="form-select" formControlName="status">
-            <option value="active">Hoạt động</option>
-            <option value="inactive">Vô hiệu</option>
+            <option value="1">Hoạt động</option>
+            <option value="0">Vô hiệu</option>
           </select>
         </div>
       </form>

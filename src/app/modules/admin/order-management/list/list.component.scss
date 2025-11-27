@@ -67,3 +67,44 @@ h1 {
 .fw-bold {
   font-weight: 600;
 }
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+
+  .icon-btn {
+    width: 34px;
+    height: 34px;
+    border: none;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.15s ease;
+
+    i {
+      font-size: 16px;
+    }
+
+    &.info {
+      background: linear-gradient(135deg, #4dabf7, #228be6);
+    }
+
+    &.danger {
+      background: linear-gradient(135deg, #ff6b6b, #d6336c);
+    }
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    }
+  }
+}

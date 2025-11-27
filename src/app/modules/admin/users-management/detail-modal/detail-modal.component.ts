@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { UserService } from '../../../../core/services/user.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { User } from '../../../../core/models/user.model';
-
+import { ActiveStatusBadgeComponent } from '../../../../shared/components/active-status-badge/active-status-badge.component';
 declare const window: any;
 
 @Component({
   selector: 'app-user-detail-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ActiveStatusBadgeComponent],
   templateUrl: './detail-modal.component.html',
   styleUrls: ['./detail-modal.component.scss']
 })
@@ -23,7 +23,7 @@ export class UserDetailModalComponent implements OnInit {
   loading = false;
   private modal: any = null;
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   openModal(userId: number): void {
     this.loading = true;
@@ -35,12 +35,12 @@ export class UserDetailModalComponent implements OnInit {
           this.user = response.data;
           this.showModal();
         } else {
-          this.notificationService.error(response.message || 'Failed to load user');
+          this.notificationService.error(response.message || 'Có lỗi xảy ra');
         }
         this.loading = false;
       },
       error: (error) => {
-        this.notificationService.error(error.error?.message || 'An error occurred');
+        this.notificationService.error(error.error?.message || 'Có lỗi xảy ra');
         this.loading = false;
       }
     });

@@ -7,6 +7,11 @@ export const clientRoutes: Routes = [
     loadComponent: () => import('../../modules/client/home/home.component').then(m => m.HomeComponent)
   },
   {
+    path: 'profile',
+    canActivate: [authGuard],
+    loadComponent: () => import('../../modules/client/profile/profile.component').then(m => m.ProfileComponent)
+  },
+  {
     path: 'orders',
     canActivate: [authGuard],
     loadComponent: () => import('../../modules/client/orders/list/list.component').then(m => m.ClientOrderListComponent)

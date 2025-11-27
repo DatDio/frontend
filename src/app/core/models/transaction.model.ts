@@ -21,6 +21,6 @@ export interface TransactionFilter extends PageFilter {
   status?: string;
   minAmount?: number;
   maxAmount?: number;
-  startDate?: string; // ISO date
-  endDate?: string;   // ISO date
+  dateFrom?: string; // ISO date
+  dateTo?: string;   // ISO date
 }

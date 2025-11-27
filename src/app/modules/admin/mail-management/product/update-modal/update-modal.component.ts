@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, inject, OnInit } from '@angular/core';
+﻿import { Component, Input, Output, EventEmitter, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Category } from '../../../../../core/models/category.model';
@@ -36,8 +36,10 @@ export class ProductUpdateModalComponent implements OnInit {
       name: ['', [Validators.required, Validators.minLength(3)]],
       description: [''],
       price: [0, [Validators.required, Validators.min(0)]],
+      liveTime: [''],
+      country: [''],
       categoryId: ['', Validators.required],
-      status: ['active', Validators.required]
+      status: ['1', Validators.required]
     });
   }
 
@@ -47,6 +49,8 @@ export class ProductUpdateModalComponent implements OnInit {
         name: this.product.name,
         description: this.product.description,
         price: this.product.price,
+        liveTime: this.product.liveTime,
+        country: this.product.country,
         categoryId: this.product.categoryId,
         status: this.product.status
       });

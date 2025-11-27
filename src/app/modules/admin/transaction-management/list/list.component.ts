@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TransactionResponse } from '../../../../core/models/transaction.model';
-import { TransactionService } from '../../../../core/services/transaction.service';
+import { TransactionService } from '../../../../core/services/wallet.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
 import { PaginationService } from '../../../../shared/services/pagination.service';
@@ -117,8 +117,7 @@ export class TransactionListComponent implements OnInit {
   private loadTransactions(): void {
     const params: any = {
       page: this.paginationConfig.currentPage,
-      limit: this.paginationConfig.pageSize,
-      sort: 'id,desc'
+      limit: this.paginationConfig.pageSize
     };
     
     if (this.dataFormSearch.transactionCode) {
