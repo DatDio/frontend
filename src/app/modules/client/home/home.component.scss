@@ -223,20 +223,76 @@ $light-gray: #f8f9fa;
       }
     }
 
-    @media (max-width: 768px) {
-      padding: 40px 0;
-      .product-group .product-list .product-header {
-        display: none;
+    @media (max-width: 1200px) {
+      .product-group .product-list {
+        .product-header,
+        .product-item {
+          grid-template-columns: 1.3fr 140px 120px 120px 100px 120px;
+          gap: 14px;
+        }
       }
+    }
+
+    @media (max-width: 992px) {
+      padding: 40px 0;
+
+      .product-group .product-list {
+        gap: 12px;
+
+        .product-header {
+          display: none;
+        }
+
+        .product-item {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          grid-template-areas:
+            "info info"
+            "live price"
+            "country quantity"
+            "action action";
+          align-items: flex-start;
+          gap: 12px;
+          padding: 16px;
+          text-align: left;
+
+          .info-col { grid-area: info; }
+          .live-col { grid-area: live; }
+          .country-col { grid-area: country; }
+          .price-col { grid-area: price; text-align: left; }
+          .quantity-col { grid-area: quantity; text-align: left; }
+          .action-col { grid-area: action; }
+
+          [data-label] {
+            position: relative;
+          }
+
+          [data-label]::before {
+            content: attr(data-label);
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: #6c757d;
+            margin-bottom: 4px;
+          }
+
+          .action-col {
+            width: 100%;
+            .buy-btn { width: 100%; }
+          }
+        }
+      }
+    }
+
+    @media (max-width: 576px) {
       .product-group .product-list .product-item {
         grid-template-columns: 1fr;
-        gap: 10px;
-        .info-col { order: 1; }
-        .live-col { order: 2; }
-        .country-col { order: 3; }
-        .price-col { order: 4; text-align: left; }
-        .quantity-col { order: 5; text-align: left; }
-        .action-col { order: 6; }
+        grid-template-areas:
+          "info"
+          "live"
+          "country"
+          "price"
+          "quantity"
+          "action";
       }
     }
   }

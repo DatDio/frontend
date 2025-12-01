@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+﻿import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -11,10 +11,13 @@ import { OrderService } from '../../../core/services/order.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { PaginationComponent, PaginationConfig } from '../../../shared/components/pagination/pagination.component';
 import { PaginationService } from '../../../shared/services/pagination.service';
+import { WebSocketService } from '../../../core/services/websocket.service';
 
 import { Category } from '../../../core/models/category.model';
 import { Product } from '../../../core/models/product.model';
 import { OrderCreate } from '../../../core/models/order.model';
+import { ProductQuantityMessage } from '../../../core/models/product-quantity-message.model';
+import { ACTIVE_STATUS_ENUM } from '../../../Utils/enums/commom.enum';
 
 declare var bootstrap: any;
 
@@ -25,7 +28,7 @@ declare var bootstrap: any;
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   private readonly seoService = inject(SeoService);
   private readonly categoryService = inject(CategoryService);
   private readonly orderService = inject(OrderService);
@@ -34,6 +37,7 @@ export class HomeComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly webSocketService = inject(WebSocketService);
   categories: Category[] = [];
   paginationConfig: PaginationConfig = {
     currentPage: 0,
@@ -46,6 +50,8 @@ export class HomeComponent implements OnInit {
   selectedProduct: Product | null = null;
   orderLoading = false;
   private modalInstance: any;
+  private productQuantityUnsub?: () => void;
+  private latestQuantities = new Map<number, number>();
 
   constructor() { }
 
@@ -53,6 +59,11 @@ export class HomeComponent implements OnInit {
     this.seoService.setTitle('MailShop - Chuyên cung cấp tài nguyên marketing');
     this.initOrderForm();
     this.loadCategories();
+    this.subscribeToQuantityUpdates();
+  }
+
+  ngOnDestroy(): void {
+    this.productQuantityUnsub?.();
   }
 
   private initOrderForm(): void {
@@ -64,16 +75,18 @@ export class HomeComponent implements OnInit {
   loadCategories(): void {
     this.categoryService.list({
       page: this.paginationConfig.currentPage,
-      limit: this.paginationConfig.pageSize
+      limit: this.paginationConfig.pageSize,
+      status: '1'
     }).subscribe({
       next: res => {
         if (res.success && res.data?.content) {
           this.categories = res.data.content;
           const paginationInfo = this.paginationService.extractPaginationInfo(res.data);
           this.paginationConfig = { ...this.paginationConfig, ...paginationInfo };
+          this.applyBufferedQuantities();
         }
       },
-      error: err => this.notificationService.error('Không thể tải danh sách sản phẩm')
+      error: () => this.notificationService.error('Không thể tải danh sách sản phẩm')
     });
   }
 
@@ -162,5 +175,40 @@ export class HomeComponent implements OnInit {
     if (!this.selectedProduct) return 0;
     const quantity = this.orderForm.get('quantity')?.value || 0;
     return this.selectedProduct.price * quantity;
+  }
+
+  private subscribeToQuantityUpdates(): void {
+    this.productQuantityUnsub = this.webSocketService.subscribe<ProductQuantityMessage>(
+      '/topic/product-quantity',
+      (payload) => this.handleQuantityUpdate(payload)
+    );
+  }
+
+  private handleQuantityUpdate(update: ProductQuantityMessage): void {
+    if (!update?.productId) {
+      return;
+    }
+
+    this.latestQuantities.set(update.productId, update.quantity);
+    this.categories = this.categories.map(category => ({
+      ...category,
+      products: category.products.map(product =>
+        product.id === update.productId ? { ...product, quantity: update.quantity } : product
+      )
+    }));
+  }
+
+  private applyBufferedQuantities(): void {
+    if (this.latestQuantities.size === 0) {
+      return;
+    }
+
+    this.categories = this.categories.map(category => ({
+      ...category,
+      products: category.products.map(product => {
+        const latest = this.latestQuantities.get(product.id);
+        return latest != null ? { ...product, quantity: latest } : product;
+      })
+    }));
   }
 }

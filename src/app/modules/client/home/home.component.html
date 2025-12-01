@@ -39,30 +39,30 @@
           @for (product of category.products; track product.id) {
           <div class="product-item">
 
-            <div class="info-col">
+            <div class="info-col" data-label="Sản phẩm">
               <div class="product-name">{{ product.name }}</div>
               <div class="product-desc">{{ product.description }}</div>
             </div>
 
-            <div class="live-col">
+            <div class="live-col" data-label="LiveTime">
               <span class="live-chip">{{ product.liveTime || '—' }}</span>
             </div>
 
-            <div class="country-col">
+            <div class="country-col" data-label="Quốc gia">
               <span class="country-chip">
                 <i class="fas fa-flag me-1"></i>{{ product.country || '—' }}
               </span>
             </div>
 
-            <div class="price-col">
+            <div class="price-col" data-label="Giá">
               <div class="price">{{ product.price | number }} VNĐ</div>
             </div>
 
-            <div class="quantity-col">
+            <div class="quantity-col" data-label="Số lượng">
               <div class="quantity-box">{{ product.quantity | number }}</div>
             </div>
 
-            <div class="action-col">
+            <div class="action-col" data-label="Thao tác">
               <button class="buy-btn" (click)="prepareOrder(product)">
                 <i class="fas fa-plus me-1"></i> Mua
               </button>
