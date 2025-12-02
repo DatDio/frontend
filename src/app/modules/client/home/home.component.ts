@@ -18,6 +18,7 @@ import { Product } from '../../../core/models/product.model';
 import { OrderCreate } from '../../../core/models/order.model';
 import { ProductQuantityMessage } from '../../../core/models/product-quantity-message.model';
 import { ACTIVE_STATUS_ENUM } from '../../../Utils/enums/commom.enum';
+import { TransactionService } from '../../../core/services/wallet.service';
 
 declare var bootstrap: any;
 
@@ -36,6 +37,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private readonly paginationService = inject(PaginationService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly authService = inject(AuthService);
+  private readonly walletService = inject(TransactionService);
   private readonly router = inject(Router);
   private readonly webSocketService = inject(WebSocketService);
   categories: Category[] = [];
@@ -140,6 +142,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           if (response.success) {
             this.notificationService.success('Đặt hàng thành công!');
             this.closeOrderModal();
+            this.walletService.refreshBalance();
             this.router.navigate(['/orders']);
           } else {
             this.notificationService.error(response.message || 'Đặt hàng thất bại');
