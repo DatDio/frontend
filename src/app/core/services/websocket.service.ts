@@ -44,13 +44,15 @@ export class WebSocketService implements OnDestroy {
   }
 
   private createClient(): Client {
+    const wsUrl = CommonApi.WS_URL;
+
     const client = new Client({
-      webSocketFactory: () => new SockJS(`${CommonApi.BASE_URL}/ws`),
+      webSocketFactory: () => new SockJS(wsUrl),
       reconnectDelay: 5000
     });
 
     client.onConnect = () => {
-      console.info('[WebSocket] Connected to', `${CommonApi.BASE_URL}/ws`);
+      console.info('[WebSocket] Connected to', wsUrl);
       this.subscriptions.forEach(entry => this.resubscribe(entry));
     };
 
