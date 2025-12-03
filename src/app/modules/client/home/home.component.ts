@@ -1,5 +1,5 @@
-﻿import { Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+﻿import { Component, OnDestroy, OnInit, PLATFORM_ID, afterRender, inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
@@ -30,6 +30,8 @@ declare var bootstrap: any;
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit, OnDestroy {
+  private readonly platformId = inject(PLATFORM_ID);
+  private readonly isBrowser = isPlatformBrowser(this.platformId);
   private readonly seoService = inject(SeoService);
   private readonly categoryService = inject(CategoryService);
   private readonly orderService = inject(OrderService);
@@ -55,7 +57,16 @@ export class HomeComponent implements OnInit, OnDestroy {
   private productQuantityUnsub?: () => void;
   private latestQuantities = new Map<number, number>();
 
-  constructor() { }
+  constructor() {
+    // Ensure data fetch also runs on client after hydration (SSR on Vercel may skip browser call).
+    if (this.isBrowser) {
+      afterRender(() => {
+        if (this.categories.length === 0) {
+          this.loadCategories();
+        }
+      });
+    }
+  }
 
   ngOnInit(): void {
     this.seoService.setTitle('MailShop - Chuyên cung cấp tài nguyên marketing');
@@ -103,7 +114,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.loadCategories();
   }
 
-  // --- LOGIC MODAL & MUA HÀNG ---
+  // --- LOGIC MODAL & MUA HANG ---
 
   prepareOrder(product: Product): void {
     if (!this.authService.isAuthenticated()) {
