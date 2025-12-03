@@ -8,6 +8,7 @@ import { NotificationService } from '../../../../core/services/notification.serv
 import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
 import { PaginationService } from '../../../../shared/services/pagination.service';
 import { convertToISO } from '../../../../Utils/functions/date-time-utils';
+import { environment } from '../../../../../environments/environment';
 
 declare global {
   interface Window {
@@ -101,7 +102,7 @@ export class ClientTransactionListComponent implements OnInit {
 
     try {
       const payOSConfig = {
-        RETURN_URL: "http://localhost:4200/transactions",
+        RETURN_URL: environment.payOSReturnUrl,
         ELEMENT_ID: 'payos-modal',
         CHECKOUT_URL: checkoutUrl,
         embedded: false,
@@ -114,7 +115,7 @@ export class ClientTransactionListComponent implements OnInit {
         },
 
         onCancel: (event: any) => {
-          this.notificationService.warning('Bạn đã hủy thanh toán');
+          //this.notificationService.warning('Bạn đã hủy thanh toán');
 
         },
 
