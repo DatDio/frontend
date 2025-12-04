@@ -6,17 +6,18 @@
   <div class="card search-card mb-4">
     <div class="card-body">
       <form [formGroup]="formSearch" class="row g-3">
-        <div class="col-md-4">
+        <div class="col-md-6">
           <label class="form-label">Mã đơn hàng</label>
           <input type="text" class="form-control" placeholder="Nhập mã đơn hàng..." formControlName="orderNumber"
             (keyup.enter)="handleSearch()">
         </div>
-        <div class="col-md-4 d-flex align-items-end gap-2">
-          <button type="button" class="btn btn-search flex-grow-1" (click)="handleSearch()">
+
+        <div class="col-md-6 d-flex align-items-end gap-2 mt-4">
+          <button type="button" class="btn btn-search w-50" (click)="handleSearch()">
             <i class="bi bi-search"></i> Tìm kiếm
           </button>
 
-          <button type="button" class="btn btn-refresh flex-grow-1" (click)="clearForm()">
+          <button type="button" class="btn btn-refresh w-50" (click)="clearForm()">
             <i class="bi bi-arrow-clockwise"></i> Xóa bộ lọc
           </button>
         </div>

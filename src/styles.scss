@@ -658,3 +658,14 @@ a {
   white-space: nowrap;
   border: 0;
 }
+// Outline Secondary Button
+.btn-outline-secondary {
+  background: transparent;
+  color: #6c757d;
+  border: 2px solid #adb5bd;
+  &:hover:not(:disabled) {
+    background: #6c757d;
+    color: #fff;
+    transform: translateY(-2px);
+  }
+}

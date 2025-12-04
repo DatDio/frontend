@@ -11,31 +11,19 @@
       <form [formGroup]="formSearch" class="row g-3">
         <div class="col-md-4">
           <label for="emailInput" class="form-label">Email</label>
-          <input 
-            id="emailInput"
-            type="email"
-            class="form-control"
-            placeholder="Tìm kiếm theo email..."
+          <input id="emailInput" type="email" class="form-control" placeholder="Tìm kiếm theo email..."
             formControlName="email">
         </div>
         <div class="col-md-4">
           <label for="statusSelect" class="form-label">Trạng thái</label>
-          <app-active-status-select
-            id="statusSelect"
-            formControlName="status">
+          <app-active-status-select id="statusSelect" formControlName="status">
           </app-active-status-select>
         </div>
         <div class="col-md-4 d-flex align-items-end gap-2">
-          <button 
-            type="button"
-            class="btn btn-primary w-50"
-            (click)="handleSearch()">
+          <button type="button" class="btn btn-primary w-50" (click)="handleSearch()">
             <i class="bi bi-search"></i> Tìm kiếm
           </button>
-          <button 
-            type="button"
-            class="btn btn-outline-secondary w-50"
-            (click)="clearForm()">
+          <button type="button" class="btn btn-secondary w-50" (click)="clearForm()">
             <i class="bi bi-arrow-clockwise"></i> Làm mới
           </button>
         </div>
@@ -52,19 +40,10 @@
         <div class="col-md-6 text-end">
           <div class="d-inline-flex gap-2 align-items-center">
             <label for="pageInput" class="form-label mb-0">Đến trang:</label>
-            <input 
-              id="pageInput"
-              type="number" 
-              class="form-control form-control-sm" 
-              style="width: 80px"
-              formControlName="searchPage"
-              placeholder="Trang..."
-              min="1"
-              [max]="paginationConfig.totalPages"
+            <input id="pageInput" type="number" class="form-control form-control-sm" style="width: 80px"
+              formControlName="searchPage" placeholder="Trang..." min="1" [max]="paginationConfig.totalPages"
               (keyup.enter)="handleSearchPage()">
-            <button 
-              class="btn btn-sm btn-outline-primary"
-              (click)="handleSearchPage()">
+            <button class="btn btn-sm btn-outline-primary" (click)="handleSearchPage()">
               <i class="bi bi-arrow-right"></i>
             </button>
           </div>
@@ -73,87 +52,85 @@
     </div>
     <div class="card-body p-0">
       @if (loading) {
-        <div class="text-center py-5">
-          <div class="spinner-border text-primary"></div>
-        </div>
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+      </div>
       } @else {
-        <div class="table-responsive">
-          <table class="table table-hover mb-0">
-            <thead>
-              <tr>
-                <th style="width: 50px; text-align: center;">STT</th>
-                <th>Người dùng</th>
-                <th>Email</th>
-                <th>Vai trò</th>
-                <th>Trạng thái</th>
-                <th>Ngày tham gia</th>
-                <th style="width: 120px; text-align: center;">Thao tác</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (user of users; track user.id; let i = $index) {
-                <tr>
-                  <td style="text-align: center; font-weight: 500;">
-                    {{ i + 1 + (paginationConfig.currentPage * paginationConfig.pageSize) }}
-                  </td>
-                  <td>
-                    <div class="user-info">
-                      <div class="user-avatar">
-                        {{ user.email.charAt(0).toUpperCase() }}
-                      </div>
-                      <div>
-                        <div class="fw-semibold">{{ user.fullName }}</div>
-                        <small class="text-muted">{{ user.email }}</small>
-                      </div>
-                    </div>
-                  </td>
-                  <td>{{ user.email }}</td>
-                  <td>
-                    @for (role of user.roles; track role) {
-                      <span class="badge bg-info me-1">{{ role }}</span>
-                    }
-                  </td>
-                  <td>
-                      <app-active-status-badge [status]="user.status"></app-active-status-badge>
-                  </td>
-                  <td>{{ user.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
-                  <td style="text-align: center;">
-                    <div class="action-buttons">
-                      <button (click)="onView(user.id)" class="icon-btn info" title="Xem chi tiết" data-bs-toggle="tooltip">
-                        <i class="bi bi-eye"></i>
-                      </button>
-                      <button (click)="onEdit(user.id)" class="icon-btn warning" title="Chỉnh sửa" data-bs-toggle="tooltip">
-                        <i class="bi bi-pencil"></i>
-                      </button>
-                      <button (click)="deleteUser(user.id)" class="icon-btn danger" title="Xóa" data-bs-toggle="tooltip">
-                        <i class="bi bi-trash"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              }
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th style="width: 50px; text-align: center;">STT</th>
+              <th>Người dùng</th>
+              <th>Email</th>
+              <th>Vai trò</th>
+              <th>Trạng thái</th>
+              <th>Ngày tham gia</th>
+              <th style="width: 120px; text-align: center;">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of users; track user.id; let i = $index) {
+            <tr>
+              <td style="text-align: center; font-weight: 500;">
+                {{ i + 1 + (paginationConfig.currentPage * paginationConfig.pageSize) }}
+              </td>
+              <td>
+                <div class="user-info">
+                  <div class="user-avatar">
+                    {{ user.email.charAt(0).toUpperCase() }}
+                  </div>
+                  <div>
+                    <div class="fw-semibold">{{ user.fullName }}</div>
+                    <small class="text-muted">{{ user.email }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>{{ user.email }}</td>
+              <td>
+                @for (role of user.roles; track role) {
+                <span class="badge bg-info me-1">{{ role }}</span>
+                }
+              </td>
+              <td>
+                <app-active-status-badge [status]="user.status"></app-active-status-badge>
+              </td>
+              <td>{{ user.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+              <td style="text-align: center;">
+                <div class="action-buttons">
+                  <button (click)="onView(user.id)" class="icon-btn info" title="Xem chi tiết" data-bs-toggle="tooltip">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                  <button (click)="onEdit(user.id)" class="icon-btn warning" title="Chỉnh sửa" data-bs-toggle="tooltip">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button (click)="deleteUser(user.id)" class="icon-btn danger" title="Xóa" data-bs-toggle="tooltip">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            }
 
-              @if (users.length === 0) {
-                <tr>
-                  <td colspan="7" class="text-center py-4 text-muted">
-                    Không tìm thấy người dùng nào
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+            @if (users.length === 0) {
+            <tr>
+              <td colspan="7" class="text-center py-4 text-muted">
+                Không tìm thấy người dùng nào
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
       }
     </div>
 
     @if (paginationConfig.totalPages > 0) {
-      <div class="card-footer">
-        <app-pagination 
-          [config]="paginationConfig"
-          (pageChange)="handlePageChange($event)"
-          (pageSizeChange)="selectPageSize($event)">
-        </app-pagination>
-      </div>
+    <div class="card-footer">
+      <app-pagination [config]="paginationConfig" (pageChange)="handlePageChange($event)"
+        (pageSizeChange)="selectPageSize($event)">
+      </app-pagination>
+    </div>
     }
   </div>
 </div>

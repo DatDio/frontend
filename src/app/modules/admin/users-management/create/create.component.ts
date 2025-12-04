@@ -23,8 +23,8 @@ export class UsersCreateComponent implements OnInit {
   loading = false;
   submitted = false;
 
-  roles = ['ADMIN', 'USER', 'MANAGER'];
-  statuses = ['ACTIVE', 'INACTIVE', 'BANNED'];
+  roles = ['ADMIN', 'USER'];
+  statuses = ['ACTIVE', 'INACTIVE'];
 
   ngOnInit(): void {
     this.initForm();
@@ -37,14 +37,14 @@ export class UsersCreateComponent implements OnInit {
       password: ['', [Validators.required, Validators.minLength(6)]],
       phone: [''],
       address: [''],
-      roles: [['USER'], Validators.required],
+      roles: ['USER', Validators.required],
       status: ['ACTIVE']
     });
   }
 
   onSubmit(): void {
     if (this.form.invalid) {
-      this.#notificationService.warning( 'Please fill in all required fields correctly');
+      this.#notificationService.warning('Vui lòng điền đầy đủ các trường bắt buộc');
       return;
     }
 
@@ -58,29 +58,29 @@ export class UsersCreateComponent implements OnInit {
       password: formValue.password,
       phone: formValue.phone || undefined,
       address: formValue.address || undefined,
-      roles: formValue.roles,
+      roles: [formValue.roles],
       status: formValue.status
     };
 
     this.#userService.create(request).subscribe({
       next: (response) => {
         if (response.success) {
-          this.#notificationService.success( 'User created successfully');
-          this.#router.navigate(['/admin/users']);
+          this.#notificationService.success('Tạo người dùng thành công');
+          this.#router.navigate(['/admin/users-management']);
         } else {
-          this.#notificationService.error( response.message || 'Failed to create user');
+          this.#notificationService.error(response.message || 'Tạo người dùng thất bại');
         }
         this.loading = false;
       },
       error: (error) => {
-        this.#notificationService.error( error.error?.message || 'An error occurred while creating user');
+        this.#notificationService.error(error.error?.message || 'Đã xảy ra lỗi khi tạo người dùng');
         this.loading = false;
       }
     });
   }
 
   onCancel(): void {
-    this.#router.navigate(['/admin/users']);
+    this.#router.navigate(['/admin/users-management']);
   }
 
   get email() {

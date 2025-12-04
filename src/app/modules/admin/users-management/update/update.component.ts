@@ -25,8 +25,8 @@ export class UsersUpdateComponent implements OnInit {
   submitted = false;
   userId: number | null = null;
 
-  roles = ['ADMIN', 'USER', 'MANAGER'];
-  statuses = ['ACTIVE', 'INACTIVE', 'BANNED'];
+  roles = ['ADMIN', 'USER'];
+  statuses = ['ACTIVE', 'INACTIVE'];
 
   ngOnInit(): void {
     this.initForm();
@@ -44,7 +44,7 @@ export class UsersUpdateComponent implements OnInit {
       fullName: ['', [Validators.required, Validators.minLength(2)]],
       phone: [''],
       address: [''],
-      roles: [['USER'], Validators.required],
+      roles: ['USER', Validators.required],
       status: ['ACTIVE']
     });
   }
@@ -62,16 +62,16 @@ export class UsersUpdateComponent implements OnInit {
             fullName: user.fullName,
             phone: user.phone || '',
             address: user.address || '',
-            roles: user.roles,
+            roles: user.roles && user.roles.length > 0 ? user.roles[0] : 'USER',
             status: user.status || 'ACTIVE'
           });
         } else {
-          this.#notificationService.error( response.message || 'Failed to load user');
+          this.#notificationService.error(response.message || 'Không thể tải thông tin người dùng');
         }
         this.loading = false;
       },
       error: (error) => {
-        this.#notificationService.error(error.error?.message || 'An error occurred while loading user');
+        this.#notificationService.error(error.error?.message || 'Đã xảy ra lỗi khi tải thông tin người dùng');
         this.loading = false;
       }
     });
@@ -79,7 +79,7 @@ export class UsersUpdateComponent implements OnInit {
 
   onSubmit(): void {
     if (this.form.invalid || !this.userId) {
-      this.#notificationService.warning( 'Please fill in all required fields correctly');
+      this.#notificationService.warning('Vui lòng điền đầy đủ các trường bắt buộc');
       return;
     }
 
@@ -93,22 +93,22 @@ export class UsersUpdateComponent implements OnInit {
       fullName: formValue.fullName,
       phone: formValue.phone || undefined,
       address: formValue.address || undefined,
-      roles: formValue.roles,
+      roles: [formValue.roles],
       status: formValue.status
     };
 
     this.#userService.update(request).subscribe({
       next: (response) => {
         if (response.success) {
-          this.#notificationService.success('User updated successfully');
-          this.#router.navigate(['/admin/users', this.userId]);
+          this.#notificationService.success('Cập nhật người dùng thành công');
+          this.#router.navigate(['/admin/users-management']);
         } else {
-          this.#notificationService.error( response.message || 'Failed to update user');
+          this.#notificationService.error(response.message || 'Cập nhật người dùng thất bại');
         }
         this.loading = false;
       },
       error: (error) => {
-        this.#notificationService.error( error.error?.message || 'An error occurred while updating user');
+        this.#notificationService.error(error.error?.message || 'Đã xảy ra lỗi khi cập nhật người dùng');
         this.loading = false;
       }
     });

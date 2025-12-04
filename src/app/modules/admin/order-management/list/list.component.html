@@ -9,20 +9,12 @@
       <form [formGroup]="formSearch" class="row g-3">
         <div class="col-md-3">
           <label for="orderNumberInput" class="form-label">Mã đơn hàng</label>
-          <input 
-            id="orderNumberInput"
-            type="text"
-            class="form-control"
-            placeholder="Mã đơn hàng..."
+          <input id="orderNumberInput" type="text" class="form-control" placeholder="Mã đơn hàng..."
             formControlName="orderNumber">
         </div>
         <div class="col-md-3">
           <label for="emailInput" class="form-label">Email khách hàng</label>
-          <input 
-            id="emailInput"
-            type="email"
-            class="form-control"
-            placeholder="Email khách hàng..."
+          <input id="emailInput" type="email" class="form-control" placeholder="Email khách hàng..."
             formControlName="userEmail">
         </div>
         <div class="col-md-3">
@@ -36,16 +28,10 @@
           </select>
         </div>
         <div class="col-md-3 d-flex align-items-end gap-2">
-          <button 
-            type="button"
-            class="btn btn-primary w-50"
-            (click)="handleSearch()">
+          <button type="button" class="btn btn-primary w-50" (click)="handleSearch()">
             <i class="bi bi-search"></i> Tìm kiếm
           </button>
-          <button 
-            type="button"
-            class="btn btn-outline-secondary w-50"
-            (click)="clearForm()">
+          <button type="button" class="btn btn-secondary w-50" (click)="clearForm()">
             <i class="bi bi-arrow-clockwise"></i> Xóa bộ lọc
           </button>
         </div>
@@ -60,7 +46,7 @@
         <div class="col-md-6">
           <span class="text-muted">Tổng: {{ paginationConfig.totalElements }} đơn hàng</span>
         </div>
-        
+
       </div>
     </div>
     <div class="table-responsive">
@@ -78,9 +64,9 @@
         </thead>
         <tbody>
           @if (orders.length === 0) {
-            <tr>
-              <td colspan="7" class="text-center text-muted py-4">Không có dữ liệu</td>
-            </tr>
+          <tr>
+            <td colspan="7" class="text-center text-muted py-4">Không có dữ liệu</td>
+          </tr>
           }
           @for (order of orders; track order.id) {
           <tr>
@@ -105,28 +91,24 @@
               </div>
             </td>
           </tr>
-        }
+          }
         </tbody>
       </table>
     </div>
 
     <!-- Pagination -->
     @if (paginationConfig.totalPages > 0) {
-      <div class="card-footer">
-        <app-pagination 
-          [config]="paginationConfig"
-          (pageChange)="handlePageChange($event)"
-          (pageSizeChange)="selectPageSize($event)">
-        </app-pagination>
-      </div>
+    <div class="card-footer">
+      <app-pagination [config]="paginationConfig" (pageChange)="handlePageChange($event)"
+        (pageSizeChange)="selectPageSize($event)">
+      </app-pagination>
+    </div>
     }
   </div>
 </div>
 
 <!-- Detail Modal -->
 @if (showDetailModal && selectedOrder) {
-  <app-order-detail-modal
-    [order]="selectedOrder"
-    (closeModal)="onModalClose()">
-  </app-order-detail-modal>
+<app-order-detail-modal [order]="selectedOrder" (closeModal)="onModalClose()">
+</app-order-detail-modal>
 }
