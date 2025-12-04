@@ -20,5 +20,13 @@ export const clientRoutes: Routes = [
     path: 'transactions',
     canActivate: [authGuard],
     loadComponent: () => import('../../modules/client/transactions/list/list.component').then(m => m.ClientTransactionListComponent)
+  },
+  {
+    path: 'policy',
+    loadComponent: () => import('../../modules/client/policy/policy.component').then(m => m.PolicyComponent)
+  },
+  {
+    path: 'terms-of-service',
+    loadComponent: () => import('../../modules/client/terms-of-service/terms-of-service.component').then(m => m.TermsOfServiceComponent)
   }
 ];

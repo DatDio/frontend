@@ -8,6 +8,7 @@ import { NotificationService } from '../../../../core/services/notification.serv
 import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
 import { PaginationService } from '../../../../shared/services/pagination.service';
 import { convertToISO } from '../../../../Utils/functions/date-time-utils';
+import { environment } from '../../../../../environments/environment';
 
 declare global {
   interface Window {
@@ -95,40 +96,40 @@ export class ClientTransactionListComponent implements OnInit {
   // ================== PAYOS POPUP ==================
   private openPayOSPopup(checkoutUrl: string): void {
     if (!window.PayOSCheckout) {
-      this.notificationService.error('PayOS SDK chưa được load. Vui lòng tải lại trang.');
+      this.notificationService.error('Có lỗi xảy ra. Vui lòng tải lại trang.');
       return;
     }
 
-    try {
-      const payOSConfig = {
-        RETURN_URL: "http://localhost:4200/transactions",
-        ELEMENT_ID: 'payos-modal',
-        CHECKOUT_URL: checkoutUrl,
-        embedded: false,
+    let exitFn: any;
 
-        onSuccess: (event: any) => {
-          console.log('✅ PayOS Success:', event);
-          this.notificationService.success('Nạp tiền thành công!');
-          this.loadTransactions();
-          this.transactionService.refreshBalance();
-        },
+    const payOSConfig = {
+      RETURN_URL: environment.payOSReturnUrl,
+      ELEMENT_ID: 'payos-modal',
+      CHECKOUT_URL: checkoutUrl,
+      embedded: false,
 
-        onCancel: (event: any) => {
-          this.notificationService.warning('Bạn đã hủy thanh toán');
+      onSuccess: () => {
+        setTimeout(() => {
+          if (exitFn) exitFn();
+        }, 10);
+      },
 
-        },
+      onCancel: () => {
+        setTimeout(() => {
+          if (exitFn) exitFn();
+        }, 10);
+      },
 
-        onExit: (event: any) => {
-          console.log('🚪 PayOS Exit:', event);
-        }
-      };
+      // ❌ KHÔNG GỌI exit() ở đây nữa
+      onExit: () => {
+        console.log("Popup closed");
+      }
+    };
 
-      const { open, exit } = window.PayOSCheckout.usePayOS(payOSConfig);
-      open();
+    const { open, exit } = window.PayOSCheckout.usePayOS(payOSConfig);
+    exitFn = exit;
 
-    } catch (error) {
-      this.notificationService.error('Không thể mở cửa sổ thanh toán. Vui lòng thử lại.');
-    }
+    open();
   }
 
   // ================= SEARCH =================
