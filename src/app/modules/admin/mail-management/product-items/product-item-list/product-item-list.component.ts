@@ -1,6 +1,6 @@
-import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ProductItem } from '../../../../../core/models/product-item.model';
 import { ProductItemService } from '../../../../../core/services/product-item.service';
@@ -19,9 +19,12 @@ export class ProductItemListComponent implements OnInit {
   private readonly productItemService = inject(ProductItemService);
   private readonly notificationService = inject(NotificationService);
   private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
+  private readonly platformId = inject(PLATFORM_ID);
 
   productId: number | null = null;
+  productName = '';
   items: ProductItem[] = [];
   currentPage = 0;
   pageSize = 10;
@@ -32,6 +35,16 @@ export class ProductItemListComponent implements OnInit {
 
   ngOnInit(): void {
     this.initSearchForm();
+
+    // Get product name from route state (passed from product list page)
+    // Only access history in browser environment
+    if (isPlatformBrowser(this.platformId)) {
+      const state = history.state as { productName?: string };
+      if (state?.productName) {
+        this.productName = state.productName;
+      }
+    }
+
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
       if (id) {
@@ -120,7 +133,7 @@ export class ProductItemListComponent implements OnInit {
     this.showImportModal = false;
     this.currentPage = 0;
     this.loadItems();
-    this.notificationService.success( 'Nhập tài khoản thành công');
+    this.notificationService.success('Nhập tài khoản thành công');
   }
 
   onDeleteItem(id: number): void {

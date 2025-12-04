@@ -28,5 +28,9 @@ export const clientRoutes: Routes = [
   {
     path: 'terms-of-service',
     loadComponent: () => import('../../modules/client/terms-of-service/terms-of-service.component').then(m => m.TermsOfServiceComponent)
+  },
+  {
+    path: 'get-code-mail',
+    loadComponent: () => import('../../modules/client/get-code-mail/get-code-mail.component').then(m => m.GetCodeMailComponent)
   }
 ];

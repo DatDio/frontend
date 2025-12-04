@@ -61,12 +61,12 @@
 
         <div class="col-md-3">
           <label class="form-label">Từ ngày</label>
-          <input type="datetime-local" class="form-control" formControlName="dateFrom">
+          <input type="date" class="form-control" formControlName="dateFrom">
         </div>
 
         <div class="col-md-3">
           <label class="form-label">Đến ngày</label>
-          <input type="datetime-local" class="form-control" formControlName="dateTo">
+          <input type="date" class="form-control" formControlName="dateTo">
         </div>
 
         <div class="col-md-6 d-flex align-items-end gap-2 mt-4">
@@ -74,14 +74,14 @@
             type="button" 
             class="btn btn-search w-50"
             (click)="handleSearch()">
-            <i class="fas fa-search"></i> Tìm kiếm
+           <i class="bi bi-search"></i> Tìm kiếm
           </button>
 
           <button 
             type="button" 
             class="btn btn-refresh w-50"
             (click)="clearForm()">
-            <i class="fas fa-redo"></i> Làm mới
+           <i class="bi bi-arrow-clockwise"></i> Xóa bộ lọc
           </button>
         </div>
 

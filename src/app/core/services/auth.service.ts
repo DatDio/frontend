@@ -2,7 +2,7 @@
 import { HttpClient } from '@angular/common/http';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject, Observable, of } from 'rxjs';
-import { tap, finalize, catchError } from 'rxjs/operators';
+import { tap, finalize, catchError, filter, take } from 'rxjs/operators';
 import { Router } from '@angular/router';
 
 import { LoaderService } from './loader.service';
@@ -27,10 +27,43 @@ export class AuthService {
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
+  // Track if we're in browser and auth check is complete
+  // This stays FALSE on SSR so we don't render auth-dependent UI on server
+  private authReadySubject = new BehaviorSubject<boolean>(false);
+  public authReady$ = this.authReadySubject.asObservable();
+
+  private isBrowser: boolean;
+
   constructor() {
-    if (isPlatformBrowser(this.platformId)) {
+    this.isBrowser = isPlatformBrowser(this.platformId);
+
+    if (this.isBrowser) {
+      // Only load from storage in browser
       this.loadUserFromStorage();
     }
+    // On SSR: authReady$ stays false, so no auth-dependent UI is rendered
+  }
+
+  /**
+   * Wait for auth to be ready (browser only).
+   * On SSR this never resolves - guards should handle SSR differently.
+   */
+  waitForAuthReady(): Observable<boolean> {
+    // If not in browser, return true immediately to not block SSR
+    if (!this.isBrowser) {
+      return of(true);
+    }
+    return this.authReady$.pipe(
+      filter(ready => ready),
+      take(1)
+    );
+  }
+
+  /**
+   * Check if we're in browser
+   */
+  isInBrowser(): boolean {
+    return this.isBrowser;
   }
 
   // ========= LOGIN =========
@@ -99,7 +132,7 @@ export class AuthService {
 
   // ========= LOGOUT =========
   logout(): void {
-    if (isPlatformBrowser(this.platformId)) {
+    if (this.isBrowser) {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
       localStorage.removeItem('currentUser');
@@ -123,23 +156,29 @@ export class AuthService {
   isAuthenticated(): boolean {
     return this.isAuthenticatedSubject.value;
   }
-  
+
+  isAuthReady(): boolean {
+    return this.authReadySubject.value;
+  }
+
   /**
    * Public restore để guard/component gọi lại khi reload.
    */
   restoreFromStorage(): void {
-    this.loadUserFromStorage();
+    if (this.isBrowser) {
+      this.loadUserFromStorage();
+    }
   }
 
   getAccessToken(): string | null {
-    if (isPlatformBrowser(this.platformId)) {
+    if (this.isBrowser) {
       return localStorage.getItem('accessToken');
     }
     return null;
   }
 
   getRefreshToken(): string | null {
-    if (isPlatformBrowser(this.platformId)) {
+    if (this.isBrowser) {
       return localStorage.getItem('refreshToken');
     }
     return null;
@@ -147,7 +186,7 @@ export class AuthService {
 
   // ========= INTERNAL METHODS =========
   private setAuthData(data: LoginResponse): void {
-    if (isPlatformBrowser(this.platformId)) {
+    if (this.isBrowser) {
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('refreshToken', data.refreshToken);
       localStorage.setItem('currentUser', JSON.stringify(data.user));
@@ -158,13 +197,13 @@ export class AuthService {
   }
 
   private setAccessToken(token: string): void {
-    if (isPlatformBrowser(this.platformId)) {
+    if (this.isBrowser) {
       localStorage.setItem('accessToken', token);
     }
   }
 
   private loadUserFromStorage(): void {
-    if (!isPlatformBrowser(this.platformId)) {
+    if (!this.isBrowser) {
       return;
     }
 
@@ -177,7 +216,6 @@ export class AuthService {
         this.currentUserSubject.next(user);
         this.isAuthenticatedSubject.next(true);
       } catch {
-        // Nếu parse lỗi, chỉ xóa dữ liệu và giữ state chưa đăng nhập, tránh navigate đột ngột
         localStorage.removeItem('currentUser');
         this.currentUserSubject.next(null);
         this.isAuthenticatedSubject.next(false);
@@ -186,5 +224,8 @@ export class AuthService {
       this.currentUserSubject.next(null);
       this.isAuthenticatedSubject.next(false);
     }
+
+    // Mark auth as ready - only happens in browser after localStorage check
+    this.authReadySubject.next(true);
   }
 }

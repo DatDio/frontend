@@ -1,170 +1,440 @@
-$primary-blue: #007bff; // Màu xanh chủ đạo
-$dark-background: #1a1a1a; // Màu đen/xám đậm
+@import '../../../styles/variables';
 
-// ======================= NAVBAR STYLES =======================
+// =============================================
+// CLIENT LAYOUT - NAVBAR
+// =============================================
+
 .client-navbar {
-  background: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
-  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
-  padding: 10px 0;
-}
+  background: $white;
+  border-bottom: 1px solid $gray-200;
+  box-shadow: $shadow-sm;
+  padding: $spacing-3 0;
+  position: sticky;
+  top: 0;
+  z-index: $z-sticky;
 
-.client-navbar .navbar-brand {
-  color: $primary-blue;
-  font-weight: 800;
-  font-size: 24px;
-}
-
-.client-navbar .nav-link {
-  color: #333 !important;
-  font-weight: 500;
-  transition: all 0.2s;
-  padding: 8px 12px !important;
-  border-bottom: 2px solid transparent; // Tạo khoảng trống để border-bottom không làm nhảy layout
-}
-
-.client-navbar .nav-link:hover {
-  color: $primary-blue !important;
-}
-
-.client-navbar .nav-link.active {
-  color: $primary-blue !important;
-  border-bottom: 2px solid $primary-blue; // Active màu xanh
-  font-weight: 600;
-}
-
-.client-navbar .navbar-toggler {
-  border: 1px solid $primary-blue;
-}
-
-// Chỉnh lại icon Toggle cho gọn
-.client-navbar .navbar-toggler-icon {
-  background: none;
-  position: relative;
-  width: 22px;
-  height: 2px;
-  background-color: $primary-blue;
-}
-
-.client-navbar .navbar-toggler-icon::before,
-.client-navbar .navbar-toggler-icon::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  width: 22px;
-  height: 2px;
-  background-color: $primary-blue;
-  transition: all 0.2s;
-}
-
-.client-navbar .navbar-toggler-icon::before {
-  top: -6px;
-}
-
-.client-navbar .navbar-toggler-icon::after {
-  top: 6px;
-}
-
-// Styling cho nút Đăng ký (Sign Up)
-.custom-signup-btn {
-    background-color: $primary-blue;
-    color: white;
-    font-weight: 600;
-    padding: 8px 20px;
-    border-radius: 6px;
-    border: none;
-    transition: all 0.3s ease;
+  .navbar-brand {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $primary;
+    letter-spacing: -0.5px;
 
     &:hover {
-        background-color: darken($primary-blue, 10%);
+      color: $primary-dark;
     }
+  }
+
+  .nav-link {
+    color: $gray-600 !important;
+    font-weight: $font-weight-medium;
+    padding: $spacing-2 $spacing-4 !important;
+    border-radius: $radius-lg;
+    transition: all $transition-base;
+    position: relative;
+
+    &:hover {
+      color: $primary !important;
+      background: $primary-bg;
+    }
+
+    &.active {
+      color: $primary !important;
+      background: $primary-bg;
+      font-weight: $font-weight-semibold;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -$spacing-3;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 24px;
+        height: 3px;
+        background: $primary;
+        border-radius: $radius-full;
+      }
+    }
+  }
+
+  .navbar-toggler {
+    border: 1px solid $gray-300;
+    padding: $spacing-2;
+    border-radius: $radius-md;
+
+    &:focus {
+      box-shadow: none;
+    }
+  }
+
+  .navbar-toggler-icon {
+    background-image: none;
+    position: relative;
+    width: 20px;
+    height: 2px;
+    background: $primary;
+    display: block;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      width: 20px;
+      height: 2px;
+      background: $primary;
+      transition: all $transition-fast;
+    }
+
+    &::before {
+      top: -6px;
+    }
+
+    &::after {
+      top: 6px;
+    }
+  }
+
+  .custom-signup-btn {
+    background: $gradient-primary;
+    color: $white;
+    font-weight: $font-weight-semibold;
+    padding: $spacing-2 $spacing-5;
+    border-radius: $radius-lg;
+    border: none;
+    box-shadow: $shadow-primary;
+    transition: all $transition-base;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: $shadow-md, $shadow-primary;
+      color: $white;
+    }
+  }
+
+  .balance-info-navbar {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    background: $primary-bg;
+    padding: $spacing-2 $spacing-4;
+    border-radius: $radius-full;
+    font-weight: $font-weight-semibold;
+    font-size: $font-size-sm;
+    color: $primary;
+    border: 1px solid rgba($primary, 0.2);
+
+    i {
+      font-size: $font-size-base;
+    }
+  }
+
+  .dropdown-menu {
+    border: 1px solid $gray-200;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-lg;
+    padding: $spacing-2;
+    min-width: 180px;
+
+    .dropdown-item {
+      padding: $spacing-2 $spacing-4;
+      border-radius: $radius-md;
+      font-size: $font-size-sm;
+      color: $gray-700;
+      transition: all $transition-fast;
+
+      &:hover {
+        background: $primary-bg;
+        color: $primary;
+      }
+    }
+
+    .dropdown-divider {
+      margin: $spacing-2 0;
+      border-color: $gray-200;
+    }
+  }
 }
 
-.balance-info-navbar {
-  background: #e6f0ff; // Nền xanh nhạt
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-weight: 600;
-  color: $primary-blue;
-  border: 1px solid $primary-blue;
-}
+// =============================================
+// HERO SECTION (SECONDARY NAV)
+// =============================================
 
-// ======================= HERO SECTION (MENU) STYLES =======================
 .hero-section {
-  background: $dark-background; // Nền đen đậm
-  padding: 15px 0;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  background: $gradient-dark;
+  padding: $spacing-4 0;
+  box-shadow: $shadow-md;
 }
 
 .hero-menu {
   display: flex;
-  gap: 20px;
+  gap: $spacing-2;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: center;
+
+  @media (min-width: $breakpoint-lg) {
+    justify-content: space-between;
+    gap: $spacing-3;
+  }
 }
 
 .hero-link {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  color: #ccc; // Màu chữ xám nhạt
+  justify-content: center;
+  gap: $spacing-2;
+  color: $gray-400;
   text-decoration: none;
-  padding: 10px 15px;
-  border-radius: 6px;
-  transition: 0.2s;
-  font-weight: 500;
+  padding: $spacing-3 $spacing-4;
+  border-radius: $radius-lg;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  transition: all $transition-base;
+  background: transparent;
+
+  i {
+    font-size: $font-size-base;
+  }
+
+  span {
+    white-space: nowrap;
+  }
+
+  &:hover {
+    color: $white;
+    background: rgba($white, 0.1);
+  }
+
+  &.active {
+    color: $white;
+    background: rgba($primary, 0.3);
+    font-weight: $font-weight-semibold;
+
+    i {
+      color: $primary-light;
+    }
+  }
 }
 
-.hero-link i {
-    font-size: 16px;
+// =============================================
+// MAIN CONTENT
+// =============================================
+
+.client-main {
+  min-height: calc(100vh - 300px);
+  padding: $spacing-8 0;
+  background: $light;
 }
 
-.hero-link:hover {
-  color: white; // Hover sáng hơn
-  background: rgba(255, 255, 255, 0.1);
-}
+// =============================================
+// FOOTER
+// =============================================
 
-.hero-link.active {
-    color: $primary-blue; // Link Active màu xanh
-    background: #333; // Nền tối hơn
-    font-weight: 600;
-}
-
-// ======================= FOOTER STYLES =======================
 .client-footer {
-  background: $dark-background; // Nền đen
-  color: #ccc;
-  padding: 40px 0 20px;
+  background: $gradient-dark;
+  color: $gray-400;
+  padding: $spacing-12 0 $spacing-6;
+
+  h5,
+  h6 {
+    color: $white;
+    font-weight: $font-weight-bold;
+    margin-bottom: $spacing-4;
+    font-size: $font-size-lg;
+  }
+
+  p {
+    color: $gray-400;
+    font-size: $font-size-sm;
+    line-height: $line-height-relaxed;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      margin-bottom: $spacing-2;
+    }
+  }
+
+  a {
+    color: $gray-400;
+    font-size: $font-size-sm;
+    transition: all $transition-fast;
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-2;
+
+    &:hover {
+      color: $white;
+      transform: translateX(4px);
+    }
+
+    &::before {
+      content: '→';
+      opacity: 0;
+      transition: opacity $transition-fast;
+    }
+
+    &:hover::before {
+      opacity: 1;
+    }
+  }
+
+  hr {
+    border-color: rgba($white, 0.1);
+    margin: $spacing-8 0 $spacing-4;
+  }
+
+  .footer-bottom {
+    text-align: center;
+    font-size: $font-size-sm;
+    color: $gray-500;
+  }
 }
 
-.client-footer h5, .client-footer h6 {
-    color: $primary-blue; // Tiêu đề footer màu xanh
-    font-weight: 700;
-}
+// =============================================
+// RESPONSIVE
+// =============================================
 
-.client-footer a {
-  color: #aaa;
-  text-decoration: none;
-  transition: color 0.2s;
-}
-
-.client-footer a:hover {
-  color: white;
-}
-
-// ======================= RESPONSIVE =======================
-@media (max-width: 768px) {
+@media (max-width: $breakpoint-md) {
   .hero-menu {
-    justify-content: space-around;
+    gap: $spacing-2;
   }
 
   .hero-link {
     flex-direction: column;
-    font-size: 13px;
-    padding: 8px 10px;
+    padding: $spacing-2 $spacing-3;
+    font-size: $font-size-xs;
+
+    i {
+      font-size: $font-size-sm;
+    }
   }
 
-  .hero-link i {
-    font-size: 14px;
+  .client-footer {
+    padding: $spacing-8 0 $spacing-4;
+    text-align: center;
+
+    .col-md-4 {
+      margin-bottom: $spacing-6;
+    }
+  }
+}
+
+// =============================================
+// AUTH LOADING OVERLAY (Prevents SSR flash)
+// =============================================
+
+.auth-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: $white;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.auth-loading-spinner {
+  position: relative;
+  width: 50px;
+  height: 50px;
+
+  .spinner-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    animation: auth-spin 1.2s linear infinite;
+
+    &:nth-child(1) {
+      border-top-color: $primary;
+      animation-delay: 0s;
+    }
+
+    &:nth-child(2) {
+      border-right-color: $primary-light;
+      animation-delay: 0.15s;
+    }
+
+    &:nth-child(3) {
+      border-bottom-color: $primary;
+      animation-delay: 0.3s;
+      width: 70%;
+      height: 70%;
+      top: 15%;
+      left: 15%;
+    }
+  }
+}
+
+@keyframes auth-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// =============================================
+// NAV PLACEHOLDER
+// =============================================
+
+.nav-placeholder {
+  width: 120px;
+  height: 36px;
+  background: linear-gradient(90deg, $gray-200 25%, $gray-100 50%, $gray-200 75%);
+  background-size: 200% 100%;
+  border-radius: $radius-lg;
+  animation: shimmer 1.5s infinite;
+}
+
+// =============================================
+// CONTENT SKELETON
+// =============================================
+
+.content-skeleton {
+  padding: $spacing-8;
+  background: $white;
+  border-radius: $radius-xl;
+
+  .skeleton-header {
+    width: 40%;
+    height: 32px;
+    background: linear-gradient(90deg, $gray-200 25%, $gray-100 50%, $gray-200 75%);
+    background-size: 200% 100%;
+    border-radius: $radius-lg;
+    margin-bottom: $spacing-6;
+    animation: shimmer 1.5s infinite;
+  }
+
+  .skeleton-body {
+    .skeleton-line {
+      width: 100%;
+      height: 16px;
+      background: linear-gradient(90deg, $gray-200 25%, $gray-100 50%, $gray-200 75%);
+      background-size: 200% 100%;
+      border-radius: $radius-md;
+      margin-bottom: $spacing-3;
+      animation: shimmer 1.5s infinite;
+
+      &.short {
+        width: 60%;
+      }
+    }
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
   }
 }

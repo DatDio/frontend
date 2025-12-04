@@ -1,0 +1,428 @@
+@import '../../../../styles/variables';
+
+// =============================================
+// GET CODE MAIL PAGE
+// =============================================
+
+.get-code-page {
+    min-height: calc(100vh - 200px);
+    padding: $spacing-10 0;
+    background: $light;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: $spacing-8;
+
+    h1 {
+        font-size: $font-size-3xl;
+        font-weight: $font-weight-bold;
+        color: $dark;
+        margin-bottom: $spacing-3;
+
+        i {
+            color: $primary;
+            margin-right: $spacing-3;
+        }
+    }
+
+    p {
+        font-size: $font-size-base;
+        color: $gray-500;
+        margin: 0;
+    }
+}
+
+// =============================================
+// GET CODE CARD
+// =============================================
+
+.get-code-card {
+    max-width: 800px;
+    margin: 0 auto;
+    background: $white;
+    border-radius: $radius-xl;
+    padding: $spacing-8;
+    box-shadow: $shadow-md;
+    border: 1px solid $gray-200;
+}
+
+// =============================================
+// FORM STYLES
+// =============================================
+
+.get-code-form {
+    .form-row {
+        margin-bottom: $spacing-6;
+    }
+
+    .form-label {
+        display: block;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-semibold;
+        color: $gray-700;
+        margin-bottom: $spacing-3;
+    }
+
+    // Radio Group for Type Get
+    .radio-group {
+        display: flex;
+        gap: $spacing-5;
+
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: $spacing-2;
+            cursor: pointer;
+            padding: $spacing-3 $spacing-5;
+            border: 2px solid $gray-200;
+            border-radius: $radius-lg;
+            transition: all $transition-base;
+
+            &:hover {
+                border-color: $primary;
+                background: $primary-bg;
+            }
+
+            input[type="radio"] {
+                width: 18px;
+                height: 18px;
+                accent-color: $primary;
+                cursor: pointer;
+            }
+
+            .radio-label {
+                font-size: $font-size-sm;
+                font-weight: $font-weight-medium;
+                color: $gray-700;
+            }
+
+            &:has(input:checked) {
+                border-color: $primary;
+                background: $primary-bg;
+
+                .radio-label {
+                    color: $primary;
+                }
+            }
+        }
+    }
+
+    // Checkbox Group for Email Types
+    .checkbox-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: $spacing-3;
+
+        .checkbox-item {
+            display: inline-flex;
+            align-items: center;
+            padding: $spacing-2 $spacing-4;
+            border: 1px solid $gray-300;
+            border-radius: $radius-full;
+            cursor: pointer;
+            transition: all $transition-base;
+            background: $white;
+
+            input[type="radio"] {
+                display: none;
+            }
+
+            .checkbox-label {
+                font-size: $font-size-sm;
+                font-weight: $font-weight-medium;
+                color: $gray-600;
+            }
+
+            &:hover {
+                border-color: $primary;
+                background: $primary-bg;
+
+                .checkbox-label {
+                    color: $primary;
+                }
+            }
+
+            &.active {
+                border-color: $primary;
+                background: $gradient-primary;
+                box-shadow: $shadow-primary;
+
+                .checkbox-label {
+                    color: $white;
+                }
+            }
+        }
+    }
+
+    // Textarea
+    .email-textarea {
+        width: 100%;
+        padding: $spacing-4;
+        border: 1px solid $gray-300;
+        border-radius: $radius-lg;
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: $font-size-sm;
+        line-height: $line-height-relaxed;
+        resize: vertical;
+        min-height: 140px;
+        transition: all $transition-base;
+        background: $gray-50;
+
+        &:focus {
+            outline: none;
+            border-color: $primary;
+            box-shadow: 0 0 0 3px rgba($primary, 0.15);
+            background: $white;
+        }
+
+        &::placeholder {
+            color: $gray-400;
+        }
+    }
+
+    .textarea-hint {
+        margin-top: $spacing-2;
+        font-size: $font-size-xs;
+        color: $gray-500;
+        display: flex;
+        align-items: center;
+        gap: $spacing-2;
+
+        i {
+            color: $primary;
+        }
+    }
+
+    // Submit Button
+    .get-code-btn {
+        width: 100%;
+        padding: $spacing-4 $spacing-6;
+        background: $gradient-primary;
+        color: $white;
+        border: none;
+        border-radius: $radius-lg;
+        font-size: $font-size-base;
+        font-weight: $font-weight-semibold;
+        cursor: pointer;
+        transition: all $transition-base;
+        box-shadow: $shadow-primary;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: $spacing-2;
+
+        &:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: $shadow-lg, 0 6px 20px rgba($primary, 0.4);
+        }
+
+        &:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+    }
+}
+
+// =============================================
+// RESULTS SECTION
+// =============================================
+
+.get-code-results {
+    margin-top: $spacing-8;
+    padding-top: $spacing-6;
+    border-top: 1px solid $gray-200;
+
+    .results-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: $spacing-5;
+
+        h4 {
+            font-size: $font-size-lg;
+            font-weight: $font-weight-semibold;
+            color: $dark;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: $spacing-2;
+
+            i {
+                color: $primary;
+            }
+        }
+
+        .clear-btn {
+            padding: $spacing-2 $spacing-4;
+            background: $danger-bg;
+            color: $danger;
+            border: none;
+            border-radius: $radius-md;
+            font-size: $font-size-sm;
+            font-weight: $font-weight-medium;
+            cursor: pointer;
+            transition: all $transition-fast;
+
+            &:hover {
+                background: $danger;
+                color: $white;
+            }
+        }
+    }
+
+    .no-results {
+        text-align: center;
+        padding: $spacing-10;
+        color: $gray-500;
+
+        i {
+            font-size: $font-size-4xl;
+            display: block;
+            margin-bottom: $spacing-4;
+            opacity: 0.5;
+        }
+
+        p {
+            margin: 0;
+            font-size: $font-size-base;
+        }
+    }
+
+    .results-list {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-4;
+    }
+
+    .result-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: $spacing-5;
+        background: $gray-50;
+        border-radius: $radius-xl;
+        border: 1px solid $gray-200;
+        transition: all $transition-base;
+
+        &:hover {
+            border-color: $primary;
+            box-shadow: $shadow-md;
+        }
+
+        .result-info {
+            flex: 1;
+
+            .result-email {
+                font-weight: $font-weight-semibold;
+                color: $dark;
+                font-size: $font-size-sm;
+                margin-bottom: $spacing-2;
+                display: flex;
+                align-items: center;
+                gap: $spacing-2;
+
+                i {
+                    color: $primary;
+                }
+            }
+
+            .result-subject {
+                font-size: $font-size-sm;
+                color: $gray-600;
+                margin-bottom: $spacing-2;
+            }
+
+            .result-sender,
+            .result-time {
+                font-size: $font-size-xs;
+                color: $gray-500;
+                display: inline-flex;
+                align-items: center;
+                gap: $spacing-1;
+                margin-right: $spacing-4;
+            }
+        }
+
+        .result-code {
+            display: flex;
+            align-items: center;
+            gap: $spacing-3;
+
+            .code-value {
+                font-family: 'Consolas', 'Monaco', monospace;
+                font-size: $font-size-xl;
+                font-weight: $font-weight-bold;
+                color: $success;
+                letter-spacing: 3px;
+                background: $success-bg;
+                padding: $spacing-3 $spacing-5;
+                border-radius: $radius-lg;
+                border: 1px solid rgba($success, 0.2);
+            }
+
+            .copy-btn {
+                padding: $spacing-3 $spacing-4;
+                background: $primary-bg;
+                color: $primary;
+                border: none;
+                border-radius: $radius-md;
+                cursor: pointer;
+                transition: all $transition-fast;
+
+                &:hover {
+                    background: $primary;
+                    color: $white;
+                    transform: scale(1.05);
+                }
+            }
+        }
+    }
+}
+
+// =============================================
+// RESPONSIVE
+// =============================================
+
+@media (max-width: $breakpoint-md) {
+    .get-code-page {
+        padding: $spacing-6 $spacing-4;
+    }
+
+    .page-header h1 {
+        font-size: $font-size-2xl;
+    }
+
+    .get-code-card {
+        padding: $spacing-5;
+    }
+
+    .radio-group {
+        flex-direction: column;
+        gap: $spacing-3;
+    }
+
+    .checkbox-group {
+        gap: $spacing-2;
+
+        .checkbox-item {
+            padding: $spacing-2 $spacing-3;
+
+            .checkbox-label {
+                font-size: $font-size-xs;
+            }
+        }
+    }
+
+    .result-item {
+        flex-direction: column;
+        gap: $spacing-4;
+        align-items: flex-start;
+
+        .result-code {
+            width: 100%;
+            justify-content: space-between;
+        }
+    }
+}

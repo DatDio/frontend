@@ -1,411 +1,649 @@
-@import '../../../../styles.scss';
+@import '../../../../styles/variables';
 
-// Định nghĩa biến
-$primary-blue: #007bff;
-$dark-background: #1a1a1a;
-$text-color-dark: #212529;
-$light-gray: #f8f9fa;
+// =============================================
+// HOME PAGE STYLES
+// =============================================
 
-// Styles cho trang Home
 .home-page {
-  
-  .hero-content {
-    background: linear-gradient(135deg, $dark-background, rgba(0, 102, 204, 0.9));
-    padding: 80px 0;
-    text-align: center;
-    color: white;
+  background: $light;
+}
+
+// =============================================
+// HERO CONTENT
+// =============================================
+
+.hero-content {
+  background: $gradient-hero;
+  padding: $spacing-16 0;
+  text-align: center;
+  color: $white;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba($primary, 0.2) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba($primary-light, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+  }
+
+  h1 {
+    font-size: $font-size-4xl;
+    font-weight: $font-weight-bold;
+    margin-bottom: $spacing-5;
+    color: $white;
+    text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  p {
+    font-size: $font-size-lg;
+    margin-bottom: $spacing-8;
+    color: $gray-300;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .cta-button {
+    background: $gradient-primary;
+    color: $white;
+    padding: $spacing-4 $spacing-8;
+    border: none;
+    border-radius: $radius-lg;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    cursor: pointer;
+    transition: all $transition-base;
+    box-shadow: $shadow-primary;
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: $shadow-lg, 0 6px 20px rgba($primary, 0.5);
+    }
+  }
+
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-10 0;
 
     h1 {
-      font-size: 52px;
-      font-weight: 700;
-      margin-bottom: 20px;
-      color: $primary-blue;
-      text-shadow: 0 3px 10px rgba(0, 0, 0, 0.6);
+      font-size: $font-size-2xl;
     }
 
     p {
-      font-size: 18px;
-      margin-bottom: 40px;
-      color: #ccc;
-      max-width: 700px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .cta-button {
-      background: $primary-blue;
-      color: white;
-      padding: 14px 45px;
-      border: none;
-      border-radius: 8px;
-      font-size: 18px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 15px rgba(0, 123, 255, 0.4);
-
-      &:hover {
-        background: darken($primary-blue, 10%);
-        transform: translateY(-3px);
-        box-shadow: 0 6px 20px rgba(0, 123, 255, 0.6);
-      }
-    }
-
-    @media (max-width: 768px) {
-      padding: 50px 0;
-      h1 { font-size: 36px; }
-      p { font-size: 16px; }
-    }
-  }
-
-  .products-section {
-    padding: 60px 0;
-    background: white;
-
-    .product-group {
-      margin-bottom: 50px;
-
-      .group-title {
-        font-size: 32px;
-        font-weight: 700;
-        margin-bottom: 30px;
-        color: $text-color-dark;
-        padding-bottom: 10px;
-        border-bottom: 4px solid $primary-blue;
-      }
-
-      .category-desc {
-        font-size: 16px;
-        color: #6c757d;
-        margin-bottom: 20px;
-      }
-
-      .product-list {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-
-        .product-header {
-          display: grid;
-          grid-template-columns: 1.2fr 160px 150px 140px 120px 140px;
-          gap: 20px;
-          padding: 10px 16px;
-          background: #f1f3f5;
-          border: 1px solid #dee2e6;
-          border-radius: 8px;
-          font-weight: 700;
-          color: $text-color-dark;
-          align-items: center;
-
-          .col-price,
-          .col-quantity,
-          .col-action {
-            text-align: center;
-          }
-        }
-
-        .product-item {
-          display: grid;
-          grid-template-columns: 1.2fr 160px 150px 140px 120px 140px;
-          align-items: center;
-          gap: 20px;
-          padding: 20px;
-          background: $light-gray;
-          border-radius: 8px;
-          border: 1px solid #dee2e6;
-          transition: all 0.3s ease;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-
-          &:hover {
-            background: #e9ecef;
-            border-color: $primary-blue;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-          }
-
-          .info-col {
-            .product-name {
-              font-size: 16px;
-              font-weight: 600;
-              color: $text-color-dark;
-              margin-bottom: 4px;
-            }
-            .product-desc {
-              font-size: 13px;
-              color: #6c757d;
-              line-height: 1.4;
-            }
-          }
-
-          .live-col {
-            .live-chip {
-              display: inline-block;
-              padding: 6px 10px;
-              border-radius: 999px;
-              background: #fff;
-              border: 1px solid #dee2e6;
-              font-weight: 600;
-              color: $text-color-dark;
-            }
-          }
-
-          .country-col {
-            .country-chip {
-              display: inline-flex;
-              align-items: center;
-              gap: 6px;
-              padding: 6px 10px;
-              border-radius: 8px;
-              background: #fff;
-              border: 1px solid #dee2e6;
-              font-weight: 600;
-              color: $text-color-dark;
-            }
-          }
-
-          .price-col {
-            text-align: right;
-            .price {
-              font-size: 18px;
-              font-weight: 700;
-              color: $primary-blue;
-            }
-          }
-
-          .quantity-col {
-            text-align: center;
-
-            .quantity-box {
-              display: inline-block;
-              min-width: 48px;
-              padding: 6px 10px;
-              background: #ffe5db;
-              color: #d9534f;
-              font-weight: 700;
-              border-radius: 8px;
-              border: 1px solid #ffd1c2;
-            }
-          }
-
-          .action-col {
-            text-align: center;
-            .buy-btn {
-              width: 100%;
-              background: $primary-blue;
-              color: white;
-              border: none;
-              padding: 10px 15px;
-              border-radius: 4px;
-              font-size: 14px;
-              font-weight: 600;
-              cursor: pointer;
-              transition: all 0.3s ease;
-
-              &:hover {
-                background: darken($primary-blue, 10%);
-                transform: scale(1.02);
-              }
-              &:disabled {
-                background: #6c757d;
-                cursor: not-allowed;
-              }
-            }
-          }
-        }
-        .empty-product {
-            text-align: center;
-            padding: 40px;
-            color: #6c757d;
-            font-size: 16px;
-            background: $light-gray;
-            border-radius: 8px;
-            border: 1px dashed #dee2e6;
-          }
-      }
-    }
-
-    @media (max-width: 1200px) {
-      .product-group .product-list {
-        .product-header,
-        .product-item {
-          grid-template-columns: 1.3fr 140px 120px 120px 100px 120px;
-          gap: 14px;
-        }
-      }
-    }
-
-    @media (max-width: 992px) {
-      padding: 40px 0;
-
-      .product-group .product-list {
-        gap: 12px;
-
-        .product-header {
-          display: none;
-        }
-
-        .product-item {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          grid-template-areas:
-            "info info"
-            "live price"
-            "country quantity"
-            "action action";
-          align-items: flex-start;
-          gap: 12px;
-          padding: 16px;
-          text-align: left;
-
-          .info-col { grid-area: info; }
-          .live-col { grid-area: live; }
-          .country-col { grid-area: country; }
-          .price-col { grid-area: price; text-align: left; }
-          .quantity-col { grid-area: quantity; text-align: left; }
-          .action-col { grid-area: action; }
-
-          [data-label] {
-            position: relative;
-          }
-
-          [data-label]::before {
-            content: attr(data-label);
-            display: block;
-            font-size: 12px;
-            font-weight: 700;
-            color: #6c757d;
-            margin-bottom: 4px;
-          }
-
-          .action-col {
-            width: 100%;
-            .buy-btn { width: 100%; }
-          }
-        }
-      }
-    }
-
-    @media (max-width: 576px) {
-      .product-group .product-list .product-item {
-        grid-template-columns: 1fr;
-        grid-template-areas:
-          "info"
-          "live"
-          "country"
-          "price"
-          "quantity"
-          "action";
-      }
+      font-size: $font-size-base;
     }
   }
 }
+
+// =============================================
+// TOOLS SECTION
+// =============================================
+
+.tools-section {
+  padding: $spacing-12 0;
+  background: $white;
+
+  .section-header {
+    text-align: center;
+    margin-bottom: $spacing-10;
+
+    h2 {
+      font-size: $font-size-3xl;
+      font-weight: $font-weight-bold;
+      color: $dark;
+      margin-bottom: $spacing-3;
+
+      i {
+        color: $primary;
+      }
+    }
+
+    p {
+      color: $gray-500;
+      font-size: $font-size-lg;
+    }
+  }
+}
+
+.featured-tools {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-8;
+}
+
+// Featured Tool Card - Premium Design
+.featured-tool-card {
+  display: block;
+  background: $gradient-dark;
+  border-radius: $radius-2xl;
+  padding: $spacing-8;
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+  transition: all $transition-slow;
+  box-shadow: $shadow-xl;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba($primary, 0.15) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .card-glow {
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba($primary-light, 0.3) 0%, transparent 70%);
+    border-radius: 50%;
+    transition: all $transition-slow;
+  }
+
+  &:hover {
+    transform: translateY(-8px);
+    box-shadow: $shadow-2xl, 0 20px 60px rgba($primary, 0.3);
+
+    .card-glow {
+      transform: scale(1.5);
+      opacity: 0.8;
+    }
+
+    .tool-icon-bg {
+      transform: scale(1.1) rotate(5deg);
+    }
+
+    .tool-action {
+      gap: $spacing-4;
+      background: $primary-light;
+    }
+  }
+
+  .card-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+    gap: $spacing-8;
+
+    @media (max-width: $breakpoint-md) {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+  }
+
+  .tool-icon-wrapper {
+    flex-shrink: 0;
+  }
+
+  .tool-icon-bg {
+    width: 100px;
+    height: 100px;
+    background: $gradient-primary;
+    border-radius: $radius-xl;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 40px rgba($primary, 0.4);
+    transition: all $transition-base;
+
+    i {
+      font-size: 42px;
+      color: $white;
+    }
+  }
+
+  .tool-details {
+    flex: 1;
+  }
+
+  .tool-header {
+    display: flex;
+    align-items: center;
+    gap: $spacing-4;
+    margin-bottom: $spacing-3;
+    flex-wrap: wrap;
+
+    @media (max-width: $breakpoint-md) {
+      justify-content: center;
+    }
+
+    h3 {
+      font-size: $font-size-3xl;
+      font-weight: $font-weight-bold;
+      color: $white;
+      margin: 0;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-2;
+      background: rgba($success, 0.2);
+      color: $success;
+      padding: $spacing-2 $spacing-4;
+      border-radius: $radius-full;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+
+      i {
+        font-size: 8px;
+        animation: pulse 2s infinite;
+      }
+    }
+  }
+
+  .tool-description {
+    color: $gray-400;
+    font-size: $font-size-lg;
+    line-height: $line-height-relaxed;
+    margin-bottom: $spacing-5;
+    max-width: 500px;
+  }
+
+  .tool-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-3;
+    margin-bottom: $spacing-6;
+
+    @media (max-width: $breakpoint-md) {
+      justify-content: center;
+    }
+
+    .feature-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-2;
+      background: rgba($white, 0.1);
+      color: $gray-300;
+      padding: $spacing-2 $spacing-4;
+      border-radius: $radius-full;
+      font-size: $font-size-sm;
+      border: 1px solid rgba($white, 0.1);
+
+      i {
+        color: $primary-light;
+      }
+    }
+  }
+
+  .tool-action {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-3;
+    background: $primary;
+    color: $white;
+    padding: $spacing-3 $spacing-6;
+    border-radius: $radius-full;
+    font-weight: $font-weight-semibold;
+    transition: all $transition-base;
+
+    i {
+      transition: transform $transition-base;
+    }
+
+    &:hover i {
+      transform: translateX(4px);
+    }
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+// Coming Soon Cards
+.coming-soon-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: $spacing-5;
+
+  @media (max-width: $breakpoint-md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.coming-soon-card {
+  background: $gray-50;
+  border: 2px dashed $gray-300;
+  border-radius: $radius-xl;
+  padding: $spacing-6;
+  text-align: center;
+  transition: all $transition-base;
+
+  &:hover {
+    border-color: $primary;
+    background: $primary-bg;
+
+    .card-icon {
+      background: $gradient-primary;
+
+      i {
+        color: $white;
+      }
+    }
+  }
+
+  .card-icon {
+    width: 60px;
+    height: 60px;
+    background: $gray-200;
+    border-radius: $radius-lg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto $spacing-4;
+    transition: all $transition-base;
+
+    i {
+      font-size: $font-size-2xl;
+      color: $gray-500;
+      transition: all $transition-base;
+    }
+  }
+
+  h4 {
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    color: $dark;
+    margin: 0 0 $spacing-2 0;
+  }
+
+  .soon-badge {
+    display: inline-block;
+    font-size: $font-size-xs;
+    color: $gray-500;
+    background: $gray-200;
+    padding: $spacing-1 $spacing-3;
+    border-radius: $radius-full;
+  }
+}
+
+// =============================================
+// PRODUCTS SECTION
+// =============================================
+
+.products-section {
+  padding: $spacing-12 0;
+  background: $light;
+}
+
+.product-group {
+  margin-bottom: $spacing-10;
+
+  .group-title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $dark;
+    margin-bottom: $spacing-4;
+    padding-bottom: $spacing-3;
+    border-bottom: 3px solid $primary;
+    display: inline-block;
+
+    i {
+      color: $primary;
+      margin-right: $spacing-2;
+    }
+  }
+
+  .category-desc {
+    font-size: $font-size-base;
+    color: $gray-500;
+    margin-bottom: $spacing-5;
+  }
+}
+
+.product-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+.product-header {
+  display: grid;
+  grid-template-columns: 1.2fr 140px 140px 140px 120px 130px;
+  gap: $spacing-4;
+  padding: $spacing-3 $spacing-5;
+  background: $dark;
+  border-radius: $radius-lg;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: $gray-300;
+
+  .col-price,
+  .col-quantity,
+  .col-action {
+    text-align: center;
+  }
+
+  @media (max-width: $breakpoint-lg) {
+    display: none;
+  }
+}
+
+.product-item {
+  display: grid;
+  grid-template-columns: 1.2fr 140px 140px 140px 120px 130px;
+  gap: $spacing-4;
+  padding: $spacing-5;
+  background: $white;
+  border-radius: $radius-xl;
+  border: 1px solid $gray-200;
+  transition: all $transition-base;
+  align-items: center;
+
+  &:hover {
+    border-color: $primary;
+    box-shadow: $shadow-md;
+    transform: translateX(4px);
+  }
+
+  .info-col {
+    .product-name {
+      font-size: $font-size-base;
+      font-weight: $font-weight-semibold;
+      color: $dark;
+      margin-bottom: $spacing-1;
+    }
+
+    .product-desc {
+      font-size: $font-size-sm;
+      color: $gray-500;
+    }
+  }
+
+  .live-col .live-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: $spacing-2 $spacing-3;
+    background: $info-bg;
+    color: $info;
+    border-radius: $radius-full;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+  }
+
+  .country-col .country-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-2;
+    padding: $spacing-2 $spacing-3;
+    background: $gray-100;
+    color: $gray-700;
+    border-radius: $radius-lg;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+
+    i {
+      color: $primary;
+    }
+  }
+
+  .price-col {
+    text-align: center;
+
+    .price {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-bold;
+      color: $primary;
+    }
+  }
+
+  .quantity-col {
+    text-align: center;
+
+    .quantity-box {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 60px;
+      padding: $spacing-2 $spacing-3;
+      background: $success-bg;
+      color: $success;
+      border-radius: $radius-lg;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-bold;
+    }
+  }
+
+  .action-col {
+    text-align: center;
+
+    .buy-btn {
+      background: $gradient-primary;
+      color: $white;
+      border: none;
+      padding: $spacing-3 $spacing-5;
+      border-radius: $radius-lg;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      cursor: pointer;
+      transition: all $transition-base;
+      box-shadow: $shadow-primary;
+      width: 100%;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: $shadow-md, $shadow-primary;
+      }
+
+      &:disabled {
+        background: $gray-400;
+        box-shadow: none;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  @media (max-width: $breakpoint-lg) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: $spacing-3;
+    padding: $spacing-4;
+
+    .info-col {
+      grid-column: span 2;
+    }
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    grid-template-columns: 1fr;
+
+    .info-col,
+    .action-col {
+      grid-column: span 1;
+    }
+  }
+}
+
+.empty-product {
+  text-align: center;
+  padding: $spacing-8;
+  color: $gray-500;
+  background: $gray-50;
+  border-radius: $radius-xl;
+}
+
+// =============================================
+// PAGINATION
+// =============================================
 
 .pagination-wrapper {
   display: flex;
   justify-content: center;
-  padding: 2rem 0;
 }
 
-// --- MODAL STYLES ---
-.modal {
-  .modal-dialog {
-    max-width: 500px;
-    width: 90%;
-    margin: 1.75rem auto; 
+// =============================================
+// MODAL
+// =============================================
+
+.modal-content {
+  border: none;
+  border-radius: $radius-xl;
+  box-shadow: $shadow-2xl;
+}
+
+.modal-header {
+  background: $gradient-primary;
+  color: $white;
+  border-radius: $radius-xl $radius-xl 0 0;
+  padding: $spacing-5;
+
+  .modal-title {
+    font-weight: $font-weight-bold;
   }
 
-  .modal-content {
-    border-radius: 12px;
-    border: none;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-    margin: 0 auto; 
-  }
+  .btn-close {
+    filter: brightness(0) invert(1);
+    opacity: 0.8;
 
-  .modal-header {
-    background: linear-gradient(135deg, $primary-blue, darken($primary-blue, 15%));
-    color: white;
-    border-radius: 12px 12px 0 0;
-    border-bottom: none;
-    padding: 1.25rem 1.5rem;
-
-    .modal-title {
-      font-weight: 600;
-      font-size: 1.25rem;
-    }
-
-    .btn-close {
-      filter: brightness(0) invert(1);
-      opacity: 0.8;
-      &:hover { opacity: 1; }
+    &:hover {
+      opacity: 1;
     }
   }
+}
 
-  .modal-body {
-    padding: 1.5rem;
+.modal-body {
+  padding: $spacing-6;
+}
 
-    .alert-info {
-      background-color: #e3f2fd;
-      color: #0d47a1;
-      border: 1px solid #bbdefb;
-      border-left: 5px solid $primary-blue;
-      padding-left: 12px;
-    }
-
-    .form-control:focus {
-      border-color: $primary-blue;
-      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-    }
-    
-    .bg-light.rounded {
-       background-color: #f8f9fa !important;
-       border: 1px dashed #ced4da;
-    }
-  }
-
-  // --- PHẦN ĐÃ SỬA: Thêm styles cho nút bấm ---
-  .modal-footer {
-    border-top: 1px solid #dee2e6;
-    padding: 1rem 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end; // Căn nút về bên phải
-    gap: 12px; // Khoảng cách giữa 2 nút
-
-    .btn {
-      padding: 10px 24px; // Padding lớn để nút to ra
-      font-weight: 600;
-      font-size: 15px;
-      border-radius: 6px;
-      min-width: 100px; // Chiều rộng tối thiểu
-      transition: all 0.2s ease;
-
-      // Nút Hủy bỏ
-      &.btn-secondary {
-        background-color: #e9ecef;
-        border: 1px solid #dee2e6;
-        color: #495057;
-
-        &:hover {
-          background-color: #dee2e6;
-          color: #212529;
-        }
-      }
-
-      // Nút Xác nhận
-      &.btn-primary {
-        background-color: $primary-blue;
-        border-color: $primary-blue;
-        color: white;
-        box-shadow: 0 4px 6px rgba(0, 123, 255, 0.2);
-
-        &:hover:not(:disabled) {
-          background-color: darken($primary-blue, 8%);
-          transform: translateY(-1px);
-        }
-
-        &:disabled {
-          opacity: 0.7;
-          cursor: not-allowed;
-        }
-      }
-    }
-  }
+.modal-footer {
+  padding: $spacing-4 $spacing-6;
+  border-top: 1px solid $gray-200;
 }

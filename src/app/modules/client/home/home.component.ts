@@ -17,7 +17,6 @@ import { Category } from '../../../core/models/category.model';
 import { Product } from '../../../core/models/product.model';
 import { OrderCreate } from '../../../core/models/order.model';
 import { ProductQuantityMessage } from '../../../core/models/product-quantity-message.model';
-import { ACTIVE_STATUS_ENUM } from '../../../Utils/enums/commom.enum';
 import { TransactionService } from '../../../core/services/wallet.service';
 
 declare var bootstrap: any;
@@ -42,6 +41,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private readonly walletService = inject(TransactionService);
   private readonly router = inject(Router);
   private readonly webSocketService = inject(WebSocketService);
+
   categories: Category[] = [];
   paginationConfig: PaginationConfig = {
     currentPage: 0,
@@ -58,7 +58,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   private latestQuantities = new Map<number, number>();
 
   constructor() {
-    // Ensure data fetch also runs on client after hydration (SSR on Vercel may skip browser call).
     if (this.isBrowser) {
       afterRender(() => {
         if (this.categories.length === 0) {
@@ -170,7 +169,6 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.modalInstance.hide();
     }
 
-    // Cleanup thủ công backdrop nếu bị kẹt
     const backdrops = document.getElementsByClassName('modal-backdrop');
     while (backdrops.length > 0) {
       backdrops[0].parentNode?.removeChild(backdrops[0]);

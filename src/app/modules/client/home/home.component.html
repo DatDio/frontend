@@ -12,6 +12,75 @@
     </div>
   </div>
 
+  <!-- FEATURED TOOL SECTION -->
+  <section class="tools-section">
+    <div class="container">
+      <div class="section-header">
+        <h2><i class="fas fa-tools me-2"></i>Công cụ tiện ích</h2>
+        <p>Các công cụ hỗ trợ xác thực và quản lý email</p>
+      </div>
+
+      <div class="featured-tools">
+        <!-- Get Code - Featured Card -->
+        <a routerLink="/get-code-mail" class="featured-tool-card">
+          <div class="card-glow"></div>
+          <div class="card-content">
+            <div class="tool-icon-wrapper">
+              <div class="tool-icon-bg">
+                <i class="fas fa-key"></i>
+              </div>
+            </div>
+            <div class="tool-details">
+              <div class="tool-header">
+                <h3>Get Code</h3>
+                <span class="status-badge">
+                  <i class="fas fa-circle"></i> Active
+                </span>
+              </div>
+              <p class="tool-description">
+                Lấy mã xác thực OTP từ email Hotmail/Outlook một cách nhanh chóng và tự động
+              </p>
+              <div class="tool-features">
+                <span class="feature-tag">
+                  <i class="fas fa-bolt"></i> Nhanh chóng
+                </span>
+                <span class="feature-tag">
+                  <i class="fas fa-shield-alt"></i> Bảo mật
+                </span>
+                <span class="feature-tag">
+                  <i class="fas fa-check-circle"></i> Chính xác
+                </span>
+              </div>
+              <div class="tool-action">
+                <span class="action-text">Sử dụng ngay</span>
+                <i class="fas fa-arrow-right"></i>
+              </div>
+            </div>
+          </div>
+        </a>
+
+        <!-- Coming Soon Cards -->
+        <div class="coming-soon-grid">
+          <div class="coming-soon-card">
+            <div class="card-icon"><i class="fas fa-envelope-open-text"></i></div>
+            <h4>Check Mail</h4>
+            <span class="soon-badge">Sắp ra mắt</span>
+          </div>
+          <div class="coming-soon-card">
+            <div class="card-icon"><i class="fas fa-inbox"></i></div>
+            <h4>Đọc hòm thư</h4>
+            <span class="soon-badge">Sắp ra mắt</span>
+          </div>
+          <div class="coming-soon-card">
+            <div class="card-icon"><i class="fas fa-shield-alt"></i></div>
+            <h4>Get 2FA</h4>
+            <span class="soon-badge">Sắp ra mắt</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="products-section">
     <div class="container">
 
@@ -96,7 +165,7 @@
 <div class="modal fade" id="orderModal" tabindex="-1" aria-labelledby="orderModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
-      
+
       <div class="modal-header">
         <h5 class="modal-title" id="orderModalLabel">
           <i class="fas fa-shopping-cart me-2"></i>Xác nhận đơn hàng
@@ -113,11 +182,11 @@
         <form [formGroup]="orderForm" (ngSubmit)="onSubmitOrder()">
           <div class="mb-3">
             <label for="quantity" class="form-label">Số lượng mua:</label>
-            <input type="number" id="quantity" class="form-control" formControlName="quantity" 
-                   min="1" max="1000" 
-                   [class.is-invalid]="orderForm.get('quantity')?.invalid && orderForm.get('quantity')?.touched">
-            
-            <div class="invalid-feedback d-block" *ngIf="orderForm.get('quantity')?.errors?.['required'] && orderForm.get('quantity')?.touched">
+            <input type="number" id="quantity" class="form-control" formControlName="quantity" min="1" max="1000"
+              [class.is-invalid]="orderForm.get('quantity')?.invalid && orderForm.get('quantity')?.touched">
+
+            <div class="invalid-feedback d-block"
+              *ngIf="orderForm.get('quantity')?.errors?.['required'] && orderForm.get('quantity')?.touched">
               Vui lòng nhập số lượng.
             </div>
             <div class="invalid-feedback d-block" *ngIf="orderForm.get('quantity')?.errors?.['min']">
@@ -134,9 +203,11 @@
 
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="closeOrderModal()">Hủy bỏ</button>
-        <button type="button" class="btn btn-primary" [disabled]="orderForm.invalid || orderLoading" (click)="onSubmitOrder()">
-          <span *ngIf="orderLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-          <i class="fas fa-check me-2" *ngIf="!orderLoading"></i> 
+        <button type="button" class="btn btn-primary" [disabled]="orderForm.invalid || orderLoading"
+          (click)="onSubmitOrder()">
+          <span *ngIf="orderLoading" class="spinner-border spinner-border-sm me-2" role="status"
+            aria-hidden="true"></span>
+          <i class="fas fa-check me-2" *ngIf="!orderLoading"></i>
           {{ orderLoading ? 'Đang xử lý...' : 'Xác nhận mua' }}
         </button>
       </div>

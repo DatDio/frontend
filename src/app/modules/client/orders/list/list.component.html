@@ -8,26 +8,16 @@
       <form [formGroup]="formSearch" class="row g-3">
         <div class="col-md-4">
           <label class="form-label">Mã đơn hàng</label>
-          <input 
-            type="text"
-            class="form-control"
-            placeholder="Nhập mã đơn hàng..."
-            formControlName="orderNumber"
+          <input type="text" class="form-control" placeholder="Nhập mã đơn hàng..." formControlName="orderNumber"
             (keyup.enter)="handleSearch()">
         </div>
         <div class="col-md-4 d-flex align-items-end gap-2">
-          <button 
-            type="button"
-            class="btn btn-search flex-grow-1"
-            (click)="handleSearch()">
-            <i class="fas fa-search"></i> Tìm kiếm
+          <button type="button" class="btn btn-search flex-grow-1" (click)="handleSearch()">
+            <i class="bi bi-search"></i> Tìm kiếm
           </button>
 
-          <button 
-            type="button"
-            class="btn btn-refresh flex-grow-1"
-            (click)="clearForm()">
-            <i class="fas fa-redo"></i> Làm mới
+          <button type="button" class="btn btn-refresh flex-grow-1" (click)="clearForm()">
+            <i class="bi bi-arrow-clockwise"></i> Xóa bộ lọc
           </button>
         </div>
       </form>
@@ -47,112 +37,105 @@
 
     <div class="card-body p-0">
       @if (loading) {
-        <div class="text-center py-5">
-          <div class="spinner-border text-primary"></div>
-        </div>
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+      </div>
       } @else {
-        <div class="table-responsive">
-          <table class="table table-hover mb-0">
-            <thead>
-              <tr>
-                <th style="width: 50px; text-align:center;">#</th>
-                <th>Mã đơn hàng</th>
-                <th>Sản phẩm</th>
-                <th>Số lượng</th>
-                <th>Danh sách tài khoản</th>
-                <th>Trạng thái</th>
-                <th>Tổng tiền</th>
-                <th>Ngày tạo</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (order of orders; track order.id; let i = $index) {
-                <tr>
-                  <td class="text-center fw-bold">
-                    {{ i + 1 + (paginationConfig.currentPage * paginationConfig.pageSize) }}
-                  </td>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead>
+            <tr>
+              <th style="width: 50px; text-align:center;">#</th>
+              <th>Mã đơn hàng</th>
+              <th>Sản phẩm</th>
+              <th>Số lượng</th>
+              <th>Danh sách tài khoản</th>
+              <th>Trạng thái</th>
+              <th>Tổng tiền</th>
+              <th>Ngày tạo</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (order of orders; track order.id; let i = $index) {
+            <tr>
+              <td class="text-center fw-bold">
+                {{ i + 1 + (paginationConfig.currentPage * paginationConfig.pageSize) }}
+              </td>
 
-                  <td class="fw-semibold order-number-cell">
-                    {{ order.orderNumber }}
-                  </td>
+              <td class="fw-semibold order-number-cell">
+                {{ order.orderNumber }}
+              </td>
 
-                  <td class="product-name-cell">
-                    {{ order.productName }}
-                  </td>
+              <td class="product-name-cell">
+                {{ order.productName }}
+              </td>
 
-                  <td class="text-center">
-                    <span class="badge badge-quantity">
-                      {{ order.accountData.length || 0 }}
-                    </span>
-                  </td>
+              <td class="text-center">
+                <span class="badge badge-quantity">
+                  {{ order.accountData.length || 0 }}
+                </span>
+              </td>
 
-                  <td class="account-data-cell">
-                    @if(!order.accountData || order.accountData.length === 0) {
-                      <span class="no-data-text">
-                        <i class="bi bi-info-circle me-1"></i>Chưa có dữ liệu
-                      </span>
-                    } @else {
-                      <div class="account-preview-wrapper">
-                        <textarea 
-                          class="form-control account-preview" 
-                          rows="2"
-                          readonly
-                          [value]="order.accountData.join('\n')">
+              <td class="account-data-cell">
+                @if(!order.accountData || order.accountData.length === 0) {
+                <span class="no-data-text">
+                  <i class="bi bi-info-circle me-1"></i>Chưa có dữ liệu
+                </span>
+                } @else {
+                <div class="account-preview-wrapper">
+                  <textarea class="form-control account-preview" rows="2" readonly
+                    [value]="order.accountData.join('\n')">
                         </textarea>
-                        <button 
-                          class="btn btn-sm btn-copy"
-                          [class.copied]="copiedOrderId === order.id"
-                          (click)="copyAccounts(order)">
-                          @if(copiedOrderId === order.id) {
-                            <i class="bi bi-check-circle-fill"></i>
-                          } @else {
-                            <i class="bi bi-clipboard"></i>
-                          }
-                        </button>
-                      </div>
+                  <button class="btn btn-sm btn-copy" [class.copied]="copiedOrderId === order.id"
+                    (click)="copyAccounts(order)">
+                    @if(copiedOrderId === order.id) {
+                    <i class="bi bi-check-circle-fill"></i>
+                    } @else {
+                    <i class="bi bi-clipboard"></i>
                     }
-                  </td>
+                  </button>
+                </div>
+                }
+              </td>
 
-                  <td>
-                    <span class="badge" [ngClass]="getStatusClass(order.orderStatus)">
-                      {{ getStatusLabel(order.orderStatus) }}
-                    </span>
-                  </td>
+              <td>
+                <span class="badge" [ngClass]="getStatusClass(order.orderStatus)">
+                  {{ getStatusLabel(order.orderStatus) }}
+                </span>
+              </td>
 
-                  <td class="fw-bold amount-cell">
-                    {{ order.totalAmount | number:'1.0-0' }} VND
-                  </td>
+              <td class="fw-bold amount-cell">
+                {{ order.totalAmount | number:'1.0-0' }} VND
+              </td>
 
-                  <td class="date-cell">
-                    {{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}
-                  </td>
-                </tr>
-              }
+              <td class="date-cell">
+                {{ order.createdAt | date:'dd/MM/yyyy HH:mm' }}
+              </td>
+            </tr>
+            }
 
-              @if (orders.length === 0) {
-                <tr>
-                  <td colspan="8" class="text-center py-4 text-muted">
-                    <div class="empty-state-inline">
-                      <i class="bi bi-inbox"></i>
-                      <p class="mb-0 mt-2">Chưa có đơn hàng nào</p>
-                    </div>
-                  </td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+            @if (orders.length === 0) {
+            <tr>
+              <td colspan="8" class="text-center py-4 text-muted">
+                <div class="empty-state-inline">
+                  <i class="bi bi-inbox"></i>
+                  <p class="mb-0 mt-2">Chưa có đơn hàng nào</p>
+                </div>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
       }
     </div>
 
     @if (paginationConfig.totalPages > 0) {
-      <div class="card-footer">
-        <app-pagination
-          [config]="paginationConfig"
-          (pageChange)="handlePageChange($event)"
-          (pageSizeChange)="selectPageSize($event)">
-        </app-pagination>
-      </div>
+    <div class="card-footer">
+      <app-pagination [config]="paginationConfig" (pageChange)="handlePageChange($event)"
+        (pageSizeChange)="selectPageSize($event)">
+      </app-pagination>
+    </div>
     }
   </div>
 </div>

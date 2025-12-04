@@ -1,0 +1,110 @@
+<div class="get-code-page">
+    <div class="container">
+        <div class="page-header">
+            <h1><i class="fas fa-key me-2"></i> Get Code Email</h1>
+            <p>Lấy mã xác thực từ email Hotmail/Outlook</p>
+        </div>
+
+        <div class="get-code-card">
+            <form [formGroup]="getCodeForm" (ngSubmit)="onGetCode()" class="get-code-form">
+                <!-- Type Get -->
+                <div class="form-row">
+                    <label class="form-label">Type get</label>
+                    <div class="radio-group">
+                        @for (type of getTypes; track type) {
+                        <label class="radio-item">
+                            <input type="radio" formControlName="getType" [value]="type">
+                            <span class="radio-label">{{ type }}</span>
+                        </label>
+                        }
+                    </div>
+                </div>
+
+                <!-- Email Type -->
+                <div class="form-row">
+                    <label class="form-label">Email</label>
+                    <div class="checkbox-group">
+                        @for (emailType of emailTypes; track emailType) {
+                        <label class="checkbox-item" [class.active]="getCodeForm.get('emailType')?.value === emailType">
+                            <input type="radio" formControlName="emailType" [value]="emailType">
+                            <span class="checkbox-label">{{ emailType }}</span>
+                        </label>
+                        }
+                    </div>
+                </div>
+
+                <!-- Email Data Textarea -->
+                <div class="form-row">
+                    <textarea formControlName="emailData" class="email-textarea" rows="6"
+                        placeholder="mail|pass|refresh_token|client_id"></textarea>
+                    <div class="textarea-hint">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Định dạng: email|password|refresh_token|client_id
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="get-code-btn" [disabled]="getCodeForm.invalid || getCodeLoading">
+                    @if (getCodeLoading) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Đang xử lý...
+                    } @else {
+                    <i class="fas fa-search me-2"></i> Get Code
+                    }
+                </button>
+            </form>
+
+            <!-- Results Section -->
+            @if (showGetCodeResults) {
+            <div class="get-code-results">
+                <div class="results-header">
+                    <h4><i class="fas fa-list me-2"></i> Kết quả ({{ getCodeResults.length }})</h4>
+                    <button type="button" class="clear-btn" (click)="clearGetCodeResults()">
+                        <i class="fas fa-times me-1"></i> Xóa
+                    </button>
+                </div>
+
+                @if (getCodeResults.length === 0) {
+                <div class="no-results">
+                    <i class="fas fa-inbox"></i>
+                    <p>Không tìm thấy mã xác thực nào</p>
+                </div>
+                } @else {
+                <div class="results-list">
+                    @for (result of getCodeResults; track result.email) {
+                    <div class="result-item">
+                        <div class="result-info">
+                            <div class="result-email">
+                                <i class="fas fa-envelope me-2"></i>{{ result.email }}
+                            </div>
+                            @if (result.subject) {
+                            <div class="result-subject">{{ result.subject }}</div>
+                            }
+                            @if (result.sender) {
+                            <div class="result-sender">
+                                <i class="fas fa-user me-1"></i>{{ result.sender }}
+                            </div>
+                            }
+                            @if (result.receivedTime) {
+                            <div class="result-time">
+                                <i class="fas fa-clock me-1"></i>{{ result.receivedTime }}
+                            </div>
+                            }
+                        </div>
+                        @if (result.code) {
+                        <div class="result-code">
+                            <span class="code-value">{{ result.code }}</span>
+                            <button type="button" class="copy-btn" (click)="copyCode(result.code)" title="Sao chép mã">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                        </div>
+                        }
+                    </div>
+                    }
+                </div>
+                }
+            </div>
+            }
+        </div>
+    </div>
+</div>

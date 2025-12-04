@@ -17,6 +17,9 @@ export class ClientLayoutComponent implements OnInit {
 
   balance$ = this.walletService.balance$;
 
+  // Use authReady$ - stays FALSE on SSR, only TRUE after browser localStorage check
+  authReady$ = this.authService.authReady$;
+  isAuthenticated$ = this.authService.isAuthenticated$;
 
   ngOnInit(): void {
     this.authService.isAuthenticated$.subscribe(isAuth => {

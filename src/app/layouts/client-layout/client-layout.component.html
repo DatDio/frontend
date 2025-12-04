@@ -1,3 +1,19 @@
+<!-- 
+  IMPORTANT: authReady$ stays FALSE on SSR, only TRUE after browser checks localStorage.
+  This prevents SSR from rendering unauthenticated UI that flashes on hydration.
+-->
+
+<!-- Loading overlay while auth is not ready (SSR and initial browser load) -->
+@if (!(authReady$ | async)) {
+<div class="auth-loading-overlay">
+  <div class="auth-loading-spinner">
+    <div class="spinner-ring"></div>
+    <div class="spinner-ring"></div>
+    <div class="spinner-ring"></div>
+  </div>
+</div>
+}
+
 <nav class="navbar navbar-expand-lg client-navbar">
   <div class="container">
     <a class="navbar-brand" routerLink="/">
@@ -10,16 +26,15 @@
 
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
-        <!-- <li class="nav-item">
-          <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
-        </li> -->
         <li class="nav-item">
           <a class="nav-link" routerLink="/pricing" routerLinkActive="active">Tài liệu API</a>
         </li>
 
-        @if (authService.isAuthenticated$ | async) {
+        <!-- Only show auth-dependent content after authReady (browser only) -->
+        @if (authReady$ | async) {
+        @if (isAuthenticated$ | async) {
         <li class="nav-item d-flex align-items-center">
-          <div class="balance-info-navbar" *ngIf="authService.isAuthenticated$ | async">
+          <div class="balance-info-navbar">
             <i class="fas fa-wallet me-1"></i>
             {{ balance$ | async | number }} VNĐ
           </div>
@@ -45,12 +60,21 @@
           <a class="btn custom-signup-btn btn-sm" routerLink="/auth/register">Đăng ký</a>
         </li>
         }
+        } @else {
+        <!-- Placeholder while loading -->
+        <li class="nav-item">
+          <div class="nav-placeholder"></div>
+        </li>
+        }
       </ul>
     </div>
   </div>
 </nav>
 
-<section class="hero-section" *ngIf="authService.isAuthenticated$ | async">
+<!-- Hero section - only show when authReady AND authenticated -->
+@if (authReady$ | async) {
+@if (isAuthenticated$ | async) {
+<section class="hero-section">
   <div class="container">
     <div class="hero-menu">
       <a routerLink="/" class="hero-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
@@ -76,9 +100,24 @@
     </div>
   </div>
 </section>
+}
+}
 
+<!-- Main content -->
 <main class="client-main container my-4">
+  @if (authReady$ | async) {
   <router-outlet></router-outlet>
+  } @else {
+  <!-- Skeleton while auth loading -->
+  <div class="content-skeleton">
+    <div class="skeleton-header"></div>
+    <div class="skeleton-body">
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line short"></div>
+    </div>
+  </div>
+  }
 </main>
 
 <footer class="client-footer">
@@ -98,7 +137,7 @@
       </div>
       <div class="col-md-4 mb-3">
         <h6>Liên hệ</h6>
-        <p>Email: supportmailshop.com</p>
+        <p>Email: support&#64;mailshop.com</p>
       </div>
     </div>
     <hr>

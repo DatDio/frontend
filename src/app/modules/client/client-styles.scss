@@ -1,143 +1,117 @@
-/* ==================== CLIENT MODULES GLOBAL STYLES ==================== */
+/* =============================================
+   CLIENT MODULES GLOBAL STYLES
+   Design System: Blue, Black, White
+   ============================================= */
 
-// Colors
-$primary-color: #007bff;
-$secondary-color: #6c757d;
-$warning-color: #ffc107;
-$success-color: #28a745;
-$danger-color: #dc3545;
-$info-color: #17a2b8;
+@import '../../../styles/variables';
 
-$bg-light: #f8f9fa;
-$bg-white: #ffffff;
-$text-dark: #1a1a1a;
-$text-muted: #6c757d;
-$border-color: #dee2e6;
-
-// Spacing
-$spacing-unit: 1rem;
-$spacing-xs: 0.25rem;
-$spacing-sm: 0.5rem;
-$spacing-md: 1rem;
-$spacing-lg: 1.5rem;
-$spacing-xl: 2rem;
-
-// Border radius
-$border-radius-sm: 4px;
-$border-radius-md: 6px;
-$border-radius-lg: 8px;
-
-// Shadows
-$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-$shadow-md: 0 2px 8px rgba(0, 0, 0, 0.1);
-$shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
-
-/* ==================== PAGE HEADER ==================== */
+// =============================================
+// PAGE HEADER
+// =============================================
 
 .page-header {
-  padding: 2rem 0;
-  margin-bottom: 2rem;
-  border-bottom: 1px solid $border-color;
+  padding: $spacing-6 0;
+  margin-bottom: $spacing-6;
+  border-bottom: 1px solid $gray-200;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: $spacing-4;
 
   .page-title {
-    font-size: 2rem;
-    font-weight: 700;
-    color: $text-dark;
-    margin-bottom: 0.5rem;
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+    color: $dark;
+    margin: 0;
+
+    i {
+      color: $primary;
+      margin-right: $spacing-3;
+    }
   }
 
   .page-description {
-    font-size: 1rem;
-    color: $text-muted;
-    margin-bottom: 0;
+    font-size: $font-size-base;
+    color: $gray-500;
+    margin: $spacing-2 0 0 0;
+    width: 100%;
   }
 
   .page-actions {
     display: flex;
-    gap: 0.5rem;
-    margin-left: auto;
-
-    .btn {
-      padding: 0.5rem 1rem;
-      border-radius: $border-radius-md;
-    }
+    gap: $spacing-3;
   }
 
-  @media (max-width: 768px) {
-    display: flex;
-    flex-direction: column;
-
+  @media (max-width: $breakpoint-md) {
     .page-title {
-      font-size: 1.5rem;
+      font-size: $font-size-2xl;
     }
 
     .page-actions {
-      margin-left: 0;
-      margin-top: 1rem;
+      width: 100%;
+
+      .btn {
+        flex: 1;
+      }
     }
   }
 }
 
-/* ==================== SEARCH & FILTER SECTION ==================== */
+// =============================================
+// SEARCH & FILTER SECTION
+// =============================================
 
 .search-section {
-  background: $bg-white;
-  padding: 1.5rem;
-  border-radius: $border-radius-lg;
+  background: $white;
+  padding: $spacing-5;
+  border-radius: $radius-xl;
   box-shadow: $shadow-sm;
-  margin-bottom: 2rem;
+  margin-bottom: $spacing-6;
+  border: 1px solid $gray-200;
 
   .search-title {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: $text-dark;
-    margin-bottom: 1rem;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-bold;
+    color: $gray-500;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
+    margin-bottom: $spacing-4;
+
+    i {
+      margin-right: $spacing-2;
+    }
   }
 
-  .form-control,
-  .form-select {
-    border: 1px solid $border-color;
-    border-radius: $border-radius-md;
-    padding: 0.75rem 1rem;
-    font-size: 0.875rem;
-    transition: all 0.3s ease;
+  .search-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-4;
+    align-items: flex-end;
+  }
 
-    &:focus {
-      border-color: $primary-color;
-      box-shadow: 0 0 0 0.2rem rgba($primary-color, 0.25);
-      outline: none;
-    }
-
-    &::placeholder {
-      color: $text-muted;
-    }
+  .search-field {
+    flex: 1;
+    min-width: 200px;
   }
 
   .btn-search {
-    background-color: $primary-color;
-    color: white;
-    border: none;
-    border-radius: $border-radius-md;
-    padding: 0.75rem 1.5rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    cursor: pointer;
+    background: $gradient-primary;
+    color: $white;
+    box-shadow: $shadow-primary;
 
     &:hover {
-      background-color: darken($primary-color, 10%);
       transform: translateY(-2px);
-      box-shadow: $shadow-md;
-    }
-
-    i {
-      margin-right: 0.5rem;
+      box-shadow: $shadow-md, $shadow-primary;
     }
   }
 
-  @media (max-width: 768px) {
-    padding: 1rem;
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-4;
+
+    .search-field {
+      width: 100%;
+    }
 
     .btn-search {
       width: 100%;
@@ -145,58 +119,63 @@ $shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
 }
 
-/* ==================== EMPTY STATE ==================== */
+// =============================================
+// EMPTY STATE
+// =============================================
 
 .empty-state {
-  background: $bg-light;
-  padding: 3rem 2rem;
-  border-radius: $border-radius-lg;
+  background: $light;
+  padding: $spacing-12 $spacing-6;
+  border-radius: $radius-xl;
   text-align: center;
-  margin: 2rem 0;
+  margin: $spacing-6 0;
+  border: 2px dashed $gray-300;
 
   .empty-icon {
-    font-size: 3rem;
-    color: $text-muted;
-    margin-bottom: 1rem;
+    font-size: 4rem;
+    color: $gray-400;
+    margin-bottom: $spacing-4;
   }
 
   .empty-title {
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: $text-dark;
-    margin-bottom: 0.5rem;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $dark;
+    margin-bottom: $spacing-2;
   }
 
   .empty-description {
-    color: $text-muted;
-    margin-bottom: 1.5rem;
-    font-size: 0.875rem;
-  }
-
-  .btn {
-    min-width: 150px;
+    color: $gray-500;
+    margin-bottom: $spacing-6;
+    font-size: $font-size-sm;
   }
 }
 
-/* ==================== CARD STYLES ==================== */
+// =============================================
+// CARD CONTAINER (GRID)
+// =============================================
 
 .card-container {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin-bottom: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: $spacing-5;
+  margin-bottom: $spacing-6;
 
-  @media (max-width: 768px) {
+  @media (max-width: $breakpoint-md) {
     grid-template-columns: 1fr;
   }
 }
 
+// =============================================
+// CARD ITEM
+// =============================================
+
 .card-item {
-  background: $bg-white;
-  border: 1px solid $border-color;
-  border-radius: $border-radius-lg;
+  background: $white;
+  border: 1px solid $gray-200;
+  border-radius: $radius-xl;
   overflow: hidden;
-  transition: all 0.3s ease;
+  transition: all $transition-base;
   box-shadow: $shadow-sm;
   display: flex;
   flex-direction: column;
@@ -204,351 +183,397 @@ $shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
   &:hover {
     box-shadow: $shadow-lg;
     transform: translateY(-4px);
-    border-color: $primary-color;
+    border-color: $primary;
   }
 
   .card-header {
-    background: $bg-light;
-    padding: 1rem;
-    border-bottom: 1px solid $border-color;
+    padding: $spacing-4 $spacing-5;
+    background: linear-gradient(135deg, $gray-50 0%, $white 100%);
+    border-bottom: 1px solid $gray-200;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 1rem;
+    gap: $spacing-3;
 
     .card-title {
-      font-size: 1rem;
-      font-weight: 600;
-      color: $text-dark;
+      font-size: $font-size-base;
+      font-weight: $font-weight-bold;
+      color: $dark;
       margin: 0;
       flex: 1;
     }
 
     .card-badge {
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      font-weight: 600;
+      padding: $spacing-1 $spacing-3;
+      border-radius: $radius-full;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-semibold;
       white-space: nowrap;
 
       &.badge-success {
-        background-color: rgba($success-color, 0.1);
-        color: $success-color;
+        background: $success-bg;
+        color: $success;
       }
 
       &.badge-warning {
-        background-color: rgba($warning-color, 0.1);
-        color: darken($warning-color, 20%);
-      }
-
-      &.badge-info {
-        background-color: rgba($info-color, 0.1);
-        color: $info-color;
+        background: $warning-bg;
+        color: darken($warning, 15%);
       }
 
       &.badge-danger {
-        background-color: rgba($danger-color, 0.1);
-        color: $danger-color;
+        background: $danger-bg;
+        color: $danger;
+      }
+
+      &.badge-info {
+        background: $info-bg;
+        color: $info;
       }
     }
   }
 
   .card-body {
-    padding: 1.25rem;
+    padding: $spacing-5;
     flex: 1;
 
     .card-meta {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1rem;
-      margin-bottom: 1rem;
+      gap: $spacing-4;
+      margin-bottom: $spacing-4;
 
       .meta-item {
         .meta-label {
-          font-size: 0.75rem;
-          font-weight: 600;
-          color: $text-muted;
+          font-size: $font-size-xs;
+          font-weight: $font-weight-bold;
+          color: $gray-500;
           text-transform: uppercase;
-          margin-bottom: 0.25rem;
+          letter-spacing: 0.5px;
+          margin-bottom: $spacing-1;
         }
 
         .meta-value {
-          font-size: 1.125rem;
-          font-weight: 600;
-          color: $text-dark;
+          font-size: $font-size-lg;
+          font-weight: $font-weight-bold;
+          color: $dark;
 
           &.text-primary {
-            color: $primary-color;
+            color: $primary;
           }
         }
       }
     }
 
     .card-description {
-      font-size: 0.875rem;
-      color: $text-muted;
-      line-height: 1.5;
+      font-size: $font-size-sm;
+      color: $gray-600;
+      line-height: $line-height-relaxed;
     }
   }
 
   .card-footer {
-    background: $bg-light;
-    padding: 1rem;
-    border-top: 1px solid $border-color;
+    padding: $spacing-4 $spacing-5;
+    background: $gray-50;
+    border-top: 1px solid $gray-200;
     display: flex;
-    gap: 0.5rem;
+    gap: $spacing-3;
 
     .btn {
       flex: 1;
-      padding: 0.5rem 1rem;
-      border-radius: $border-radius-md;
-      font-size: 0.875rem;
-      font-weight: 600;
-      transition: all 0.3s ease;
-      border: none;
-      cursor: pointer;
-
-      &.btn-primary {
-        background-color: $primary-color;
-        color: white;
-
-        &:hover {
-          background-color: darken($primary-color, 10%);
-        }
-      }
-
-      &.btn-secondary {
-        background-color: $secondary-color;
-        color: white;
-
-        &:hover {
-          background-color: darken($secondary-color, 10%);
-        }
-      }
-
-      &.btn-outline {
-        background-color: transparent;
-        border: 1px solid $primary-color;
-        color: $primary-color;
-
-        &:hover {
-          background-color: $primary-color;
-          color: white;
-        }
-      }
-
-      i {
-        margin-right: 0.25rem;
-      }
     }
   }
 }
 
-/* ==================== TABLE STYLES ==================== */
+// =============================================
+// TABLE CONTAINER
+// =============================================
 
 .table-container {
-  background: $bg-white;
-  border-radius: $border-radius-lg;
+  background: $white;
+  border-radius: $radius-xl;
   box-shadow: $shadow-sm;
   overflow: hidden;
-  margin-bottom: 2rem;
-
-  table {
-    margin: 0;
-
-    thead {
-      background-color: $bg-light;
-      border-bottom: 2px solid $border-color;
-
-      th {
-        padding: 1rem;
-        font-weight: 600;
-        color: $text-dark;
-        font-size: 0.875rem;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border: none;
-      }
-    }
-
-    tbody {
-      tr {
-        border-bottom: 1px solid $border-color;
-        transition: background-color 0.2s ease;
-
-        &:hover {
-          background-color: $bg-light;
-        }
-
-        &:last-child {
-          border-bottom: none;
-        }
-
-        td {
-          padding: 1rem;
-          color: $text-dark;
-          font-size: 0.875rem;
-          vertical-align: middle;
-        }
-      }
-    }
-
-    .badge {
-      padding: 0.35rem 0.65rem;
-      border-radius: $border-radius-sm;
-      font-size: 0.75rem;
-      font-weight: 600;
-
-      &.badge-success {
-        background-color: $success-color;
-        color: white;
-      }
-
-      &.badge-warning {
-        background-color: $warning-color;
-        color: #000;
-      }
-
-      &.badge-danger {
-        background-color: $danger-color;
-        color: white;
-      }
-
-      &.badge-info {
-        background-color: $info-color;
-        color: white;
-      }
-    }
-  }
-
-  @media (max-width: 768px) {
-    .table-responsive {
-      font-size: 0.75rem;
-
-      table {
-        th,
-        td {
-          padding: 0.75rem 0.5rem;
-        }
-      }
-    }
-  }
+  margin-bottom: $spacing-6;
+  border: 1px solid $gray-200;
 }
 
-/* ==================== BUTTON STYLES ==================== */
+.table-responsive {
+  overflow-x: auto;
+}
 
-.btn-primary,
-.btn-secondary,
-.btn-outline-primary,
-.btn-outline-secondary {
-  border-radius: $border-radius-md;
-  padding: 0.5rem 1rem;
-  font-weight: 600;
-  font-size: 0.875rem;
-  transition: all 0.3s ease;
-  border: none;
-  cursor: pointer;
+// =============================================
+// STATS CARDS
+// =============================================
 
-  i {
-    margin-right: 0.5rem;
-  }
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: $spacing-5;
+  margin-bottom: $spacing-6;
+}
+
+.stat-card {
+  background: $white;
+  border: 1px solid $gray-200;
+  border-radius: $radius-xl;
+  padding: $spacing-5;
+  display: flex;
+  align-items: center;
+  gap: $spacing-4;
+  transition: all $transition-base;
 
   &:hover {
-    transform: translateY(-2px);
     box-shadow: $shadow-md;
+    transform: translateY(-2px);
   }
 
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
+  .stat-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: $radius-lg;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: $font-size-2xl;
+
+    &.icon-primary {
+      background: $primary-bg;
+      color: $primary;
+    }
+
+    &.icon-success {
+      background: $success-bg;
+      color: $success;
+    }
+
+    &.icon-warning {
+      background: $warning-bg;
+      color: darken($warning, 10%);
+    }
+
+    &.icon-danger {
+      background: $danger-bg;
+      color: $danger;
+    }
+  }
+
+  .stat-content {
+    flex: 1;
+
+    .stat-value {
+      font-size: $font-size-2xl;
+      font-weight: $font-weight-bold;
+      color: $dark;
+      line-height: 1;
+      margin-bottom: $spacing-1;
+    }
+
+    .stat-label {
+      font-size: $font-size-sm;
+      color: $gray-500;
+    }
   }
 }
 
-/* ==================== ALERT STYLES ==================== */
+// =============================================
+// TABS
+// =============================================
 
-.alert {
-  border-radius: $border-radius-lg;
-  padding: 1.25rem;
-  border: 1px solid;
-  font-size: 0.875rem;
-  margin-bottom: 1.5rem;
+.nav-tabs-custom {
+  border-bottom: 2px solid $gray-200;
+  gap: $spacing-2;
 
-  i {
-    margin-right: 0.5rem;
-  }
+  .nav-link {
+    padding: $spacing-3 $spacing-5;
+    font-weight: $font-weight-medium;
+    color: $gray-500;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all $transition-fast;
 
-  &.alert-info {
-    background-color: rgba($info-color, 0.1);
-    border-color: $info-color;
-    color: $info-color;
-  }
+    &:hover {
+      color: $primary;
+      border-color: transparent;
+    }
 
-  &.alert-warning {
-    background-color: rgba($warning-color, 0.1);
-    border-color: $warning-color;
-    color: darken($warning-color, 20%);
-  }
-
-  &.alert-success {
-    background-color: rgba($success-color, 0.1);
-    border-color: $success-color;
-    color: $success-color;
-  }
-
-  &.alert-danger {
-    background-color: rgba($danger-color, 0.1);
-    border-color: $danger-color;
-    color: $danger-color;
+    &.active {
+      color: $primary;
+      border-color: $primary;
+      background: transparent;
+      font-weight: $font-weight-semibold;
+    }
   }
 }
 
-/* ==================== PAGINATION ==================== */
+// =============================================
+// FORM SECTION
+// =============================================
+
+.form-section {
+  background: $white;
+  border: 1px solid $gray-200;
+  border-radius: $radius-xl;
+  padding: $spacing-6;
+  margin-bottom: $spacing-6;
+
+  .section-title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $dark;
+    margin-bottom: $spacing-5;
+    padding-bottom: $spacing-4;
+    border-bottom: 1px solid $gray-200;
+
+    i {
+      color: $primary;
+      margin-right: $spacing-2;
+    }
+  }
+
+  .form-group {
+    margin-bottom: $spacing-5;
+  }
+}
+
+// =============================================
+// PAGINATION
+// =============================================
 
 .pagination-wrapper {
   display: flex;
   justify-content: center;
-  margin-top: 2rem;
-  margin-bottom: 2rem;
+  margin: $spacing-8 0;
 }
 
-/* ==================== GENERAL UTILITIES ==================== */
+// =============================================
+// PAGE CONTAINER
+// =============================================
 
 .page-container {
-  padding: 2rem 0;
+  padding: $spacing-6 0;
   min-height: calc(100vh - 300px);
 }
 
+// =============================================
+// DIVIDERS
+// =============================================
+
 .section-divider {
   height: 1px;
-  background-color: $border-color;
-  margin: 2rem 0;
+  background: $gray-200;
+  margin: $spacing-6 0;
 }
+
+// =============================================
+// ACTION BUTTONS
+// =============================================
+
+.action-buttons {
+  display: flex;
+  gap: $spacing-2;
+  flex-wrap: wrap;
+
+  .btn-icon {
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: $radius-md;
+    font-size: $font-size-sm;
+    transition: all $transition-fast;
+
+    &.btn-view {
+      background: $info-bg;
+      color: $info;
+
+      &:hover {
+        background: $info;
+        color: $white;
+      }
+    }
+
+    &.btn-edit {
+      background: $warning-bg;
+      color: darken($warning, 10%);
+
+      &:hover {
+        background: $warning;
+        color: $white;
+      }
+    }
+
+    &.btn-delete {
+      background: $danger-bg;
+      color: $danger;
+
+      &:hover {
+        background: $danger;
+        color: $white;
+      }
+    }
+  }
+}
+
+// =============================================
+// COPY BUTTON
+// =============================================
+
+.copy-btn {
+  padding: $spacing-2 $spacing-3;
+  background: $primary-bg;
+  color: $primary;
+  border: none;
+  border-radius: $radius-md;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: $primary;
+    color: $white;
+    transform: scale(1.05);
+  }
+
+  i {
+    margin-right: $spacing-1;
+  }
+}
+
+// =============================================
+// UTILITIES
+// =============================================
 
 .text-primary {
-  color: $primary-color;
-}
-
-.text-muted {
-  color: $text-muted;
+  color: $primary !important;
 }
 
 .text-dark {
-  color: $text-dark;
+  color: $dark !important;
+}
+
+.text-muted {
+  color: $gray-500 !important;
+}
+
+.text-success {
+  color: $success !important;
+}
+
+.text-danger {
+  color: $danger !important;
+}
+
+.text-warning {
+  color: $warning !important;
 }
 
 .bg-light {
-  background-color: $bg-light;
+  background: $light !important;
 }
 
-.shadow-sm {
-  box-shadow: $shadow-sm;
-}
-
-.shadow-md {
-  box-shadow: $shadow-md;
-}
-
-.shadow-lg {
-  box-shadow: $shadow-lg;
+.bg-white {
+  background: $white !important;
 }

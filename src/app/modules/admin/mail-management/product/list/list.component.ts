@@ -51,7 +51,7 @@ export class MailManagementListComponent implements OnInit {
   showCreateModal = false;
   showUpdateModal = false;
   selectedProduct: Product | null = null;
-  
+
   paginationConfig: PaginationConfig = {
     currentPage: 0,
     totalPages: 1,
@@ -108,7 +108,7 @@ export class MailManagementListComponent implements OnInit {
     if (!pageNum) {
       return;
     }
-    
+
     if (pageNum > this.paginationConfig.totalPages || pageNum < 1) {
       this.notificationService.error(`Page must be between 1 and ${this.paginationConfig.totalPages}`);
     } else {
@@ -173,8 +173,10 @@ export class MailManagementListComponent implements OnInit {
     });
   }
 
-  onDetail(productId: number): void {
-    this.router.navigate(['/admin/mail-management', productId, 'items']);
+  onDetail(product: Product): void {
+    this.router.navigate(['/admin/mail-management', product.id, 'items'], {
+      state: { productName: product.name }
+    });
   }
 
   onCreateClick(): void {

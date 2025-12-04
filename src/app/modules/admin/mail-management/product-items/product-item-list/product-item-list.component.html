@@ -1,6 +1,6 @@
 <div class="container-fluid p-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Danh sách tài khoản email</h1>
+    <h1>Danh sách tài khoản email @if (productName) {<span class="text-primary">{{ productName }}</span>}</h1>
     <button class="btn btn-success" (click)="onImportClick()">
       <i class="fas fa-upload"></i> Nhập tài khoản
     </button>
@@ -13,11 +13,7 @@
         <div class="row g-3">
           <div class="col-md-4">
             <label for="accountData" class="form-label">Dữ liệu tài khoản</label>
-            <input
-              id="accountData"
-              type="text"
-              class="form-control"
-              formControlName="accountData"
+            <input id="accountData" type="text" class="form-control" formControlName="accountData"
               placeholder="Nhập dữ liệu tài khoản...">
           </div>
           <div class="col-md-4">
@@ -56,50 +52,44 @@
       </thead>
       <tbody>
         @if (items.length === 0) {
-          <tr>
-            <td colspan="6" class="text-center text-muted py-4">Không có dữ liệu</td>
-          </tr>
+        <tr>
+          <td colspan="6" class="text-center text-muted py-4">Không có dữ liệu</td>
+        </tr>
         }
         @for (item of items; track item.id; let i = $index) {
-          <tr>
-            <td>{{ i + 1 + (currentPage * pageSize) }}</td>
-            <td class="text-monospace">{{ item.accountData }}</td>
-            <td>
-              <span [ngClass]="item.sold ? 'badge bg-success' : 'badge bg-secondary'">
-                {{ item.sold ? 'Có' : 'Không' }}
-              </span>
-            </td>
-            <td>{{ item.buyerId || '-' }}</td>
-            <td>{{ item.soldAt ? (item.soldAt | date: 'dd/MM/yyyy') : '-' }}</td>
-            <td>
-              <button class="btn btn-sm btn-danger" (click)="onDeleteItem(item.id)">
-                <i class="fas fa-trash"></i> Xóa
-              </button>
-            </td>
-          </tr>
+        <tr>
+          <td>{{ i + 1 + (currentPage * pageSize) }}</td>
+          <td class="text-monospace">{{ item.accountData }}</td>
+          <td>
+            <span [ngClass]="item.sold ? 'badge bg-success' : 'badge bg-secondary'">
+              {{ item.sold ? 'Có' : 'Không' }}
+            </span>
+          </td>
+          <td>{{ item.buyerId || '-' }}</td>
+          <td>{{ item.soldAt ? (item.soldAt | date: 'dd/MM/yyyy') : '-' }}</td>
+          <td>
+            <button class="btn btn-sm btn-danger" (click)="onDeleteItem(item.id)">
+              <i class="fas fa-trash"></i> Xóa
+            </button>
+          </td>
+        </tr>
         }
       </tbody>
     </table>
   </div>
 
   <!-- Pagination -->
-  <app-pagination
-    [config]="{
+  <app-pagination [config]="{
       currentPage: currentPage,
       totalPages: totalPages,
       pageSize: pageSize,
       totalElements: totalElements
-    }"
-    (pageChange)="onPageChange($event)"
-    (pageSizeChange)="onPageSizeChange($event)">
+    }" (pageChange)="onPageChange($event)" (pageSizeChange)="onPageSizeChange($event)">
   </app-pagination>
 </div>
 
 <!-- Import Modal -->
 @if (showImportModal) {
-  <app-bulk-import-modal
-    [productId]="productId"
-    (closeModal)="onModalClose()"
-    (successImport)="onImportSuccess()">
-  </app-bulk-import-modal>
+<app-bulk-import-modal [productId]="productId" (closeModal)="onModalClose()" (successImport)="onImportSuccess()">
+</app-bulk-import-modal>
 }

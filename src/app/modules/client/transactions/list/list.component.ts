@@ -240,30 +240,31 @@ export class ClientTransactionListComponent implements OnInit {
   // ================= UI HELPERS =================
   getTypeLabel(type: string): string {
     const map: Record<string, string> = {
-      deposit: 'Nạp tiền',
-      withdrawal: 'Rút tiền',
-      purchase: 'Mua hàng',
-      refund: 'Hoàn tiền'
+      DEPOSIT: 'Nạp tiền',
+      PURCHASE: 'Mua tài khoản',
+      REFUND: 'Hoàn tiền',
+      ADMIN_ADJUST: 'Admin điều chỉnh',
     };
     return map[type] || type;
   }
 
   getTypeClass(type: string): string {
     const map: Record<string, string> = {
-      deposit: 'badge-success',
-      withdrawal: 'badge-warning',
-      purchase: 'badge-danger',
-      refund: 'badge-info'
+      DEPOSIT: 'badge-success',
+      PURCHASE: 'badge-warning',
+      REFUND: 'badge-danger',
+      ADMIN_ADJUST: 'badge-info'
     };
     return map[type] || 'badge-secondary';
   }
 
   getStatusLabel(status: string): string {
     const map: Record<string, string> = {
-      pending: 'Chờ xử lý',
-      completed: 'Hoàn thành',
-      failed: 'Thất bại',
-      cancelled: 'Hủy'
+      PENDING: 'Chờ xử lý',
+      SUCCESS: 'Hoàn thành',
+      FAILED: 'Thất bại',
+      CANCELLED: 'Hủy',
+      REFUNDED: 'Đã hoàn tiền'
     };
     return map[status] || status;
   }
@@ -279,6 +280,6 @@ export class ClientTransactionListComponent implements OnInit {
   }
 
   getAmountColor(type: string): string {
-    return type === 'withdrawal' ? 'text-danger' : 'text-success';
+    return type === 'PURCHASE' ? 'text-danger' : 'text-success';
   }
 }
