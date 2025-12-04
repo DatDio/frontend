@@ -35,8 +35,6 @@ export class AuthService {
 
   // ========= LOGIN =========
   login(credentials: LoginRequest): Observable<ApiResponse<LoginResponse>> {
-    this.loaderService.show();
-
     return this.httpClient
       .post<ApiResponse<LoginResponse>>(AuthApi.LOGIN, credentials)
       .pipe(
@@ -44,8 +42,7 @@ export class AuthService {
           if (response.success && response.data) {
             this.setAuthData(response.data);
           }
-        }),
-        finalize(() => this.loaderService.hide())
+        })
       );
   }
 
