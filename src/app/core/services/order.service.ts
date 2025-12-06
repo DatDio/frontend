@@ -67,7 +67,7 @@ export class OrderService {
     this.loaderService.show();
 
     return this.httpClient
-      .get<ApiResponse<Order>>(AdminOrderApi.GET_BY_ID(id))
+      .get<ApiResponse<Order>>(OrderApi.GET_BY_ID(id))
       .pipe(finalize(() => this.loaderService.hide()));
   }
 

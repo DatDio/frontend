@@ -19,7 +19,7 @@
           <div class="col-md-4">
             <label for="sold" class="form-label">Đã bán</label>
             <select id="sold" class="form-select" formControlName="sold">
-              <option value="">-- Tất cả --</option>
+              <option value="">Tất cả trạng thái</option>
               <option value="true">Có</option>
               <option value="false">Không</option>
             </select>
@@ -29,7 +29,7 @@
               <i class="bi bi-search"></i> Tìm kiếm
             </button>
             <button type="button" class="btn btn-secondary" (click)="clearForm()">
-              <i class="bi bi-arrow-clockwise"></i> Đặt lại
+              <i class="bi bi-arrow-clockwise"></i> Xoá bộ lọc
             </button>
           </div>
         </div>
@@ -65,10 +65,11 @@
               {{ item.sold ? 'Có' : 'Không' }}
             </span>
           </td>
-          <td>{{ item.buyerId || '-' }}</td>
+          <td>{{ item.buyerName || '-' }}</td>
           <td>{{ item.soldAt ? (item.soldAt | date: 'dd/MM/yyyy') : '-' }}</td>
           <td>
-            <button class="btn btn-sm btn-danger" (click)="onDeleteItem(item.id)">
+            <button class="btn btn-sm btn-danger" (click)="onDeleteItem(item.id)" [disabled]="item.buyerName"
+              [title]="item.buyerName ? 'Không thể xóa tài khoản đã bán' : 'Xóa tài khoản'">
               <i class="fas fa-trash"></i> Xóa
             </button>
           </td>

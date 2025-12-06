@@ -34,7 +34,7 @@ export interface UpdateUserRequest {
   fullName: string;
   phone?: string;
   address?: string;
-  roles: string[];
+  roles?: string[];
   status: number;
 }
 

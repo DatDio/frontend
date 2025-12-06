@@ -7,6 +7,7 @@ import { Category } from '../../../../../core/models/category.model';
 import { ProductService } from '../../../../../core/services/product.service';
 import { CategoryService } from '../../../../../core/services/category.service';
 import { NotificationService } from '../../../../../core/services/notification.service';
+import { ConfirmService } from '../../../../../shared/services/confirm.service';
 import { PaginationComponent, PaginationConfig } from '../../../../../shared/components/pagination/pagination.component';
 import { PaginationService } from '../../../../../shared/services/pagination.service';
 import { ProductCreateModalComponent } from '../create-modal/create-modal.component';
@@ -41,6 +42,7 @@ export class MailManagementListComponent implements OnInit {
   private readonly productService = inject(ProductService);
   private readonly categoryService = inject(CategoryService);
   private readonly notificationService = inject(NotificationService);
+  private readonly confirmService = inject(ConfirmService);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
   private readonly paginationService = inject(PaginationService);
@@ -208,8 +210,15 @@ export class MailManagementListComponent implements OnInit {
     this.loadProducts();
   }
 
-  onDeleteClick(id: number): void {
-    if (confirm('Bạn có chắc muốn xóa sản phẩm này?')) {
+  async onDeleteClick(id: number): Promise<void> {
+    const confirmed = await this.confirmService.confirm({
+      title: 'Xác nhận xóa',
+      message: 'Bạn có chắc muốn xóa sản phẩm này?',
+      confirmText: 'Xóa',
+      cancelText: 'Hủy'
+    });
+
+    if (confirmed) {
       this.productService.delete(id).subscribe({
         next: (response: any) => {
           if (response.success) {

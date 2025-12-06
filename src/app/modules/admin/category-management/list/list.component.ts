@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CategoryService } from '../../../../core/services/category.service';
 import { NotificationService } from '../../../../core/services/notification.service';
+import { ConfirmService } from '../../../../shared/services/confirm.service';
 import { Category } from '../../../../core/models/category.model';
 import { CategoryModalComponent } from '../category-modal/category-modal.component';
 import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
@@ -24,6 +25,7 @@ import { ActiveStatusBadgeComponent } from '../../../../shared/components/active
 export class CategoryListComponent implements OnInit {
   readonly #categoryService = inject(CategoryService);
   readonly #notificationService = inject(NotificationService);
+  readonly #confirmService = inject(ConfirmService);
   readonly #fb = inject(FormBuilder);
   readonly #paginationService = inject(PaginationService);
 
@@ -98,12 +100,19 @@ export class CategoryListComponent implements OnInit {
     }
   }
 
-  deleteCategory(id: number): void {
-    if (confirm('Are you sure you want to delete this category?')) {
+  async deleteCategory(id: number): Promise<void> {
+    const confirmed = await this.#confirmService.confirm({
+      title: 'Xác nhận xóa',
+      message: 'Bạn có chắc muốn xóa danh mục này?',
+      confirmText: 'Xóa',
+      cancelText: 'Hủy'
+    });
+
+    if (confirmed) {
       this.#categoryService.delete(id).subscribe({
         next: (response) => {
           if (response.success) {
-            this.#notificationService.success('Category deleted successfully');
+            this.#notificationService.success('Xóa danh mục thành công');
             this.loadCategories();
           } else {
             this.#notificationService.error(response.message || 'Failed to delete category');

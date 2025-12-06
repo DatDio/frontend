@@ -5,7 +5,8 @@ export interface ProductItem {
   productId: number;
   accountData: string;     // mail|pass|recovery
   sold: boolean;
-  buyerId?: number;       
+  buyerId?: number; 
+  buyerName?: string;          
   orderId?: number;       
   soldAt?: string;        
 }

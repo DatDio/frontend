@@ -4,6 +4,7 @@ import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule }
 import { Router, RouterModule } from '@angular/router';
 import { UserService } from '../../../../core/services/user.service';
 import { NotificationService } from '../../../../core/services/notification.service';
+import { ConfirmService } from '../../../../shared/services/confirm.service';
 import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
 import { PaginationService } from '../../../../shared/services/pagination.service';
 import { UserDetailModalComponent } from '../detail-modal/detail-modal.component';
@@ -19,7 +20,7 @@ interface UserSearchFilter {
 @Component({
   selector: 'app-users-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, PaginationComponent, UserDetailModalComponent, ActiveStatusSelectComponent,ActiveStatusBadgeComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, PaginationComponent, UserDetailModalComponent, ActiveStatusSelectComponent, ActiveStatusBadgeComponent],
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss']
 })
@@ -28,20 +29,21 @@ export class UsersListComponent implements OnInit {
 
   readonly #userService = inject(UserService);
   readonly #notificationService = inject(NotificationService);
+  readonly #confirmService = inject(ConfirmService);
   readonly #router = inject(Router);
   readonly #fb = inject(FormBuilder);
   readonly #paginationService = inject(PaginationService);
 
   users: User[] = [];
   loading = true;
-  
+
   paginationConfig: PaginationConfig = {
     currentPage: 0,
     totalPages: 1,
     pageSize: 10,
     totalElements: 0
   };
-  
+
   dataFormSearch: UserSearchFilter = {};
   formSearch!: FormGroup;
 
@@ -76,7 +78,7 @@ export class UsersListComponent implements OnInit {
     if (!pageNum) {
       return;
     }
-    
+
     if (pageNum > this.paginationConfig.totalPages || pageNum < 1) {
       this.#notificationService.error(`Page must be between 1 and ${this.paginationConfig.totalPages}`);
     } else {
@@ -118,13 +120,13 @@ export class UsersListComponent implements OnInit {
 
   private loadUsers(): void {
     this.loading = true;
-    
+
     // Build query params
     const params: any = {
       page: this.paginationConfig.currentPage,
       limit: this.paginationConfig.pageSize
     };
-    
+
     if (this.dataFormSearch.email) {
       params.email = this.dataFormSearch.email;
     }
@@ -136,7 +138,7 @@ export class UsersListComponent implements OnInit {
       next: (response) => {
         if (response.success) {
           this.users = response.data.content;
-          
+
           // Extract pagination từ backend
           const paginationInfo = this.#paginationService.extractPaginationInfo(response.data);
           this.paginationConfig = {
@@ -145,7 +147,7 @@ export class UsersListComponent implements OnInit {
             totalElements: paginationInfo.totalElements,
             totalPages: paginationInfo.totalPages
           };
-          
+
         } else {
           this.#notificationService.error(response.message || 'Có lỗi xảy ra');
         }
@@ -170,8 +172,15 @@ export class UsersListComponent implements OnInit {
     this.#router.navigate(['/admin/users-management/edit', id]);
   }
 
-  deleteUser(id: number): void {
-    if (confirm('Are you sure you want to delete this user?')) {
+  async deleteUser(id: number): Promise<void> {
+    const confirmed = await this.#confirmService.confirm({
+      title: 'Xác nhận xóa',
+      message: 'Bạn có chắc muốn xóa người dùng này?',
+      confirmText: 'Xóa',
+      cancelText: 'Hủy'
+    });
+
+    if (confirmed) {
       this.#userService.delete(id).subscribe({
         next: (response) => {
           if (response.success) {

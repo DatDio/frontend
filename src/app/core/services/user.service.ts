@@ -6,6 +6,7 @@ import { LoaderService } from './loader.service';
 import { User, UserFilter, CreateUserRequest, UpdateUserRequest } from '../models/user.model';
 import { ApiResponse, PaginatedResponse } from '../models/common.model';
 import { AdminUserApi } from '../../Utils/apis/users/admin-user.api';
+import { ClientUserApi } from '../../Utils/apis/users/client-user.api';
 
 @Injectable({
   providedIn: 'root'
@@ -37,6 +38,15 @@ export class UserService {
       );
   }
 
+   getByClient(id: number): Observable<ApiResponse<User>> {
+    this.loaderService.show();
+
+    return this.httpClient
+      .get<ApiResponse<User>>(ClientUserApi.GET_USER_BY_ID(id))
+      .pipe(
+        finalize(() => this.loaderService.hide())
+      );
+  }
   // ===== CREATE =====
   create(data: CreateUserRequest): Observable<ApiResponse<User>> {
     this.loaderService.show();
@@ -58,7 +68,15 @@ export class UserService {
         finalize(() => this.loaderService.hide())
       );
   }
+  updateByClient(data: UpdateUserRequest): Observable<ApiResponse<User>> {
+    this.loaderService.show();
 
+    return this.httpClient
+      .put<ApiResponse<User>>(ClientUserApi.UPDATE(data.id), data)
+      .pipe(
+        finalize(() => this.loaderService.hide())
+      );
+  }
   // ===== DELETE MULTIPLE =====
   delete(id: number): Observable<ApiResponse<void>> {
     this.loaderService.show();
@@ -98,16 +116,7 @@ export class UserService {
       );
   }
 
-  // ===== CHANGE PASSWORD =====
-  changePassword(data: { currentPassword: string; newPassword: string }): Observable<ApiResponse<void>> {
-    this.loaderService.show();
-
-    return this.httpClient
-      .post<ApiResponse<void>>(`${AdminUserApi.SEARCH.split('/admin')[0]}/profile/change-password`, data)
-      .pipe(
-        finalize(() => this.loaderService.hide())
-      );
-  }
+  
 
   // ===== FILTER BUILDER =====
   private createUserFilter(filter?: UserFilter): HttpParams {

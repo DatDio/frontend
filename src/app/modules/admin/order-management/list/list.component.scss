@@ -41,7 +41,7 @@ h1 {
   tbody {
     tr {
       border-bottom: 1px solid #dee2e6;
-      
+
       &:hover {
         background-color: #f8f9fa;
       }
@@ -57,6 +57,33 @@ h1 {
 .badge {
   font-size: 12px;
   padding: 4px 8px;
+  border-radius: 20px;
+  font-weight: 500;
+
+  &.badge-warning {
+    background-color: #ffc107;
+    color: #000;
+  }
+
+  &.badge-info {
+    background-color: #17a2b8;
+    color: #fff;
+  }
+
+  &.badge-success {
+    background-color: #28a745;
+    color: #fff;
+  }
+
+  &.badge-danger {
+    background-color: #dc3545;
+    color: #fff;
+  }
+
+  &.badge-secondary {
+    background-color: #6c757d;
+    color: #fff;
+  }
 }
 
 .btn-sm {

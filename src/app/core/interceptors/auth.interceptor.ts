@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { HttpInterceptorFn, HttpErrorResponse, HttpEvent } from '@angular/common/http';
-import { throwError, BehaviorSubject, Observable } from 'rxjs';
+import { throwError, BehaviorSubject, Observable, EMPTY } from 'rxjs';
 import { catchError, filter, take, switchMap } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 
@@ -22,6 +22,12 @@ const handle401Error = (request: any, next: any, authService: AuthService): Obse
       take(1),
       switchMap(token => next(addToken(request, token)) as Observable<HttpEvent<any>>)
     );
+  }
+
+  // No refresh token available, force logout and fail fast
+  if (!authService.getRefreshToken()) {
+    authService.logout();
+    return EMPTY;
   }
 
   isRefreshing = true;

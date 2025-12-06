@@ -1,106 +1,172 @@
 <div class="dashboard">
   <div class="dashboard__header mb-4">
     <h1>Dashboard</h1>
-    <p class="text-muted">Welcome back! Here's what's happening today.</p>
+    <p class="text-muted">Thống kê đơn hàng và doanh thu</p>
   </div>
 
   @if (loading) {
-    <div class="text-center py-5">
-      <div class="spinner-border text-primary"></div>
-    </div>
+  <div class="text-center py-5">
+    <div class="spinner-border text-primary"></div>
+  </div>
   } @else {
-    <div class="row g-4 mb-4">
-      <div class="col-md-6 col-lg-3">
-        <div class="stat-card stat-card--primary">
-          <div class="stat-card__icon">
-            <i class="bi bi-people"></i>
-          </div>
-          <div class="stat-card__content">
-            <h3>{{ stats.totalUsers }}</h3>
-            <p>Total Users</p>
-          </div>
+  <!-- Overview Cards Row 1: Hôm nay -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card stat-card--primary">
+        <div class="stat-card__icon">
+          <i class="bi bi-cart-check"></i>
         </div>
-      </div>
-      <div class="col-md-6 col-lg-3">
-        <div class="stat-card stat-card--success">
-          <div class="stat-card__icon">
-            <i class="bi bi-envelope"></i>
-          </div>
-          <div class="stat-card__content">
-            <h3>{{ stats.totalAccounts }}</h3>
-            <p>Mail Accounts</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-3">
-        <div class="stat-card stat-card--warning">
-          <div class="stat-card__icon">
-            <i class="bi bi-check-circle"></i>
-          </div>
-          <div class="stat-card__content">
-            <h3>{{ stats.activeAccounts }}</h3>
-            <p>Active Accounts</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-3">
-        <div class="stat-card stat-card--info">
-          <div class="stat-card__icon">
-            <i class="bi bi-currency-dollar"></i>
-          </div>
-          <div class="stat-card__content">
-            <h3>${{ stats.revenue }}</h3>
-            <p>Total Revenue</p>
-          </div>
+        <div class="stat-card__content">
+          <h3>{{ stats.ordersToday }}</h3>
+          <p>Đơn hàng hôm nay</p>
+          <small [ngClass]="getGrowthClass(stats.ordersGrowthPercent)">
+            <i class="bi" [ngClass]="getGrowthIcon(stats.ordersGrowthPercent)"></i>
+            {{ stats.ordersGrowthPercent | number:'1.1-1' }}% so với hôm qua
+          </small>
         </div>
       </div>
     </div>
 
-    <div class="row g-4">
-      <div class="col-lg-8">
-        <div class="card">
-          <div class="card-header">
-            <h5 class="mb-0">Recent Activities</h5>
-          </div>
-          <div class="card-body">
-            <div class="activity-list">
-              @for (activity of recentActivities; track activity.message) {
-                <div class="activity-item">
-                  <div class="activity-item__icon" [class]="'activity-item__icon--' + activity.type">
-                    <i class="bi" [class.bi-person-plus]="activity.type === 'user'"
-                       [class.bi-envelope-plus]="activity.type === 'account'"
-                       [class.bi-cart-check]="activity.type === 'sale'"></i>
-                  </div>
-                  <div class="activity-item__content">
-                    <p class="mb-0">{{ activity.message }}</p>
-                    <small class="text-muted">{{ activity.time }}</small>
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card stat-card--success">
+        <div class="stat-card__icon">
+          <i class="bi bi-currency-dollar"></i>
+        </div>
+        <div class="stat-card__content">
+          <h3>{{ formatCurrency(stats.revenueToday) }}</h3>
+          <p>Doanh thu hôm nay (VND)</p>
+          <small [ngClass]="getGrowthClass(stats.revenueGrowthPercent)">
+            <i class="bi" [ngClass]="getGrowthIcon(stats.revenueGrowthPercent)"></i>
+            {{ stats.revenueGrowthPercent | number:'1.1-1' }}% so với hôm qua
+          </small>
         </div>
       </div>
-      <div class="col-lg-4">
-        <div class="card">
-          <div class="card-header">
-            <h5 class="mb-0">Quick Actions</h5>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card stat-card--warning">
+        <div class="stat-card__icon">
+          <i class="bi bi-calendar-month"></i>
+        </div>
+        <div class="stat-card__content">
+          <h3>{{ stats.ordersThisMonth }}</h3>
+          <p>Đơn hàng tháng này</p>
+          <small class="text-muted">
+            {{ formatCurrency(stats.revenueThisMonth) }} VND
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+      <div class="stat-card stat-card--info">
+        <div class="stat-card__icon">
+          <i class="bi bi-graph-up-arrow"></i>
+        </div>
+        <div class="stat-card__content">
+          <h3>{{ formatCurrency(stats.totalRevenue) }}</h3>
+          <p>Tổng doanh thu (VND)</p>
+          <small class="text-muted">
+            {{ stats.totalOrders }} đơn hàng
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart Section -->
+  <div class="row g-4 mb-4">
+    <div class="col-12">
+      <div class="card chart-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <i class="bi bi-bar-chart-fill me-2"></i>
+            Biểu đồ doanh thu & đơn hàng
+          </h5>
+          <div class="period-filter">
+            <select class="form-select form-select-sm" [(ngModel)]="selectedPeriod" (change)="onPeriodChange()">
+              <option value="WEEK">7 ngày qua</option>
+              <option value="MONTH">30 ngày qua</option>
+              <option value="YEAR">12 tháng qua</option>
+            </select>
           </div>
-          <div class="card-body">
-            <div class="d-grid gap-2">
-              <a routerLink="/admin/users-management" class="btn btn-outline-primary">
-                <i class="bi bi-people"></i> Manage Users
-              </a>
-              <a routerLink="/admin/mail-management" class="btn btn-outline-primary">
-                <i class="bi bi-envelope"></i> Manage Mail Accounts
-              </a>
-              <button class="btn btn-outline-secondary">
-                <i class="bi bi-file-earmark-arrow-down"></i> Export Reports
-              </button>
+        </div>
+        <div class="card-body">
+          @if (chartLoading) {
+          <div class="text-center py-4">
+            <div class="spinner-border text-primary spinner-border-sm"></div>
+            <span class="ms-2">Đang tải biểu đồ...</span>
+          </div>
+          }
+          <div class="chart-container" [class.d-none]="chartLoading">
+            <canvas #revenueChart></canvas>
+          </div>
+
+          <!-- Chart Summary -->
+          @if (chartData) {
+          <div class="chart-summary mt-4">
+            <div class="row text-center">
+              <div class="col-md-4">
+                <div class="summary-item">
+                  <span class="summary-value text-primary">{{ formatCurrency(chartData.totalRevenue) }}</span>
+                  <span class="summary-label">Tổng doanh thu ({{ getPeriodLabel() }})</span>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="summary-item">
+                  <span class="summary-value text-danger">{{ chartData.totalOrders }}</span>
+                  <span class="summary-label">Tổng đơn hàng</span>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="summary-item">
+                  <span class="summary-value text-success">{{ formatCurrency(chartData.avgOrderValue) }}</span>
+                  <span class="summary-label">Giá trị TB/đơn (VND)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="row g-4">
+    <div class="col">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">Thống kê nhanh</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <div class="quick-stat-item">
+                <div class="quick-stat-icon bg-primary-soft">
+                  <i class="bi bi-calendar-check text-primary"></i>
+                </div>
+                <div class="quick-stat-content">
+                  <span class="quick-stat-value">{{ stats.ordersYesterday }}</span>
+                  <span class="quick-stat-label">Đơn hàng hôm qua</span>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-3">
+              <div class="quick-stat-item">
+                <div class="quick-stat-icon bg-success-soft">
+                  <i class="bi bi-cash-coin text-success"></i>
+                </div>
+                <div class="quick-stat-content">
+                  <span class="quick-stat-value">{{ formatCurrency(stats.revenueYesterday) }}</span>
+                  <span class="quick-stat-label">Doanh thu hôm qua (VND)</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+  </div>
   }
 </div>

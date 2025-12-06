@@ -43,7 +43,7 @@ export class CategoryModalComponent implements OnInit {
       this.form.patchValue({
         name: this.category.name,
         description: this.category.description || '',
-        status: this.category.status || STATUS_ENUM.ACTIVE
+        status: String(this.category.status) // Convert to string for select binding
       });
     }
   }
@@ -69,21 +69,21 @@ export class CategoryModalComponent implements OnInit {
       this.#categoryService.create(request).subscribe({
         next: (response) => {
           if (response.success) {
-            this.#notificationService.success( 'Tạo danh mục thành công');
+            this.#notificationService.success('Tạo danh mục thành công');
             this.closed.emit(response.data);
           } else {
-            this.#notificationService.error( response.message || 'Có lỗi xảy ra');
+            this.#notificationService.error(response.message || 'Có lỗi xảy ra');
           }
           this.loading = false;
         },
         error: (error) => {
-          this.#notificationService.error( error.error?.message || 'Có lỗi xảy ra');
+          this.#notificationService.error(error.error?.message || 'Có lỗi xảy ra');
           this.loading = false;
         }
       });
     } else {
       if (!this.category) return;
-      
+
       const request: CategoryUpdate = {
         id: this.category.id,
         name: formValue.name,
@@ -94,15 +94,15 @@ export class CategoryModalComponent implements OnInit {
       this.#categoryService.update(request).subscribe({
         next: (response) => {
           if (response.success) {
-            this.#notificationService.success( 'Cập nhật thành công');
+            this.#notificationService.success('Cập nhật thành công');
             this.closed.emit(response.data);
           } else {
-            this.#notificationService.error( response.message || 'Có lỗi xảy ra');
+            this.#notificationService.error(response.message || 'Có lỗi xảy ra');
           }
           this.loading = false;
         },
         error: (error) => {
-          this.#notificationService.error( error.error?.message || 'Có lỗi xảy ra');
+          this.#notificationService.error(error.error?.message || 'Có lỗi xảy ra');
           this.loading = false;
         }
       });

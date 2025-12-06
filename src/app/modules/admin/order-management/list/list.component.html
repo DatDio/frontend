@@ -17,7 +17,7 @@
           <input id="emailInput" type="email" class="form-control" placeholder="Email khách hàng..."
             formControlName="userEmail">
         </div>
-        <div class="col-md-3">
+        <!-- <div class="col-md-3">
           <label for="statusSelect" class="form-label">Trạng thái</label>
           <select id="statusSelect" class="form-select" formControlName="orderStatus">
             <option value="">-- Tất cả trạng thái --</option>
@@ -26,7 +26,7 @@
             <option value="completed">Hoàn thành</option>
             <option value="cancelled">Hủy</option>
           </select>
-        </div>
+        </div> -->
         <div class="col-md-3 d-flex align-items-end gap-2">
           <button type="button" class="btn btn-primary w-50" (click)="handleSearch()">
             <i class="bi bi-search"></i> Tìm kiếm
@@ -73,7 +73,7 @@
             <td>{{ order.id }}</td>
             <td class="fw-bold">{{ order.orderNumber }}</td>
             <td>{{ order.userEmail }}</td>
-            <td>{{ order.totalAmount | number: '1.2-2' }}</td>
+            <td> {{ order.totalAmount | number:'1.0-0' }} VND</td>
             <td>
               <span [ngClass]="'badge ' + getStatusClass(order.orderStatus)">
                 {{ getStatusLabel(order.orderStatus) }}
@@ -85,9 +85,9 @@
                 <button class="icon-btn info" (click)="onViewDetail(order)" title="Chi tiết">
                   <i class="bi bi-eye"></i>
                 </button>
-                <button class="icon-btn danger" (click)="onDeleteOrder(order.id)" title="Xóa">
+                <!-- <button class="icon-btn danger" (click)="onDeleteOrder(order.id)" title="Xóa">
                   <i class="bi bi-trash"></i>
-                </button>
+                </button> -->
               </div>
             </td>
           </tr>
@@ -108,7 +108,7 @@
 </div>
 
 <!-- Detail Modal -->
-@if (showDetailModal && selectedOrder) {
-<app-order-detail-modal [order]="selectedOrder" (closeModal)="onModalClose()">
+@if (showDetailModal && selectedOrderId) {
+<app-order-detail-modal [orderId]="selectedOrderId" (closeModal)="onModalClose()">
 </app-order-detail-modal>
 }

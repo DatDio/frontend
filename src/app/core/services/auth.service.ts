@@ -94,10 +94,25 @@ export class AuthService {
         finalize(() => this.loaderService.hide())
       );
   }
+// ===== CHANGE PASSWORD =====
+  changePassword(data: { currentPassword: string; newPassword: string }): Observable<ApiResponse<void>> {
+    this.loaderService.show();
 
+    return this.httpClient
+      .post<ApiResponse<void>>(AuthApi.CHANGE_PASSWORD, data)
+      .pipe(
+        finalize(() => this.loaderService.hide())
+      );
+  }
   // ========= REFRESH TOKEN =========
   refreshToken(): Observable<ApiResponse<{ accessToken: string }>> {
     const refreshToken = this.getRefreshToken();
+
+    // If there is no refresh token in storage, bail out early
+    if (!refreshToken) {
+      this.logout();
+      return of({ success: false, data: { accessToken: '' } });
+    }
 
     return this.httpClient
       .post<ApiResponse<{ accessToken: string }>>(AuthApi.REFRESH, { refreshToken })

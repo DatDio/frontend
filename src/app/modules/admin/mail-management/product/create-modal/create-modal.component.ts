@@ -32,7 +32,7 @@ export class ProductCreateModalComponent implements OnInit {
     this.createForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(3)]],
       description: [''],
-      price: [0, [Validators.required, Validators.min(0)]],
+      price: [0, [Validators.required, Validators.min(1)]],
       liveTime: [''],
       country: [''],
       categoryId: ['', Validators.required],

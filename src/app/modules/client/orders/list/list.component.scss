@@ -262,9 +262,9 @@
 // =============================================
 
 .order-number-cell {
-  display: flex;
-  gap: $spacing-2;
-  align-items: center;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: $font-size-xs;
+  white-space: nowrap;
 }
 
 .product-name-cell,

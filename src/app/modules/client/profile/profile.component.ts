@@ -7,6 +7,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { SeoService } from '../../../core/services/seo.service';
 import { UserService } from '../../../core/services/user.service';
+import { ConfirmService } from '../../../shared/services/confirm.service';
 import { ActiveStatusBadgeComponent } from '../../../shared/components/active-status-badge/active-status-badge.component';
 // IMPORT DỊCH VỤ VÀ MODELS API KEY
 import { ApiKeyResponse } from '../../../core/models/api-key.model';
@@ -18,7 +19,7 @@ declare var bootstrap: any;
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule,ActiveStatusBadgeComponent],
+  imports: [CommonModule, ReactiveFormsModule, ActiveStatusBadgeComponent],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })
@@ -29,6 +30,7 @@ export class ProfileComponent implements OnInit {
   private readonly seoService = inject(SeoService);
   private readonly formBuilder = inject(FormBuilder);
   private readonly apiKeyService = inject(ApiKeyService);
+  private readonly confirmService = inject(ConfirmService);
 
   profileForm!: FormGroup;
   changePasswordForm!: FormGroup;
@@ -54,11 +56,43 @@ export class ProfileComponent implements OnInit {
     this.seoService.setTitle('Hồ sơ cá nhân - MailShop');
     this.seoService.setMetaDescription('Quản lý hồ sơ cá nhân và cài đặt tài khoản của bạn');
 
-    this.currentUser = this.authService.getCurrentUser();
-    this.initProfileForm();
+    this.initProfileForm(); // Initialize with empty values first
+    this.loadUserProfile(); // Then load data from API
     this.initChangePasswordForm();
     this.initCreateApiKeyForm();
     this.loadApiKeys();
+  }
+
+  private loadUserProfile(): void {
+    const userId = this.authService.getCurrentUser()?.id;
+    if (!userId) {
+      this.notificationService.error('Không tìm thấy thông tin người dùng');
+      return;
+    }
+
+    this.loading = true;
+    this.userService.getByClient(userId).subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.currentUser = response.data;
+          // Patch form with API data
+          this.profileForm.patchValue({
+            fullName: response.data.fullName || '',
+            email: response.data.email || '',
+            phone: response.data.phone || '',
+            address: response.data.address || '',
+            avatarUrl: response.data.avatarUrl || ''
+          });
+        } else {
+          this.notificationService.error('Không thể tải thông tin người dùng');
+        }
+        this.loading = false;
+      },
+      error: (error) => {
+        this.notificationService.error(error.error?.message || 'Lỗi khi tải thông tin');
+        this.loading = false;
+      }
+    });
   }
 
   // --- API KEY MANAGEMENT ---
@@ -118,8 +152,15 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  onDeleteApiKey(id: number): void {
-    if (!confirm('Bạn có chắc chắn muốn xóa API Key này không?')) return;
+  async onDeleteApiKey(id: number): Promise<void> {
+    const confirmed = await this.confirmService.confirm({
+      title: 'Xác nhận xóa',
+      message: 'Bạn có chắc chắn muốn xóa API Key này không?',
+      confirmText: 'Xóa',
+      cancelText: 'Hủy'
+    });
+
+    if (!confirmed) return;
 
     this.apiKeyLoading = true;
     this.apiKeyService.delete(id).subscribe({
@@ -224,11 +265,10 @@ export class ProfileComponent implements OnInit {
       fullName: formValue.fullName,
       phone: formValue.phone || undefined,
       address: formValue.address || undefined,
-      roles: this.currentUser.roles,
       status: this.currentUser.status
     };
 
-    this.userService.update(updateRequest).subscribe({
+    this.userService.updateByClient(updateRequest).subscribe({
       next: (response) => {
         if (response.success) {
           this.notificationService.success('Cập nhật hồ sơ thành công');
@@ -260,7 +300,7 @@ export class ProfileComponent implements OnInit {
     this.passwordSubmitted = true;
     const formValue = this.changePasswordForm.value;
 
-    this.userService.changePassword({
+    this.authService.changePassword({
       currentPassword: formValue.currentPassword,
       newPassword: formValue.newPassword
     }).subscribe({

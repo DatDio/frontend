@@ -22,13 +22,13 @@ export interface Order {
 
 
 export interface OrderCreate {
-    productId:number;
-    quantity:number;
+  productId: number;
+  quantity: number;
 
 }
 
 export interface OrderFilter extends PageFilter {
-    orderNumber?: string;
-    userEmail?: string;
-    orderStatus?: string;
+  orderNumber?: string;
+  userEmail?: string;
+  orderStatus?: string;
 }

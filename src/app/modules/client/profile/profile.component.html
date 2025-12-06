@@ -9,18 +9,12 @@
         <div class="alert alert-warning">
           <p class="fw-bold m-0">⚠️ Key này chỉ hiển thị một lần. Hãy sao chép ngay!</p>
         </div>
-        
+
         <div class="form-label mt-3">Plaintext Key:</div>
         <div class="input-group">
-          <input type="text" 
-                 class="form-control fw-bold" 
-                 [value]="newlyGeneratedKey.key" 
-                 id="plaintextKeyInput" 
-                 readonly>
-          <button type="button" 
-                  class="btn btn-primary" 
-                  (click)="copyKeyToClipboard()" 
-                  id="copyKeyButton">
+          <input type="text" class="form-control fw-bold" [value]="newlyGeneratedKey.key" id="plaintextKeyInput"
+            readonly>
+          <button type="button" class="btn btn-primary" (click)="copyKeyToClipboard()" id="copyKeyButton">
             <i class="bi bi-clipboard"></i> Copy
           </button>
         </div>
@@ -53,19 +47,9 @@
             </div>
             <label class="form-label fw-semibold">Plaintext Key:</label>
             <div class="input-group">
-              <input 
-                type="text" 
-                class="form-control font-monospace" 
-                id="plaintextKeyInput" 
-                [value]="newlyGeneratedKey.key" 
-                readonly
-              >
-              <button 
-                class="btn btn-outline-secondary" 
-                type="button" 
-                id="copyKeyButton"
-                (click)="copyKeyToClipboard()"
-              >
+              <input type="text" class="form-control font-monospace" id="plaintextKeyInput"
+                [value]="newlyGeneratedKey.key" readonly>
+              <button class="btn btn-outline-secondary" type="button" id="copyKeyButton" (click)="copyKeyToClipboard()">
                 <i class="bi bi-clipboard"></i> Copy
               </button>
             </div>
@@ -94,27 +78,18 @@
           </div>
 
           <nav class="profile-nav">
-            <button 
-              class="profile-nav__item" 
-              [class.active]="activeTab === 'profile'"
-              (click)="setActiveTab('profile')"
-            >
+            <button class="profile-nav__item" [class.active]="activeTab === 'profile'"
+              (click)="setActiveTab('profile')">
               <i class="bi bi-person"></i>
               <span>Thông tin cá nhân</span>
             </button>
-            <button 
-              class="profile-nav__item" 
-              [class.active]="activeTab === 'password'"
-              (click)="setActiveTab('password')"
-            >
+            <button class="profile-nav__item" [class.active]="activeTab === 'password'"
+              (click)="setActiveTab('password')">
               <i class="bi bi-lock"></i>
               <span>Đổi mật khẩu</span>
             </button>
-            <button 
-              class="profile-nav__item" 
-              [class.active]="activeTab === 'apikeys'"
-              (click)="setActiveTab('apikeys')"
-            >
+            <button class="profile-nav__item" [class.active]="activeTab === 'apikeys'"
+              (click)="setActiveTab('apikeys')">
               <i class="bi bi-key"></i>
               <span>API Keys</span>
             </button>
@@ -132,12 +107,8 @@
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <label class="form-label">Họ tên *</label>
-                  <input 
-                    type="text" 
-                    class="form-control" 
-                    formControlName="fullName"
-                    [class.is-invalid]="submitted && fullName?.invalid"
-                  >
+                  <input type="text" class="form-control" formControlName="fullName"
+                    [class.is-invalid]="submitted && fullName?.invalid">
                   <div class="invalid-feedback" [class.d-block]="submitted && fullName?.invalid">
                     <div *ngIf="fullName?.errors?.['required']">Họ tên là bắt buộc</div>
                     <div *ngIf="fullName?.errors?.['minlength']">Họ tên phải có ít nhất 2 ký tự</div>
@@ -146,38 +117,22 @@
 
                 <div class="col-md-6 mb-3">
                   <label class="form-label">Email</label>
-                  <input 
-                    type="email" 
-                    class="form-control" 
-                    formControlName="email"
-                  >
+                  <input type="email" class="form-control" formControlName="email">
                 </div>
 
                 <div class="col-md-6 mb-3">
                   <label class="form-label">Số điện thoại</label>
-                  <input 
-                    type="tel" 
-                    class="form-control" 
-                    formControlName="phone"
-                  >
+                  <input type="tel" class="form-control" formControlName="phone">
                 </div>
 
                 <div class="col-md-6 mb-3">
                   <label class="form-label">Địa chỉ</label>
-                  <input 
-                    type="text" 
-                    class="form-control" 
-                    formControlName="address"
-                  >
+                  <input type="text" class="form-control" formControlName="address">
                 </div>
               </div>
 
               <div class="profile-section__actions mt-4">
-                <button 
-                  type="submit" 
-                  class="btn btn-primary"
-                  [disabled]="loading"
-                >
+                <button type="submit" class="btn btn-primary" [disabled]="loading">
                   <span *ngIf="!loading">
                     <i class="bi bi-save me-1"></i>
                     Lưu thay đổi
@@ -199,17 +154,11 @@
                 <div class="col-md-12 mb-3">
                   <label class="form-label">Mật khẩu hiện tại *</label>
                   <div class="input-group">
-                    <input 
-                      [type]="showCurrentPassword ? 'text' : 'password'" 
-                      class="form-control" 
+                    <input [type]="showCurrentPassword ? 'text' : 'password'" class="form-control"
                       formControlName="currentPassword"
-                      [class.is-invalid]="passwordSubmitted && currentPassword?.invalid"
-                    >
-                    <button 
-                      class="btn btn-outline-secondary" 
-                      type="button"
-                      (click)="showCurrentPassword = !showCurrentPassword"
-                    >
+                      [class.is-invalid]="passwordSubmitted && currentPassword?.invalid">
+                    <button class="btn btn-outline-secondary" type="button"
+                      (click)="showCurrentPassword = !showCurrentPassword">
                       <i [class]="showCurrentPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
                     </button>
                   </div>
@@ -221,17 +170,10 @@
                 <div class="col-md-6 mb-3">
                   <label class="form-label">Mật khẩu mới *</label>
                   <div class="input-group">
-                    <input 
-                      [type]="showNewPassword ? 'text' : 'password'" 
-                      class="form-control" 
-                      formControlName="newPassword"
-                      [class.is-invalid]="passwordSubmitted && newPassword?.invalid"
-                    >
-                    <button 
-                      class="btn btn-outline-secondary" 
-                      type="button"
-                      (click)="showNewPassword = !showNewPassword"
-                    >
+                    <input [type]="showNewPassword ? 'text' : 'password'" class="form-control"
+                      formControlName="newPassword" [class.is-invalid]="passwordSubmitted && newPassword?.invalid">
+                    <button class="btn btn-outline-secondary" type="button"
+                      (click)="showNewPassword = !showNewPassword">
                       <i [class]="showNewPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
                     </button>
                   </div>
@@ -244,21 +186,16 @@
                 <div class="col-md-6 mb-3">
                   <label class="form-label">Xác nhận mật khẩu *</label>
                   <div class="input-group">
-                    <input 
-                      [type]="showConfirmPassword ? 'text' : 'password'" 
-                      class="form-control" 
+                    <input [type]="showConfirmPassword ? 'text' : 'password'" class="form-control"
                       formControlName="confirmPassword"
-                      [class.is-invalid]="passwordSubmitted && (confirmPassword?.invalid || changePasswordForm.errors?.['passwordMismatch'])"
-                    >
-                    <button 
-                      class="btn btn-outline-secondary" 
-                      type="button"
-                      (click)="showConfirmPassword = !showConfirmPassword"
-                    >
+                      [class.is-invalid]="passwordSubmitted && (confirmPassword?.invalid || changePasswordForm.errors?.['passwordMismatch'])">
+                    <button class="btn btn-outline-secondary" type="button"
+                      (click)="showConfirmPassword = !showConfirmPassword">
                       <i [class]="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
                     </button>
                   </div>
-                  <div class="invalid-feedback" [class.d-block]="passwordSubmitted && (confirmPassword?.invalid || changePasswordForm.errors?.['passwordMismatch'])">
+                  <div class="invalid-feedback"
+                    [class.d-block]="passwordSubmitted && (confirmPassword?.invalid || changePasswordForm.errors?.['passwordMismatch'])">
                     <div *ngIf="confirmPassword?.errors?.['required']">Xác nhận mật khẩu là bắt buộc</div>
                     <div *ngIf="changePasswordForm.errors?.['passwordMismatch']">Mật khẩu không khớp</div>
                   </div>
@@ -266,11 +203,7 @@
               </div>
 
               <div class="profile-section__actions mt-4">
-                <button 
-                  type="submit" 
-                  class="btn btn-primary"
-                  [disabled]="loading"
-                >
+                <button type="submit" class="btn btn-primary" [disabled]="loading">
                   <span *ngIf="!loading">
                     <i class="bi bi-shield-check me-1"></i>
                     Cập nhật mật khẩu
@@ -287,10 +220,11 @@
           <!-- Tab: API Keys -->
           <div *ngIf="activeTab === 'apikeys'">
             <h4 class="profile-section__title mb-4">Quản lý API Keys</h4>
-            
+
             <div class="alert alert-info">
               <i class="bi bi-info-circle me-2"></i>
-              API Key dùng để truy cập dịch vụ qua API. Hãy lưu trữ key an toàn, key chỉ được hiển thị một lần duy nhất khi tạo.
+              API Key dùng để truy cập dịch vụ qua API. Hãy lưu trữ key an toàn, key chỉ được hiển thị một lần duy nhất
+              khi tạo.
             </div>
 
             <!-- Create API Key Form -->
@@ -302,20 +236,11 @@
                 <form [formGroup]="createApiKeyForm" (ngSubmit)="onCreateApiKey()">
                   <div class="row align-items-end">
                     <div class="col-md-8 mb-3 mb-md-0">
-                      <label class="form-label">Tên Key (Tùy chọn)</label>
-                      <input 
-                        type="text" 
-                        class="form-control" 
-                        formControlName="name"
-                        placeholder="VD: Production API Key"
-                      >
+                      <label class="form-label">Tên Key</label>
+                      <input type="text" class="form-control" formControlName="name" placeholder="VD: ApiKey-MailShop ">
                     </div>
                     <div class="col-md-4">
-                      <button 
-                        type="submit" 
-                        class="btn btn-primary w-100"
-                        [disabled]="apiKeyLoading"
-                      >
+                      <button type="submit" class="btn btn-primary w-100" [disabled]="apiKeyLoading">
                         <span *ngIf="!apiKeyLoading">
                           <i class="bi bi-plus-circle me-1"></i>
                           Tạo Key
@@ -346,7 +271,7 @@
                 </thead>
                 <tbody>
                   <tr *ngIf="apiKeyLoading">
-                    <td colspan="6" class="text-center py-4">
+                    <td colspan="5" class="text-center py-4">
                       <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
                       </div>
@@ -361,17 +286,13 @@
                     </td>
                     <td>{{ key.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
                     <td>
-                      <button 
-                        class="btn btn-sm btn-danger"
-                        (click)="onDeleteApiKey(key.id)"
-                        [disabled]="apiKeyLoading"
-                      >
+                      <button class="btn btn-sm btn-danger" (click)="onDeleteApiKey(key.id)" [disabled]="apiKeyLoading">
                         <i class="bi bi-trash"></i> Xóa
                       </button>
                     </td>
                   </tr>
                   <tr *ngIf="!apiKeyLoading && apiKeys.length === 0">
-                    <td colspan="6" class="text-center py-4 text-muted">
+                    <td colspan="5" class="text-center py-4 text-muted">
                       Bạn chưa có API Key nào.
                     </td>
                   </tr>

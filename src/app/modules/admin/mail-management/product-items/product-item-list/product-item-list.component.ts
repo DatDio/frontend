@@ -5,6 +5,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ProductItem } from '../../../../../core/models/product-item.model';
 import { ProductItemService } from '../../../../../core/services/product-item.service';
 import { NotificationService } from '../../../../../core/services/notification.service';
+import { ConfirmService } from '../../../../../shared/services/confirm.service';
 import { BulkImportModalComponent } from '../bulk-import-modal/bulk-import-modal.component';
 import { PaginationComponent } from '../../../../../shared/components/pagination/pagination.component';
 
@@ -18,6 +19,7 @@ import { PaginationComponent } from '../../../../../shared/components/pagination
 export class ProductItemListComponent implements OnInit {
   private readonly productItemService = inject(ProductItemService);
   private readonly notificationService = inject(NotificationService);
+  private readonly confirmService = inject(ConfirmService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
@@ -133,11 +135,18 @@ export class ProductItemListComponent implements OnInit {
     this.showImportModal = false;
     this.currentPage = 0;
     this.loadItems();
-    this.notificationService.success('Nhập tài khoản thành công');
+    //this.notificationService.success('Nhập tài khoản thành công');
   }
 
-  onDeleteItem(id: number): void {
-    if (confirm('Bạn có chắc muốn xóa tài khoản này?')) {
+  async onDeleteItem(id: number): Promise<void> {
+    const confirmed = await this.confirmService.confirm({
+      title: 'Xác nhận xóa',
+      message: 'Bạn có chắc muốn xóa tài khoản này?',
+      confirmText: 'Xóa',
+      cancelText: 'Hủy'
+    });
+
+    if (confirmed) {
       this.productItemService.delete(id).subscribe({
         next: () => {
           this.notificationService.success('Xóa tài khoản thành công');

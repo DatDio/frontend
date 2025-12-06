@@ -31,12 +31,12 @@ export class BulkImportModalComponent {
     const accounts = this.accountsText;
 
     if (accounts.length === 0) {
-      this.notificationService.error( 'Vui lòng nhập ít nhất một tài khoản');
+      this.notificationService.error('Vui lòng nhập ít nhất một tài khoản');
       return;
     }
 
     if (!this.productId) {
-      this.notificationService.error( 'Product ID không tồn tại');
+      this.notificationService.error('Product ID không tồn tại');
       return;
     }
 
@@ -51,7 +51,7 @@ export class BulkImportModalComponent {
         this.isLoading = false;
         if (response.success) {
           this.accountsText = '';
-          this.notificationService.success(`Đã nhập tài khoản`);
+          this.notificationService.success(response.message ?? `Đã nhập tài khoản`);
           this.successImport.emit();
         }
       },

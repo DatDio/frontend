@@ -24,7 +24,7 @@
             <i class="bi bi-search"></i> Tìm kiếm
           </button>
           <button type="button" class="btn btn-secondary w-50" (click)="clearForm()">
-            <i class="bi bi-arrow-clockwise"></i> Làm mới
+            <i class="bi bi-arrow-clockwise"></i> Xoá bộ lọc
           </button>
         </div>
       </form>
@@ -36,17 +36,6 @@
       <div class="row align-items-center">
         <div class="col-md-6">
           <span class="text-muted">Tổng số: {{ paginationConfig.totalElements }} người dùng</span>
-        </div>
-        <div class="col-md-6 text-end">
-          <div class="d-inline-flex gap-2 align-items-center">
-            <label for="pageInput" class="form-label mb-0">Đến trang:</label>
-            <input id="pageInput" type="number" class="form-control form-control-sm" style="width: 80px"
-              formControlName="searchPage" placeholder="Trang..." min="1" [max]="paginationConfig.totalPages"
-              (keyup.enter)="handleSearchPage()">
-            <button class="btn btn-sm btn-outline-primary" (click)="handleSearchPage()">
-              <i class="bi bi-arrow-right"></i>
-            </button>
-          </div>
         </div>
       </div>
     </div>

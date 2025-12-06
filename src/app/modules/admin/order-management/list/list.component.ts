@@ -5,6 +5,7 @@ import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule }
 import { Order } from '../../../../core/models/order.model';
 import { OrderService } from '../../../../core/services/order.service';
 import { NotificationService } from '../../../../core/services/notification.service';
+import { ConfirmService } from '../../../../shared/services/confirm.service';
 import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
 import { PaginationService } from '../../../../shared/services/pagination.service';
 import { OrderDetailModalComponent } from '../order-detail-modal/order-detail-modal.component';
@@ -26,11 +27,12 @@ interface OrderSearchFilter {
 export class OrderListComponent implements OnInit {
   private readonly orderService = inject(OrderService);
   private readonly notificationService = inject(NotificationService);
+  private readonly confirmService = inject(ConfirmService);
   private readonly fb = inject(FormBuilder);
   private readonly paginationService = inject(PaginationService);
 
   orders: Order[] = [];
-  
+
   paginationConfig: PaginationConfig = {
     currentPage: 0,
     totalPages: 1,
@@ -41,7 +43,7 @@ export class OrderListComponent implements OnInit {
   dataFormSearch: OrderSearchFilter = {};
   formSearch!: FormGroup;
 
-  selectedOrder: Order | null = null;
+  selectedOrderId: number | null = null;
   showDetailModal = false;
 
   ngOnInit(): void {
@@ -76,7 +78,7 @@ export class OrderListComponent implements OnInit {
     if (!pageNum) {
       return;
     }
-    
+
     if (pageNum > this.paginationConfig.totalPages || pageNum < 1) {
       this.notificationService.error(`Page must be between 1 and ${this.paginationConfig.totalPages}`);
     } else {
@@ -122,7 +124,7 @@ export class OrderListComponent implements OnInit {
       limit: this.paginationConfig.pageSize,
       sort: 'id,desc'
     };
-    
+
     if (this.dataFormSearch.orderNumber) {
       params.orderNumber = this.dataFormSearch.orderNumber;
     }
@@ -137,7 +139,7 @@ export class OrderListComponent implements OnInit {
       next: (response: any) => {
         if (response.success && response.data?.content) {
           this.orders = response.data.content;
-          
+
           // Extract pagination từ backend
           const paginationInfo = this.paginationService.extractPaginationInfo(response.data);
           this.paginationConfig = {
@@ -156,17 +158,24 @@ export class OrderListComponent implements OnInit {
   }
 
   onViewDetail(order: Order): void {
-    this.selectedOrder = order;
+    this.selectedOrderId = order.id;
     this.showDetailModal = true;
   }
 
   onModalClose(): void {
     this.showDetailModal = false;
-    this.selectedOrder = null;
+    this.selectedOrderId = null;
   }
 
-  onDeleteOrder(id: number): void {
-    if (confirm('Bạn có chắc muốn xóa đơn hàng này?')) {
+  async onDeleteOrder(id: number): Promise<void> {
+    const confirmed = await this.confirmService.confirm({
+      title: 'Xác nhận xóa',
+      message: 'Bạn có chắc muốn xóa đơn hàng này?',
+      confirmText: 'Xóa',
+      cancelText: 'Hủy'
+    });
+
+    if (confirmed) {
       this.orderService.delete(id).subscribe({
         next: () => {
           this.notificationService.success('Xóa đơn hàng thành công');
@@ -182,21 +191,23 @@ export class OrderListComponent implements OnInit {
 
   getStatusLabel(status: string): string {
     const statusMap: { [key: string]: string } = {
-      pending: 'Chờ xử lý',
-      processing: 'Đang xử lý',
-      completed: 'Hoàn thành',
-      cancelled: 'Hủy'
+      'PENDING': 'Chờ xử lý',
+      'PROCESSING': 'Đang xử lý',
+      'COMPLETED': 'Hoàn thành',
+      'CANCELLED': 'Đã hủy',
+      'REFUNDED': 'Hoàn tiền'
     };
-    return statusMap[status] || status;
+    return statusMap[status?.toUpperCase()] || status;
   }
 
   getStatusClass(status: string): string {
     const classMap: { [key: string]: string } = {
-      pending: 'bg-warning',
-      processing: 'bg-info',
-      completed: 'bg-success',
-      cancelled: 'bg-danger'
+      'PENDING': 'badge-warning',
+      'PROCESSING': 'badge-info',
+      'COMPLETED': 'badge-success',
+      'CANCELLED': 'badge-danger',
+      'REFUNDED': 'badge-secondary'
     };
-    return classMap[status] || 'bg-secondary';
+    return classMap[status?.toUpperCase()] || 'badge-secondary';
   }
 }
