@@ -115,8 +115,6 @@ export class ClientTransactionListComponent implements OnInit {
       }
     });
 
-    this.transactionService.refreshBalance();
-    this.loadTransactions();
   }
 
   // ================== PAYOS POPUP ==================
@@ -138,17 +136,22 @@ export class ClientTransactionListComponent implements OnInit {
         setTimeout(() => {
           if (exitFn) exitFn();
         }, 10);
+        this.transactionService.refreshBalance();
+        this.loadTransactions();
       },
 
       onCancel: () => {
         setTimeout(() => {
           if (exitFn) exitFn();
         }, 10);
+        this.transactionService.refreshBalance();
+        this.loadTransactions();
       },
 
       // ❌ KHÔNG GỌI exit() ở đây nữa
       onExit: () => {
-        console.log("Popup closed");
+        this.transactionService.refreshBalance();
+        this.loadTransactions();
       }
     };
 
