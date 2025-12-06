@@ -51,10 +51,35 @@ export class ClientTransactionListComponent implements OnInit {
 
   // ========== DEPOSIT ==========
   depositAmount: number = 10000;
+  depositAmountDisplay: string = '10,000';
 
   ngOnInit(): void {
     this.initForm();
     this.loadTransactions();
+    this.depositAmountDisplay = this.formatNumber(this.depositAmount);
+  }
+
+  // Format number with thousand separators
+  private formatNumber(value: number): string {
+    return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  // Handle deposit amount input change
+  onDepositAmountChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    // Remove all non-digit characters
+    const rawValue = input.value.replace(/[^0-9]/g, '');
+
+    if (rawValue) {
+      this.depositAmount = parseInt(rawValue, 10);
+      this.depositAmountDisplay = this.formatNumber(this.depositAmount);
+    } else {
+      this.depositAmount = 0;
+      this.depositAmountDisplay = '';
+    }
+
+    // Update input value with formatted display
+    input.value = this.depositAmountDisplay;
   }
 
   private initForm(): void {
@@ -76,7 +101,6 @@ export class ClientTransactionListComponent implements OnInit {
 
     this.transactionService.createDeposit(this.depositAmount).subscribe({
       next: (res: any) => {
-        console.log('✅ Backend Response:', res);
 
         if (res.success && res.data?.checkoutUrl) {
           this.openPayOSPopup(res.data.checkoutUrl);
@@ -85,7 +109,6 @@ export class ClientTransactionListComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.error('❌ Create Deposit Error:', error);
         this.notificationService.error(
           error.error?.message || 'Lỗi khi tạo yêu cầu thanh toán'
         );
