@@ -114,6 +114,9 @@ export class ClientTransactionListComponent implements OnInit {
         );
       }
     });
+
+    this.transactionService.refreshBalance();
+    this.loadTransactions();
   }
 
   // ================== PAYOS POPUP ==================
