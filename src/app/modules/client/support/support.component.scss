@@ -1,23 +1,11 @@
+@import '../../../../styles/variables';
+
 .support-page {
-    min-height: calc(100vh - 200px);
     padding: 2rem;
-    background-color: #fff;
-}
-
-.support-container {
-    max-width: 900px;
-    margin: 0 auto;
-}
-
-.support-title {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: #333;
-    margin-bottom: 1.5rem;
 }
 
 .support-intro {
-    color: #555;
+    color: $gray-600;
     margin-bottom: 2rem;
     line-height: 1.6;
 }
@@ -25,25 +13,32 @@
 .section-title {
     font-size: 1.1rem;
     font-weight: 600;
-    color: #333;
+    color: $dark;
     margin: 1.5rem 0 1rem;
 }
 
 .contact-list {
-    list-style: disc;
-    padding-left: 1.5rem;
+    list-style: none;
+    padding-left: 0;
     margin-bottom: 2rem;
 
     li {
         margin-bottom: 0.5rem;
-        color: #555;
+        color: $gray-600;
 
         a {
-            color: #0066cc;
-            text-decoration: underline;
+            color: $primary;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
 
             &:hover {
-                color: #004499;
+                color: $primary-dark;
+                text-decoration: underline;
+            }
+
+            i {
+                font-size: 1.2rem;
             }
         }
     }
@@ -55,26 +50,15 @@
 
     li {
         margin-bottom: 1rem;
-        color: #555;
+        color: $gray-600;
 
         strong {
-            color: #333;
+            color: $dark;
         }
 
         p {
             margin: 0.25rem 0 0;
             line-height: 1.5;
         }
-    }
-}
-
-// Responsive
-@media (max-width: 576px) {
-    .support-page {
-        padding: 1.5rem 1rem;
-    }
-
-    .support-title {
-        font-size: 1.5rem;
     }
 }
