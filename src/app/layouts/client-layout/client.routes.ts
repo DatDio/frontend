@@ -32,5 +32,9 @@ export const clientRoutes: Routes = [
   {
     path: 'get-code-mail',
     loadComponent: () => import('../../modules/client/get-code-mail/get-code-mail.component').then(m => m.GetCodeMailComponent)
+  },
+  {
+    path: 'support',
+    loadComponent: () => import('../../modules/client/support/support.component').then(m => m.SupportComponent)
   }
 ];

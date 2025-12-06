@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
   selector: 'app-terms-of-service',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './terms-of-service.component.html'
+  templateUrl: './terms-of-service.component.html',
+  styleUrls: ['./terms-of-service.component.scss']
 })
 export class TermsOfServiceComponent { }

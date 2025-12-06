@@ -577,3 +577,122 @@
 .bg-white {
   background: $white !important;
 }
+// =============================================
+// SUPPORT PAGE
+// =============================================
+
+.support-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: $spacing-6;
+
+  .support-card {
+    background: $white;
+    border: 1px solid $gray-200;
+    border-radius: $radius-xl;
+    padding: $spacing-8;
+    text-align: center;
+    box-shadow: $shadow-md;
+    transition: all $transition-base;
+
+    &:hover {
+      box-shadow: $shadow-lg;
+      transform: translateY(-2px);
+    }
+  }
+
+  .support-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto $spacing-6;
+    background: $primary-bg;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $primary;
+  }
+
+  .support-title {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $dark;
+    margin-bottom: $spacing-4;
+  }
+
+  .support-description {
+    font-size: $font-size-base;
+    color: $gray-600;
+    line-height: $line-height-relaxed;
+    margin-bottom: $spacing-6;
+  }
+
+  .support-links {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-4;
+  }
+
+  .support-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-3;
+    padding: $spacing-4 $spacing-5;
+    border-radius: $radius-lg;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+    text-decoration: none;
+    transition: all $transition-base;
+
+    svg {
+      flex-shrink: 0;
+    }
+
+    &.telegram-group {
+      background: linear-gradient(135deg, #0088cc, #0099dd);
+      color: $white;
+      box-shadow: 0 4px 15px rgba(0, 136, 204, 0.3);
+
+      &:hover {
+        background: linear-gradient(135deg, #006699, #0088cc);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 136, 204, 0.4);
+      }
+    }
+
+    &.telegram-channel {
+      background: linear-gradient(135deg, #229ED9, #2AABEE);
+      color: $white;
+      box-shadow: 0 4px 15px rgba(34, 158, 217, 0.3);
+
+      &:hover {
+        background: linear-gradient(135deg, #1D8EC2, #229ED9);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(34, 158, 217, 0.4);
+      }
+    }
+  }
+
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-4;
+
+    .support-card {
+      padding: $spacing-5;
+    }
+
+    .support-icon {
+      width: 80px;
+      height: 80px;
+
+      svg {
+        width: 48px;
+        height: 48px;
+      }
+    }
+
+    .support-title {
+      font-size: $font-size-xl;
+    }
+  }
+}

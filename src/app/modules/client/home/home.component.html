@@ -98,7 +98,7 @@
             <div class="col-action"></div>
           </div>
 
-          @for (product of category.products ?? []; track product.id) {
+          @for (product of category.products; track product.id) {
           <div class="product-item">
 
             <div class="info-col" data-label="Sản phẩm">
