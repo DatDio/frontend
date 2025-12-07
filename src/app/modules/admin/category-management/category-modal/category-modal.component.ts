@@ -62,8 +62,8 @@ export class CategoryModalComponent implements OnInit {
     if (this.mode === 'create') {
       const request: CategoryCreate = {
         name: formValue.name,
-        description: formValue.description || undefined,
-        status: formValue.status
+        status: formValue.status,
+        ...(formValue.description?.trim() && { description: formValue.description.trim() })
       };
 
       this.#categoryService.create(request).subscribe({
@@ -87,8 +87,8 @@ export class CategoryModalComponent implements OnInit {
       const request: CategoryUpdate = {
         id: this.category.id,
         name: formValue.name,
-        description: formValue.description || undefined,
-        status: Number(formValue.status)
+        status: Number(formValue.status),
+        ...(formValue.description?.trim() && { description: formValue.description.trim() })
       };
 
       this.#categoryService.update(request).subscribe({
