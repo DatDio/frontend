@@ -5,7 +5,7 @@ import { finalize } from 'rxjs/operators';
 
 import { HotmailService } from '../../../core/services/hotmail.service';
 import { NotificationService } from '../../../core/services/notification.service';
-import { HotmailGetCodeResponse, EMAIL_TYPES, GET_TYPES } from '../../../core/models/hotmail.model';
+import { HotmailGetCodeResponse, EMAIL_TYPES, GET_TYPES, EmailType } from '../../../core/models/hotmail.model';
 
 @Component({
   selector: 'app-get-code-mail',
@@ -26,6 +26,9 @@ export class GetCodeMailComponent implements OnInit {
   getCodeResults: HotmailGetCodeResponse[] = [];
   showGetCodeResults = false;
 
+  // Multi-select state for email types
+  selectedEmailTypes: Set<string> = new Set(['Auto']);
+
   ngOnInit(): void {
     this.initGetCodeForm();
   }
@@ -33,14 +36,39 @@ export class GetCodeMailComponent implements OnInit {
   private initGetCodeForm(): void {
     this.getCodeForm = this.formBuilder.group({
       getType: ['Oauth2', Validators.required],
-      emailType: ['Auto', Validators.required],
       emailData: ['', [Validators.required, Validators.minLength(10)]]
     });
+  }
+
+  toggleEmailType(type: EmailType): void {
+    if (this.selectedEmailTypes.has(type)) {
+      // Don't allow deselecting if it's the only one selected
+      if (this.selectedEmailTypes.size > 1) {
+        this.selectedEmailTypes.delete(type);
+      }
+    } else {
+      this.selectedEmailTypes.add(type);
+    }
+  }
+
+  isEmailTypeSelected(type: EmailType): boolean {
+    return this.selectedEmailTypes.has(type);
+  }
+
+  get emailCount(): number {
+    const emailData = this.getCodeForm.get('emailData')?.value || '';
+    const lines = emailData.trim().split('\n').filter((line: string) => line.trim().length > 0);
+    return lines.length;
   }
 
   onGetCode(): void {
     if (this.getCodeForm.invalid) {
       this.notificationService.warning('Vui lòng nhập đầy đủ thông tin');
+      return;
+    }
+
+    if (this.selectedEmailTypes.size === 0) {
+      this.notificationService.warning('Vui lòng chọn ít nhất một loại email');
       return;
     }
 
@@ -50,7 +78,7 @@ export class GetCodeMailComponent implements OnInit {
 
     const request = {
       getType: this.getCodeForm.get('getType')?.value,
-      emailType: this.getCodeForm.get('emailType')?.value,
+      emailTypes: Array.from(this.selectedEmailTypes),
       emailData: this.getCodeForm.get('emailData')?.value.trim()
     };
 
@@ -64,7 +92,8 @@ export class GetCodeMailComponent implements OnInit {
             if (this.getCodeResults.length === 0) {
               this.notificationService.info('Không tìm thấy mã xác thực nào');
             } else {
-              this.notificationService.success(`Tìm thấy ${this.getCodeResults.length} mã xác thực`);
+              const successCount = this.getCodeResults.filter(r => r.status).length;
+              this.notificationService.success(`Tìm thấy ${successCount}/${this.getCodeResults.length} mã xác thực`);
             }
           } else {
             this.notificationService.error(response.message || 'Không thể lấy mã xác thực');
@@ -84,8 +113,15 @@ export class GetCodeMailComponent implements OnInit {
     });
   }
 
+  retryGetCode(result: HotmailGetCodeResponse): void {
+    // Re-run get code for this specific email
+    this.notificationService.info(`Đang thử lại cho ${result.email}...`);
+    // This would need backend support for single-email retry
+  }
+
   clearGetCodeResults(): void {
     this.getCodeResults = [];
     this.showGetCodeResults = false;
   }
 }
+

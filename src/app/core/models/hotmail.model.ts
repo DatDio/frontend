@@ -2,12 +2,12 @@
  * Request DTO for getting verification code from Hotmail
  */
 export interface HotmailGetCodeRequest {
-    /** Email data format: email|password|refresh_token|client_id */
+    /** Email data format: email|password|refresh_token|client_id (multiple lines supported) */
     emailData: string;
-    /** Type of get method: Pop3 or Oauth2 */
-    getType: 'Pop3' | 'Oauth2';
-    /** Type of email/service to get code for */
-    emailType: EmailType;
+    /** Type of get method: Graph API or Oauth2 */
+    getType: 'Graph API' | 'Oauth2';
+    /** Types of email/services to get code for (supports multi-select) */
+    emailTypes: string[];
 }
 
 /**
@@ -15,11 +15,11 @@ export interface HotmailGetCodeRequest {
  */
 export interface HotmailGetCodeResponse {
     email: string;
-    subject?: string;
+    password?: string;
+    status: boolean;
     code?: string;
-    sender?: string;
-    receivedTime?: string;
-    body?: string;
+    content?: string;
+    date?: string;
 }
 
 /**
@@ -36,7 +36,9 @@ export type EmailType =
     | 'Lazada'
     | 'Shopee'
     | 'KakaoTalk'
-    | 'Telegram';
+    | 'Telegram'
+    | 'Google'
+    | 'WeChat';
 
 /**
  * List of all supported email types
@@ -52,10 +54,13 @@ export const EMAIL_TYPES: EmailType[] = [
     'Lazada',
     'Shopee',
     'KakaoTalk',
-    'Telegram'
+    'Telegram',
+    'Google',
+    'WeChat'
 ];
 
 /**
  * Supported get types
  */
-export const GET_TYPES: Array<'Pop3' | 'Oauth2'> = ['Pop3', 'Oauth2'];
+export const GET_TYPES: Array<'Graph API' | 'Oauth2'> = ['Graph API', 'Oauth2'];
+

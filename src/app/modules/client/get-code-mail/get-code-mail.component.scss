@@ -226,6 +226,66 @@
 }
 
 // =============================================
+// EMAIL COUNT & ACTION BUTTONS
+// =============================================
+
+.email-count {
+    font-weight: $font-weight-normal;
+    color: $primary;
+    font-size: $font-size-sm;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: $spacing-3;
+    margin-top: $spacing-4;
+
+    .filter-btn {
+        padding: $spacing-3 $spacing-5;
+        background: $info;
+        color: $white;
+        border: none;
+        border-radius: $radius-md;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-medium;
+        cursor: pointer;
+        transition: all $transition-base;
+
+        &:hover {
+            background: darken($info, 10%);
+            transform: translateY(-2px);
+        }
+    }
+
+    .get-code-btn {
+        padding: $spacing-3 $spacing-5;
+        background: $success;
+        color: $white;
+        border: none;
+        border-radius: $radius-md;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-semibold;
+        cursor: pointer;
+        transition: all $transition-base;
+        display: flex;
+        align-items: center;
+        gap: $spacing-2;
+
+        &:hover:not(:disabled) {
+            background: darken($success, 10%);
+            transform: translateY(-2px);
+        }
+
+        &:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+    }
+}
+
+// =============================================
 // RESULTS SECTION
 // =============================================
 
@@ -289,94 +349,167 @@
             font-size: $font-size-base;
         }
     }
+}
 
-    .results-list {
-        display: flex;
-        flex-direction: column;
-        gap: $spacing-4;
+// =============================================
+// RESULTS TABLE
+// =============================================
+
+.results-table-wrapper {
+    overflow-x: auto;
+    border-radius: $radius-lg;
+    box-shadow: $shadow-sm;
+}
+
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: $font-size-sm;
+
+    th,
+    td {
+        padding: $spacing-3 $spacing-4;
+        text-align: left;
+        border-bottom: 1px solid $gray-200;
     }
 
-    .result-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: $spacing-5;
-        background: $gray-50;
-        border-radius: $radius-xl;
-        border: 1px solid $gray-200;
-        transition: all $transition-base;
+    th {
+        background: $gray-100;
+        font-weight: $font-weight-semibold;
+        color: $gray-700;
+        white-space: nowrap;
+    }
+
+    tbody tr {
+        transition: background $transition-fast;
 
         &:hover {
-            border-color: $primary;
-            box-shadow: $shadow-md;
+            background: $gray-50;
         }
 
-        .result-info {
-            flex: 1;
+        &.success-row {
+            background: rgba($success, 0.05);
 
-            .result-email {
-                font-weight: $font-weight-semibold;
-                color: $dark;
-                font-size: $font-size-sm;
-                margin-bottom: $spacing-2;
-                display: flex;
-                align-items: center;
-                gap: $spacing-2;
-
-                i {
-                    color: $primary;
-                }
-            }
-
-            .result-subject {
-                font-size: $font-size-sm;
-                color: $gray-600;
-                margin-bottom: $spacing-2;
-            }
-
-            .result-sender,
-            .result-time {
-                font-size: $font-size-xs;
-                color: $gray-500;
-                display: inline-flex;
-                align-items: center;
-                gap: $spacing-1;
-                margin-right: $spacing-4;
+            &:hover {
+                background: rgba($success, 0.1);
             }
         }
 
-        .result-code {
-            display: flex;
-            align-items: center;
-            gap: $spacing-3;
+        &.error-row {
+            background: rgba($danger, 0.05);
 
-            .code-value {
-                font-family: 'Consolas', 'Monaco', monospace;
-                font-size: $font-size-xl;
-                font-weight: $font-weight-bold;
-                color: $success;
-                letter-spacing: 3px;
-                background: $success-bg;
-                padding: $spacing-3 $spacing-5;
-                border-radius: $radius-lg;
-                border: 1px solid rgba($success, 0.2);
+            &:hover {
+                background: rgba($danger, 0.1);
             }
+        }
+    }
 
-            .copy-btn {
-                padding: $spacing-3 $spacing-4;
-                background: $primary-bg;
-                color: $primary;
-                border: none;
-                border-radius: $radius-md;
-                cursor: pointer;
-                transition: all $transition-fast;
+    .stt {
+        width: 50px;
+        text-align: center;
+        font-weight: $font-weight-medium;
+    }
 
-                &:hover {
-                    background: $primary;
-                    color: $white;
-                    transform: scale(1.05);
-                }
-            }
+    .email {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .password {
+        font-family: 'Consolas', 'Monaco', monospace;
+        color: $gray-600;
+    }
+
+    .status {
+        text-align: center;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: $spacing-1 $spacing-3;
+        border-radius: $radius-full;
+        font-size: $font-size-xs;
+        font-weight: $font-weight-medium;
+
+        &.success {
+            background: $success-bg;
+            color: $success;
+        }
+
+        &.error {
+            background: $danger-bg;
+            color: $danger;
+        }
+    }
+
+    .code {
+        white-space: nowrap;
+    }
+
+    .code-value {
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-weight: $font-weight-bold;
+        color: $success;
+        background: $success-bg;
+        padding: $spacing-1 $spacing-2;
+        border-radius: $radius-sm;
+        margin-right: $spacing-2;
+    }
+
+    .no-code {
+        color: $gray-400;
+    }
+
+    .copy-btn {
+        padding: $spacing-1 $spacing-3;
+        background: $primary;
+        color: $white;
+        border: none;
+        border-radius: $radius-sm;
+        font-size: $font-size-xs;
+        font-weight: $font-weight-medium;
+        cursor: pointer;
+        transition: all $transition-fast;
+
+        &:hover {
+            background: darken($primary, 10%);
+        }
+    }
+
+    .content {
+        max-width: 200px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: $gray-600;
+    }
+
+    .date {
+        white-space: nowrap;
+        color: $gray-500;
+        font-size: $font-size-xs;
+    }
+
+    .actions {
+        text-align: center;
+    }
+
+    .retry-btn {
+        padding: $spacing-1 $spacing-3;
+        background: $info-bg;
+        color: $info;
+        border: none;
+        border-radius: $radius-sm;
+        font-size: $font-size-xs;
+        font-weight: $font-weight-medium;
+        cursor: pointer;
+        transition: all $transition-fast;
+
+        &:hover {
+            background: $info;
+            color: $white;
         }
     }
 }
@@ -415,14 +548,27 @@
         }
     }
 
-    .result-item {
+    .action-buttons {
         flex-direction: column;
-        gap: $spacing-4;
-        align-items: flex-start;
 
-        .result-code {
+        .filter-btn,
+        .get-code-btn {
             width: 100%;
-            justify-content: space-between;
+            justify-content: center;
+        }
+    }
+
+    .results-table {
+        font-size: $font-size-xs;
+
+        th,
+        td {
+            padding: $spacing-2;
+        }
+
+        .email,
+        .content {
+            max-width: 120px;
         }
     }
 }
