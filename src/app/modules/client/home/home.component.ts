@@ -1,4 +1,4 @@
-﻿import { Component, OnDestroy, OnInit, PLATFORM_ID, afterRender, inject } from '@angular/core';
+﻿import { Component, OnDestroy, OnInit, PLATFORM_ID, inject } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -58,13 +58,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private latestQuantities = new Map<number, number>();
 
   constructor() {
-    if (this.isBrowser) {
-      afterRender(() => {
-        if (this.categories.length === 0) {
-          this.loadCategories();
-        }
-      });
-    }
+    // loadCategories() is called in ngOnInit() for SSR support
   }
 
   ngOnInit(): void {
