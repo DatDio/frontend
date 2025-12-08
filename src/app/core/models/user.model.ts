@@ -10,12 +10,16 @@ export interface User {
 
   authProvider?: string | null;
   emailVerified: boolean;
-  
+
   roles: string[];
   status: number;
 
   createdAt: string; // hoặc Date nếu bạn map sang Date
   updatedAt: string; // hoặc Date
+
+  balance?: number; // Wallet balance
+  totalDeposit?: number; // Total deposited amount
+  totalSpent?: number; // Total spent amount
 }
 
 export interface CreateUserRequest {

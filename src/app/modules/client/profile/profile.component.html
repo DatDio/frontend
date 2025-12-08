@@ -77,6 +77,37 @@
             <small class="text-muted">{{ currentUser?.email }}</small>
           </div>
 
+          <!-- Financial Stats -->
+          <div class="profile-stats mb-4">
+            <div class="stat-item">
+              <div class="stat-icon balance">
+                <i class="bi bi-wallet2"></i>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Số dư hiện tại</span>
+                <span class="stat-value text-primary">{{ (currentUser?.balance || 0) | number }} VNĐ</span>
+              </div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-icon deposit">
+                <i class="bi bi-arrow-down-circle"></i>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Tổng đã nạp</span>
+                <span class="stat-value text-success">{{ (currentUser?.totalDeposit || 0) | number }} VNĐ</span>
+              </div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-icon spent">
+                <i class="bi bi-arrow-up-circle"></i>
+              </div>
+              <div class="stat-info">
+                <span class="stat-label">Tổng đã tiêu</span>
+                <span class="stat-value text-danger">{{ (currentUser?.totalSpent || 0) | number }} VNĐ</span>
+              </div>
+            </div>
+          </div>
+
           <nav class="profile-nav">
             <button class="profile-nav__item" [class.active]="activeTab === 'profile'"
               (click)="setActiveTab('profile')">

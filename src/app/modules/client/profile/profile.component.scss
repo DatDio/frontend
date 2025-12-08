@@ -56,6 +56,79 @@
     }
   }
 
+  .profile-stats {
+    padding-bottom: $spacing-5;
+    margin-bottom: $spacing-4;
+    border-bottom: 1px solid $gray-200;
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: $spacing-3;
+      padding: $spacing-3;
+      background: $gray-50;
+      border-radius: $radius-lg;
+      margin-bottom: $spacing-2;
+      transition: all $transition-base;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      &:hover {
+        background: $gray-100;
+        transform: translateX(4px);
+      }
+
+      .stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: $radius-lg;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: $font-size-lg;
+        flex-shrink: 0;
+
+        &.balance {
+          background: rgba($primary, 0.1);
+          color: $primary;
+        }
+
+        &.deposit {
+          background: rgba($success, 0.1);
+          color: $success;
+        }
+
+        &.spent {
+          background: rgba($danger, 0.1);
+          color: $danger;
+        }
+      }
+
+      .stat-info {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        flex: 1;
+
+        .stat-label {
+          font-size: $font-size-xs;
+          color: $gray-500;
+          font-weight: $font-weight-medium;
+        }
+
+        .stat-value {
+          font-size: $font-size-sm;
+          font-weight: $font-weight-bold;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+  }
+
   .profile-nav {
     display: flex;
     flex-direction: column;
