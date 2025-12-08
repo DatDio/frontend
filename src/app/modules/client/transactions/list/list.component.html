@@ -2,12 +2,14 @@
 
   <div id="payos-modal"></div>
 
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Lịch sử giao dịch</h1>
-  </div>
+
 
   <div class="card deposit-card mb-5 p-4">
-    <h3 class="mb-4 text-center">Nạp tiền vào tài khoản</h3>
+    <h3 class="mb-4 text-center d-flex justify-content-center">Nạp tiền vào tài khoản</h3>
+
+    <div class="text-center mb-3">
+      <img src="assets/images/bank-building.png" alt="Bank" style="width: 80px; height: auto; opacity: 0.9;">
+    </div>
     <div class="payment-form text-center">
 
       <div class="d-flex justify-content-center mb-4">
@@ -31,7 +33,9 @@
     </div>
   </div>
 
-
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Lịch sử giao dịch</h1>
+  </div>
   <div class="card search-card mb-4">
     <div class="card-body">
       <form [formGroup]="formSearch" class="row g-3">
@@ -121,7 +125,7 @@
                 </span>
               </td>
 
-              <td class="fw-bold" [ngClass]="getAmountColor(transaction.type)">
+              <td class="fw-bold">
                 {{ transaction.amount | number:'1.0-0' }} VNĐ
               </td>
 

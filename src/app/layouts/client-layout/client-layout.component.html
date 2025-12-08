@@ -20,25 +20,24 @@
       MailShop
     </a>
 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+    <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
       <span class="navbar-toggler-icon"></span>
     </button>
 
-    <div class="collapse navbar-collapse" id="navbarNav">
+    <!-- Desktop navbar -->
+    <div class="collapse navbar-collapse d-none d-lg-flex" id="navbarNav">
       <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
         <li class="nav-item">
           <a class="nav-link" href="https://dat-dio.gitbook.io/mailshopdocs" target="_blank" rel="noopener noreferrer">
             Tài liệu API
           </a>
-
         </li>
 
-        <!-- Only show auth-dependent content after authReady (browser only) -->
         @if (authReady$ | async) {
         @if (isAuthenticated$ | async) {
         <li class="nav-item d-flex align-items-center">
           <div class="balance-info-navbar">
-            <i class="fas fa-wallet me-1"></i>
+            <i class="bi bi-wallet2 me-1"></i>
             {{ balance$ | async | number }} VNĐ
           </div>
         </li>
@@ -64,7 +63,6 @@
         </li>
         }
         } @else {
-        <!-- Placeholder while loading -->
         <li class="nav-item">
           <div class="nav-placeholder"></div>
         </li>
@@ -74,30 +72,91 @@
   </div>
 </nav>
 
+<!-- Mobile Offcanvas Sidebar -->
+<div class="offcanvas offcanvas-start mobile-sidebar" tabindex="-1" id="mobileMenu">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title">MailShop</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+  </div>
+  <div class="offcanvas-body">
+    @if (authReady$ | async) {
+    @if (isAuthenticated$ | async) {
+    <div class="balance-info-sidebar mb-3">
+      <i class="bi bi-wallet2 me-2"></i>
+      {{ balance$ | async | number }} VNĐ
+    </div>
+    <div class="user-email-sidebar mb-3">
+      <i class="bi bi-person-circle me-2"></i>
+      {{ (authService.currentUser$ | async)?.email }}
+    </div>
+    <hr>
+    <nav class="nav flex-column sidebar-nav">
+      <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
+        data-bs-dismiss="offcanvas">
+        <i class="bi bi-house-door-fill me-2"></i>Trang chủ
+      </a>
+      <a class="nav-link" routerLink="/profile" routerLinkActive="active" data-bs-dismiss="offcanvas">
+        <i class="bi bi-person-fill me-2"></i>Tài khoản
+      </a>
+      <a class="nav-link" routerLink="/transactions" routerLinkActive="active" data-bs-dismiss="offcanvas">
+        <i class="bi bi-credit-card-fill me-2"></i>Nạp tiền
+      </a>
+      <a class="nav-link" routerLink="/orders" routerLinkActive="active" data-bs-dismiss="offcanvas">
+        <i class="bi bi-cart-fill me-2"></i>Lịch sử mua hàng
+      </a>
+      <a class="nav-link" routerLink="/support" routerLinkActive="active" data-bs-dismiss="offcanvas">
+        <i class="bi bi-headset me-2"></i>Hỗ trợ
+      </a>
+      <hr>
+      <a class="nav-link" href="https://dat-dio.gitbook.io/mailshopdocs" target="_blank" rel="noopener noreferrer">
+        <i class="bi bi-book me-2"></i>Tài liệu API
+      </a>
+      <a class="nav-link text-danger" (click)="logout()" data-bs-dismiss="offcanvas">
+        <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+      </a>
+    </nav>
+    } @else {
+    <nav class="nav flex-column sidebar-nav">
+      <a class="nav-link" routerLink="/auth/login" data-bs-dismiss="offcanvas">
+        <i class="bi bi-box-arrow-in-right me-2"></i>Đăng nhập
+      </a>
+      <a class="nav-link" routerLink="/auth/register" data-bs-dismiss="offcanvas">
+        <i class="bi bi-person-plus me-2"></i>Đăng ký
+      </a>
+      <hr>
+      <a class="nav-link" href="https://dat-dio.gitbook.io/mailshopdocs" target="_blank" rel="noopener noreferrer">
+        <i class="bi bi-book me-2"></i>Tài liệu API
+      </a>
+    </nav>
+    }
+    }
+  </div>
+</div>
+
 <!-- Hero section - only show when authReady AND authenticated -->
 @if (authReady$ | async) {
 @if (isAuthenticated$ | async) {
-<section class="hero-section">
+<section class="hero-section d-none d-lg-block">
   <div class="container">
     <div class="hero-menu">
       <a routerLink="/" class="hero-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
-        <i class="fas fa-home"></i>
+        <i class="bi bi-house-door-fill"></i>
         <span>Trang chủ</span>
       </a>
       <a routerLink="/profile" class="hero-link" routerLinkActive="active">
-        <i class="fas fa-user"></i>
+        <i class="bi bi-person-fill"></i>
         <span>Tài khoản</span>
       </a>
       <a routerLink="/transactions" class="hero-link" routerLinkActive="active">
-        <i class="fas fa-credit-card"></i>
+        <i class="bi bi-credit-card-fill"></i>
         <span>Nạp tiền</span>
       </a>
       <a routerLink="/orders" class="hero-link" routerLinkActive="active">
-        <i class="fas fa-shopping-cart"></i>
+        <i class="bi bi-cart-fill"></i>
         <span>Lịch sử mua hàng</span>
       </a>
       <a routerLink="/support" class="hero-link" routerLinkActive="active">
-        <i class="fas fa-headset"></i>
+        <i class="bi bi-headset"></i>
         <span>Hỗ trợ</span>
       </a>
     </div>

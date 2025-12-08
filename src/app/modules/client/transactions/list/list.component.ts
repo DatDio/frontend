@@ -300,15 +300,13 @@ export class ClientTransactionListComponent implements OnInit {
 
   getStatusClass(status: string): string {
     const map: Record<string, string> = {
-      pending: 'badge-warning',
-      completed: 'badge-success',
-      failed: 'badge-danger',
-      cancelled: 'badge-secondary'
+      PENDING: 'badge-warning',
+      SUCCESS: 'badge-success',
+      FAILED: 'badge-danger',
+      CANCELLED: 'badge-secondary'
     };
     return map[status] || 'badge-secondary';
   }
 
-  getAmountColor(type: string): string {
-    return type === 'PURCHASE' ? 'text-danger' : 'text-success';
-  }
+ 
 }

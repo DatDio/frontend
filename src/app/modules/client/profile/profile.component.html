@@ -162,8 +162,9 @@
                       <i [class]="showCurrentPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
                     </button>
                   </div>
-                  <div class="invalid-feedback" [class.d-block]="passwordSubmitted && currentPassword?.invalid">
-                    <div *ngIf="currentPassword?.errors?.['required']">Mật khẩu hiện tại là bắt buộc</div>
+                  <div class="text-danger small mt-1"
+                    *ngIf="passwordSubmitted && currentPassword?.errors?.['required']">
+                    Mật khẩu hiện tại là bắt buộc
                   </div>
                 </div>
 
@@ -177,9 +178,11 @@
                       <i [class]="showNewPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
                     </button>
                   </div>
-                  <div class="invalid-feedback" [class.d-block]="passwordSubmitted && newPassword?.invalid">
-                    <div *ngIf="newPassword?.errors?.['required']">Mật khẩu mới là bắt buộc</div>
-                    <div *ngIf="newPassword?.errors?.['minlength']">Mật khẩu phải có ít nhất 6 ký tự</div>
+                  <div class="text-danger small mt-1" *ngIf="passwordSubmitted && newPassword?.errors?.['required']">
+                    Mật khẩu mới là bắt buộc
+                  </div>
+                  <div class="text-danger small mt-1" *ngIf="passwordSubmitted && newPassword?.errors?.['minlength']">
+                    Mật khẩu phải có ít nhất 6 ký tự
                   </div>
                 </div>
 
@@ -194,10 +197,13 @@
                       <i [class]="showConfirmPassword ? 'bi bi-eye-slash' : 'bi bi-eye'"></i>
                     </button>
                   </div>
-                  <div class="invalid-feedback"
-                    [class.d-block]="passwordSubmitted && (confirmPassword?.invalid || changePasswordForm.errors?.['passwordMismatch'])">
-                    <div *ngIf="confirmPassword?.errors?.['required']">Xác nhận mật khẩu là bắt buộc</div>
-                    <div *ngIf="changePasswordForm.errors?.['passwordMismatch']">Mật khẩu không khớp</div>
+                  <div class="text-danger small mt-1"
+                    *ngIf="passwordSubmitted && confirmPassword?.errors?.['required']">
+                    Xác nhận mật khẩu là bắt buộc
+                  </div>
+                  <div class="text-danger small mt-1"
+                    *ngIf="passwordSubmitted && changePasswordForm.errors?.['passwordMismatch']">
+                    Mật khẩu không khớp
                   </div>
                 </div>
               </div>

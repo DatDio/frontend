@@ -117,6 +117,7 @@
     height: auto;
   }
 }
+
 // =============================================
 // TOOLS SECTION
 // =============================================
@@ -609,14 +610,69 @@
     .info-col {
       grid-column: span 2;
     }
+
+    // Show data labels for mobile
+    .live-col,
+    .country-col,
+    .price-col,
+    .quantity-col {
+      display: flex;
+      align-items: center;
+      gap: $spacing-2;
+
+      &::before {
+        content: attr(data-label) ': ';
+        font-size: $font-size-xs;
+        font-weight: $font-weight-semibold;
+        color: $gray-500;
+        min-width: 70px;
+      }
+    }
+
+    .price-col,
+    .quantity-col {
+      text-align: left;
+    }
   }
 
   @media (max-width: $breakpoint-sm) {
     grid-template-columns: 1fr;
+    gap: $spacing-3;
 
-    .info-col,
+    .info-col {
+      grid-column: span 1;
+      padding-bottom: $spacing-3;
+      border-bottom: 1px solid $gray-200;
+      margin-bottom: $spacing-2;
+    }
+
+    .live-col,
+    .country-col,
+    .price-col,
+    .quantity-col {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: $spacing-2 0;
+
+      &::before {
+        content: attr(data-label);
+        font-size: $font-size-sm;
+        font-weight: $font-weight-semibold;
+        color: $gray-600;
+      }
+    }
+
+    .price-col,
+    .quantity-col {
+      text-align: right;
+    }
+
     .action-col {
       grid-column: span 1;
+      margin-top: $spacing-3;
+      padding-top: $spacing-3;
+      border-top: 1px solid $gray-200;
     }
   }
 }

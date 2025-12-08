@@ -439,3 +439,110 @@
     background-position: -200% 0;
   }
 }
+
+// =============================================
+// MOBILE OFFCANVAS SIDEBAR
+// =============================================
+
+.mobile-sidebar {
+  width: 60% !important;
+  min-width: 200px;
+  max-width: 300px;
+  background: $white;
+  border-right: 1px solid $gray-200;
+
+  .offcanvas-header {
+    background: $gradient-primary;
+    color: $white;
+    padding: $spacing-4 $spacing-5;
+
+    .offcanvas-title {
+      font-weight: $font-weight-bold;
+      font-size: $font-size-xl;
+    }
+
+    .btn-close {
+      filter: brightness(0) invert(1);
+      opacity: 0.8;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  .offcanvas-body {
+    padding: $spacing-4;
+  }
+
+  .balance-info-sidebar {
+    display: flex;
+    align-items: center;
+    background: $primary-bg;
+    padding: $spacing-3 $spacing-4;
+    border-radius: $radius-lg;
+    font-weight: $font-weight-semibold;
+    font-size: $font-size-sm;
+    color: $primary;
+    border: 1px solid rgba($primary, 0.2);
+
+    i {
+      color: $primary;
+    }
+  }
+
+  .user-email-sidebar {
+    display: flex;
+    align-items: center;
+    padding: $spacing-2 $spacing-3;
+    font-size: $font-size-sm;
+    color: $gray-600;
+    background: $gray-50;
+    border-radius: $radius-md;
+    word-break: break-all;
+
+    i {
+      color: $gray-500;
+      flex-shrink: 0;
+    }
+  }
+
+  .sidebar-nav {
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: $spacing-3 $spacing-4;
+      color: $gray-700;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      border-radius: $radius-md;
+      transition: all $transition-fast;
+      margin-bottom: $spacing-1;
+
+      i {
+        font-size: $font-size-base;
+        width: 20px;
+      }
+
+      &:hover {
+        background: $gray-100;
+        color: $primary;
+      }
+
+      &.active {
+        background: $primary-bg;
+        color: $primary;
+        font-weight: $font-weight-semibold;
+      }
+
+      &.text-danger:hover {
+        background: rgba($danger, 0.1);
+      }
+    }
+  }
+
+  hr {
+    margin: $spacing-3 0;
+    border-color: $gray-200;
+  }
+}

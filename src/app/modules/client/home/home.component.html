@@ -93,8 +93,8 @@
             <div class="col-name"><i class="fas fa-envelope me-2"></i>Sản phẩm</div>
             <div class="col-live"><i class="fas fa-hourglass-half me-2"></i>LiveTime</div>
             <div class="col-country"><i class="fas fa-globe me-2"></i>Quốc gia</div>
-            <div class="col-price"><i class="fas fa-tag me-2"></i>Giá</div>
-            <div class="col-quantity"><i class="fas fa-shopping-cart me-2"></i>Số lượng</div>
+            <div class="col-price text-start"><i class="fas fa-tag me-2"></i>Giá</div>
+            <div class="col-quantity text-start"><i class="fas fa-shopping-cart me-2"></i>Số lượng</div>
             <div class="col-action"></div>
           </div>
 
@@ -116,11 +116,11 @@
               </span>
             </div>
 
-            <div class="price-col" data-label="Giá">
+            <div class="price-col text-start" data-label="Giá">
               <div class="price">{{ product.price | number }} VNĐ</div>
             </div>
 
-            <div class="quantity-col" data-label="Số lượng">
+            <div class="quantity-col text-start" data-label="Số lượng">
               <div class="quantity-box">{{ product.quantity | number }}</div>
             </div>
 

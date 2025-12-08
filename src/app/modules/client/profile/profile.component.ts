@@ -132,7 +132,7 @@ export class ProfileComponent implements OnInit {
           // 1. LƯU VÀ HIỂN THỊ MODAL KEY PLAINTEXT
           this.newlyGeneratedKey = {
             key: res.data.apiKey,
-            warning: res.data.warning || 'Key này chỉ hiển thị một lần. Hãy sao chép ngay!'
+            warning: ''
           };
           this.openKeyModal();
 
