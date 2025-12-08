@@ -27,6 +27,13 @@
     <!-- Desktop navbar -->
     <div class="collapse navbar-collapse d-none d-lg-flex" id="navbarNav">
       <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
+        <!-- Theme Toggle -->
+        <li class="nav-item">
+          <button class="theme-toggle-btn" (click)="toggleTheme()" title="Chuyển đổi giao diện">
+            <i class="bi" [class.bi-sun-fill]="(theme$ | async) === 'dark'"
+              [class.bi-moon-fill]="(theme$ | async) === 'light'"></i>
+          </button>
+        </li>
         <li class="nav-item">
           <a class="nav-link" href="https://dat-dio.gitbook.io/mailshopdocs" target="_blank" rel="noopener noreferrer">
             Tài liệu API
@@ -104,12 +111,24 @@
       <a class="nav-link" routerLink="/orders" routerLinkActive="active" data-bs-dismiss="offcanvas">
         <i class="bi bi-cart-fill me-2"></i>Lịch sử mua hàng
       </a>
+      <a class="nav-link" routerLink="/ranks" routerLinkActive="active" data-bs-dismiss="offcanvas">
+        <i class="bi bi-trophy-fill me-2"></i>Hạng
+      </a>
+      <a class="nav-link" routerLink="/tools" routerLinkActive="active" data-bs-dismiss="offcanvas">
+        <i class="bi bi-tools me-2"></i>Công cụ
+      </a>
       <a class="nav-link" routerLink="/support" routerLinkActive="active" data-bs-dismiss="offcanvas">
         <i class="bi bi-headset me-2"></i>Hỗ trợ
       </a>
       <hr>
       <a class="nav-link" href="https://dat-dio.gitbook.io/mailshopdocs" target="_blank" rel="noopener noreferrer">
         <i class="bi bi-book me-2"></i>Tài liệu API
+      </a>
+      <!-- Theme Toggle in Sidebar -->
+      <a class="nav-link" (click)="toggleTheme()">
+        <i class="bi me-2" [class.bi-sun-fill]="(theme$ | async) === 'dark'"
+          [class.bi-moon-fill]="(theme$ | async) === 'light'"></i>
+        {{ (theme$ | async) === 'dark' ? 'Giao diện sáng' : 'Giao diện tối' }}
       </a>
       <a class="nav-link text-danger" (click)="logout()" data-bs-dismiss="offcanvas">
         <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
@@ -154,6 +173,10 @@
       <a routerLink="/orders" class="hero-link" routerLinkActive="active">
         <i class="bi bi-cart-fill"></i>
         <span>Lịch sử mua hàng</span>
+      </a>
+      <a routerLink="/ranks" class="hero-link" routerLinkActive="active">
+        <i class="bi bi-trophy-fill"></i>
+        <span>Hạng</span>
       </a>
       <a routerLink="/support" class="hero-link" routerLinkActive="active">
         <i class="bi bi-headset"></i>

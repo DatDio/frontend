@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { TransactionService } from '../../core/services/wallet.service';
+import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-client-layout',
@@ -14,8 +15,10 @@ import { TransactionService } from '../../core/services/wallet.service';
 export class ClientLayoutComponent implements OnInit {
   readonly walletService = inject(TransactionService);
   readonly authService = inject(AuthService);
+  readonly themeService = inject(ThemeService);
 
   balance$ = this.walletService.balance$;
+  theme$ = this.themeService.theme$;
 
   // Use authReady$ - stays FALSE on SSR, only TRUE after browser localStorage check
   authReady$ = this.authService.authReady$;
@@ -31,5 +34,9 @@ export class ClientLayoutComponent implements OnInit {
 
   logout(): void {
     this.authService.logout();
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
   }
 }

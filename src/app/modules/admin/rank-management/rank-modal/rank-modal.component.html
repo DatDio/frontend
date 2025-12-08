@@ -1,0 +1,116 @@
+<div class="modal-overlay" *ngIf="true">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <h5 class="modal-title">
+                {{ mode === 'create' ? 'Thêm thứ hạng' : 'Cập nhật thứ hạng' }}
+            </h5>
+            <button type="button" class="btn-close" (click)="onCancel()"></button>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="name" class="form-label">Tên thứ hạng <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" formControlName="name"
+                            placeholder="VD: Bronze, Silver, Gold..." [class.is-invalid]="submitted && name?.invalid">
+                        <div class="invalid-feedback" *ngIf="submitted && name?.invalid">
+                            <span *ngIf="name?.errors?.['required']">Tên thứ hạng là bắt buộc</span>
+                            <span *ngIf="name?.errors?.['minlength']">Tên phải có ít nhất 2 ký tự</span>
+                            <span *ngIf="name?.errors?.['maxlength']">Tên không được quá 50 ký tự</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="bonusPercent" class="form-label">Phần trăm bonus <span
+                                class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="bonusPercent" formControlName="bonusPercent"
+                                placeholder="0" [class.is-invalid]="submitted && bonusPercent?.invalid">
+                            <span class="input-group-text">%</span>
+                        </div>
+                        <div class="invalid-feedback d-block" *ngIf="submitted && bonusPercent?.invalid">
+                            <span *ngIf="bonusPercent?.errors?.['required']">Phần trăm bonus là bắt buộc</span>
+                            <span *ngIf="bonusPercent?.errors?.['min']">Phần trăm tối thiểu là 0</span>
+                            <span *ngIf="bonusPercent?.errors?.['max']">Phần trăm tối đa là 100</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="minDeposit" class="form-label">Mức nạp tối thiểu (VNĐ) <span
+                                class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="minDeposit" formControlName="minDeposit"
+                            placeholder="0" [class.is-invalid]="submitted && minDeposit?.invalid">
+                        <div class="invalid-feedback" *ngIf="submitted && minDeposit?.invalid">
+                            <span *ngIf="minDeposit?.errors?.['required']">Mức nạp tối thiểu là bắt buộc</span>
+                            <span *ngIf="minDeposit?.errors?.['min']">Mức nạp phải >= 0</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label for="periodDays" class="form-label">Số ngày tính hạng <span
+                                class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <input type="number" class="form-control" id="periodDays" formControlName="periodDays"
+                                placeholder="7" [class.is-invalid]="submitted && periodDays?.invalid">
+                            <span class="input-group-text">ngày</span>
+                        </div>
+                        <div class="invalid-feedback d-block" *ngIf="submitted && periodDays?.invalid">
+                            <span *ngIf="periodDays?.errors?.['required']">Số ngày là bắt buộc</span>
+                            <span *ngIf="periodDays?.errors?.['min']">Số ngày tối thiểu là 1</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="displayOrder" class="form-label">Thứ tự hiển thị</label>
+                        <input type="number" class="form-control" id="displayOrder" formControlName="displayOrder"
+                            placeholder="0">
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="color" class="form-label">Màu sắc</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="color" class="form-control form-control-color" id="color"
+                                formControlName="color" title="Chọn màu thứ hạng">
+                            <input type="text" class="form-control" formControlName="color" placeholder="#6c757d">
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label for="status" class="form-label">Trạng thái <span class="text-danger">*</span></label>
+                        <select class="form-control form-select" id="status" formControlName="status"
+                            [class.is-invalid]="submitted && status?.invalid">
+                            <option value="" disabled>-- Chọn trạng thái --</option>
+                            <option *ngFor="let opt of statusOptions" [value]="opt.value">
+                                {{ opt.label }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="iconUrl" class="form-label">Icon URL (tùy chọn)</label>
+                    <input type="text" class="form-control" id="iconUrl" formControlName="iconUrl"
+                        placeholder="https://example.com/icon.png">
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="loading">
+                    Hủy
+                </button>
+                <button type="submit" class="btn btn-primary" [disabled]="loading">
+                    <span *ngIf="!loading">{{ mode === 'create' ? 'Tạo' : 'Cập nhật' }}</span>
+                    <span *ngIf="loading">
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        {{ mode === 'create' ? 'Đang tạo...' : 'Đang cập nhật...' }}
+                    </span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

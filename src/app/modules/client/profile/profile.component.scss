@@ -129,6 +129,82 @@
     }
   }
 
+  // Rank Info Section
+  .profile-rank {
+    padding: $spacing-4;
+    background: linear-gradient(135deg, $gray-50 0%, $gray-100 100%);
+    border-radius: $radius-lg;
+    border: 1px solid $gray-200;
+
+    .rank-card-mini {
+      display: flex;
+      align-items: center;
+      gap: $spacing-3;
+      margin-bottom: $spacing-3;
+
+      .rank-badge-mini {
+        width: 48px;
+        height: 48px;
+        border-radius: $radius-lg;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+
+        i {
+          font-size: $font-size-xl;
+          color: $white;
+        }
+      }
+
+      .rank-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        .rank-label {
+          font-size: $font-size-xs;
+          color: $gray-500;
+        }
+
+        .rank-name {
+          font-size: $font-size-lg;
+          font-weight: $font-weight-bold;
+          text-transform: uppercase;
+        }
+
+        .rank-bonus {
+          font-size: $font-size-sm;
+          color: $success;
+          font-weight: $font-weight-medium;
+        }
+      }
+    }
+
+    .view-all-ranks {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: $spacing-2;
+      font-size: $font-size-sm;
+      color: $primary;
+      text-decoration: none;
+      padding: $spacing-2;
+      background: $white;
+      border-radius: $radius-md;
+      transition: all $transition-base;
+
+      &:hover {
+        background: $primary;
+        color: $white;
+      }
+
+      i {
+        font-size: $font-size-xs;
+      }
+    }
+  }
+
   .profile-nav {
     display: flex;
     flex-direction: column;

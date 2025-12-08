@@ -1,0 +1,77 @@
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RankService } from '../../../core/services/rank.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { NotificationService } from '../../../core/services/notification.service';
+import { Rank, UserRankInfo } from '../../../core/models/rank.model';
+
+@Component({
+    selector: 'app-ranks',
+    standalone: true,
+    imports: [CommonModule],
+    templateUrl: './ranks.component.html',
+    styleUrls: ['./ranks.component.scss']
+})
+export class RanksComponent implements OnInit {
+    readonly #rankService = inject(RankService);
+    readonly #authService = inject(AuthService);
+    readonly #notificationService = inject(NotificationService);
+
+    ranks: Rank[] = [];
+    myRankInfo: UserRankInfo | null = null;
+    loading = true;
+    isLoggedIn = false;
+
+    ngOnInit(): void {
+        this.isLoggedIn = this.#authService.isAuthenticated();
+        this.loadRanks();
+        if (this.isLoggedIn) {
+            this.loadMyRank();
+        }
+    }
+
+    private loadRanks(): void {
+        this.loading = true;
+        this.#rankService.getAllRanks().subscribe({
+            next: (response) => {
+                if (response.success) {
+                    this.ranks = response.data || [];
+                }
+                this.loading = false;
+            },
+            error: () => {
+                this.loading = false;
+            }
+        });
+    }
+
+    private loadMyRank(): void {
+        this.#rankService.getMyRank().subscribe({
+            next: (response) => {
+                if (response.success) {
+                    this.myRankInfo = response.data;
+                }
+            },
+            error: () => {
+                // Ignore error, just don't show rank
+            }
+        });
+    }
+
+    isCurrentRank(rank: Rank): boolean {
+        return this.myRankInfo?.rankId === rank.id;
+    }
+
+    formatCurrency(value: number): string {
+        return new Intl.NumberFormat('vi-VN').format(value);
+    }
+
+    getRankProgress(): number {
+        if (!this.myRankInfo || !this.myRankInfo.nextRankMinDeposit) {
+            return 100;
+        }
+        const current = this.myRankInfo.currentDeposit;
+        const next = this.myRankInfo.nextRankMinDeposit;
+        return Math.min(100, Math.round((current / next) * 100));
+    }
+}

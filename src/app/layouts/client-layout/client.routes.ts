@@ -36,5 +36,13 @@ export const clientRoutes: Routes = [
   {
     path: 'support',
     loadComponent: () => import('../../modules/client/support/support.component').then(m => m.SupportComponent)
+  },
+  {
+    path: 'ranks',
+    loadComponent: () => import('../../modules/client/ranks/ranks.component').then(m => m.RanksComponent)
+  },
+  {
+    path: 'tools',
+    loadComponent: () => import('../../modules/client/tools/tools.component').then(m => m.ToolsComponent)
   }
 ];

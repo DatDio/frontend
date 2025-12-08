@@ -108,6 +108,27 @@
             </div>
           </div>
 
+          <!-- Rank Info -->
+          @if (currentUser?.rank) {
+          <div class="profile-rank mb-4">
+            <div class="rank-card-mini">
+              <div class="rank-badge-mini" [style.background]="currentUser?.rank?.color || '#6c757d'">
+                <i class="bi bi-trophy-fill"></i>
+              </div>
+              <div class="rank-info">
+                <span class="rank-label">Hạng của bạn</span>
+                <span class="rank-name" [style.color]="currentUser?.rank?.color || '#6c757d'">
+                  {{ currentUser?.rank?.rankName }}
+                </span>
+                <span class="rank-bonus">+{{ currentUser?.rank?.bonusPercent || 0 }}% khi nạp</span>
+              </div>
+            </div>
+            <a routerLink="/ranks" class="view-all-ranks">
+              Xem tất cả thứ hạng <i class="bi bi-chevron-right"></i>
+            </a>
+          </div>
+          }
+
           <nav class="profile-nav">
             <button class="profile-nav__item" [class.active]="activeTab === 'profile'"
               (click)="setActiveTab('profile')">

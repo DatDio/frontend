@@ -52,5 +52,9 @@ export const adminRoutes: Routes = [
   {
     path: 'transactions-management',
     loadComponent: () => import('../../modules/admin/transaction-management/list/list.component').then(m => m.TransactionListComponent)
+  },
+  {
+    path: 'ranks-management',
+    loadComponent: () => import('../../modules/admin/rank-management/list/list.component').then(m => m.RankListComponent)
   }
 ];

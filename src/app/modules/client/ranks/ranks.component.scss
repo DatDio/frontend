@@ -1,0 +1,299 @@
+@import '../../../../styles/variables';
+
+.ranks-page {
+    min-height: 100vh;
+    background: $dark;
+}
+
+// =============================================
+// HEADER SECTION
+// =============================================
+.ranks-header {
+    background: linear-gradient(180deg, darken($dark, 5%) 0%, $dark 100%);
+    padding: $spacing-12 0;
+    text-align: center;
+    border-bottom: 1px solid rgba($white, 0.1);
+
+    h1 {
+        font-size: $font-size-3xl;
+        font-weight: $font-weight-bold;
+        color: $white;
+        margin-bottom: $spacing-4;
+
+        i {
+            color: $warning;
+            margin-right: $spacing-2;
+        }
+    }
+
+    p {
+        color: $gray-400;
+        font-size: $font-size-base;
+        max-width: 600px;
+        margin: 0 auto $spacing-8;
+    }
+}
+
+// My Rank Summary Cards
+.my-rank-summary {
+    display: flex;
+    justify-content: center;
+    gap: $spacing-6;
+    flex-wrap: wrap;
+
+    .rank-info-card {
+        background: rgba($white, 0.05);
+        border: 1px solid rgba($white, 0.1);
+        border-radius: $radius-lg;
+        padding: $spacing-4 $spacing-6;
+        min-width: 180px;
+
+        .rank-label {
+            font-size: $font-size-sm;
+            color: $gray-400;
+            margin-bottom: $spacing-2;
+        }
+
+        .rank-name {
+            font-size: $font-size-xl;
+            font-weight: $font-weight-bold;
+            text-transform: uppercase;
+        }
+
+        .rank-value {
+            font-size: $font-size-xl;
+            font-weight: $font-weight-bold;
+            color: $white;
+
+            &.bonus {
+                color: $primary-light;
+            }
+        }
+    }
+}
+
+// =============================================
+// RANKS CONTENT
+// =============================================
+.ranks-content {
+    padding: $spacing-12 0;
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 $spacing-4;
+    }
+}
+
+// Loading & Empty States
+.loading-state,
+.empty-state {
+    text-align: center;
+    padding: $spacing-16;
+    color: $gray-400;
+
+    .spinner-border {
+        width: 3rem;
+        height: 3rem;
+    }
+
+    i {
+        font-size: 4rem;
+        margin-bottom: $spacing-4;
+        opacity: 0.5;
+    }
+
+    p {
+        margin-top: $spacing-4;
+        font-size: $font-size-lg;
+    }
+}
+
+// =============================================
+// RANKS GRID
+// =============================================
+.ranks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: $spacing-6;
+    justify-items: center;
+
+    @media (min-width: $breakpoint-lg) {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+// =============================================
+// RANK CARD - Shield/Medal Design
+// =============================================
+.rank-card {
+    position: relative;
+    width: 100%;
+    max-width: 260px;
+    background: linear-gradient(180deg, rgba($white, 0.08) 0%, rgba($white, 0.02) 100%);
+    border: 1px solid rgba($white, 0.1);
+    border-radius: $radius-xl;
+    padding: $spacing-6 $spacing-4;
+    text-align: center;
+    transition: all $transition-base;
+
+    &:hover {
+        transform: translateY(-8px);
+        border-color: rgba($primary, 0.5);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    &.current-rank {
+        border-color: $primary;
+        box-shadow: 0 0 30px rgba($primary, 0.3);
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(180deg, rgba($primary, 0.1) 0%, transparent 50%);
+            border-radius: $radius-xl;
+            pointer-events: none;
+        }
+    }
+}
+
+// Current Badge
+.current-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: $primary;
+    color: $white;
+    padding: $spacing-1 $spacing-4;
+    border-radius: $radius-full;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-semibold;
+    white-space: nowrap;
+
+    i {
+        margin-right: $spacing-1;
+    }
+}
+
+// Rank Visual (Badge/Shield)
+.rank-visual {
+    margin-bottom: $spacing-4;
+
+    .rank-badge {
+        width: 80px;
+        height: 100px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
+
+        i {
+            font-size: 32px;
+            color: $white;
+        }
+
+        img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+    }
+}
+
+// Rank Details
+.rank-details {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-3;
+    margin-bottom: $spacing-4;
+}
+
+.bonus-section,
+.deposit-section {
+    background: rgba($dark, 0.5);
+    padding: $spacing-3;
+    border-radius: $radius-md;
+}
+
+.bonus-section {
+    .bonus-label {
+        display: block;
+        font-size: $font-size-xs;
+        color: $gray-400;
+        margin-bottom: $spacing-1;
+    }
+
+    .bonus-value {
+        font-size: $font-size-2xl;
+        font-weight: $font-weight-bold;
+        color: $success;
+    }
+}
+
+.deposit-section {
+    .deposit-label {
+        display: block;
+        font-size: $font-size-xs;
+        color: $gray-400;
+        margin-bottom: $spacing-1;
+    }
+
+    .deposit-value {
+        font-size: $font-size-base;
+        font-weight: $font-weight-bold;
+        color: $primary-light;
+    }
+}
+
+// Rank Name
+.rank-name-section {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    text-transform: lowercase;
+    letter-spacing: 2px;
+}
+
+// =============================================
+// RESPONSIVE
+// =============================================
+@media (max-width: $breakpoint-md) {
+    .ranks-header {
+        padding: $spacing-8 0;
+
+        h1 {
+            font-size: $font-size-2xl;
+        }
+    }
+
+    .my-rank-summary {
+        flex-direction: column;
+        align-items: center;
+
+        .rank-info-card {
+            width: 100%;
+            max-width: 280px;
+        }
+    }
+
+    .ranks-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: $spacing-4;
+    }
+
+    .rank-card {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: $breakpoint-sm) {
+    .ranks-grid {
+        grid-template-columns: 1fr;
+    }
+}

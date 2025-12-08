@@ -1,4 +1,5 @@
 import { PageFilter } from "./common.model";
+import { UserRankInfo } from "./rank.model";
 
 export interface User {
   id: number;
@@ -14,12 +15,14 @@ export interface User {
   roles: string[];
   status: number;
 
-  createdAt: string; // hoặc Date nếu bạn map sang Date
-  updatedAt: string; // hoặc Date
+  createdAt: string;
+  updatedAt: string;
 
-  balance?: number; // Wallet balance
-  totalDeposit?: number; // Total deposited amount
-  totalSpent?: number; // Total spent amount
+  balance?: number;
+  totalDeposit?: number;
+  totalSpent?: number;
+
+  rank?: UserRankInfo;
 }
 
 export interface CreateUserRequest {

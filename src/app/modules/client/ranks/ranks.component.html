@@ -1,0 +1,85 @@
+<div class="ranks-page">
+    <!-- Header Section -->
+    <div class="ranks-header">
+        <div class="container">
+            <h1><i class="bi bi-trophy"></i> Hệ Thống Thứ Hạng</h1>
+            <p>Thứ hạng của bạn sẽ được tính dựa trên tổng số tiền bạn đã nạp vào hệ thống trong {{
+                myRankInfo?.periodDays || 7 }} ngày gần nhất.</p>
+
+            @if (isLoggedIn && myRankInfo) {
+            <div class="my-rank-summary">
+                <div class="rank-info-card">
+                    <div class="rank-label">Hạng của bạn</div>
+                    <div class="rank-name" [style.color]="myRankInfo.color || '#6c757d'">
+                        {{ myRankInfo.rankName }}
+                    </div>
+                </div>
+                <div class="rank-info-card">
+                    <div class="rank-label">Tổng tiền {{ myRankInfo.periodDays }} ngày qua</div>
+                    <div class="rank-value">{{ formatCurrency(myRankInfo.currentDeposit) }} ₫</div>
+                </div>
+                <div class="rank-info-card">
+                    <div class="rank-label">Giảm giá</div>
+                    <div class="rank-value bonus">{{ myRankInfo.bonusPercent }} %</div>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+
+    <!-- Ranks Grid -->
+    <div class="ranks-content">
+        <div class="container">
+            @if (loading) {
+            <div class="loading-state">
+                <div class="spinner-border text-primary"></div>
+                <p>Đang tải thứ hạng...</p>
+            </div>
+            } @else if (ranks.length === 0) {
+            <div class="empty-state">
+                <i class="bi bi-trophy"></i>
+                <p>Chưa có thứ hạng nào được thiết lập</p>
+            </div>
+            } @else {
+            <div class="ranks-grid">
+                @for (rank of ranks; track rank.id) {
+                <div class="rank-card" [class.current-rank]="isCurrentRank(rank)">
+                    @if (isCurrentRank(rank)) {
+                    <div class="current-badge">
+                        <i class="bi bi-check-circle-fill"></i> Hạng hiện tại
+                    </div>
+                    }
+
+                    <div class="rank-visual">
+                        <div class="rank-badge"
+                            [style.background]="rank.color ? 'linear-gradient(135deg, ' + rank.color + ', ' + rank.color + '99)' : 'linear-gradient(135deg, #6c757d, #6c757d99)'">
+                            @if (rank.iconUrl) {
+                            <img [src]="rank.iconUrl" [alt]="rank.name">
+                            } @else {
+                            <i class="bi bi-trophy-fill"></i>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="rank-details">
+                        <div class="bonus-section">
+                            <span class="bonus-label">Giảm giá</span>
+                            <span class="bonus-value">{{ rank.bonusPercent }} %</span>
+                        </div>
+
+                        <div class="deposit-section">
+                            <span class="deposit-label">Tổng nạp</span>
+                            <span class="deposit-value">{{ formatCurrency(rank.minDeposit) }} ₫</span>
+                        </div>
+                    </div>
+
+                    <div class="rank-name-section" [style.color]="rank.color || '#6c757d'">
+                        {{ rank.name.toLowerCase() }}
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+    </div>
+</div>

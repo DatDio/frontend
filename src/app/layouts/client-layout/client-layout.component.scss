@@ -153,6 +153,31 @@
       border-color: $gray-200;
     }
   }
+
+  // Theme Toggle Button
+  .theme-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: $radius-full;
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all $transition-base;
+
+    i {
+      font-size: $font-size-lg;
+    }
+
+    &:hover {
+      background: $primary-bg;
+      color: $primary;
+      transform: rotate(15deg);
+    }
+  }
 }
 
 // =============================================

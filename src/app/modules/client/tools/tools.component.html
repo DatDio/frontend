@@ -1,0 +1,55 @@
+<div class="tools-page">
+    <div class="container py-4">
+        <!-- Page Header -->
+        <div class="page-header mb-4">
+            <h1><i class="bi bi-tools me-2"></i>Công cụ tiện ích</h1>
+            <p class="text-muted">Các công cụ hỗ trợ thao tác với email</p>
+        </div>
+
+        <!-- Tools Grid -->
+        <div class="tools-grid">
+            @for (tool of tools; track tool.id) {
+            <div class="tool-card" [class.coming-soon]="tool.status === 'coming-soon'">
+                @if (tool.status === 'active') {
+                <a [routerLink]="tool.route" class="tool-card-inner" [style.background]="tool.gradient">
+                    <div class="tool-icon">
+                        @if (tool.icon.startsWith('assets/')) {
+                        <img [src]="tool.icon" [alt]="tool.name">
+                        } @else {
+                        <i [class]="tool.icon"></i>
+                        }
+                    </div>
+                    <div class="tool-info">
+                        <h3>{{ tool.name }}</h3>
+                        <p>{{ tool.description }}</p>
+                        <span class="tool-status active">
+                            <i class="bi bi-check-circle-fill me-1"></i>Hoạt động
+                        </span>
+                    </div>
+                    <div class="tool-arrow">
+                        <i class="bi bi-arrow-right"></i>
+                    </div>
+                </a>
+                } @else {
+                <div class="tool-card-inner disabled" [style.background]="tool.gradient">
+                    <div class="tool-icon">
+                        @if (tool.icon.startsWith('assets/')) {
+                        <img [src]="tool.icon" [alt]="tool.name">
+                        } @else {
+                        <i [class]="tool.icon"></i>
+                        }
+                    </div>
+                    <div class="tool-info">
+                        <h3>{{ tool.name }}</h3>
+                        <p>{{ tool.description }}</p>
+                        <span class="tool-status coming-soon">
+                            <i class="bi bi-clock-fill me-1"></i>Sắp ra mắt
+                        </span>
+                    </div>
+                </div>
+                }
+            </div>
+            }
+        </div>
+    </div>
+</div>
