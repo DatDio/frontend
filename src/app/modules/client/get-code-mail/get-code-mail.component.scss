@@ -1,8 +1,46 @@
 @import '../../../../styles/variables';
+@import '../check-live-mail/check-live-mail.component.scss';
 
 // =============================================
 // GET CODE MAIL PAGE
 // =============================================
+
+.code-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+
+    .code-value {
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-weight: 600;
+        color: #28a745;
+        background: rgba(40, 167, 69, 0.15);
+        padding: 0.15rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+
+    .code-copy-btn {
+        width: 22px;
+        height: 22px;
+        border: none;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.2);
+        color: #28a745;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.65rem;
+        transition: all 0.2s;
+
+        &:hover {
+            background: rgba(40, 167, 69, 0.3);
+            transform: scale(1.1);
+        }
+    }
+}
 
 .get-code-page {
     min-height: calc(100vh - 200px);

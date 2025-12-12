@@ -7,7 +7,7 @@
 
         <div class="get-code-card">
             <form [formGroup]="getCodeForm" (ngSubmit)="onGetCode()" class="get-code-form">
-                <!-- Type Get - Multi-select Checkboxes -->
+                <!-- Type Get -->
                 <div class="form-row">
                     <label class="form-label">Type Get</label>
                     <div class="checkbox-group">
@@ -21,7 +21,7 @@
                     </div>
                 </div>
 
-                <!-- Email Type - Multi-select Checkboxes -->
+                <!-- Email Type -->
                 <div class="form-row">
                     <label class="form-label">Email <span class="email-count">[{{ emailCount }}]</span></label>
                     <div class="checkbox-group">
@@ -47,13 +47,20 @@
 
                 <!-- Action Buttons -->
                 <div class="action-buttons">
-                    <button type="button" class="filter-btn">
-                        <i class="fas fa-filter me-1"></i> Filter
+                    @if (isLoading) {
+                    <button type="button" class="stop-btn" (click)="stopGetCode()">
+                        <i class="fas fa-stop me-1"></i> Dừng
                     </button>
-                    <button type="submit" class="get-code-btn" [disabled]="getCodeForm.invalid || getCodeLoading">
-                        @if (getCodeLoading) {
-                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                        Đang xử lý...
+                    }
+                    @if (showResults) {
+                    <button type="button" class="clear-btn" (click)="clearResults()">
+                        <i class="fas fa-trash me-1"></i> Clear
+                    </button>
+                    }
+                    <button type="submit" class="get-code-btn" [disabled]="getCodeForm.invalid || isLoading">
+                        @if (isLoading) {
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        Đang xử lý... ({{ progressPercent }}%)
                         } @else {
                         <i class="fas fa-search me-2"></i> Get Code
                         }
@@ -61,20 +68,17 @@
                 </div>
             </form>
 
-            <!-- Results Section -->
-            @if (showGetCodeResults) {
+            <!-- Results Section - Table Layout -->
+            @if (showResults) {
             <div class="get-code-results">
                 <div class="results-header">
-                    <h4><i class="fas fa-list me-2"></i> Kết quả ({{ getCodeResults.length }})</h4>
-                    <button type="button" class="clear-btn" (click)="clearGetCodeResults()">
-                        <i class="fas fa-times me-1"></i> Xóa
-                    </button>
+                    <h4><i class="fas fa-list me-2"></i> Kết quả ({{ successCount + failedCount + unknownCount }})</h4>
                 </div>
 
-                @if (getCodeResults.length === 0) {
+                @if (allResults.length === 0 && !isLoading) {
                 <div class="no-results">
                     <i class="fas fa-inbox"></i>
-                    <p>Không tìm thấy mã xác thực nào</p>
+                    <p>Chưa có kết quả</p>
                 </div>
                 } @else {
                 <div class="results-table-wrapper">
@@ -83,7 +87,7 @@
                             <tr>
                                 <th>STT</th>
                                 <th>Email</th>
-                                <th>PassMail</th>
+                                <th>Mailpass</th>
                                 <th>Status</th>
                                 <th>Kết quả</th>
                                 <th>Nội dung</th>
@@ -92,15 +96,19 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @for (result of getCodeResults; track result.email; let i = $index) {
-                            <tr [class.success-row]="result.status" [class.error-row]="!result.status">
+                            @for (result of allResults; track result.email; let i = $index) {
+                            <tr [class.success-row]="result.status === 'SUCCESS'"
+                                [class.error-row]="result.status === 'FAILED'"
+                                [class.unknown-row]="result.status === 'UNKNOWN'">
                                 <td class="stt">{{ i + 1 }}</td>
                                 <td class="email">{{ result.email }}</td>
                                 <td class="password">{{ result.password || '-' }}</td>
                                 <td class="status">
-                                    <span class="status-badge" [class.success]="result.status"
-                                        [class.error]="!result.status">
-                                        {{ result.status ? 'Thành công' : 'Thất bại' }}
+                                    <span class="status-badge" [class.success]="result.status === 'SUCCESS'"
+                                        [class.error]="result.status === 'FAILED'"
+                                        [class.unknown]="result.status === 'UNKNOWN'">
+                                        {{ result.status === 'SUCCESS' ? 'Thành công' : result.status === 'FAILED' ?
+                                        'Thất bại' : 'Unknown' }}
                                     </span>
                                 </td>
                                 <td class="code">
@@ -117,9 +125,13 @@
                                 <td class="content">{{ result.content || '-' }}</td>
                                 <td class="date">{{ result.date || '-' }}</td>
                                 <td class="actions">
-                                    <button type="button" class="retry-btn" (click)="retryGetCode(result)"
-                                        title="Thử lại">
+                                    <button type="button" class="retry-btn" (click)="retryRow(result)"
+                                        [disabled]="result.retrying" title="Thử lại">
+                                        @if (result.retrying) {
+                                        <span class="spinner-border spinner-border-sm"></span>
+                                        } @else {
                                         Thử lại
+                                        }
                                     </button>
                                 </td>
                             </tr>

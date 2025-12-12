@@ -1,10 +1,9 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
-
 import { NotificationService } from '../../../core/services/notification.service';
-import { HotmailService } from '../../../core/services/hotmail.service';
-import { finalize } from 'rxjs/operators';
+import { GetOAuth2Response, CheckStatus } from '../../../core/models/hotmail.model';
+import { HotmailApi } from '../../../Utils/apis/hotmail/hotmail.api';
 
 interface OAuth2Result {
     email: string;
@@ -12,7 +11,7 @@ interface OAuth2Result {
     refreshToken: string;
     clientId: string;
     accessToken?: string;
-    status: 'success' | 'error' | 'getting';
+    status: CheckStatus;
     error?: string;
 }
 
@@ -23,30 +22,50 @@ interface OAuth2Result {
     templateUrl: './get-oauth2.component.html',
     styleUrls: ['./get-oauth2.component.scss']
 })
-export class GetOAuth2Component implements OnInit {
+export class GetOAuth2Component implements OnInit, OnDestroy {
     private readonly formBuilder = inject(FormBuilder);
     private readonly notificationService = inject(NotificationService);
-    private readonly hotmailService = inject(HotmailService);
 
     getForm!: FormGroup;
     isLoading = false;
-    results: OAuth2Result[] = [];
     showResults = false;
     removeDuplicate = true;
 
-    ngOnInit(): void {
-        this.initForm();
-    }
+    private eventSource: EventSource | null = null;
 
-    private initForm(): void {
+    successResults: OAuth2Result[] = [];
+    errorResults: OAuth2Result[] = [];
+    unknownResults: OAuth2Result[] = [];
+    totalCount = 0;
+    processedCount = 0;
+
+    ngOnInit(): void {
         this.getForm = this.formBuilder.group({
             emailData: ['', [Validators.required, Validators.minLength(10)]]
         });
     }
 
+    ngOnDestroy(): void {
+        this.closeEventSource();
+    }
+
+    private closeEventSource(): void {
+        if (this.eventSource) {
+            this.eventSource.close();
+            this.eventSource = null;
+        }
+    }
+
     get emailCount(): number {
         const data = this.getForm.get('emailData')?.value || '';
         return data.trim().split('\n').filter((line: string) => line.trim().length > 0).length;
+    }
+
+    get successCount(): number { return this.successResults.length; }
+    get errorCount(): number { return this.errorResults.length; }
+    get unknownCount(): number { return this.unknownResults.length; }
+    get progressPercent(): number {
+        return this.totalCount > 0 ? Math.round((this.processedCount / this.totalCount) * 100) : 0;
     }
 
     onGet(): void {
@@ -55,111 +74,133 @@ export class GetOAuth2Component implements OnInit {
             return;
         }
 
+        this.successResults = [];
+        this.errorResults = [];
+        this.unknownResults = [];
+        this.processedCount = 0;
         this.isLoading = true;
         this.showResults = true;
-        let emailData = this.getForm.get('emailData')?.value.trim();
+        this.closeEventSource();
 
-        // Remove duplicates if enabled
+        let emailData = this.getForm.get('emailData')?.value.trim();
         if (this.removeDuplicate) {
             const lines = emailData.split('\n').filter((line: string) => line.trim().length > 0);
             emailData = [...new Set(lines)].join('\n');
         }
+        this.totalCount = emailData.split('\n').filter((line: string) => line.trim().length > 0).length;
 
-        // Initialize results with getting status
-        const lines = emailData.split('\n').filter((line: string) => line.trim().length > 0);
-        this.results = lines.map((line: string) => {
-            const parts = line.split('|');
-            return {
-                email: parts[0]?.trim() || '',
-                password: parts[1]?.trim() || '',
-                refreshToken: parts[2]?.trim() || '',
-                clientId: parts[3]?.trim() || '',
-                status: 'getting' as const
-            };
-        });
-
-        // Call backend API to get OAuth2 tokens
-        const request = { emailData };
-        this.hotmailService.getOAuth2Token(request)
-            .pipe(finalize(() => this.isLoading = false))
-            .subscribe({
-                next: (response) => {
-                    if (response.success && response.data) {
-                        this.results = response.data.map(r => ({
-                            email: r.email,
-                            password: r.password || '',
-                            refreshToken: r.refreshToken || '',
-                            clientId: r.clientId || '',
-                            accessToken: r.accessToken,
-                            status: r.success ? 'success' as const : 'error' as const,
-                            error: r.error
-                        }));
-                        const successCount = this.results.filter(r => r.status === 'success').length;
-                        this.notificationService.success(`Hoàn thành: ${successCount}/${this.results.length} thành công`);
-                    } else {
-                        this.notificationService.error(response.message || 'Không thể lấy OAuth2 token');
-                    }
-                },
-                error: (error) => {
-                    this.notificationService.error(error.error?.message || 'Đã xảy ra lỗi khi lấy token');
+        fetch(HotmailApi.GET_OAUTH2_START, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ emailData })
+        })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success && result.data?.sessionId) {
+                    this.connectToStream(result.data.sessionId);
+                } else {
+                    throw new Error(result.message || 'Failed to create session');
                 }
+            })
+            .catch(error => {
+                this.isLoading = false;
+                this.notificationService.error('Lỗi: ' + error.message);
             });
     }
 
+    private connectToStream(sessionId: string): void {
+        const url = `${HotmailApi.GET_OAUTH2_STREAM}?sessionId=${sessionId}`;
+        this.eventSource = new EventSource(url);
+
+        this.eventSource.onmessage = (event) => {
+            try {
+                const result: GetOAuth2Response = JSON.parse(event.data);
+                this.handleResult(result);
+            } catch (e) { }
+        };
+
+        this.eventSource.addEventListener('result', (event: any) => {
+            try {
+                const result: GetOAuth2Response = JSON.parse(event.data);
+                this.handleResult(result);
+            } catch (e) { }
+        });
+
+        this.eventSource.addEventListener('done', () => {
+            this.closeEventSource();
+            this.isLoading = false;
+            this.notificationService.success(
+                `Hoàn thành: ${this.successCount} success, ${this.errorCount} error, ${this.unknownCount} unknown`
+            );
+        });
+
+        this.eventSource.onerror = () => {
+            this.closeEventSource();
+            this.isLoading = false;
+        };
+    }
+
+    private handleResult(result: GetOAuth2Response): void {
+        this.processedCount++;
+        const oauth2Result: OAuth2Result = {
+            email: result.email,
+            password: result.password || '',
+            refreshToken: result.refreshToken || '',
+            clientId: result.clientId || '',
+            accessToken: result.accessToken,
+            status: result.status || (result.success ? 'SUCCESS' : 'FAILED'),
+            error: result.error
+        };
+
+        if (oauth2Result.status === 'SUCCESS') {
+            this.successResults = [...this.successResults, oauth2Result];
+        } else if (oauth2Result.status === 'FAILED') {
+            this.errorResults = [...this.errorResults, oauth2Result];
+        } else {
+            this.unknownResults = [...this.unknownResults, oauth2Result];
+        }
+    }
+
     copyToken(token: string): void {
-        navigator.clipboard.writeText(token).then(() => {
-            this.notificationService.success('Đã copy access token!');
-        });
+        navigator.clipboard.writeText(token).then(() => this.notificationService.success('Đã copy access token!'));
     }
 
-    copyAllSuccess(): void {
-        const successTokens = this.results
-            .filter(r => r.status === 'success')
-            .map(r => `${r.email}|${r.password}|${r.accessToken}`)
-            .join('\n');
-        if (!successTokens) {
-            this.notificationService.warning('Không có token nào');
-            return;
-        }
-        navigator.clipboard.writeText(successTokens).then(() => {
-            this.notificationService.success('Đã copy tất cả access tokens!');
-        });
+    copySuccess(): void {
+        const data = this.successResults.map(r => `${r.email}|${r.accessToken}`).join('\n');
+        if (!data) { this.notificationService.warning('Không có token'); return; }
+        navigator.clipboard.writeText(data).then(() => this.notificationService.success(`Đã copy ${this.successCount} tokens!`));
     }
 
-    copyAllError(): void {
-        const errorEmails = this.results
-            .filter(r => r.status === 'error')
-            .map(r => `${r.email}|${r.password}|${r.refreshToken}|${r.clientId}`)
-            .join('\n');
-        if (!errorEmails) {
-            this.notificationService.warning('Không có email lỗi nào');
-            return;
-        }
-        navigator.clipboard.writeText(errorEmails).then(() => {
-            this.notificationService.success('Đã copy tất cả email lỗi!');
-        });
+    copyError(): void {
+        const data = this.errorResults.map(r => `${r.email}|${r.password}|${r.refreshToken}|${r.clientId}`).join('\n');
+        if (!data) { this.notificationService.warning('Không có email lỗi'); return; }
+        navigator.clipboard.writeText(data).then(() => this.notificationService.success(`Đã copy ${this.errorCount} email lỗi!`));
+    }
+
+    copyUnknown(): void {
+        const data = this.unknownResults.map(r => `${r.email}|${r.password}`).join('\n');
+        if (!data) { this.notificationService.warning('Không có email unknown'); return; }
+        navigator.clipboard.writeText(data).then(() => this.notificationService.success(`Đã copy ${this.unknownCount} email!`));
     }
 
     filter(): void {
-        // Filter out error emails from textarea
-        const successEmails = this.results
-            .filter(r => r.status === 'success')
-            .map(r => `${r.email}|${r.password}|${r.refreshToken}|${r.clientId}`)
-            .join('\n');
-        this.getForm.patchValue({ emailData: successEmails });
+        const data = this.successResults.map(r => `${r.email}|${r.password}|${r.refreshToken}|${r.clientId}`).join('\n');
+        this.getForm.patchValue({ emailData: data });
         this.notificationService.success('Đã lọc, chỉ giữ lại email thành công');
     }
 
     clearResults(): void {
-        this.results = [];
+        this.successResults = [];
+        this.errorResults = [];
+        this.unknownResults = [];
+        this.processedCount = 0;
+        this.totalCount = 0;
         this.showResults = false;
     }
 
-    get successCount(): number {
-        return this.results.filter(r => r.status === 'success').length;
-    }
-
-    get errorCount(): number {
-        return this.results.filter(r => r.status === 'error').length;
+    stopGet(): void {
+        this.closeEventSource();
+        this.isLoading = false;
+        this.notificationService.info('Đã dừng lấy token');
     }
 }

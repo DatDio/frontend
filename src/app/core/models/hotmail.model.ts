@@ -1,4 +1,9 @@
 /**
+ * Status categories for 3-column display
+ */
+export type CheckStatus = 'SUCCESS' | 'FAILED' | 'UNKNOWN';
+
+/**
  * Request DTO for getting verification code from Hotmail
  */
 export interface HotmailGetCodeRequest {
@@ -16,7 +21,10 @@ export interface HotmailGetCodeRequest {
 export interface HotmailGetCodeResponse {
     email: string;
     password?: string;
+    refreshToken?: string;
+    clientId?: string;
     status: boolean;
+    checkStatus?: CheckStatus;
     code?: string;
     content?: string;
     date?: string;
@@ -39,6 +47,7 @@ export interface CheckLiveMailResponse {
     refreshToken?: string;
     clientId?: string;
     isLive: boolean;
+    status?: CheckStatus;
     error?: string;
 }
 
@@ -60,6 +69,7 @@ export interface GetOAuth2Response {
     clientId?: string;
     accessToken?: string;
     success: boolean;
+    status?: CheckStatus;
     error?: string;
 }
 
@@ -104,4 +114,5 @@ export const EMAIL_TYPES: EmailType[] = [
  * Supported get types
  */
 export const GET_TYPES: Array<'Graph API' | 'Oauth2'> = ['Graph API', 'Oauth2'];
+
 
