@@ -1,0 +1,114 @@
+<div class="tool-page">
+    <div class="container">
+        <div class="page-header">
+            <h1><i class="fas fa-envelope-open-text me-2"></i> Check Live Mail</h1>
+            <p>Kiểm tra trạng thái hoạt động của tài khoản email Hotmail/Outlook</p>
+        </div>
+
+        <div class="tool-card">
+            <form [formGroup]="checkForm" (ngSubmit)="onCheck()" class="tool-form">
+                <!-- Email Input -->
+                <div class="form-row">
+                    <label class="form-label">
+                        Email <span class="item-count">[{{ emailCount }}]</span>
+                    </label>
+                    <textarea formControlName="emailData" class="data-textarea" rows="8"
+                        placeholder="email|password|refresh_token|client_id"></textarea>
+                    <div class="textarea-hint">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Định dạng: email|password|refresh_token|client_id (mỗi dòng một email)
+                    </div>
+                </div>
+
+                <!-- Options -->
+                <div class="options-row">
+                    <label class="remove-duplicate-checkbox">
+                        <input type="checkbox" [(ngModel)]="removeDuplicate" [ngModelOptions]="{standalone: true}">
+                        <span>Remove duplicate</span>
+                    </label>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button type="button" class="copy-error-btn" (click)="copyAllDie()" *ngIf="showResults">
+                        <i class="fas fa-copy me-1"></i> Copy All Error
+                    </button>
+                    <button type="button" class="copy-success-btn" (click)="copyAllLive()" *ngIf="showResults">
+                        <i class="fas fa-copy me-1"></i> Copy All Success
+                    </button>
+                    <button type="button" class="filter-btn" (click)="filter()" *ngIf="showResults">
+                        <i class="fas fa-filter me-1"></i> Filter
+                    </button>
+                    <button type="submit" class="submit-btn" [disabled]="checkForm.invalid || isLoading">
+                        @if (isLoading) {
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        Đang kiểm tra...
+                        } @else {
+                        <i class="fas fa-search me-2"></i> Check Live
+                        }
+                    </button>
+                </div>
+            </form>
+
+            <!-- Results Section -->
+            @if (showResults) {
+            <div class="results-section">
+                <div class="results-header">
+                    <h4><i class="fas fa-list me-2"></i> Kết quả ({{ results.length }})</h4>
+                    <div class="results-actions">
+                        <span class="badge bg-success me-2">Live: {{ liveCount }}</span>
+                        <span class="badge bg-danger">Die: {{ dieCount }}</span>
+                    </div>
+                </div>
+
+                <div class="results-table-wrapper">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Email</th>
+                                <th>Password</th>
+                                <th>Status</th>
+                                <th>Oauth2 (refresh_token|client_id)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (result of results; track result.email; let i = $index) {
+                            <tr [class.success-row]="result.status === 'live'"
+                                [class.error-row]="result.status === 'die'"
+                                [class.checking-row]="result.status === 'checking'">
+                                <td class="stt">{{ i + 1 }}</td>
+                                <td class="email">{{ result.email }}</td>
+                                <td class="password">{{ result.password }}</td>
+                                <td class="status">
+                                    @if (result.status === 'checking') {
+                                    <span class="status-badge checking">
+                                        <i class="fas fa-spinner fa-spin me-1"></i> Getting
+                                    </span>
+                                    } @else if (result.status === 'live') {
+                                    <span class="status-badge success">
+                                        <i class="fas fa-check-circle me-1"></i> Live
+                                    </span>
+                                    } @else {
+                                    <span class="status-badge error">
+                                        <i class="fas fa-times-circle me-1"></i> Die
+                                    </span>
+                                    }
+                                </td>
+                                <td class="token">
+                                    @if (result.refreshToken) {
+                                    {{ result.refreshToken | slice:0:20 }}...
+                                    } @else {
+                                    -
+                                    }
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+</div>

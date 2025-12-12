@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { LoaderService } from './loader.service';
-import { Rank, RankCreate, RankUpdate, RankFilter, UserRankInfo } from '../models/rank.model';
+import { Rank, RankFilter, UserRankInfo } from '../models/rank.model';
 import { ApiResponse, PaginatedResponse } from '../models/common.model';
 import { AdminRankApi } from '../../Utils/apis/ranks/admin-rank.api';
 import { ClientRankApi } from '../../Utils/apis/ranks/client-rank.api';
@@ -52,9 +52,10 @@ export class RankService {
     }
 
     /**
-     * Create new rank (admin)
+     * Create new rank with FormData (admin)
+     * @param data Form data containing rank info and optional icon file
      */
-    create(data: RankCreate): Observable<ApiResponse<Rank>> {
+    create(data: FormData): Observable<ApiResponse<Rank>> {
         this.loaderService.show();
         return this.httpClient
             .post<ApiResponse<Rank>>(AdminRankApi.CREATE, data)
@@ -62,9 +63,11 @@ export class RankService {
     }
 
     /**
-     * Update rank (admin)
+     * Update rank with FormData (admin)
+     * @param id Rank ID
+     * @param data Form data containing rank info and optional icon file
      */
-    update(id: number, data: RankUpdate): Observable<ApiResponse<Rank>> {
+    update(id: number, data: FormData): Observable<ApiResponse<Rank>> {
         this.loaderService.show();
         return this.httpClient
             .put<ApiResponse<Rank>>(AdminRankApi.UPDATE(id), data)

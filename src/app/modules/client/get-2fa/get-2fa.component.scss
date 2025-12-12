@@ -1,0 +1,39 @@
+@import '../../../../styles/variables';
+@import '../check-live-facebook/check-live-facebook.component.scss';
+
+// 2FA specific styles
+.countdown {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    padding: $spacing-1 $spacing-2;
+    background: $success-bg;
+    color: $success;
+    border-radius: $radius-md;
+    font-weight: $font-weight-bold;
+    font-size: $font-size-sm;
+
+    &.warning {
+        background: $danger-bg;
+        color: $danger;
+        animation: pulse 0.5s infinite;
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+.code-value {
+    font-size: $font-size-lg;
+    letter-spacing: 2px;
+}

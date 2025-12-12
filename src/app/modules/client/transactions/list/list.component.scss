@@ -13,7 +13,7 @@
 h1 {
   font-size: $font-size-3xl;
   font-weight: $font-weight-bold;
-  color: $dark;
+  color: var(--text-heading);
 
   i {
     color: $primary;
@@ -22,7 +22,7 @@ h1 {
 }
 
 .text-muted {
-  color: $gray-500;
+  color: var(--text-muted);
   font-size: $font-size-sm;
 }
 
@@ -62,14 +62,15 @@ body:has(#payos-modal:not(:empty)) {
 // =============================================
 
 .deposit-card {
-  background: $white;
-  border: 1px solid $gray-200;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
   border-radius: $radius-xl;
-  box-shadow: $shadow-md;
+  box-shadow: var(--shadow-card);
   padding: $spacing-6;
+  transition: background-color 0.3s ease;
 
   h3 {
-    color: $dark;
+    color: var(--text-heading);
     font-size: $font-size-2xl;
     font-weight: $font-weight-bold;
     margin-bottom: $spacing-5;
@@ -84,8 +85,8 @@ body:has(#payos-modal:not(:empty)) {
 }
 
 .bank-box {
-  border: 1px solid $gray-200 !important;
-  background: $gray-50;
+  border: 1px solid var(--border-color) !important;
+  background: var(--bg-table-header);
   border-radius: $radius-lg !important;
   padding: $spacing-4;
   display: flex;
@@ -97,7 +98,7 @@ body:has(#payos-modal:not(:empty)) {
   }
 
   strong {
-    color: $dark;
+    color: var(--text-heading);
     font-size: $font-size-base;
   }
 }
@@ -106,8 +107,9 @@ body:has(#payos-modal:not(:empty)) {
   max-width: 300px;
   font-size: $font-size-2xl !important;
   font-weight: $font-weight-bold;
-  color: $dark;
-  border: 2px solid $gray-300;
+  color: var(--text-primary) !important;
+  background: var(--bg-input) !important;
+  border: 2px solid var(--border-input);
   border-radius: $radius-lg;
   padding: $spacing-3 $spacing-4;
   transition: all $transition-base;
@@ -115,6 +117,7 @@ body:has(#payos-modal:not(:empty)) {
   &:focus {
     border-color: $primary;
     box-shadow: 0 0 0 3px rgba($primary, 0.15);
+    background: var(--bg-input) !important;
   }
 }
 
@@ -156,32 +159,18 @@ body:has(#payos-modal:not(:empty)) {
 // =============================================
 
 .search-card {
-  background: $white;
+  background: var(--bg-card);
   border-radius: $radius-xl;
-  border: 1px solid $gray-200;
+  border: 1px solid var(--border-card);
   padding: $spacing-5;
   margin-bottom: $spacing-6;
-  box-shadow: $shadow-sm;
-}
-
-.form-control,
-.form-select {
-  border: 1px solid $gray-300;
-  border-radius: $radius-lg;
-  padding: $spacing-3 $spacing-4;
-  font-size: $font-size-sm;
-  color: $dark;
-  transition: all $transition-base;
-
-  &:focus {
-    border-color: $primary;
-    box-shadow: 0 0 0 3px rgba($primary, 0.15);
-  }
+  box-shadow: var(--shadow-card);
+  transition: background-color 0.3s ease;
 }
 
 .form-label {
   font-weight: $font-weight-semibold;
-  color: $gray-700;
+  color: var(--text-secondary);
   font-size: $font-size-sm;
 }
 
@@ -203,17 +192,17 @@ body:has(#payos-modal:not(:empty)) {
 }
 
 .btn-refresh {
-  background: $gray-100;
-  border: 1px solid $gray-300;
-  color: $gray-700;
+  background: var(--bg-table-header);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
   font-weight: $font-weight-semibold;
   padding: $spacing-3 $spacing-5;
   border-radius: $radius-lg;
   transition: all $transition-base;
 
   &:hover {
-    background: $gray-200;
-    color: $dark;
+    background: var(--bg-table-row-hover);
+    color: var(--text-heading);
   }
 }
 
@@ -222,21 +211,24 @@ body:has(#payos-modal:not(:empty)) {
 // =============================================
 
 .transaction-table-card {
-  background: $white;
+  background: var(--bg-card);
   border-radius: $radius-xl;
-  border: 1px solid $gray-200;
-  box-shadow: $shadow-sm;
+  border: 1px solid var(--border-card);
+  box-shadow: var(--shadow-card);
   overflow: hidden;
+  transition: background-color 0.3s ease;
 
   .card-header {
-    background: $gray-50;
-    border-bottom: 1px solid $gray-200;
+    background: var(--bg-table-header);
+    border-bottom: 1px solid var(--border-color);
     padding: $spacing-4 $spacing-5;
+    color: var(--text-heading);
   }
 }
 
 .table {
   margin: 0;
+  color: var(--text-primary);
 
   thead {
     background: $dark !important;
@@ -259,11 +251,15 @@ body:has(#payos-modal:not(:empty)) {
 
   tbody {
     tr {
-      border-bottom: 1px solid $gray-200;
+      border-bottom: 1px solid var(--border-color);
       transition: all $transition-fast;
 
       &:hover {
-        background: $gray-50;
+        background: var(--bg-table-row-hover) !important;
+
+        td {
+          background: var(--bg-table-row-hover) !important;
+        }
       }
 
       &:last-child {
@@ -274,7 +270,8 @@ body:has(#payos-modal:not(:empty)) {
         padding: $spacing-4;
         vertical-align: middle;
         font-size: $font-size-sm;
-        color: $gray-700;
+        color: var(--text-primary);
+        background: transparent;
       }
     }
   }
@@ -359,4 +356,8 @@ body:has(#payos-modal:not(:empty)) {
   .table-responsive {
     font-size: $font-size-xs;
   }
+}
+
+.card-footer {
+  padding: 0px;
 }

@@ -1,11 +1,14 @@
+@import '../../../../styles/variables';
+
 /* Pagination Component Styles */
 .pagination-wrapper {
-  background-color: #ffffff;
-  border: 1px solid #dcdfe6;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-card);
   border-radius: 8px;
   padding: 12px 16px;
   margin-top: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: var(--shadow-card);
+  transition: background-color 0.3s ease;
 }
 
 /* Single Row Layout */
@@ -34,7 +37,7 @@
   gap: 8px;
 
   .form-label {
-    color: #495057;
+    color: var(--text-secondary);
     font-weight: 500;
     font-size: 13px;
     margin-bottom: 0;
@@ -48,11 +51,11 @@
   .form-select-sm {
     height: 32px;
     padding: 4px 28px 4px 12px;
-    border: 1px solid #dcdfe6;
+    border: 1px solid var(--border-input);
     border-radius: 4px;
     cursor: pointer;
-    background-color: white;
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23333' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+    background-color: var(--bg-input);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23999' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
     background-repeat: no-repeat;
     background-position: right 6px center;
     background-size: 14px 10px;
@@ -60,15 +63,15 @@
     font-size: 13px;
     font-weight: 400;
     transition: all 0.2s ease;
-    color: #333;
+    color: var(--text-primary);
 
     &:hover {
-      border-color: #409eff;
+      border-color: $primary;
     }
 
     &:focus {
-      border-color: #409eff;
-      box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+      border-color: $primary;
+      box-shadow: 0 0 0 2px rgba($primary, 0.2);
       outline: none;
     }
   }
@@ -80,7 +83,7 @@
   align-items: center;
   gap: 8px;
   padding-left: 16px;
-  border-left: 1px solid #e0e0e0;
+  border-left: 1px solid var(--border-color);
   white-space: nowrap;
 
   @media (max-width: 992px) {
@@ -97,25 +100,27 @@
   .text-muted {
     font-size: 13px;
     font-weight: 500;
-    color: #606266;
+    color: var(--text-secondary);
   }
 
   .form-control-sm {
     height: 32px;
     padding: 4px 10px;
-    border: 1px solid #dcdfe6;
+    border: 1px solid var(--border-input);
     border-radius: 4px;
     font-size: 13px;
     transition: all 0.2s ease;
     min-width: 60px;
+    background-color: var(--bg-input);
+    color: var(--text-primary);
 
     &:hover {
-      border-color: #409eff;
+      border-color: $primary;
     }
 
     &:focus {
-      border-color: #409eff;
-      box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+      border-color: $primary;
+      box-shadow: 0 0 0 2px rgba($primary, 0.2);
       outline: none;
     }
   }
@@ -125,21 +130,21 @@
     height: 32px;
     font-size: 13px;
     font-weight: 500;
-    background-color: #409eff;
-    border-color: #409eff;
+    background-color: $primary;
+    border-color: $primary;
     color: white;
     transition: all 0.2s ease;
 
     &:hover:not(:disabled) {
-      background-color: #66b1ff;
-      border-color: #66b1ff;
+      background-color: $primary-light;
+      border-color: $primary-light;
       transform: none;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     &:disabled {
-      background-color: #a0cfff;
-      border-color: #a0cfff;
+      background-color: rgba($primary, 0.5);
+      border-color: rgba($primary, 0.5);
       opacity: 1;
       cursor: not-allowed;
     }
@@ -172,10 +177,10 @@ nav.pagination-nav {
       min-width: 32px;
       padding: 6px 8px;
       font-size: 13px;
-      border: 1px solid #dcdfe6;
+      border: 1px solid var(--border-input);
       border-radius: 4px;
-      color: #606266;
-      background-color: white;
+      color: var(--text-secondary);
+      background-color: var(--bg-input);
       transition: all 0.2s ease;
       font-weight: 400;
       display: flex;
@@ -191,17 +196,17 @@ nav.pagination-nav {
       }
 
       &:hover:not(:disabled) {
-        color: #409eff;
-        background-color: #ecf5ff;
-        border-color: #409eff;
+        color: $primary;
+        background-color: rgba($primary, 0.1);
+        border-color: $primary;
         transform: none;
         box-shadow: none;
       }
 
       &:disabled {
-        color: #c0c4cc;
-        background-color: #f4f4f5;
-        border-color: #e4e7ed;
+        color: var(--text-muted);
+        background-color: var(--bg-table-header);
+        border-color: var(--border-color);
         cursor: not-allowed;
       }
 
@@ -224,18 +229,18 @@ nav.pagination-nav {
 
     &.active {
       .page-link {
-        background-color: #409eff;
-        border-color: #409eff;
+        background-color: $primary;
+        border-color: $primary;
         color: white;
         font-weight: 500;
-        box-shadow: 0 2px 4px rgba(64, 158, 255, 0.2);
+        box-shadow: 0 2px 4px rgba($primary, 0.2);
       }
     }
 
     &.disabled {
       &.page-item:not(:has(.page-link[disabled])) {
         .page-link {
-          color: #606266;
+          color: var(--text-secondary);
           pointer-events: none;
           background-color: transparent;
           border-color: transparent;
@@ -244,9 +249,9 @@ nav.pagination-nav {
       }
 
       .page-link[disabled] {
-        color: #c0c4cc;
-        background-color: #f4f4f5;
-        border-color: #e4e7ed;
+        color: var(--text-muted);
+        background-color: var(--bg-table-header);
+        border-color: var(--border-color);
       }
     }
   }

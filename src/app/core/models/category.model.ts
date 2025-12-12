@@ -5,16 +5,19 @@ export interface Category {
   id: number;
   name: string;
   description?: string;
+  imageUrl?: string;
   status: number;
-  products: Product[]; 
+  products: Product[];
   createdAt: Date;
   updatedAt: Date;
 }
+
 export interface CategoryCreate {
   name: string;
   description?: string;
   status?: string;
 }
+
 export interface CategoryUpdate {
   id: number;
   name: string;

@@ -9,56 +9,66 @@
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="modal-body">
-        <div class="mb-3">
-          <label for="name" class="form-label">Tên danh mục <span class="text-danger">*</span></label>
-          <input
-            type="text"
-            class="form-control"
-            id="name"
-            formControlName="name"
-            placeholder="Nhập nội dung"
-            [class.is-invalid]="submitted && name?.invalid"
-          >
-          <div class="invalid-feedback" *ngIf="submitted && name?.invalid">
-            <span *ngIf="name?.errors?.['required']">Category name is required</span>
-            <span *ngIf="name?.errors?.['minlength']">Category name must be at least 2 characters</span>
+        <div class="row">
+          <!-- Image upload column -->
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Ảnh đại diện</label>
+            <div class="image-upload-container">
+              <div class="image-preview-wrapper" *ngIf="imagePreview">
+                <img [src]="imagePreview" alt="Preview" class="image-preview">
+                <button type="button" class="btn btn-sm btn-danger remove-btn" (click)="removeImage()">
+                  <i class="bi bi-x"></i>
+                </button>
+              </div>
+              <div class="upload-area" *ngIf="!imagePreview">
+                <input type="file" id="imageFile" class="d-none"
+                  accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml" (change)="onImageSelected($event)">
+                <label for="imageFile" class="upload-label">
+                  <i class="bi bi-cloud-upload fs-2"></i>
+                  <span class="d-block mt-2">Chọn ảnh</span>
+                  <small class="text-muted">JPG, PNG (tối đa 5MB)</small>
+                </label>
+              </div>
+              <div class="mt-2 text-center" *ngIf="imagePreview">
+                <input type="file" id="changeImage" class="d-none"
+                  accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml" (change)="onImageSelected($event)">
+                <label for="changeImage" class="btn btn-sm btn-outline-primary">Đổi ảnh</label>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div class="mb-3">
-          <label for="description" class="form-label">Mô tả</label>
-          <textarea
-            class="form-control"
-            id="description"
-            formControlName="description"
-            placeholder="Nhập mô tả "
-            rows="3"
-          ></textarea>
-        </div>
+          <!-- Form fields column -->
+          <div class="col-md-8">
+            <div class="mb-3">
+              <label for="name" class="form-label">Tên danh mục <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" id="name" formControlName="name" placeholder="Nhập tên danh mục"
+                [class.is-invalid]="submitted && name?.invalid">
+              <div class="invalid-feedback" *ngIf="submitted && name?.invalid">
+                <span *ngIf="name?.errors?.['required']">Tên danh mục là bắt buộc</span>
+                <span *ngIf="name?.errors?.['minlength']">Tên phải có ít nhất 2 ký tự</span>
+              </div>
+            </div>
 
-        <div class="mb-3">
-          <label for="status" class="form-label">Trạng thái <span class="text-danger">*</span></label>
-          <select
-            class="form-control form-select"
-            id="status"
-            formControlName="status"
-            [class.is-invalid]="submitted && status?.invalid"
-          >
-            <option value="" disabled>-- Chọn trạng thái --</option>
-            <option *ngFor="let opt of statusOptions" [value]="opt.value">
-              {{ opt.label }}
-            </option>
-          </select>
-          <div class="invalid-feedback" *ngIf="submitted && status?.invalid">
-            <span *ngIf="status?.errors?.['required']">Status is required</span>
+            <div class="mb-3">
+              <label for="description" class="form-label">Mô tả</label>
+              <textarea class="form-control" id="description" formControlName="description" placeholder="Nhập mô tả"
+                rows="3"></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label for="status" class="form-label">Trạng thái <span class="text-danger">*</span></label>
+              <select class="form-control form-select" id="status" formControlName="status"
+                [class.is-invalid]="submitted && status?.invalid">
+                <option value="" disabled>-- Chọn trạng thái --</option>
+                <option *ngFor="let opt of statusOptions" [value]="opt.value">{{ opt.label }}</option>
+              </select>
+            </div>
           </div>
         </div>
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="loading">
-          Hủy
-        </button>
+        <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="loading">Hủy</button>
         <button type="submit" class="btn btn-primary" [disabled]="loading">
           <span *ngIf="!loading">{{ mode === 'create' ? 'Tạo' : 'Cập nhật' }}</span>
           <span *ngIf="loading">

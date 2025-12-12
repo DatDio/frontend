@@ -147,3 +147,65 @@
         opacity: 1;
     }
 }
+
+// Icon upload styles
+.icon-preview-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid #dee2e6;
+    flex-shrink: 0;
+}
+
+.icon-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.remove-icon-btn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    line-height: 1;
+}
+
+.upload-area {
+    flex: 1;
+    min-height: 80px;
+}
+
+.upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    color: #6c757d;
+    min-height: 80px;
+
+    &:hover {
+        border-color: #0d6efd;
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+}
+
+.has-preview .upload-label {
+    min-height: auto;
+    padding: 0.75rem;
+}

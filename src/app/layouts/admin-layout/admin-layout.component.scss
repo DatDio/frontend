@@ -1,7 +1,26 @@
+// Force admin to always use light theme
+// Override global dark theme CSS variables
 .admin-layout {
   display: flex;
   flex-direction: column;
   height: 100vh;
+
+  // Override CSS variables to always use light theme in admin
+  --bg-primary: #ffffff;
+  --bg-secondary: #f0f4f8;
+  --bg-card: #ffffff;
+  --bg-input: #ffffff;
+  --bg-table-header: #f8fafc;
+  --bg-table-row-hover: #f9fafb;
+  --text-primary: #1a1a2e;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-heading: #1a1a2e;
+  --border-color: #e2e8f0;
+  --border-input: #cbd5e1;
+  --border-card: #e2e8f0;
+  --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-card-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
 .admin-navbar {
@@ -22,7 +41,7 @@
   color: white;
   transition: margin-left 0.3s ease;
   overflow-y: auto;
-  
+
   &:not(.sidebar-open) {
     margin-left: -250px;
   }
@@ -34,7 +53,7 @@
     align-items: center;
     transition: all 0.3s;
     text-decoration: none;
-    
+
     i {
       margin-right: 0.75rem;
       font-size: 1.2rem;
@@ -63,7 +82,7 @@
   overflow-y: auto;
   background-color: #f8f9fa;
   transition: margin-left 0.3s ease;
-  
+
   &:not(.sidebar-open) {
     margin-left: 0;
   }

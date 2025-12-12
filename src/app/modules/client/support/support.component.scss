@@ -2,10 +2,17 @@
 
 .support-page {
     padding: 2rem;
+    background: var(--bg-card);
+    border-radius: $radius-xl;
+    box-shadow: var(--shadow-card);
+}
+
+.support-title {
+    color: var(--text-heading) !important;
 }
 
 .support-intro {
-    color: $gray-600;
+    color: var(--text-secondary);
     margin-bottom: 2rem;
     line-height: 1.6;
 }
@@ -13,7 +20,7 @@
 .section-title {
     font-size: 1.1rem;
     font-weight: 600;
-    color: $dark;
+    color: var(--text-heading);
     margin: 1.5rem 0 1rem;
 }
 
@@ -24,7 +31,7 @@
 
     li {
         margin-bottom: 0.5rem;
-        color: $gray-600;
+        color: var(--text-secondary);
 
         a {
             color: $primary;
@@ -50,15 +57,16 @@
 
     li {
         margin-bottom: 1rem;
-        color: $gray-600;
+        color: var(--text-secondary);
 
         strong {
-            color: $dark;
+            color: var(--text-heading);
         }
 
         p {
             margin: 0.25rem 0 0;
             line-height: 1.5;
+            color: var(--text-primary);
         }
     }
 }

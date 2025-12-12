@@ -16,10 +16,10 @@
                 </div>
                 <div class="rank-info-card">
                     <div class="rank-label">Tổng tiền {{ myRankInfo.periodDays }} ngày qua</div>
-                    <div class="rank-value">{{ formatCurrency(myRankInfo.currentDeposit) }} ₫</div>
+                    <div class="rank-value">{{ formatCurrency(myRankInfo.currentDeposit) }} vnđ</div>
                 </div>
                 <div class="rank-info-card">
-                    <div class="rank-label">Giảm giá</div>
+                    <div class="rank-label">Bonus nạp tiền</div>
                     <div class="rank-value bonus">{{ myRankInfo.bonusPercent }} %</div>
                 </div>
             </div>
@@ -63,18 +63,18 @@
 
                     <div class="rank-details">
                         <div class="bonus-section">
-                            <span class="bonus-label">Giảm giá</span>
+                            <span class="bonus-label">Bonus nạp tiền</span>
                             <span class="bonus-value">{{ rank.bonusPercent }} %</span>
                         </div>
 
                         <div class="deposit-section">
                             <span class="deposit-label">Tổng nạp</span>
-                            <span class="deposit-value">{{ formatCurrency(rank.minDeposit) }} ₫</span>
+                            <span class="deposit-value">{{ formatCurrency(rank.minDeposit) }} vnd</span>
                         </div>
                     </div>
 
                     <div class="rank-name-section" [style.color]="rank.color || '#6c757d'">
-                        {{ rank.name.toLowerCase() }}
+                        {{ rank.name }}
                     </div>
                 </div>
                 }

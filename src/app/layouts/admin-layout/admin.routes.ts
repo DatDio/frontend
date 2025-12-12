@@ -56,5 +56,9 @@ export const adminRoutes: Routes = [
   {
     path: 'ranks-management',
     loadComponent: () => import('../../modules/admin/rank-management/list/list.component').then(m => m.RankListComponent)
+  },
+  {
+    path: 'settings',
+    loadComponent: () => import('../../modules/admin/settings/settings.component').then(m => m.SettingsComponent)
   }
 ];

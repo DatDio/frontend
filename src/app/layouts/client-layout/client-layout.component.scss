@@ -5,13 +5,14 @@
 // =============================================
 
 .client-navbar {
-  background: $white;
-  border-bottom: 1px solid $gray-200;
-  box-shadow: $shadow-sm;
+  background: var(--bg-navbar);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--shadow-card);
   padding: $spacing-3 0;
   position: sticky;
   top: 0;
   z-index: $z-sticky;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 
   .navbar-brand {
     font-size: $font-size-2xl;
@@ -25,7 +26,7 @@
   }
 
   .nav-link {
-    color: $gray-600 !important;
+    color: var(--text-secondary) !important;
     font-weight: $font-weight-medium;
     padding: $spacing-2 $spacing-4 !important;
     border-radius: $radius-lg;
@@ -34,12 +35,12 @@
 
     &:hover {
       color: $primary !important;
-      background: $primary-bg;
+      background: rgba($primary, 0.1);
     }
 
     &.active {
       color: $primary !important;
-      background: $primary-bg;
+      background: rgba($primary, 0.1);
       font-weight: $font-weight-semibold;
 
       &::after {
@@ -57,7 +58,7 @@
   }
 
   .navbar-toggler {
-    border: 1px solid $gray-300;
+    border: 1px solid var(--border-color);
     padding: $spacing-2;
     border-radius: $radius-md;
 
@@ -115,7 +116,7 @@
     display: flex;
     align-items: center;
     gap: $spacing-2;
-    background: $primary-bg;
+    background: rgba($primary, 0.1);
     padding: $spacing-2 $spacing-4;
     border-radius: $radius-full;
     font-weight: $font-weight-semibold;
@@ -129,9 +130,10 @@
   }
 
   .dropdown-menu {
-    border: 1px solid $gray-200;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
     border-radius: $radius-lg;
-    box-shadow: $shadow-lg;
+    box-shadow: var(--shadow-card-hover);
     padding: $spacing-2;
     min-width: 180px;
 
@@ -139,18 +141,18 @@
       padding: $spacing-2 $spacing-4;
       border-radius: $radius-md;
       font-size: $font-size-sm;
-      color: $gray-700;
+      color: var(--text-secondary);
       transition: all $transition-fast;
 
       &:hover {
-        background: $primary-bg;
+        background: rgba($primary, 0.1);
         color: $primary;
       }
     }
 
     .dropdown-divider {
       margin: $spacing-2 0;
-      border-color: $gray-200;
+      border-color: var(--border-color);
     }
   }
 
@@ -173,7 +175,7 @@
     }
 
     &:hover {
-      background: $primary-bg;
+      background: rgba($primary, 0.1);
       color: $primary;
       transform: rotate(15deg);
     }
@@ -247,8 +249,9 @@
 .client-main {
   min-height: calc(100vh - 300px);
   padding: $spacing-8 0;
-  background: $light;
+  background: var(--bg-secondary);
   padding-top: 0px;
+  transition: background-color 0.3s ease;
 }
 
 // =============================================
@@ -359,7 +362,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: $white;
+  background: var(--bg-primary);
   z-index: 99999;
   display: flex;
   align-items: center;
@@ -413,7 +416,7 @@
 .nav-placeholder {
   width: 120px;
   height: 36px;
-  background: linear-gradient(90deg, $gray-200 25%, $gray-100 50%, $gray-200 75%);
+  background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-card) 50%, var(--border-color) 75%);
   background-size: 200% 100%;
   border-radius: $radius-lg;
   animation: shimmer 1.5s infinite;
@@ -425,13 +428,13 @@
 
 .content-skeleton {
   padding: $spacing-8;
-  background: $white;
+  background: var(--bg-card);
   border-radius: $radius-xl;
 
   .skeleton-header {
     width: 40%;
     height: 32px;
-    background: linear-gradient(90deg, $gray-200 25%, $gray-100 50%, $gray-200 75%);
+    background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-secondary) 50%, var(--border-color) 75%);
     background-size: 200% 100%;
     border-radius: $radius-lg;
     margin-bottom: $spacing-6;
@@ -442,7 +445,7 @@
     .skeleton-line {
       width: 100%;
       height: 16px;
-      background: linear-gradient(90deg, $gray-200 25%, $gray-100 50%, $gray-200 75%);
+      background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-secondary) 50%, var(--border-color) 75%);
       background-size: 200% 100%;
       border-radius: $radius-md;
       margin-bottom: $spacing-3;
@@ -473,8 +476,8 @@
   width: 60% !important;
   min-width: 200px;
   max-width: 300px;
-  background: $white;
-  border-right: 1px solid $gray-200;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--border-color);
 
   .offcanvas-header {
     background: $gradient-primary;
@@ -498,12 +501,13 @@
 
   .offcanvas-body {
     padding: $spacing-4;
+    background: var(--bg-sidebar);
   }
 
   .balance-info-sidebar {
     display: flex;
     align-items: center;
-    background: $primary-bg;
+    background: rgba($primary, 0.1);
     padding: $spacing-3 $spacing-4;
     border-radius: $radius-lg;
     font-weight: $font-weight-semibold;
@@ -521,13 +525,13 @@
     align-items: center;
     padding: $spacing-2 $spacing-3;
     font-size: $font-size-sm;
-    color: $gray-600;
-    background: $gray-50;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
     border-radius: $radius-md;
     word-break: break-all;
 
     i {
-      color: $gray-500;
+      color: var(--text-muted);
       flex-shrink: 0;
     }
   }
@@ -537,7 +541,7 @@
       display: flex;
       align-items: center;
       padding: $spacing-3 $spacing-4;
-      color: $gray-700;
+      color: var(--text-secondary);
       font-size: $font-size-sm;
       font-weight: $font-weight-medium;
       border-radius: $radius-md;
@@ -550,12 +554,12 @@
       }
 
       &:hover {
-        background: $gray-100;
+        background: var(--bg-table-row-hover);
         color: $primary;
       }
 
       &.active {
-        background: $primary-bg;
+        background: rgba($primary, 0.1);
         color: $primary;
         font-weight: $font-weight-semibold;
       }
@@ -568,6 +572,6 @@
 
   hr {
     margin: $spacing-3 0;
-    border-color: $gray-200;
+    border-color: var(--border-color);
   }
 }

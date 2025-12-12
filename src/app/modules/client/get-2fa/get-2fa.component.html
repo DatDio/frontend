@@ -1,0 +1,107 @@
+<div class="tool-page">
+    <div class="container">
+        <div class="page-header">
+            <h1><i class="fas fa-shield-alt me-2"></i> Get 2FA Code</h1>
+            <p>Lấy mã xác thực 2 bước (TOTP) từ secret key</p>
+        </div>
+
+        <div class="tool-card">
+            <form [formGroup]="getForm" (ngSubmit)="onGet()" class="tool-form">
+                <!-- Secret Input -->
+                <div class="form-row">
+                    <label class="form-label">
+                        2FA Secret <span class="item-count">[{{ itemCount }}]</span>
+                    </label>
+                    <textarea formControlName="secretData" class="data-textarea" rows="8"
+                        placeholder="email|password|2fa_secret&#10;hoặc chỉ nhập secret key"></textarea>
+                    <div class="textarea-hint">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Định dạng: email|password|2fa_secret hoặc chỉ nhập secret key (mỗi dòng một mục)
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button type="button" class="filter-btn" (click)="refreshCodes()" *ngIf="showResults">
+                        <i class="fas fa-sync-alt me-1"></i> Refresh
+                    </button>
+                    <button type="button" class="copy-success-btn" (click)="copyAll()" *ngIf="showResults">
+                        <i class="fas fa-copy me-1"></i> Copy All
+                    </button>
+                    <button type="submit" class="submit-btn" [disabled]="getForm.invalid || isLoading">
+                        @if (isLoading) {
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        Đang tạo...
+                        } @else {
+                        <i class="fas fa-key me-2"></i> Get 2FA
+                        }
+                    </button>
+                </div>
+            </form>
+
+            <!-- Results Section -->
+            @if (showResults) {
+            <div class="results-section">
+                <div class="results-header">
+                    <h4><i class="fas fa-list me-2"></i> Kết quả ({{ results.length }})</h4>
+                    <div class="results-actions">
+                        <span class="badge bg-success me-2">Thành công: {{ successCount }}</span>
+                        <span class="badge bg-danger me-2">Lỗi: {{ errorCount }}</span>
+                        <button type="button" class="clear-btn" (click)="clearResults()">
+                            <i class="fas fa-times me-1"></i> Xóa
+                        </button>
+                    </div>
+                </div>
+
+                <div class="results-table-wrapper">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Email/ID</th>
+                                <th>2FA Code</th>
+                                <th>Thời gian</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (result of results; track result.secret; let i = $index) {
+                            <tr [class.success-row]="result.status === 'success'"
+                                [class.error-row]="result.status === 'error'">
+                                <td class="stt">{{ i + 1 }}</td>
+                                <td class="email">{{ result.email }}</td>
+                                <td class="code">
+                                    @if (result.status === 'success') {
+                                    <span class="code-value">{{ result.code }}</span>
+                                    } @else if (result.status === 'generating') {
+                                    <span class="status-badge checking">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                    </span>
+                                    } @else {
+                                    <span class="text-danger">{{ result.error }}</span>
+                                    }
+                                </td>
+                                <td class="time">
+                                    @if (result.status === 'success') {
+                                    <div class="countdown" [class.warning]="result.timeRemaining <= 5">
+                                        {{ result.timeRemaining }}s
+                                    </div>
+                                    }
+                                </td>
+                                <td class="actions">
+                                    @if (result.status === 'success') {
+                                    <button type="button" class="copy-btn" (click)="copyCode(result.code)">
+                                        <i class="fas fa-copy me-1"></i> Copy
+                                    </button>
+                                    }
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+</div>

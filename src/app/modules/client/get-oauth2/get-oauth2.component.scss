@@ -1,0 +1,24 @@
+@import '../../../../styles/variables';
+@import '../check-live-facebook/check-live-facebook.component.scss';
+
+// OAuth2 specific styles
+.oauth2-btn {
+    background: $success !important;
+    box-shadow: 0 4px 15px rgba($success, 0.4) !important;
+
+    &:hover:not(:disabled) {
+        background: darken($success, 10%) !important;
+    }
+}
+
+.token-cell {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+
+    .token-value {
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: $font-size-xs;
+        color: $gray-600;
+    }
+}

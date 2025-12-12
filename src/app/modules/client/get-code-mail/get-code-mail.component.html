@@ -7,14 +7,15 @@
 
         <div class="get-code-card">
             <form [formGroup]="getCodeForm" (ngSubmit)="onGetCode()" class="get-code-form">
-                <!-- Type Get -->
+                <!-- Type Get - Multi-select Checkboxes -->
                 <div class="form-row">
                     <label class="form-label">Type Get</label>
-                    <div class="radio-group">
+                    <div class="checkbox-group">
                         @for (type of getTypes; track type) {
-                        <label class="radio-item">
-                            <input type="radio" formControlName="getType" [value]="type">
-                            <span class="radio-label">{{ type }}</span>
+                        <label class="checkbox-item" [class.active]="isGetTypeSelected(type)"
+                            (click)="toggleGetType(type); $event.preventDefault()">
+                            <input type="checkbox" [checked]="isGetTypeSelected(type)">
+                            <span class="checkbox-label">{{ type }}</span>
                         </label>
                         }
                     </div>
@@ -26,7 +27,7 @@
                     <div class="checkbox-group">
                         @for (emailType of emailTypes; track emailType) {
                         <label class="checkbox-item" [class.active]="isEmailTypeSelected(emailType)"
-                            (click)="toggleEmailType(emailType)">
+                            (click)="toggleEmailType(emailType); $event.preventDefault()">
                             <input type="checkbox" [checked]="isEmailTypeSelected(emailType)">
                             <span class="checkbox-label">{{ emailType }}</span>
                         </label>

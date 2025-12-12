@@ -7,7 +7,8 @@
 .get-code-page {
     min-height: calc(100vh - 200px);
     padding: $spacing-10 0;
-    background: $light;
+    background: var(--bg-secondary);
+    transition: background-color 0.3s ease;
 }
 
 .page-header {
@@ -17,7 +18,7 @@
     h1 {
         font-size: $font-size-3xl;
         font-weight: $font-weight-bold;
-        color: $dark;
+        color: var(--text-heading);
         margin-bottom: $spacing-3;
 
         i {
@@ -28,7 +29,7 @@
 
     p {
         font-size: $font-size-base;
-        color: $gray-500;
+        color: var(--text-muted);
         margin: 0;
     }
 }
@@ -40,11 +41,12 @@
 .get-code-card {
     max-width: 800px;
     margin: 0 auto;
-    background: $white;
+    background: var(--bg-card);
     border-radius: $radius-xl;
     padding: $spacing-8;
-    box-shadow: $shadow-md;
-    border: 1px solid $gray-200;
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--border-card);
+    transition: background-color 0.3s ease;
 }
 
 // =============================================
@@ -60,7 +62,7 @@
         display: block;
         font-size: $font-size-sm;
         font-weight: $font-weight-semibold;
-        color: $gray-700;
+        color: var(--text-secondary);
         margin-bottom: $spacing-3;
     }
 
@@ -75,13 +77,14 @@
             gap: $spacing-2;
             cursor: pointer;
             padding: $spacing-3 $spacing-5;
-            border: 2px solid $gray-200;
+            border: 2px solid var(--border-input);
             border-radius: $radius-lg;
             transition: all $transition-base;
+            background: var(--bg-input);
 
             &:hover {
                 border-color: $primary;
-                background: $primary-bg;
+                background: rgba($primary, 0.1);
             }
 
             input[type="radio"] {
@@ -94,12 +97,12 @@
             .radio-label {
                 font-size: $font-size-sm;
                 font-weight: $font-weight-medium;
-                color: $gray-700;
+                color: var(--text-secondary);
             }
 
             &:has(input:checked) {
                 border-color: $primary;
-                background: $primary-bg;
+                background: rgba($primary, 0.15);
 
                 .radio-label {
                     color: $primary;
@@ -118,11 +121,11 @@
             display: inline-flex;
             align-items: center;
             padding: $spacing-2 $spacing-4;
-            border: 1px solid $gray-300;
+            border: 1px solid var(--border-input);
             border-radius: $radius-full;
             cursor: pointer;
             transition: all $transition-base;
-            background: $white;
+            background: var(--bg-input);
 
             input[type="radio"] {
                 display: none;
@@ -131,12 +134,12 @@
             .checkbox-label {
                 font-size: $font-size-sm;
                 font-weight: $font-weight-medium;
-                color: $gray-600;
+                color: var(--text-secondary);
             }
 
             &:hover {
                 border-color: $primary;
-                background: $primary-bg;
+                background: rgba($primary, 0.1);
 
                 .checkbox-label {
                     color: $primary;
@@ -159,7 +162,7 @@
     .email-textarea {
         width: 100%;
         padding: $spacing-4;
-        border: 1px solid $gray-300;
+        border: 1px solid var(--border-input);
         border-radius: $radius-lg;
         font-family: 'Consolas', 'Monaco', monospace;
         font-size: $font-size-sm;
@@ -167,24 +170,25 @@
         resize: vertical;
         min-height: 140px;
         transition: all $transition-base;
-        background: $gray-50;
+        background: var(--bg-input);
+        color: var(--text-primary);
 
         &:focus {
             outline: none;
             border-color: $primary;
             box-shadow: 0 0 0 3px rgba($primary, 0.15);
-            background: $white;
+            background: var(--bg-input);
         }
 
         &::placeholder {
-            color: $gray-400;
+            color: var(--text-muted);
         }
     }
 
     .textarea-hint {
         margin-top: $spacing-2;
         font-size: $font-size-xs;
-        color: $gray-500;
+        color: var(--text-muted);
         display: flex;
         align-items: center;
         gap: $spacing-2;
@@ -292,7 +296,7 @@
 .get-code-results {
     margin-top: $spacing-8;
     padding-top: $spacing-6;
-    border-top: 1px solid $gray-200;
+    border-top: 1px solid var(--border-color);
 
     .results-header {
         display: flex;
@@ -303,7 +307,7 @@
         h4 {
             font-size: $font-size-lg;
             font-weight: $font-weight-semibold;
-            color: $dark;
+            color: var(--text-heading);
             margin: 0;
             display: flex;
             align-items: center;
@@ -335,7 +339,7 @@
     .no-results {
         text-align: center;
         padding: $spacing-10;
-        color: $gray-500;
+        color: var(--text-muted);
 
         i {
             font-size: $font-size-4xl;
@@ -358,25 +362,26 @@
 .results-table-wrapper {
     overflow-x: auto;
     border-radius: $radius-lg;
-    box-shadow: $shadow-sm;
+    box-shadow: var(--shadow-card);
 }
 
 .results-table {
     width: 100%;
     border-collapse: collapse;
     font-size: $font-size-sm;
+    background: var(--bg-card);
 
     th,
     td {
         padding: $spacing-3 $spacing-4;
         text-align: left;
-        border-bottom: 1px solid $gray-200;
+        border-bottom: 1px solid var(--border-color);
     }
 
     th {
-        background: $gray-100;
+        background: var(--bg-table-header);
         font-weight: $font-weight-semibold;
-        color: $gray-700;
+        color: var(--text-secondary);
         white-space: nowrap;
     }
 
@@ -384,22 +389,22 @@
         transition: background $transition-fast;
 
         &:hover {
-            background: $gray-50;
+            background: var(--bg-table-row-hover);
         }
 
         &.success-row {
-            background: rgba($success, 0.05);
+            background: rgba($success, 0.08);
 
             &:hover {
-                background: rgba($success, 0.1);
+                background: rgba($success, 0.12);
             }
         }
 
         &.error-row {
-            background: rgba($danger, 0.05);
+            background: rgba($danger, 0.08);
 
             &:hover {
-                background: rgba($danger, 0.1);
+                background: rgba($danger, 0.12);
             }
         }
     }
@@ -408,6 +413,7 @@
         width: 50px;
         text-align: center;
         font-weight: $font-weight-medium;
+        color: var(--text-primary);
     }
 
     .email {
@@ -415,11 +421,12 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        color: var(--text-primary);
     }
 
     .password {
         font-family: 'Consolas', 'Monaco', monospace;
-        color: $gray-600;
+        color: var(--text-secondary);
     }
 
     .status {
@@ -459,7 +466,7 @@
     }
 
     .no-code {
-        color: $gray-400;
+        color: var(--text-muted);
     }
 
     .copy-btn {
@@ -483,12 +490,12 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        color: $gray-600;
+        color: var(--text-secondary);
     }
 
     .date {
         white-space: nowrap;
-        color: $gray-500;
+        color: var(--text-muted);
         font-size: $font-size-xs;
     }
 

@@ -18,6 +18,7 @@ import { Product } from '../../../core/models/product.model';
 import { OrderCreate } from '../../../core/models/order.model';
 import { ProductQuantityMessage } from '../../../core/models/product-quantity-message.model';
 import { TransactionService } from '../../../core/services/wallet.service';
+import { environment } from '../../../../environments/environment';
 
 declare var bootstrap: any;
 
@@ -216,5 +217,13 @@ export class HomeComponent implements OnInit, OnDestroy {
         return latest != null ? { ...product, quantity: latest } : product;
       })
     }));
+  }
+
+  getFullImageUrl(relativePath: string | undefined): string {
+    if (!relativePath) return '';
+    if (relativePath.startsWith('http://') || relativePath.startsWith('https://')) {
+      return relativePath;
+    }
+    return `${environment.apiBaseUrl}${relativePath}`;
   }
 }

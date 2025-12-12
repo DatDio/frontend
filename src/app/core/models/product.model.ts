@@ -5,8 +5,9 @@ export interface Product {
   name: string;
   description: string;
   price: number;
-  liveTime?:string;
-  country? : string;
+  liveTime?: string;
+  country?: string;
+  imageUrl?: string;
   categoryId: number;
   categoryName: string;
   status: number;

@@ -3,8 +3,6 @@ export interface Rank {
     name: string;
     bonusPercent: number;
     minDeposit: number;
-    periodDays: number;
-    displayOrder: number;
     iconUrl?: string;
     color?: string;
     status: number;
@@ -16,8 +14,6 @@ export interface RankCreate {
     name: string;
     bonusPercent: number;
     minDeposit: number;
-    periodDays: number;
-    displayOrder: number;
     iconUrl?: string;
     color?: string;
 }
@@ -26,8 +22,6 @@ export interface RankUpdate {
     name?: string;
     bonusPercent?: number;
     minDeposit?: number;
-    periodDays?: number;
-    displayOrder?: number;
     iconUrl?: string;
     color?: string;
     status?: number;

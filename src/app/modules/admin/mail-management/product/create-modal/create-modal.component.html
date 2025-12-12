@@ -1,5 +1,5 @@
 <div class="modal-overlay">
-  <div class="modal-content" (click)="$event.stopPropagation()">
+  <div class="modal-content modal-lg" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <h5 class="modal-title">Tạo sản phẩm mới</h5>
       <button type="button" class="btn-close" (click)="onClose()"></button>
@@ -7,64 +7,86 @@
 
     <div class="modal-body">
       <form [formGroup]="createForm">
-        <div class="mb-3">
-          <label for="name" class="form-label">Tên sản phẩm <span class="text-danger">*</span></label>
-          <input id="name" type="text" class="form-control" formControlName="name" placeholder="Nhập tên sản phẩm...">
-          @if (createForm.get('name')?.invalid && createForm.get('name')?.touched) {
-          <div class="text-danger small mt-1">Tên phải ít nhất 3 ký tự</div>
-          }
-        </div>
-
-        <div class="mb-3">
-          <label for="description" class="form-label">Mô tả</label>
-          <textarea id="description" class="form-control" formControlName="description" rows="3"
-            placeholder="Nhập mô tả sản phẩm..."></textarea>
-        </div>
-
         <div class="row">
-          <div class="col-md-6 mb-3">
-            <label for="price" class="form-label">Giá <span class="text-danger">*</span></label>
-            <input id="price" type="number" class="form-control" formControlName="price" placeholder="Nhập giá..."
-              min="1">
-            @if (createForm.get('price')?.invalid && createForm.get('price')?.touched) {
-            <div class="text-danger small mt-1">Giá phải lớn hơn 0</div>
-            }
+          <!-- Image upload column -->
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Ảnh sản phẩm</label>
+            <div class="image-upload-container">
+              <div class="image-preview-wrapper" *ngIf="imagePreview">
+                <img [src]="imagePreview" alt="Preview" class="image-preview">
+                <button type="button" class="btn btn-sm btn-danger remove-btn" (click)="removeImage()">
+                  <i class="bi bi-x"></i>
+                </button>
+              </div>
+              <div class="upload-area" *ngIf="!imagePreview">
+                <input type="file" id="productImage" class="d-none"
+                  accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml" (change)="onImageSelected($event)">
+                <label for="productImage" class="upload-label">
+                  <i class="bi bi-cloud-upload fs-2"></i>
+                  <span class="d-block mt-2">Chọn ảnh</span>
+                  <small class="text-muted">JPG, PNG (tối đa 5MB)</small>
+                </label>
+              </div>
+              <div class="mt-2 text-center" *ngIf="imagePreview">
+                <input type="file" id="changeProductImage" class="d-none"
+                  accept="image/jpeg,image/png,image/gif,image/webp,image/svg+xml" (change)="onImageSelected($event)">
+                <label for="changeProductImage" class="btn btn-sm btn-outline-primary">Đổi ảnh</label>
+              </div>
+            </div>
           </div>
 
-          <div class="col-md-6 mb-3">
-            <label for="categoryId" class="form-label">Danh mục <span class="text-danger">*</span></label>
-            <select id="categoryId" class="form-select" formControlName="categoryId">
-              <option value="">-- Chọn danh mục --</option>
-              @for (category of categories; track category.id) {
-              <option [value]="category.id">{{ category.name }}</option>
+          <!-- Form fields column -->
+          <div class="col-md-8">
+            <div class="mb-3">
+              <label for="name" class="form-label">Tên sản phẩm <span class="text-danger">*</span></label>
+              <input id="name" type="text" class="form-control" formControlName="name"
+                placeholder="Nhập tên sản phẩm...">
+              @if (createForm.get('name')?.invalid && createForm.get('name')?.touched) {
+              <div class="text-danger small mt-1">Tên phải ít nhất 3 ký tự</div>
               }
-            </select>
-            @if (createForm.get('categoryId')?.invalid && createForm.get('categoryId')?.touched) {
-            <div class="text-danger small mt-1">Vui lòng chọn danh mục</div>
-            }
-          </div>
-        </div>
+            </div>
 
-        <div class="row">
-          <div class="col-md-6 mb-3">
-            <label for="liveTime" class="form-label">LiveTime</label>
-            <input id="liveTime" type="text" class="form-control" formControlName="liveTime"
-              placeholder="Ví dụ: 3-5 giờ hoặc 6-12 Tháng">
-          </div>
+            <div class="mb-3">
+              <label for="description" class="form-label">Mô tả</label>
+              <textarea id="description" class="form-control" formControlName="description" rows="2"
+                placeholder="Nhập mô tả sản phẩm..."></textarea>
+            </div>
 
-          <div class="col-md-6 mb-3">
-            <label for="country" class="form-label">Quốc gia</label>
-            <input id="country" type="text" class="form-control" formControlName="country"
-              placeholder="Ví dụ: Việt Nam">
-          </div>
-        </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="price" class="form-label">Giá <span class="text-danger">*</span></label>
+                <input id="price" type="number" class="form-control" formControlName="price" placeholder="Nhập giá..."
+                  min="1">
+                @if (createForm.get('price')?.invalid && createForm.get('price')?.touched) {
+                <div class="text-danger small mt-1">Giá phải lớn hơn 0</div>
+                }
+              </div>
 
-        <div class="mb-3">
-          <label for="status" class="form-label">Trạng thái <span class="text-danger">*</span></label>
-          <select id="status" class="form-select" formControlName="status">
-            <option value="1">Hoạt động</option>
-            <option value="0">Không hoạt động</option>
-          </select>
+              <div class="col-md-6 mb-3">
+                <label for="categoryId" class="form-label">Danh mục <span class="text-danger">*</span></label>
+                <select id="categoryId" class="form-select" formControlName="categoryId">
+                  <option value="">-- Chọn danh mục --</option>
+                  @for (category of categories; track category.id) {
+                  <option [value]="category.id">{{ category.name }}</option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="liveTime" class="form-label">LiveTime</label>
+                <input id="liveTime" type="text" class="form-control" formControlName="liveTime"
+                  placeholder="Ví dụ: 3-5 giờ">
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label for="country" class="form-label">Quốc gia</label>
+                <input id="country" type="text" class="form-control" formControlName="country"
+                  placeholder="Ví dụ: Việt Nam">
+              </div>
+            </div>
+          </div>
         </div>
       </form>
     </div>

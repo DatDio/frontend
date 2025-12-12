@@ -19,7 +19,7 @@ export class ProductService {
    * Get list of products
    */
   list(filter?: ProductFilter): Observable<ApiResponse<PaginatedResponse<Product>>> {
-   
+
     const params = this.createProductFilter(filter);
 
     return this.httpClient
@@ -59,9 +59,9 @@ export class ProductService {
   }
 
   /**
-   * Create new product
+   * Create new product with FormData
    */
-  create(data: ProductCreate): Observable<ApiResponse<Product>> {
+  create(data: FormData): Observable<ApiResponse<Product>> {
     this.loaderService.show();
 
     return this.httpClient
@@ -72,13 +72,13 @@ export class ProductService {
   }
 
   /**
-   * Update product
+   * Update product with FormData
    */
-  update(data: ProductUpdate): Observable<ApiResponse<Product>> {
+  update(id: number, data: FormData): Observable<ApiResponse<Product>> {
     this.loaderService.show();
 
     return this.httpClient
-      .put<ApiResponse<Product>>(AdminProductApi.UPDATE(data.id), data)
+      .put<ApiResponse<Product>>(AdminProductApi.UPDATE(id), data)
       .pipe(
         finalize(() => this.loaderService.hide())
       );

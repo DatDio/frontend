@@ -67,8 +67,6 @@
                             <th>Tên</th>
                             <th>% Bonus</th>
                             <th>Mức nạp tối thiểu</th>
-                            <th>Số ngày tính</th>
-                            <th>Thứ tự</th>
                             <th>Trạng thái</th>
                             <th>Hành động</th>
                         </tr>
@@ -92,8 +90,6 @@
                             <td>
                                 <span class="text-primary fw-bold">{{ formatCurrency(rank.minDeposit) }} VNĐ</span>
                             </td>
-                            <td>{{ rank.periodDays }} ngày</td>
-                            <td>{{ rank.displayOrder }}</td>
                             <td>
                                 <app-active-status-badge [status]="rank.status"></app-active-status-badge>
                             </td>

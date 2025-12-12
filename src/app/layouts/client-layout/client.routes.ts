@@ -44,5 +44,21 @@ export const clientRoutes: Routes = [
   {
     path: 'tools',
     loadComponent: () => import('../../modules/client/tools/tools.component').then(m => m.ToolsComponent)
+  },
+  {
+    path: 'check-live-facebook',
+    loadComponent: () => import('../../modules/client/check-live-facebook/check-live-facebook.component').then(m => m.CheckLiveFacebookComponent)
+  },
+  {
+    path: 'check-live-mail',
+    loadComponent: () => import('../../modules/client/check-live-mail/check-live-mail.component').then(m => m.CheckLiveMailComponent)
+  },
+  {
+    path: 'get-2fa',
+    loadComponent: () => import('../../modules/client/get-2fa/get-2fa.component').then(m => m.Get2FAComponent)
+  },
+  {
+    path: 'get-oauth2',
+    loadComponent: () => import('../../modules/client/get-oauth2/get-oauth2.component').then(m => m.GetOAuth2Component)
   }
 ];

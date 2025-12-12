@@ -1,0 +1,108 @@
+<div class="tool-page">
+    <div class="container">
+        <div class="page-header">
+            <h1><i class="fab fa-facebook me-2"></i> Check Live Facebook</h1>
+            <p>Kiểm tra trạng thái hoạt động của tài khoản Facebook bằng UID</p>
+        </div>
+
+        <div class="tool-card">
+            <form [formGroup]="checkForm" (ngSubmit)="onCheck()" class="tool-form">
+                <!-- UID Input -->
+                <div class="form-row">
+                    <label class="form-label">
+                        UID Facebook <span class="item-count">[{{ uidCount }}]</span>
+                    </label>
+                    <textarea formControlName="uidData" class="data-textarea" rows="8"
+                        placeholder="Nhập UID, mỗi dòng một UID&#10;100000123456789&#10;100000987654321"></textarea>
+                    <div class="textarea-hint">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Mỗi dòng một UID Facebook
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button type="submit" class="submit-btn" [disabled]="checkForm.invalid || isLoading">
+                        @if (isLoading) {
+                        <span class="spinner-border spinner-border-sm me-2"></span>
+                        Đang kiểm tra...
+                        } @else {
+                        <i class="fas fa-search me-2"></i> Check Live
+                        }
+                    </button>
+                </div>
+            </form>
+
+            <!-- Results Section -->
+            @if (showResults) {
+            <div class="results-section">
+                <div class="results-header">
+                    <h4><i class="fas fa-list me-2"></i> Kết quả ({{ results.length }})</h4>
+                    <div class="results-actions">
+                        <button type="button" class="copy-success-btn" (click)="copyAllLive()">
+                            <i class="fas fa-copy me-1"></i> Copy Live ({{ liveCount }})
+                        </button>
+                        <button type="button" class="copy-error-btn" (click)="copyAllDie()">
+                            <i class="fas fa-copy me-1"></i> Copy Die ({{ dieCount }})
+                        </button>
+                        <button type="button" class="clear-btn" (click)="clearResults()">
+                            <i class="fas fa-times me-1"></i> Xóa
+                        </button>
+                    </div>
+                </div>
+
+                <div class="results-table-wrapper">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Avatar</th>
+                                <th>UID</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (result of results; track result.uid; let i = $index) {
+                            <tr [class.success-row]="result.status === 'live'"
+                                [class.error-row]="result.status === 'die'"
+                                [class.checking-row]="result.status === 'checking'">
+                                <td class="stt">{{ i + 1 }}</td>
+                                <td class="avatar">
+                                    @if (result.status === 'live' && result.avatar) {
+                                    <img [src]="result.avatar" alt="Avatar" class="fb-avatar">
+                                    } @else if (result.status === 'checking') {
+                                    <div class="avatar-placeholder checking">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                    </div>
+                                    } @else {
+                                    <div class="avatar-placeholder">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    }
+                                </td>
+                                <td class="uid">{{ result.uid }}</td>
+                                <td class="status">
+                                    @if (result.status === 'checking') {
+                                    <span class="status-badge checking">
+                                        <i class="fas fa-spinner fa-spin me-1"></i> Đang kiểm tra
+                                    </span>
+                                    } @else if (result.status === 'live') {
+                                    <span class="status-badge success">
+                                        <i class="fas fa-check-circle me-1"></i> Live
+                                    </span>
+                                    } @else {
+                                    <span class="status-badge error">
+                                        <i class="fas fa-times-circle me-1"></i> Die
+                                    </span>
+                                    }
+                                </td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            }
+        </div>
+    </div>
+</div>

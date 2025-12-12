@@ -31,31 +31,40 @@ export class ToolsComponent {
             gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
         },
         {
-            id: 'check-mail',
-            name: 'Check Mail',
-            description: 'Kiểm tra trạng thái hoạt động của email',
-            icon: 'bi bi-envelope-check',
-            route: '',
-            status: 'coming-soon',
-            gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'
+            id: 'check-live-facebook',
+            name: 'Check Live Facebook',
+            description: 'Kiểm tra trạng thái hoạt động của tài khoản Facebook bằng UID',
+            icon: 'bi bi-facebook',
+            route: '/check-live-facebook',
+            status: 'active',
+            gradient: 'linear-gradient(135deg, #1877f2 0%, #3b5998 100%)'
         },
         {
-            id: 'read-inbox',
-            name: 'Đọc hòm thư',
-            description: 'Đọc nội dung email trong hòm thư',
-            icon: 'bi bi-inbox',
-            route: '',
-            status: 'coming-soon',
-            gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
+            id: 'check-live-mail',
+            name: 'Check Live Mail',
+            description: 'Kiểm tra trạng thái hoạt động của email Hotmail/Outlook',
+            icon: 'bi bi-envelope-check',
+            route: '/check-live-mail',
+            status: 'active',
+            gradient: 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'
         },
         {
             id: 'get-2fa',
             name: 'Get 2FA',
-            description: 'Lấy mã xác thực 2 bước',
+            description: 'Lấy mã xác thực 2 bước (TOTP) từ secret key',
             icon: 'bi bi-shield-lock',
-            route: '',
-            status: 'coming-soon',
+            route: '/get-2fa',
+            status: 'active',
             gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
+        },
+        {
+            id: 'get-oauth2',
+            name: 'Get OAuth2 Token',
+            description: 'Lấy Access Token từ Refresh Token cho email',
+            icon: 'bi bi-key',
+            route: '/get-oauth2',
+            status: 'active',
+            gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
         }
     ];
 }

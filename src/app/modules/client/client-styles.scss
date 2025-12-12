@@ -1,6 +1,6 @@
 /* =============================================
    CLIENT MODULES GLOBAL STYLES
-   Design System: Blue, Black, White
+   Design System: Blue, Black, White with Dark Theme Support
    ============================================= */
 
 @import '../../../styles/variables';
@@ -12,7 +12,7 @@
 .page-header {
   padding: $spacing-6 0;
   margin-bottom: $spacing-6;
-  border-bottom: 1px solid $gray-200;
+  border-bottom: 1px solid var(--border-color);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -22,7 +22,7 @@
   .page-title {
     font-size: $font-size-3xl;
     font-weight: $font-weight-bold;
-    color: $dark;
+    color: var(--text-heading);
     margin: 0;
 
     i {
@@ -33,7 +33,7 @@
 
   .page-description {
     font-size: $font-size-base;
-    color: $gray-500;
+    color: var(--text-muted);
     margin: $spacing-2 0 0 0;
     width: 100%;
   }
@@ -63,17 +63,18 @@
 // =============================================
 
 .search-section {
-  background: $white;
+  background: var(--bg-card);
   padding: $spacing-5;
   border-radius: $radius-xl;
-  box-shadow: $shadow-sm;
+  box-shadow: var(--shadow-card);
   margin-bottom: $spacing-6;
-  border: 1px solid $gray-200;
+  border: 1px solid var(--border-card);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 
   .search-title {
     font-size: $font-size-xs;
     font-weight: $font-weight-bold;
-    color: $gray-500;
+    color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: $spacing-4;
@@ -124,28 +125,29 @@
 // =============================================
 
 .empty-state {
-  background: $light;
+  background: var(--bg-secondary);
   padding: $spacing-12 $spacing-6;
   border-radius: $radius-xl;
   text-align: center;
   margin: $spacing-6 0;
-  border: 2px dashed $gray-300;
+  border: 2px dashed var(--border-color);
+  transition: background-color 0.3s ease, border-color 0.3s ease;
 
   .empty-icon {
     font-size: 4rem;
-    color: $gray-400;
+    color: var(--text-muted);
     margin-bottom: $spacing-4;
   }
 
   .empty-title {
     font-size: $font-size-xl;
     font-weight: $font-weight-bold;
-    color: $dark;
+    color: var(--text-heading);
     margin-bottom: $spacing-2;
   }
 
   .empty-description {
-    color: $gray-500;
+    color: var(--text-muted);
     margin-bottom: $spacing-6;
     font-size: $font-size-sm;
   }
@@ -171,25 +173,25 @@
 // =============================================
 
 .card-item {
-  background: $white;
-  border: 1px solid $gray-200;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
   border-radius: $radius-xl;
   overflow: hidden;
   transition: all $transition-base;
-  box-shadow: $shadow-sm;
+  box-shadow: var(--shadow-card);
   display: flex;
   flex-direction: column;
 
   &:hover {
-    box-shadow: $shadow-lg;
+    box-shadow: var(--shadow-card-hover);
     transform: translateY(-4px);
     border-color: $primary;
   }
 
   .card-header {
     padding: $spacing-4 $spacing-5;
-    background: linear-gradient(135deg, $gray-50 0%, $white 100%);
-    border-bottom: 1px solid $gray-200;
+    background: var(--bg-table-header);
+    border-bottom: 1px solid var(--border-card);
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -198,7 +200,7 @@
     .card-title {
       font-size: $font-size-base;
       font-weight: $font-weight-bold;
-      color: $dark;
+      color: var(--text-heading);
       margin: 0;
       flex: 1;
     }
@@ -211,22 +213,22 @@
       white-space: nowrap;
 
       &.badge-success {
-        background: $success-bg;
+        background: rgba($success, 0.15);
         color: $success;
       }
 
       &.badge-warning {
-        background: $warning-bg;
+        background: rgba($warning, 0.15);
         color: darken($warning, 15%);
       }
 
       &.badge-danger {
-        background: $danger-bg;
+        background: rgba($danger, 0.15);
         color: $danger;
       }
 
       &.badge-info {
-        background: $info-bg;
+        background: rgba($info, 0.15);
         color: $info;
       }
     }
@@ -246,7 +248,7 @@
         .meta-label {
           font-size: $font-size-xs;
           font-weight: $font-weight-bold;
-          color: $gray-500;
+          color: var(--text-muted);
           text-transform: uppercase;
           letter-spacing: 0.5px;
           margin-bottom: $spacing-1;
@@ -255,7 +257,7 @@
         .meta-value {
           font-size: $font-size-lg;
           font-weight: $font-weight-bold;
-          color: $dark;
+          color: var(--text-heading);
 
           &.text-primary {
             color: $primary;
@@ -266,15 +268,15 @@
 
     .card-description {
       font-size: $font-size-sm;
-      color: $gray-600;
+      color: var(--text-secondary);
       line-height: $line-height-relaxed;
     }
   }
 
   .card-footer {
     padding: $spacing-4 $spacing-5;
-    background: $gray-50;
-    border-top: 1px solid $gray-200;
+    background: var(--bg-table-header);
+    border-top: 1px solid var(--border-card);
     display: flex;
     gap: $spacing-3;
 
@@ -289,12 +291,13 @@
 // =============================================
 
 .table-container {
-  background: $white;
+  background: var(--bg-card);
   border-radius: $radius-xl;
-  box-shadow: $shadow-sm;
+  box-shadow: var(--shadow-card);
   overflow: hidden;
   margin-bottom: $spacing-6;
-  border: 1px solid $gray-200;
+  border: 1px solid var(--border-card);
+  transition: background-color 0.3s ease;
 }
 
 .table-responsive {
@@ -313,8 +316,8 @@
 }
 
 .stat-card {
-  background: $white;
-  border: 1px solid $gray-200;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
   border-radius: $radius-xl;
   padding: $spacing-5;
   display: flex;
@@ -323,7 +326,7 @@
   transition: all $transition-base;
 
   &:hover {
-    box-shadow: $shadow-md;
+    box-shadow: var(--shadow-card-hover);
     transform: translateY(-2px);
   }
 
@@ -337,22 +340,22 @@
     font-size: $font-size-2xl;
 
     &.icon-primary {
-      background: $primary-bg;
+      background: rgba($primary, 0.15);
       color: $primary;
     }
 
     &.icon-success {
-      background: $success-bg;
+      background: rgba($success, 0.15);
       color: $success;
     }
 
     &.icon-warning {
-      background: $warning-bg;
+      background: rgba($warning, 0.15);
       color: darken($warning, 10%);
     }
 
     &.icon-danger {
-      background: $danger-bg;
+      background: rgba($danger, 0.15);
       color: $danger;
     }
   }
@@ -363,14 +366,14 @@
     .stat-value {
       font-size: $font-size-2xl;
       font-weight: $font-weight-bold;
-      color: $dark;
+      color: var(--text-heading);
       line-height: 1;
       margin-bottom: $spacing-1;
     }
 
     .stat-label {
       font-size: $font-size-sm;
-      color: $gray-500;
+      color: var(--text-muted);
     }
   }
 }
@@ -380,13 +383,13 @@
 // =============================================
 
 .nav-tabs-custom {
-  border-bottom: 2px solid $gray-200;
+  border-bottom: 2px solid var(--border-color);
   gap: $spacing-2;
 
   .nav-link {
     padding: $spacing-3 $spacing-5;
     font-weight: $font-weight-medium;
-    color: $gray-500;
+    color: var(--text-muted);
     border: none;
     border-bottom: 2px solid transparent;
     margin-bottom: -2px;
@@ -411,19 +414,20 @@
 // =============================================
 
 .form-section {
-  background: $white;
-  border: 1px solid $gray-200;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
   border-radius: $radius-xl;
   padding: $spacing-6;
   margin-bottom: $spacing-6;
+  transition: background-color 0.3s ease;
 
   .section-title {
     font-size: $font-size-lg;
     font-weight: $font-weight-bold;
-    color: $dark;
+    color: var(--text-heading);
     margin-bottom: $spacing-5;
     padding-bottom: $spacing-4;
-    border-bottom: 1px solid $gray-200;
+    border-bottom: 1px solid var(--border-color);
 
     i {
       color: $primary;
@@ -461,7 +465,7 @@
 
 .section-divider {
   height: 1px;
-  background: $gray-200;
+  background: var(--border-color);
   margin: $spacing-6 0;
 }
 
@@ -486,7 +490,7 @@
     transition: all $transition-fast;
 
     &.btn-view {
-      background: $info-bg;
+      background: rgba($info, 0.15);
       color: $info;
 
       &:hover {
@@ -496,7 +500,7 @@
     }
 
     &.btn-edit {
-      background: $warning-bg;
+      background: rgba($warning, 0.15);
       color: darken($warning, 10%);
 
       &:hover {
@@ -506,7 +510,7 @@
     }
 
     &.btn-delete {
-      background: $danger-bg;
+      background: rgba($danger, 0.15);
       color: $danger;
 
       &:hover {
@@ -523,7 +527,7 @@
 
 .copy-btn {
   padding: $spacing-2 $spacing-3;
-  background: $primary-bg;
+  background: rgba($primary, 0.15);
   color: $primary;
   border: none;
   border-radius: $radius-md;
@@ -551,11 +555,11 @@
 }
 
 .text-dark {
-  color: $dark !important;
+  color: var(--text-heading) !important;
 }
 
 .text-muted {
-  color: $gray-500 !important;
+  color: var(--text-muted) !important;
 }
 
 .text-success {
@@ -571,12 +575,13 @@
 }
 
 .bg-light {
-  background: $light !important;
+  background: var(--bg-secondary) !important;
 }
 
 .bg-white {
-  background: $white !important;
+  background: var(--bg-card) !important;
 }
+
 // =============================================
 // SUPPORT PAGE
 // =============================================
@@ -587,16 +592,16 @@
   padding: $spacing-6;
 
   .support-card {
-    background: $white;
-    border: 1px solid $gray-200;
+    background: var(--bg-card);
+    border: 1px solid var(--border-card);
     border-radius: $radius-xl;
     padding: $spacing-8;
     text-align: center;
-    box-shadow: $shadow-md;
+    box-shadow: var(--shadow-card);
     transition: all $transition-base;
 
     &:hover {
-      box-shadow: $shadow-lg;
+      box-shadow: var(--shadow-card-hover);
       transform: translateY(-2px);
     }
   }
@@ -605,7 +610,7 @@
     width: 100px;
     height: 100px;
     margin: 0 auto $spacing-6;
-    background: $primary-bg;
+    background: rgba($primary, 0.15);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -616,13 +621,13 @@
   .support-title {
     font-size: $font-size-2xl;
     font-weight: $font-weight-bold;
-    color: $dark;
+    color: var(--text-heading);
     margin-bottom: $spacing-4;
   }
 
   .support-description {
     font-size: $font-size-base;
-    color: $gray-600;
+    color: var(--text-secondary);
     line-height: $line-height-relaxed;
     margin-bottom: $spacing-6;
   }

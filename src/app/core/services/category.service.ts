@@ -59,9 +59,9 @@ export class CategoryService {
     }
 
     /**
-     * Create new category
+     * Create new category with FormData
      */
-    create(data: CategoryCreate): Observable<ApiResponse<Category>> {
+    create(data: FormData): Observable<ApiResponse<Category>> {
         this.loaderService.show();
 
         return this.httpClient
@@ -72,13 +72,13 @@ export class CategoryService {
     }
 
     /**
-     * Update category
+     * Update category with FormData
      */
-    update(data: CategoryUpdate): Observable<ApiResponse<Category>> {
+    update(id: number, data: FormData): Observable<ApiResponse<Category>> {
         this.loaderService.show();
 
         return this.httpClient
-            .put<ApiResponse<Category>>(AdminCategoryApi.UPDATE(data.id), data)
+            .put<ApiResponse<Category>>(AdminCategoryApi.UPDATE(id), data)
             .pipe(
                 finalize(() => this.loaderService.hide())
             );

@@ -1,3 +1,29 @@
+@import '../../../../styles/variables';
+
 .terms-page {
     padding: 2rem;
+    background: var(--bg-card);
+    border-radius: $radius-xl;
+    box-shadow: var(--shadow-card);
+    transition: background-color 0.3s ease;
+
+    section {
+        p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        ul {
+            color: var(--text-secondary);
+
+            li {
+                margin-bottom: 0.5rem;
+                line-height: 1.6;
+            }
+        }
+
+        strong {
+            color: var(--text-heading);
+        }
+    }
 }

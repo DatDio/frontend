@@ -12,7 +12,7 @@
   h1 {
     font-size: $font-size-3xl;
     font-weight: $font-weight-bold;
-    color: $dark;
+    color: var(--text-heading);
     margin-bottom: $spacing-2;
 
     i {
@@ -22,7 +22,7 @@
   }
 
   .text-muted {
-    color: $gray-500;
+    color: var(--text-muted);
     font-size: $font-size-sm;
   }
 }
@@ -32,33 +32,19 @@
 // =============================================
 
 .search-card {
-  background: $white;
+  background: var(--bg-card);
   border-radius: $radius-xl;
-  border: 1px solid $gray-200;
+  border: 1px solid var(--border-card);
   padding: $spacing-5;
   margin-bottom: $spacing-6;
-  box-shadow: $shadow-sm;
+  box-shadow: var(--shadow-card);
+  transition: background-color 0.3s ease;
 
   .form-label {
     font-weight: $font-weight-semibold;
-    color: $gray-700;
+    color: var(--text-secondary);
     font-size: $font-size-sm;
     margin-bottom: $spacing-2;
-  }
-}
-
-.form-control,
-.form-select {
-  border: 1px solid $gray-300;
-  border-radius: $radius-lg;
-  padding: $spacing-3 $spacing-4;
-  font-size: $font-size-sm;
-  color: $dark;
-  transition: all $transition-base;
-
-  &:focus {
-    border-color: $primary;
-    box-shadow: 0 0 0 3px rgba($primary, 0.15);
   }
 }
 
@@ -80,17 +66,17 @@
 }
 
 .btn-refresh {
-  background: $gray-100;
-  border: 1px solid $gray-300;
-  color: $gray-700;
+  background: var(--bg-table-header);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
   font-weight: $font-weight-semibold;
   padding: $spacing-3 $spacing-5;
   border-radius: $radius-lg;
   transition: all $transition-base;
 
   &:hover {
-    background: $gray-200;
-    color: $dark;
+    background: var(--bg-table-row-hover);
+    color: var(--text-heading);
   }
 }
 
@@ -99,15 +85,16 @@
 // =============================================
 
 .order-table-card {
-  background: $white;
+  background: var(--bg-card);
   border-radius: $radius-xl;
-  border: 1px solid $gray-200;
-  box-shadow: $shadow-sm;
+  border: 1px solid var(--border-card);
+  box-shadow: var(--shadow-card);
   overflow: hidden;
+  transition: background-color 0.3s ease;
 
   .card-header {
-    background: $gray-50;
-    border-bottom: 1px solid $gray-200;
+    background: var(--bg-table-header);
+    border-bottom: 1px solid var(--border-color);
     padding: $spacing-4 $spacing-5;
     display: flex;
     justify-content: space-between;
@@ -116,7 +103,7 @@
     h5 {
       font-size: $font-size-base;
       font-weight: $font-weight-semibold;
-      color: $dark;
+      color: var(--text-heading);
       margin: 0;
     }
   }
@@ -124,6 +111,7 @@
 
 .table {
   margin: 0;
+  color: var(--text-primary);
 
   thead {
     background: $dark !important;
@@ -146,11 +134,15 @@
 
   tbody {
     tr {
-      border-bottom: 1px solid $gray-200;
+      border-bottom: 1px solid var(--border-color);
       transition: all $transition-fast;
 
       &:hover {
-        background: $gray-50;
+        background: var(--bg-table-row-hover) !important;
+
+        td {
+          background: var(--bg-table-row-hover) !important;
+        }
       }
 
       &:last-child {
@@ -161,7 +153,8 @@
         padding: $spacing-4;
         vertical-align: middle;
         font-size: $font-size-sm;
-        color: $gray-700;
+        color: var(--text-primary);
+        background: transparent;
       }
     }
   }
@@ -204,7 +197,7 @@
 }
 
 .badge-quantity {
-  background: $primary-bg;
+  background: rgba($primary, 0.15);
   color: $primary;
   border: 1px solid rgba($primary, 0.2);
   padding: $spacing-1 $spacing-3;
@@ -226,12 +219,13 @@
 .account-preview {
   resize: none;
   min-width: 240px;
-  background: $gray-50;
-  border: 1px dashed $gray-300;
+  background: var(--bg-table-header);
+  border: 1px dashed var(--border-color);
   border-radius: $radius-md;
   font-family: 'Consolas', 'Monaco', monospace;
   font-size: $font-size-xs;
   padding: $spacing-2;
+  color: var(--text-primary);
 }
 
 .btn-copy {
@@ -265,12 +259,14 @@
   font-family: 'Consolas', 'Monaco', monospace;
   font-size: $font-size-xs;
   white-space: nowrap;
+  color: var(--text-primary);
 }
 
 .product-name-cell,
 .amount-cell,
 .date-cell {
   white-space: nowrap;
+  color: var(--text-primary);
 }
 
 // =============================================
@@ -278,7 +274,7 @@
 // =============================================
 
 .no-data-text {
-  color: $gray-500;
+  color: var(--text-muted);
 }
 
 .empty-state-inline {
@@ -290,12 +286,12 @@
 
   i {
     font-size: $font-size-3xl;
-    color: $gray-400;
+    color: var(--text-muted);
   }
 
   span {
     font-size: $font-size-sm;
-    color: $gray-500;
+    color: var(--text-muted);
   }
 }
 
@@ -341,4 +337,8 @@
       width: 100%;
     }
   }
+}
+
+.card-footer {
+  padding: 0px;
 }

@@ -1,55 +1,72 @@
 <div class="tools-page">
     <div class="container py-4">
-        <!-- Page Header -->
-        <div class="page-header mb-4">
-            <h1><i class="bi bi-tools me-2"></i>Công cụ tiện ích</h1>
-            <p class="text-muted">Các công cụ hỗ trợ thao tác với email</p>
+        <!-- Section Header -->
+        <div class="section-header">
+            <h2><i class="bi bi-tools me-2"></i>Công cụ tiện ích</h2>
+            <p>Các công cụ hỗ trợ marketing tự động</p>
         </div>
 
-        <!-- Tools Grid -->
+        <!-- Tools Grid - Same as home page -->
         <div class="tools-grid">
-            @for (tool of tools; track tool.id) {
-            <div class="tool-card" [class.coming-soon]="tool.status === 'coming-soon'">
-                @if (tool.status === 'active') {
-                <a [routerLink]="tool.route" class="tool-card-inner" [style.background]="tool.gradient">
-                    <div class="tool-icon">
-                        @if (tool.icon.startsWith('assets/')) {
-                        <img [src]="tool.icon" [alt]="tool.name">
-                        } @else {
-                        <i [class]="tool.icon"></i>
-                        }
-                    </div>
-                    <div class="tool-info">
-                        <h3>{{ tool.name }}</h3>
-                        <p>{{ tool.description }}</p>
-                        <span class="tool-status active">
-                            <i class="bi bi-check-circle-fill me-1"></i>Hoạt động
-                        </span>
-                    </div>
-                    <div class="tool-arrow">
-                        <i class="bi bi-arrow-right"></i>
-                    </div>
-                </a>
-                } @else {
-                <div class="tool-card-inner disabled" [style.background]="tool.gradient">
-                    <div class="tool-icon">
-                        @if (tool.icon.startsWith('assets/')) {
-                        <img [src]="tool.icon" [alt]="tool.name">
-                        } @else {
-                        <i [class]="tool.icon"></i>
-                        }
-                    </div>
-                    <div class="tool-info">
-                        <h3>{{ tool.name }}</h3>
-                        <p>{{ tool.description }}</p>
-                        <span class="tool-status coming-soon">
-                            <i class="bi bi-clock-fill me-1"></i>Sắp ra mắt
-                        </span>
-                    </div>
+            <!-- Get Code -->
+            <a routerLink="/get-code-mail" class="tool-card">
+                <div class="tool-icon">
+                    <i class="bi bi-code-slash"></i>
                 </div>
-                }
-            </div>
-            }
+                <div class="tool-info">
+                    <h4>Get Code</h4>
+                    <p>Lấy mã OTP từ Hotmail</p>
+                </div>
+                <span class="tool-status active">Hoạt động</span>
+            </a>
+
+            <!-- Check Live FB -->
+            <a routerLink="/check-live-facebook" class="tool-card">
+                <div class="tool-icon">
+                    <i class="bi bi-facebook"></i>
+                </div>
+                <div class="tool-info">
+                    <h4>Check Live FB</h4>
+                    <p>Kiểm tra tài khoản Facebook</p>
+                </div>
+                <span class="tool-status active">Hoạt động</span>
+            </a>
+
+            <!-- Check Live Mail -->
+            <a routerLink="/check-live-mail" class="tool-card">
+                <div class="tool-icon">
+                    <i class="bi bi-envelope-fill"></i>
+                </div>
+                <div class="tool-info">
+                    <h4>Check Live Mail</h4>
+                    <p>Kiểm tra email còn sống</p>
+                </div>
+                <span class="tool-status active">Hoạt động</span>
+            </a>
+
+            <!-- Get 2FA -->
+            <a routerLink="/get-2fa" class="tool-card">
+                <div class="tool-icon">
+                    <i class="bi bi-shield-lock-fill"></i>
+                </div>
+                <div class="tool-info">
+                    <h4>Get 2FA</h4>
+                    <p>Lấy mã xác thực 2 bước</p>
+                </div>
+                <span class="tool-status active">Hoạt động</span>
+            </a>
+
+            <!-- Get OAuth2 -->
+            <a routerLink="/get-oauth2" class="tool-card">
+                <div class="tool-icon">
+                    <i class="bi bi-key-fill"></i>
+                </div>
+                <div class="tool-info">
+                    <h4>Get OAuth2</h4>
+                    <p>Lấy token OAuth2</p>
+                </div>
+                <span class="tool-status active">Hoạt động</span>
+            </a>
         </div>
     </div>
 </div>

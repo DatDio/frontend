@@ -54,6 +54,12 @@
             {{ (authService.currentUser$ | async)?.email }}
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
+            @if (authService.isAdmin()) {
+            <li><a class="dropdown-item" routerLink="/admin">Quản trị</a></li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            }
             <li><a class="dropdown-item" routerLink="/profile">Profile</a></li>
             <li>
               <hr class="dropdown-divider">
@@ -221,8 +227,20 @@
         </ul>
       </div>
       <div class="col-md-4 mb-3">
-        <h6>Liên hệ</h6>
-        <p>Email: support&#64;mailshop.com</p>
+        <h6 class="mr-2">Liên hệ</h6>
+        <ul class="list-unstyled">
+          <li>
+            <a href="https://t.me/mailshopgroupchat" target="_blank" rel="noopener noreferrer">
+              <i class="bi bi-telegram me-2"></i>Group Chat - Tham gia nhóm chat hỗ trợ
+            </a>
+          </li>
+          <li>
+            <a href="https://t.me/mailshopsupport" target="_blank" rel="noopener noreferrer">
+              <i class="bi bi-telegram me-2"></i>Kênh Thông Báo - Cập nhật tin tức mới nhất
+            </a>
+          </li>
+        </ul>
+
       </div>
     </div>
     <hr>

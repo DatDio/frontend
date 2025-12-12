@@ -31,15 +31,13 @@ export class OrderService {
 
     return this.httpClient
       .get<ApiResponse<PaginatedResponse<Order>>>(AdminOrderApi.SEARCH, { params })
-      
+
   }
 
   /**
  * Client: Get current user's orders
  */
   searchMyOrders(filter?: OrderFilter): Observable<ApiResponse<PaginatedResponse<Order>>> {
-    this.loaderService.show();
-
     let params = new HttpParams()
       .set('page', (filter?.page ?? 0).toString())
       .set('limit', (filter?.limit ?? 10).toString())

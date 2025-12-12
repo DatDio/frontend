@@ -5,6 +5,7 @@ import { Category } from '../../../../../core/models/category.model';
 import { Product } from '../../../../../core/models/product.model';
 import { ProductService } from '../../../../../core/services/product.service';
 import { NotificationService } from '../../../../../core/services/notification.service';
+import { environment } from '../../../../../../environments/environment';
 
 @Component({
   selector: 'app-product-update-modal',
@@ -25,6 +26,10 @@ export class ProductUpdateModalComponent implements OnInit {
 
   updateForm!: FormGroup;
   isLoading = false;
+
+  // Image upload
+  imagePreview: string | null = null;
+  imageFile: File | null = null;
 
   ngOnInit(): void {
     this.initForm();
@@ -54,7 +59,71 @@ export class ProductUpdateModalComponent implements OnInit {
         categoryId: this.product.categoryId,
         status: this.product.status
       });
+      // Set preview for existing image
+      if (this.product.imageUrl) {
+        this.imagePreview = this.getFullImageUrl(this.product.imageUrl);
+      }
     }
+  }
+
+  private getFullImageUrl(imageUrl: string): string {
+    if (!imageUrl) return '';
+    if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+      return imageUrl;
+    }
+    return environment.apiBaseUrl + imageUrl;
+  }
+
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+      if (!allowedTypes.includes(file.type)) {
+        this.notificationService.error('Chỉ chấp nhận file ảnh (jpg, png, gif, webp, svg)');
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        this.notificationService.error('Kích thước file không được vượt quá 5MB');
+        return;
+      }
+
+      this.imageFile = file;
+      this.imagePreview = URL.createObjectURL(file);
+    }
+  }
+
+  removeImage(): void {
+    this.imageFile = null;
+    this.imagePreview = null;
+  }
+
+  private buildFormData(): FormData {
+    const formData = new FormData();
+    const formValue = this.updateForm.value;
+
+    formData.append('id', this.product.id.toString());
+    formData.append('name', formValue.name.trim());
+    if (formValue.description?.trim()) {
+      formData.append('description', formValue.description.trim());
+    }
+    formData.append('price', formValue.price.toString());
+    if (formValue.liveTime?.trim()) {
+      formData.append('liveTime', formValue.liveTime.trim());
+    }
+    if (formValue.country?.trim()) {
+      formData.append('country', formValue.country.trim());
+    }
+    formData.append('categoryId', formValue.categoryId.toString());
+    formData.append('status', formValue.status.toString());
+
+    if (this.imageFile) {
+      formData.append('image', this.imageFile);
+    }
+
+    return formData;
   }
 
   onClose(): void {
@@ -68,13 +137,9 @@ export class ProductUpdateModalComponent implements OnInit {
     }
 
     this.isLoading = true;
-    const formData = {
-      id: this.product.id,
-      ...this.updateForm.value,
-      categoryId: Number(this.updateForm.get('categoryId')?.value)
-    };
+    const formData = this.buildFormData();
 
-    this.productService.update(formData).subscribe({
+    this.productService.update(this.product.id, formData).subscribe({
       next: (response: any) => {
         this.isLoading = false;
         if (response.success) {
@@ -84,7 +149,7 @@ export class ProductUpdateModalComponent implements OnInit {
       },
       error: (error: any) => {
         this.isLoading = false;
-        this.notificationService.error('Lỗi khi cập nhật sản phẩm');
+        this.notificationService.error('Lỗi khi cập nhật sản phẩm: ' + (error.error?.message || ''));
       }
     });
   }

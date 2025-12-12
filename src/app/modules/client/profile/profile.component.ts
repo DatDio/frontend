@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 import { User } from '../../../core/models/user.model';
 import { AuthService } from '../../../core/services/auth.service';
@@ -19,7 +20,7 @@ declare var bootstrap: any;
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ActiveStatusBadgeComponent],
+  imports: [CommonModule, ReactiveFormsModule, ActiveStatusBadgeComponent, RouterModule],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })

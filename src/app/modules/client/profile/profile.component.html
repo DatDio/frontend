@@ -287,8 +287,8 @@
 
             <!-- Create API Key Form -->
             <div class="card mb-4">
-              <div class="card-header bg-light">
-                <h5 class="mb-0">Tạo API Key mới</h5>
+              <div class="card-header">
+                <h5 class="mb-0 api-keys-lenght">Tạo API Key mới</h5>
               </div>
               <div class="card-body">
                 <form [formGroup]="createApiKeyForm" (ngSubmit)="onCreateApiKey()">
@@ -315,9 +315,9 @@
             </div>
 
             <!-- API Keys List -->
-            <h5 class="mb-3">Các API Keys hiện có ({{ apiKeys.length }})</h5>
+            <h5 class="mb-3 api-keys-lenght">Các API Keys hiện có ({{ apiKeys.length }})</h5>
             <div class="table-responsive">
-              <table class="table table-hover">
+              <table class="table table-hover api-keys-table">
                 <thead>
                   <tr>
                     <th>STT</th>

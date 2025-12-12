@@ -26,6 +26,9 @@ export class GetCodeMailComponent implements OnInit {
   getCodeResults: HotmailGetCodeResponse[] = [];
   showGetCodeResults = false;
 
+  // Multi-select state for get types (Graph API, Oauth2)
+  selectedGetTypes: Set<string> = new Set(['Oauth2']);
+
   // Multi-select state for email types
   selectedEmailTypes: Set<string> = new Set(['Auto']);
 
@@ -35,19 +38,57 @@ export class GetCodeMailComponent implements OnInit {
 
   private initGetCodeForm(): void {
     this.getCodeForm = this.formBuilder.group({
-      getType: ['Oauth2', Validators.required],
       emailData: ['', [Validators.required, Validators.minLength(10)]]
     });
   }
 
-  toggleEmailType(type: EmailType): void {
-    if (this.selectedEmailTypes.has(type)) {
+  // Toggle Get Type (Graph API, Oauth2)
+  toggleGetType(type: string): void {
+    if (this.selectedGetTypes.has(type)) {
       // Don't allow deselecting if it's the only one selected
-      if (this.selectedEmailTypes.size > 1) {
-        this.selectedEmailTypes.delete(type);
+      if (this.selectedGetTypes.size > 1) {
+        this.selectedGetTypes.delete(type);
       }
     } else {
-      this.selectedEmailTypes.add(type);
+      this.selectedGetTypes.add(type);
+    }
+  }
+
+  isGetTypeSelected(type: string): boolean {
+    return this.selectedGetTypes.has(type);
+  }
+
+  // Toggle Email Type with Auto select/deselect all logic
+  toggleEmailType(type: EmailType): void {
+    if (type === 'Auto') {
+      // If Auto is being selected, select all. If Auto is being deselected, deselect all except the first one
+      if (this.selectedEmailTypes.has('Auto')) {
+        // Deselecting Auto - clear all and keep only the first non-Auto type
+        this.selectedEmailTypes.clear();
+        this.selectedEmailTypes.add(this.emailTypes[1]); // First non-Auto type
+      } else {
+        // Selecting Auto - select all email types
+        this.selectedEmailTypes.clear();
+        this.emailTypes.forEach(emailType => this.selectedEmailTypes.add(emailType));
+      }
+    } else {
+      if (this.selectedEmailTypes.has(type)) {
+        // Don't allow deselecting if it's the only one selected
+        if (this.selectedEmailTypes.size > 1) {
+          this.selectedEmailTypes.delete(type);
+          // If Auto was selected and we're deselecting something else, also deselect Auto
+          if (this.selectedEmailTypes.has('Auto')) {
+            this.selectedEmailTypes.delete('Auto');
+          }
+        }
+      } else {
+        this.selectedEmailTypes.add(type);
+        // Check if all non-Auto types are selected, then also select Auto
+        const allNonAutoSelected = this.emailTypes.filter(t => t !== 'Auto').every(t => this.selectedEmailTypes.has(t));
+        if (allNonAutoSelected) {
+          this.selectedEmailTypes.add('Auto');
+        }
+      }
     }
   }
 
@@ -67,6 +108,11 @@ export class GetCodeMailComponent implements OnInit {
       return;
     }
 
+    if (this.selectedGetTypes.size === 0) {
+      this.notificationService.warning('Vui lòng chọn ít nhất một Type Get');
+      return;
+    }
+
     if (this.selectedEmailTypes.size === 0) {
       this.notificationService.warning('Vui lòng chọn ít nhất một loại email');
       return;
@@ -77,7 +123,7 @@ export class GetCodeMailComponent implements OnInit {
     this.getCodeResults = [];
 
     const request = {
-      getType: this.getCodeForm.get('getType')?.value,
+      getTypes: Array.from(this.selectedGetTypes),
       emailTypes: Array.from(this.selectedEmailTypes),
       emailData: this.getCodeForm.get('emailData')?.value.trim()
     };

@@ -5,9 +5,37 @@
 // =============================================
 
 .profile-container {
-  background: $light;
+  background: var(--bg-secondary);
   min-height: calc(100vh - 200px);
   padding: $spacing-8 0;
+  transition: background-color 0.3s ease;
+}
+
+// API Keys title - đặt ở root level
+.api-keys-lenght {
+  color: var(--text-heading) !important;
+}
+
+// API Keys table with dark header - đặt ở root level
+.api-keys-table {
+  thead {
+    background: $dark !important;
+
+    tr {
+      background: $dark !important;
+    }
+
+    th {
+      font-weight: $font-weight-semibold;
+      color: $white !important;
+      background: $dark !important;
+      padding: $spacing-3 $spacing-4;
+      border: none !important;
+      font-size: $font-size-xs;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
 }
 
 // =============================================
@@ -15,18 +43,19 @@
 // =============================================
 
 .profile-sidebar {
-  background: $white;
+  background: var(--bg-card);
   border-radius: $radius-xl;
   padding: $spacing-6;
-  box-shadow: $shadow-md;
-  border: 1px solid $gray-200;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--border-card);
   height: fit-content;
+  transition: background-color 0.3s ease;
 
   .profile-avatar {
     text-align: center;
     margin-bottom: $spacing-6;
     padding-bottom: $spacing-5;
-    border-bottom: 1px solid $gray-200;
+    border-bottom: 1px solid var(--border-color);
 
     .avatar-placeholder {
       width: 100px;
@@ -45,13 +74,13 @@
 
     h5 {
       font-weight: $font-weight-semibold;
-      color: $dark;
+      color: var(--text-heading);
       margin: 0 0 $spacing-1 0;
     }
 
     small {
       word-break: break-all;
-      color: $gray-500;
+      color: var(--text-muted);
       font-size: $font-size-sm;
     }
   }
@@ -59,14 +88,14 @@
   .profile-stats {
     padding-bottom: $spacing-5;
     margin-bottom: $spacing-4;
-    border-bottom: 1px solid $gray-200;
+    border-bottom: 1px solid var(--border-color);
 
     .stat-item {
       display: flex;
       align-items: center;
       gap: $spacing-3;
       padding: $spacing-3;
-      background: $gray-50;
+      background: var(--bg-table-header);
       border-radius: $radius-lg;
       margin-bottom: $spacing-2;
       transition: all $transition-base;
@@ -76,7 +105,7 @@
       }
 
       &:hover {
-        background: $gray-100;
+        background: var(--bg-table-row-hover);
         transform: translateX(4px);
       }
 
@@ -114,7 +143,7 @@
 
         .stat-label {
           font-size: $font-size-xs;
-          color: $gray-500;
+          color: var(--text-muted);
           font-weight: $font-weight-medium;
         }
 
@@ -132,9 +161,9 @@
   // Rank Info Section
   .profile-rank {
     padding: $spacing-4;
-    background: linear-gradient(135deg, $gray-50 0%, $gray-100 100%);
+    background: var(--bg-table-header);
     border-radius: $radius-lg;
-    border: 1px solid $gray-200;
+    border: 1px solid var(--border-color);
 
     .rank-card-mini {
       display: flex;
@@ -164,7 +193,7 @@
 
         .rank-label {
           font-size: $font-size-xs;
-          color: $gray-500;
+          color: var(--text-muted);
         }
 
         .rank-name {
@@ -190,7 +219,7 @@
       color: $primary;
       text-decoration: none;
       padding: $spacing-2;
-      background: $white;
+      background: var(--bg-card);
       border-radius: $radius-md;
       transition: all $transition-base;
 
@@ -217,7 +246,7 @@
       padding: $spacing-3 $spacing-4;
       border: none;
       background: transparent;
-      color: $gray-600;
+      color: var(--text-secondary);
       border-radius: $radius-lg;
       cursor: pointer;
       transition: all $transition-base;
@@ -233,8 +262,8 @@
       }
 
       &:hover {
-        background: $gray-100;
-        color: $dark;
+        background: var(--bg-table-row-hover);
+        color: var(--text-heading);
       }
 
       &.active {
@@ -256,21 +285,22 @@
 // =============================================
 
 .profile-content {
-  background: $white;
+  background: var(--bg-card);
   border-radius: $radius-xl;
   padding: $spacing-6;
-  box-shadow: $shadow-md;
-  border: 1px solid $gray-200;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--border-card);
+  transition: background-color 0.3s ease;
 }
 
 .profile-section {
   &__title {
     font-size: $font-size-xl;
     font-weight: $font-weight-bold;
-    color: $dark;
+    color: var(--text-heading);
     padding-bottom: $spacing-4;
     margin-bottom: $spacing-5;
-    border-bottom: 2px solid $gray-200;
+    border-bottom: 2px solid var(--border-color);
     display: flex;
     align-items: center;
     gap: $spacing-3;
@@ -278,6 +308,26 @@
     i {
       color: $primary;
     }
+  }
+
+  &__actions {
+    display: flex;
+    gap: $spacing-4;
+    padding-top: $spacing-5;
+    border-top: 1px solid var(--border-color);
+    margin-top: $spacing-5;
+
+    .btn {
+      min-width: 160px;
+    }
+  }
+
+  // Form Controls
+  .form-label {
+    font-weight: $font-weight-semibold;
+    margin-bottom: $spacing-2;
+    color: var(--text-secondary);
+    font-size: $font-size-sm;
   }
 
   &__actions {
@@ -296,21 +346,28 @@
   .form-label {
     font-weight: $font-weight-semibold;
     margin-bottom: $spacing-2;
-    color: $gray-700;
+    color: var(--text-secondary);
     font-size: $font-size-sm;
   }
 
   .form-control,
   .form-select {
-    border: 1px solid $gray-300;
+    border: 1px solid var(--border-input);
     border-radius: $radius-lg;
     padding: $spacing-3 $spacing-4;
     font-size: $font-size-sm;
     transition: all $transition-base;
+    background: var(--bg-input);
+    color: var(--text-primary);
+
+    &::placeholder {
+      color: var(--text-muted);
+    }
 
     &:focus {
       border-color: $primary;
       box-shadow: 0 0 0 3px rgba($primary, 0.15);
+      background: var(--bg-input);
     }
 
     &.is-invalid {
@@ -322,19 +379,21 @@
     }
 
     &:disabled {
-      background: $gray-100;
+      background: var(--bg-table-header);
       cursor: not-allowed;
+      color: var(--text-muted);
     }
   }
 
   .input-group {
     .btn-outline-secondary {
-      border-color: $gray-300;
-      color: $gray-600;
+      border-color: var(--border-input);
+      color: var(--text-secondary);
       border-radius: 0 $radius-lg $radius-lg 0;
+      background: var(--bg-input);
 
       &:hover {
-        background: $primary-bg;
+        background: rgba($primary, 0.1);
         border-color: $primary;
         color: $primary;
       }
@@ -355,6 +414,14 @@
   .alert {
     border-radius: $radius-lg;
     border-left: 4px solid;
+    background: var(--bg-table-header);
+    color: var(--text-primary);
+
+    &.alert-info {
+      background: rgba($info, 0.15);
+      border-color: $info;
+      color: var(--text-primary);
+    }
 
     i {
       font-size: $font-size-base;
@@ -363,20 +430,21 @@
 
   // Cards
   .card {
-    border: 1px solid $gray-200;
+    border: 1px solid var(--border-card);
     border-radius: $radius-xl;
-    box-shadow: $shadow-sm;
+    box-shadow: var(--shadow-card);
+    background: var(--bg-card);
 
     .card-header {
-      background: $gray-50;
-      border-bottom: 1px solid $gray-200;
+      background: var(--bg-table-header);
+      border-bottom: 1px solid var(--border-color);
       padding: $spacing-4 $spacing-5;
       border-radius: $radius-xl $radius-xl 0 0;
 
       h5 {
         font-size: $font-size-base;
         font-weight: $font-weight-semibold;
-        color: $dark;
+        color: var(--text-heading);
         margin: 0;
       }
     }
@@ -389,15 +457,18 @@
   // Table
   .table {
     font-size: $font-size-sm;
+    color: var(--text-primary);
+    background: transparent;
 
     thead {
-      background: $gray-100;
+      background: $dark !important;
 
       th {
         font-weight: $font-weight-semibold;
-        color: $gray-600;
+        color: $white !important;
+        background: $dark !important;
         padding: $spacing-3 $spacing-4;
-        border-bottom: 2px solid $gray-200;
+        border: none !important;
         font-size: $font-size-xs;
         text-transform: uppercase;
         letter-spacing: 0.5px;
@@ -407,19 +478,21 @@
     tbody {
       tr {
         &:hover {
-          background: $gray-50;
+          background: var(--bg-table-row-hover);
         }
 
         td {
           padding: $spacing-3 $spacing-4;
           vertical-align: middle;
+          border-bottom: 1px solid var(--border-color);
+          color: var(--text-primary);
 
           code {
-            background: $gray-100;
+            background: var(--bg-table-header);
             padding: $spacing-1 $spacing-2;
             border-radius: $radius-sm;
             font-size: $font-size-xs;
-            color: $gray-700;
+            color: var(--text-secondary);
           }
         }
       }
@@ -466,9 +539,10 @@
   }
 
   .modal-footer {
-    border-top: 1px solid $gray-200;
+    border-top: 1px solid var(--border-color);
     padding: $spacing-4 $spacing-6;
     gap: $spacing-3;
+    background: var(--bg-card);
   }
 }
 
@@ -515,6 +589,8 @@
         min-width: 140px;
       }
     }
+
+
   }
 }
 

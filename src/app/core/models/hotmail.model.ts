@@ -4,8 +4,8 @@
 export interface HotmailGetCodeRequest {
     /** Email data format: email|password|refresh_token|client_id (multiple lines supported) */
     emailData: string;
-    /** Type of get method: Graph API or Oauth2 */
-    getType: 'Graph API' | 'Oauth2';
+    /** Types of get method: Graph API and/or Oauth2 (supports multi-select) */
+    getTypes: string[];
     /** Types of email/services to get code for (supports multi-select) */
     emailTypes: string[];
 }
@@ -20,6 +20,47 @@ export interface HotmailGetCodeResponse {
     code?: string;
     content?: string;
     date?: string;
+}
+
+/**
+ * Request DTO for checking if email accounts are live
+ */
+export interface CheckLiveMailRequest {
+    /** Email data format: email|password|refresh_token|client_id (multiple lines supported) */
+    emailData: string;
+}
+
+/**
+ * Response DTO for check live mail result
+ */
+export interface CheckLiveMailResponse {
+    email: string;
+    password?: string;
+    refreshToken?: string;
+    clientId?: string;
+    isLive: boolean;
+    error?: string;
+}
+
+/**
+ * Request DTO for getting OAuth2 access tokens
+ */
+export interface GetOAuth2Request {
+    /** Email data format: email|password|refresh_token|client_id (multiple lines supported) */
+    emailData: string;
+}
+
+/**
+ * Response DTO for get OAuth2 token result
+ */
+export interface GetOAuth2Response {
+    email: string;
+    password?: string;
+    refreshToken?: string;
+    clientId?: string;
+    accessToken?: string;
+    success: boolean;
+    error?: string;
 }
 
 /**
