@@ -239,6 +239,22 @@
             }
         }
 
+        .copy-unknown-btn {
+            padding: $spacing-2 $spacing-4;
+            background: $warning;
+            color: $white;
+            border: none;
+            border-radius: $radius-md;
+            font-size: $font-size-sm;
+            font-weight: $font-weight-medium;
+            cursor: pointer;
+            transition: all $transition-fast;
+
+            &:hover {
+                background: darken($warning, 10%);
+            }
+        }
+
         .clear-btn {
             padding: $spacing-2 $spacing-4;
             background: var(--bg-table-header);
@@ -254,6 +270,198 @@
                 background: var(--border-color);
             }
         }
+    }
+}
+
+// =============================================
+// STOP BUTTON
+// =============================================
+
+.stop-btn {
+    padding: $spacing-3 $spacing-5;
+    background: $danger;
+    color: $white;
+    border: none;
+    border-radius: $radius-lg;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transition: all $transition-base;
+
+    &:hover {
+        background: darken($danger, 10%);
+    }
+}
+
+// =============================================
+// PROGRESS BAR
+// =============================================
+
+.progress-section {
+    margin-top: $spacing-6;
+    padding: $spacing-4;
+    background: var(--bg-table-header);
+    border-radius: $radius-lg;
+
+    .progress-info {
+        display: flex;
+        justify-content: space-between;
+        font-size: $font-size-sm;
+        color: var(--text-secondary);
+        margin-bottom: $spacing-2;
+    }
+
+    .progress-bar-wrapper {
+        height: 8px;
+        background: var(--border-color);
+        border-radius: $radius-full;
+        overflow: hidden;
+
+        .progress-bar {
+            height: 100%;
+            background: $gradient-primary;
+            border-radius: $radius-full;
+            transition: width 0.3s ease;
+        }
+    }
+}
+
+// =============================================
+// OPTIONS ROW
+// =============================================
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    cursor: pointer;
+    font-size: $font-size-sm;
+    color: var(--text-secondary);
+
+    input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        accent-color: $primary;
+    }
+}
+
+// =============================================
+// RESULTS GRID - 3 COLUMNS
+// =============================================
+
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: $spacing-4;
+    margin-top: $spacing-4;
+
+    @media (max-width: $breakpoint-lg) {
+        grid-template-columns: 1fr;
+    }
+}
+
+.result-column {
+    background: var(--bg-card);
+    border-radius: $radius-lg;
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+
+    .column-header {
+        padding: $spacing-3 $spacing-4;
+        font-weight: $font-weight-semibold;
+        font-size: $font-size-sm;
+        display: flex;
+        align-items: center;
+        gap: $spacing-2;
+
+        &.success {
+            background: rgba($success, 0.15);
+            color: $success;
+        }
+
+        &.error {
+            background: rgba($danger, 0.15);
+            color: $danger;
+        }
+
+        &.warning {
+            background: rgba($warning, 0.15);
+            color: $warning;
+        }
+    }
+
+    .column-content {
+        max-height: 400px;
+        overflow-y: auto;
+        padding: $spacing-2;
+    }
+
+    .result-item {
+        display: flex;
+        align-items: center;
+        gap: $spacing-3;
+        padding: $spacing-2 $spacing-3;
+        border-radius: $radius-md;
+        margin-bottom: $spacing-1;
+        font-size: $font-size-sm;
+
+        &.success {
+            background: rgba($success, 0.08);
+        }
+
+        &.error {
+            background: rgba($danger, 0.08);
+        }
+
+        &.warning {
+            background: rgba($warning, 0.08);
+        }
+
+        .result-avatar {
+            flex-shrink: 0;
+
+            .fb-avatar {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                object-fit: cover;
+                border: 2px solid $primary;
+            }
+
+            .avatar-placeholder {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: var(--bg-table-header);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: var(--text-muted);
+                font-size: $font-size-xs;
+            }
+        }
+
+        .result-uid {
+            font-family: 'Consolas', 'Monaco', monospace;
+            color: var(--text-primary);
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .result-error {
+            font-size: $font-size-xs;
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+    }
+
+    .empty-message {
+        padding: $spacing-4;
+        text-align: center;
+        color: var(--text-muted);
+        font-size: $font-size-sm;
     }
 }
 

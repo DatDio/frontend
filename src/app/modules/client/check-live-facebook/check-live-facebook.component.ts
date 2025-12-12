@@ -1,13 +1,13 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-
+import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { NotificationService } from '../../../core/services/notification.service';
+import { FacebookApi } from '../../../Utils/apis/facebook/facebook.api';
+import { CheckStatus } from '../../../core/models/hotmail.model';
 
 interface FacebookCheckResult {
     uid: string;
-    status: 'live' | 'die' | 'checking';
-    name?: string;
+    status: CheckStatus;
     avatar?: string;
     error?: string;
 }
@@ -15,32 +15,54 @@ interface FacebookCheckResult {
 @Component({
     selector: 'app-check-live-facebook',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule, FormsModule],
     templateUrl: './check-live-facebook.component.html',
     styleUrls: ['./check-live-facebook.component.scss']
 })
-export class CheckLiveFacebookComponent implements OnInit {
+export class CheckLiveFacebookComponent implements OnInit, OnDestroy {
     private readonly formBuilder = inject(FormBuilder);
     private readonly notificationService = inject(NotificationService);
 
     checkForm!: FormGroup;
     isLoading = false;
-    results: FacebookCheckResult[] = [];
     showResults = false;
+    removeDuplicate = true;
+
+    private eventSource: EventSource | null = null;
+
+    liveResults: FacebookCheckResult[] = [];
+    dieResults: FacebookCheckResult[] = [];
+    unknownResults: FacebookCheckResult[] = [];
+    totalCount = 0;
+    processedCount = 0;
 
     ngOnInit(): void {
-        this.initForm();
-    }
-
-    private initForm(): void {
         this.checkForm = this.formBuilder.group({
             uidData: ['', [Validators.required, Validators.minLength(5)]]
         });
     }
 
+    ngOnDestroy(): void {
+        this.closeEventSource();
+    }
+
+    private closeEventSource(): void {
+        if (this.eventSource) {
+            this.eventSource.close();
+            this.eventSource = null;
+        }
+    }
+
     get uidCount(): number {
         const data = this.checkForm.get('uidData')?.value || '';
         return data.trim().split('\n').filter((line: string) => line.trim().length > 0).length;
+    }
+
+    get liveCount(): number { return this.liveResults.length; }
+    get dieCount(): number { return this.dieResults.length; }
+    get unknownCount(): number { return this.unknownResults.length; }
+    get progressPercent(): number {
+        return this.totalCount > 0 ? Math.round((this.processedCount / this.totalCount) * 100) : 0;
     }
 
     onCheck(): void {
@@ -49,86 +71,129 @@ export class CheckLiveFacebookComponent implements OnInit {
             return;
         }
 
+        this.liveResults = [];
+        this.dieResults = [];
+        this.unknownResults = [];
+        this.processedCount = 0;
         this.isLoading = true;
         this.showResults = true;
-        const uidData = this.checkForm.get('uidData')?.value.trim();
-        const uids = uidData.split('\n').filter((line: string) => line.trim().length > 0);
+        this.closeEventSource();
 
-        // Initialize results with checking status
-        this.results = uids.map((uid: string) => ({
-            uid: uid.trim(),
-            status: 'checking' as const
-        }));
+        let uidData = this.checkForm.get('uidData')?.value.trim();
+        if (this.removeDuplicate) {
+            const lines = uidData.split('\n').filter((line: string) => line.trim().length > 0);
+            uidData = [...new Set(lines)].join('\n');
+        }
+        this.totalCount = uidData.split('\n').filter((line: string) => line.trim().length > 0).length;
 
-        // Check each UID using Facebook Graph API
-        this.results.forEach((result, index) => {
-            this.checkFacebookUid(result.uid, index);
+        fetch(FacebookApi.CHECK_LIVE_START, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ uidData })
+        })
+            .then(res => res.json())
+            .then(result => {
+                if (result.success && result.data?.sessionId) {
+                    this.connectToStream(result.data.sessionId);
+                } else {
+                    throw new Error(result.message || 'Failed to create session');
+                }
+            })
+            .catch(error => {
+                this.isLoading = false;
+                this.notificationService.error('Lỗi: ' + error.message);
+            });
+    }
+
+    private connectToStream(sessionId: string): void {
+        const url = `${FacebookApi.CHECK_LIVE_STREAM}?sessionId=${sessionId}`;
+        this.eventSource = new EventSource(url);
+
+        this.eventSource.onmessage = (event) => {
+            try {
+                const result: FacebookCheckResult = JSON.parse(event.data);
+                this.handleResult(result);
+            } catch (e) { }
+        };
+
+        this.eventSource.addEventListener('result', (event: any) => {
+            try {
+                const result: FacebookCheckResult = JSON.parse(event.data);
+                this.handleResult(result);
+            } catch (e) { }
         });
-    }
 
-    private checkFacebookUid(uid: string, index: number): void {
-        // Use Facebook Graph API to check if UID exists
-        const img = new Image();
-        img.onload = () => {
-            this.results[index] = {
-                ...this.results[index],
-                status: 'live',
-                avatar: `https://graph.facebook.com/${uid}/picture?type=large`
-            };
-            this.checkIfComplete();
-        };
-        img.onerror = () => {
-            this.results[index] = {
-                ...this.results[index],
-                status: 'die',
-                error: 'UID không tồn tại hoặc đã bị khóa'
-            };
-            this.checkIfComplete();
-        };
-        img.src = `https://graph.facebook.com/${uid}/picture?type=large`;
-    }
-
-    private checkIfComplete(): void {
-        const allDone = this.results.every(r => r.status !== 'checking');
-        if (allDone) {
+        this.eventSource.addEventListener('done', () => {
+            this.closeEventSource();
             this.isLoading = false;
-            const liveCount = this.results.filter(r => r.status === 'live').length;
-            this.notificationService.success(`Hoàn thành: ${liveCount}/${this.results.length} live`);
+            this.notificationService.success(
+                `Hoàn thành: ${this.liveCount} live, ${this.dieCount} die, ${this.unknownCount} unknown`
+            );
+        });
+
+        this.eventSource.onerror = () => {
+            this.closeEventSource();
+            this.isLoading = false;
+        };
+    }
+
+    private handleResult(result: FacebookCheckResult): void {
+        this.processedCount++;
+
+        if (result.status === 'SUCCESS') {
+            this.liveResults = [...this.liveResults, result];
+        } else if (result.status === 'FAILED') {
+            this.dieResults = [...this.dieResults, result];
+        } else {
+            this.unknownResults = [...this.unknownResults, result];
         }
     }
 
     copyAllLive(): void {
-        const liveUids = this.results.filter(r => r.status === 'live').map(r => r.uid).join('\n');
+        const liveUids = this.liveResults.map(r => r.uid).join('\n');
         if (!liveUids) {
             this.notificationService.warning('Không có UID live nào');
             return;
         }
         navigator.clipboard.writeText(liveUids).then(() => {
-            this.notificationService.success('Đã copy tất cả UID live!');
+            this.notificationService.success(`Đã copy ${this.liveCount} UID live!`);
         });
     }
 
     copyAllDie(): void {
-        const dieUids = this.results.filter(r => r.status === 'die').map(r => r.uid).join('\n');
+        const dieUids = this.dieResults.map(r => r.uid).join('\n');
         if (!dieUids) {
             this.notificationService.warning('Không có UID die nào');
             return;
         }
         navigator.clipboard.writeText(dieUids).then(() => {
-            this.notificationService.success('Đã copy tất cả UID die!');
+            this.notificationService.success(`Đã copy ${this.dieCount} UID die!`);
+        });
+    }
+
+    copyAllUnknown(): void {
+        const unknownUids = this.unknownResults.map(r => r.uid).join('\n');
+        if (!unknownUids) {
+            this.notificationService.warning('Không có UID unknown nào');
+            return;
+        }
+        navigator.clipboard.writeText(unknownUids).then(() => {
+            this.notificationService.success(`Đã copy ${this.unknownCount} UID unknown!`);
         });
     }
 
     clearResults(): void {
-        this.results = [];
+        this.liveResults = [];
+        this.dieResults = [];
+        this.unknownResults = [];
+        this.processedCount = 0;
+        this.totalCount = 0;
         this.showResults = false;
     }
 
-    get liveCount(): number {
-        return this.results.filter(r => r.status === 'live').length;
-    }
-
-    get dieCount(): number {
-        return this.results.filter(r => r.status === 'die').length;
+    stopCheck(): void {
+        this.closeEventSource();
+        this.isLoading = false;
+        this.notificationService.info('Đã dừng kiểm tra');
     }
 }

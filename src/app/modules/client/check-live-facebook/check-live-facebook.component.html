@@ -20,6 +20,14 @@
                     </div>
                 </div>
 
+                <!-- Options -->
+                <div class="form-row options-row">
+                    <label class="checkbox-label">
+                        <input type="checkbox" [(ngModel)]="removeDuplicate" [ngModelOptions]="{standalone: true}">
+                        <span>Loại bỏ UID trùng lặp</span>
+                    </label>
+                </div>
+
                 <!-- Action Buttons -->
                 <div class="action-buttons">
                     <button type="submit" class="submit-btn" [disabled]="checkForm.invalid || isLoading">
@@ -30,14 +38,32 @@
                         <i class="fas fa-search me-2"></i> Check Live
                         }
                     </button>
+                    @if (isLoading) {
+                    <button type="button" class="stop-btn" (click)="stopCheck()">
+                        <i class="fas fa-stop me-1"></i> Dừng
+                    </button>
+                    }
                 </div>
             </form>
+
+            <!-- Progress Bar -->
+            @if (showResults && totalCount > 0) {
+            <div class="progress-section">
+                <div class="progress-info">
+                    <span>Tiến trình: {{ processedCount }}/{{ totalCount }}</span>
+                    <span>{{ progressPercent }}%</span>
+                </div>
+                <div class="progress-bar-wrapper">
+                    <div class="progress-bar" [style.width.%]="progressPercent"></div>
+                </div>
+            </div>
+            }
 
             <!-- Results Section -->
             @if (showResults) {
             <div class="results-section">
                 <div class="results-header">
-                    <h4><i class="fas fa-list me-2"></i> Kết quả ({{ results.length }})</h4>
+                    <h4><i class="fas fa-list me-2"></i> Kết quả</h4>
                     <div class="results-actions">
                         <button type="button" class="copy-success-btn" (click)="copyAllLive()">
                             <i class="fas fa-copy me-1"></i> Copy Live ({{ liveCount }})
@@ -45,61 +71,79 @@
                         <button type="button" class="copy-error-btn" (click)="copyAllDie()">
                             <i class="fas fa-copy me-1"></i> Copy Die ({{ dieCount }})
                         </button>
+                        <button type="button" class="copy-unknown-btn" (click)="copyAllUnknown()">
+                            <i class="fas fa-copy me-1"></i> Copy Unknown ({{ unknownCount }})
+                        </button>
                         <button type="button" class="clear-btn" (click)="clearResults()">
                             <i class="fas fa-times me-1"></i> Xóa
                         </button>
                     </div>
                 </div>
 
-                <div class="results-table-wrapper">
-                    <table class="results-table">
-                        <thead>
-                            <tr>
-                                <th>STT</th>
-                                <th>Avatar</th>
-                                <th>UID</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (result of results; track result.uid; let i = $index) {
-                            <tr [class.success-row]="result.status === 'live'"
-                                [class.error-row]="result.status === 'die'"
-                                [class.checking-row]="result.status === 'checking'">
-                                <td class="stt">{{ i + 1 }}</td>
-                                <td class="avatar">
-                                    @if (result.status === 'live' && result.avatar) {
+                <!-- Results Grid: 3 Columns -->
+                <div class="results-grid">
+                    <!-- Live Column -->
+                    <div class="result-column live-column">
+                        <div class="column-header success">
+                            <i class="fas fa-check-circle me-1"></i> Live ({{ liveCount }})
+                        </div>
+                        <div class="column-content">
+                            @for (result of liveResults; track result.uid) {
+                            <div class="result-item success">
+                                <div class="result-avatar">
+                                    @if (result.avatar) {
                                     <img [src]="result.avatar" alt="Avatar" class="fb-avatar">
-                                    } @else if (result.status === 'checking') {
-                                    <div class="avatar-placeholder checking">
-                                        <i class="fas fa-spinner fa-spin"></i>
-                                    </div>
                                     } @else {
                                     <div class="avatar-placeholder">
                                         <i class="fas fa-user"></i>
                                     </div>
                                     }
-                                </td>
-                                <td class="uid">{{ result.uid }}</td>
-                                <td class="status">
-                                    @if (result.status === 'checking') {
-                                    <span class="status-badge checking">
-                                        <i class="fas fa-spinner fa-spin me-1"></i> Đang kiểm tra
-                                    </span>
-                                    } @else if (result.status === 'live') {
-                                    <span class="status-badge success">
-                                        <i class="fas fa-check-circle me-1"></i> Live
-                                    </span>
-                                    } @else {
-                                    <span class="status-badge error">
-                                        <i class="fas fa-times-circle me-1"></i> Die
-                                    </span>
-                                    }
-                                </td>
-                            </tr>
+                                </div>
+                                <span class="result-uid">{{ result.uid }}</span>
+                            </div>
                             }
-                        </tbody>
-                    </table>
+                            @if (liveResults.length === 0) {
+                            <div class="empty-message">Chưa có kết quả</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Die Column -->
+                    <div class="result-column die-column">
+                        <div class="column-header error">
+                            <i class="fas fa-times-circle me-1"></i> Die ({{ dieCount }})
+                        </div>
+                        <div class="column-content">
+                            @for (result of dieResults; track result.uid) {
+                            <div class="result-item error">
+                                <span class="result-uid">{{ result.uid }}</span>
+                            </div>
+                            }
+                            @if (dieResults.length === 0) {
+                            <div class="empty-message">Chưa có kết quả</div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Unknown Column -->
+                    <div class="result-column unknown-column">
+                        <div class="column-header warning">
+                            <i class="fas fa-question-circle me-1"></i> Unknown ({{ unknownCount }})
+                        </div>
+                        <div class="column-content">
+                            @for (result of unknownResults; track result.uid) {
+                            <div class="result-item warning">
+                                <span class="result-uid">{{ result.uid }}</span>
+                                @if (result.error) {
+                                <span class="result-error">{{ result.error }}</span>
+                                }
+                            </div>
+                            }
+                            @if (unknownResults.length === 0) {
+                            <div class="empty-message">Chưa có kết quả</div>
+                            }
+                        </div>
+                    </div>
                 </div>
             </div>
             }
