@@ -68,9 +68,11 @@
             <td colspan="7" class="text-center text-muted py-4">Không có dữ liệu</td>
           </tr>
           }
-          @for (order of orders; track order.id) {
+          @for (order of orders; track order.id; let i = $index) {
           <tr>
-            <td>{{ order.id }}</td>
+            <td>
+              {{ i + 1 + (paginationConfig.currentPage * paginationConfig.pageSize) }}
+            </td>
             <td class="fw-bold">{{ order.orderNumber }}</td>
             <td>{{ order.userEmail }}</td>
             <td> {{ order.totalAmount | number:'1.0-0' }} VND</td>
