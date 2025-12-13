@@ -60,5 +60,9 @@ export const clientRoutes: Routes = [
   {
     path: 'get-oauth2',
     loadComponent: () => import('../../modules/client/get-oauth2/get-oauth2.component').then(m => m.GetOAuth2Component)
+  },
+  {
+    path: 'read-mail',
+    loadComponent: () => import('../../modules/client/read-mail/read-mail.component').then(m => m.ReadMailComponent)
   }
 ];

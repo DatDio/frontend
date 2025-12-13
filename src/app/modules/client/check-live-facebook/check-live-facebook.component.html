@@ -90,15 +90,6 @@
                         <div class="column-content">
                             @for (result of liveResults; track result.uid) {
                             <div class="result-item success">
-                                <div class="result-avatar">
-                                    @if (result.avatar) {
-                                    <img [src]="result.avatar" alt="Avatar" class="fb-avatar">
-                                    } @else {
-                                    <div class="avatar-placeholder">
-                                        <i class="fas fa-user"></i>
-                                    </div>
-                                    }
-                                </div>
                                 <span class="result-uid">{{ result.uid }}</span>
                             </div>
                             }
@@ -134,9 +125,6 @@
                             @for (result of unknownResults; track result.uid) {
                             <div class="result-item warning">
                                 <span class="result-uid">{{ result.uid }}</span>
-                                @if (result.error) {
-                                <span class="result-error">{{ result.error }}</span>
-                                }
                             </div>
                             }
                             @if (unknownResults.length === 0) {

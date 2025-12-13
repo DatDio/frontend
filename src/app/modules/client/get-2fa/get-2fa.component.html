@@ -13,10 +13,10 @@
                         2FA Secret <span class="item-count">[{{ itemCount }}]</span>
                     </label>
                     <textarea formControlName="secretData" class="data-textarea" rows="8"
-                        placeholder="email|password|2fa_secret&#10;hoặc chỉ nhập secret key"></textarea>
+                        placeholder="Nhập 2FA Secret Key&#10;Ví dụ: JBSWY3DPEHPK3PXP&#10;Mỗi dòng một secret"></textarea>
                     <div class="textarea-hint">
                         <i class="fas fa-info-circle me-1"></i>
-                        Định dạng: email|password|2fa_secret hoặc chỉ nhập secret key (mỗi dòng một mục)
+                        Chỉ cần nhập 2FA secret key (Base32), mỗi dòng một key
                     </div>
                 </div>
 
@@ -24,9 +24,6 @@
                 <div class="action-buttons">
                     <button type="button" class="filter-btn" (click)="refreshCodes()" *ngIf="showResults">
                         <i class="fas fa-sync-alt me-1"></i> Refresh
-                    </button>
-                    <button type="button" class="copy-success-btn" (click)="copyAll()" *ngIf="showResults">
-                        <i class="fas fa-copy me-1"></i> Copy All
                     </button>
                     <button type="submit" class="submit-btn" [disabled]="getForm.invalid || isLoading">
                         @if (isLoading) {
@@ -65,11 +62,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @for (result of results; track result.secret; let i = $index) {
+                            @for (result of results; track result.identifier; let i = $index) {
                             <tr [class.success-row]="result.status === 'success'"
                                 [class.error-row]="result.status === 'error'">
                                 <td class="stt">{{ i + 1 }}</td>
-                                <td class="email">{{ result.email }}</td>
+                                <td class="email">{{ result.identifier }}</td>
                                 <td class="code">
                                     @if (result.status === 'success') {
                                     <span class="code-value">{{ result.code }}</span>

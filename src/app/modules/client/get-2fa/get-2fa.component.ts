@@ -1,16 +1,24 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
 
 import { NotificationService } from '../../../core/services/notification.service';
+import { CommonApi } from '../../../Utils/apis/commom.api';
 
 interface TwoFAResult {
-    email: string;
+    identifier: string;
     secret: string;
     code: string;
     status: 'success' | 'error' | 'generating';
     timeRemaining: number;
     error?: string;
+}
+
+interface ApiResponse<T> {
+    success: boolean;
+    message: string;
+    data: T;
 }
 
 @Component({
@@ -20,9 +28,12 @@ interface TwoFAResult {
     templateUrl: './get-2fa.component.html',
     styleUrls: ['./get-2fa.component.scss']
 })
-export class Get2FAComponent implements OnInit {
+export class Get2FAComponent implements OnInit, OnDestroy {
     private readonly formBuilder = inject(FormBuilder);
     private readonly notificationService = inject(NotificationService);
+    private readonly http = inject(HttpClient);
+
+    private readonly API_BASE = `${CommonApi.CONTEXT_PATH}/tools/totp`;
 
     getForm!: FormGroup;
     isLoading = false;
@@ -60,78 +71,48 @@ export class Get2FAComponent implements OnInit {
         this.isLoading = true;
         this.showResults = true;
         const secretData = this.getForm.get('secretData')?.value.trim();
+
+        // Set all items to generating state
         const lines = secretData.split('\n').filter((line: string) => line.trim().length > 0);
+        this.results = lines.map((line: string) => ({
+            identifier: line.trim().substring(0, 15) + (line.length > 15 ? '...' : ''),
+            secret: line.trim(),
+            code: '',
+            status: 'generating' as const,
+            timeRemaining: 30
+        }));
 
-        // Parse data - format: email|password|2fa_secret or just secret
-        this.results = lines.map((line: string) => {
-            const parts = line.split('|');
-            let email = '';
-            let secret = '';
-
-            if (parts.length >= 3) {
-                email = parts[0]?.trim() || '';
-                secret = parts[2]?.trim() || ''; // 2FA secret is the 3rd part
-            } else {
-                secret = parts[0]?.trim() || '';
-            }
-
-            return {
-                email: email || secret.substring(0, 10) + '...',
-                secret: secret,
-                code: '',
-                status: 'generating' as const,
-                timeRemaining: 30
-            };
-        });
-
-        // Generate 2FA codes
-        this.generateCodes();
-        this.isLoading = false;
-
-        // Start countdown timer
-        this.startTimer();
+        // Call backend API
+        this.generateCodesFromBackend(secretData);
     }
 
-    private generateCodes(): void {
-        this.results = this.results.map(result => {
-            try {
-                const code = this.generateTOTP(result.secret);
-                return {
-                    ...result,
-                    code: code,
-                    status: 'success' as const,
-                    timeRemaining: 30 - (Math.floor(Date.now() / 1000) % 30)
-                };
-            } catch (e) {
-                return {
-                    ...result,
-                    status: 'error' as const,
-                    error: 'Invalid secret'
-                };
-            }
-        });
+    private generateCodesFromBackend(secretData: string): void {
+        this.http.post<ApiResponse<TwoFAResult[]>>(`${this.API_BASE}/generate`, { secretData })
+            .subscribe({
+                next: (response) => {
+                    if (response.success && response.data) {
+                        this.results = response.data;
+                        const successCount = this.results.filter(r => r.status === 'success').length;
+                        this.notificationService.success(`Đã tạo ${successCount}/${this.results.length} mã 2FA`);
 
-        const successCount = this.results.filter(r => r.status === 'success').length;
-        this.notificationService.success(`Đã tạo ${successCount}/${this.results.length} mã 2FA`);
-    }
-
-    private generateTOTP(secret: string): string {
-        // Simple TOTP generation - for demo purposes
-        // In production, use a proper library like otplib
-        const epoch = Math.floor(Date.now() / 1000 / 30);
-        const hash = this.simpleHash(secret + epoch.toString());
-        const code = (hash % 1000000).toString().padStart(6, '0');
-        return code;
-    }
-
-    private simpleHash(str: string): number {
-        let hash = 0;
-        for (let i = 0; i < str.length; i++) {
-            const char = str.charCodeAt(i);
-            hash = ((hash << 5) - hash) + char;
-            hash = hash & hash;
-        }
-        return Math.abs(hash);
+                        // Start countdown timer
+                        this.startTimer();
+                    } else {
+                        this.notificationService.error('Có lỗi khi tạo mã 2FA');
+                    }
+                    this.isLoading = false;
+                },
+                error: (error) => {
+                    console.error('Error generating TOTP:', error);
+                    this.notificationService.error('Có lỗi khi kết nối server');
+                    this.results = this.results.map(r => ({
+                        ...r,
+                        status: 'error' as const,
+                        error: 'Connection error'
+                    }));
+                    this.isLoading = false;
+                }
+            });
     }
 
     private startTimer(): void {
@@ -139,6 +120,7 @@ export class Get2FAComponent implements OnInit {
             clearInterval(this.intervalId);
         }
 
+        // Update time remaining every second
         this.intervalId = setInterval(() => {
             const currentSecond = Math.floor(Date.now() / 1000) % 30;
             const remaining = 30 - currentSecond;
@@ -150,28 +132,30 @@ export class Get2FAComponent implements OnInit {
 
             // Regenerate codes when timer resets
             if (remaining === 30) {
-                this.generateCodes();
+                this.refreshCodesFromBackend();
             }
         }, 1000);
+    }
+
+    private refreshCodesFromBackend(): void {
+        const secrets = this.results.map(r => r.secret).join('\n');
+
+        this.http.post<ApiResponse<TwoFAResult[]>>(`${this.API_BASE}/generate`, { secretData: secrets })
+            .subscribe({
+                next: (response) => {
+                    if (response.success && response.data) {
+                        this.results = response.data;
+                    }
+                },
+                error: (error) => {
+                    console.error('Error refreshing TOTP:', error);
+                }
+            });
     }
 
     copyCode(code: string): void {
         navigator.clipboard.writeText(code).then(() => {
             this.notificationService.success('Đã copy mã 2FA!');
-        });
-    }
-
-    copyAll(): void {
-        const codes = this.results
-            .filter(r => r.status === 'success')
-            .map(r => `${r.email}|${r.code}`)
-            .join('\n');
-        if (!codes) {
-            this.notificationService.warning('Không có mã nào để copy');
-            return;
-        }
-        navigator.clipboard.writeText(codes).then(() => {
-            this.notificationService.success('Đã copy tất cả mã 2FA!');
         });
     }
 
@@ -184,7 +168,7 @@ export class Get2FAComponent implements OnInit {
     }
 
     refreshCodes(): void {
-        this.generateCodes();
+        this.refreshCodesFromBackend();
     }
 
     get successCount(): number {
@@ -195,3 +179,4 @@ export class Get2FAComponent implements OnInit {
         return this.results.filter(r => r.status === 'error').length;
     }
 }
+
