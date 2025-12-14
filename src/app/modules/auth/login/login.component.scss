@@ -24,10 +24,18 @@
   .form-control {
     padding: 0.75rem;
     border-radius: 8px;
-    
+    background-color: #fff;
+    color: #333;
+    border: 1px solid #ddd;
+
+    &::placeholder {
+      color: #999;
+    }
+
     &:focus {
       border-color: #667eea;
       box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+      background-color: #fff;
     }
   }
 
@@ -37,7 +45,7 @@
     font-weight: 500;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     border: none;
-    
+
     &:hover {
       opacity: 0.9;
       transform: translateY(-1px);

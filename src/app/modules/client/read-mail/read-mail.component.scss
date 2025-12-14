@@ -213,6 +213,39 @@
 }
 
 // =============================================
+// PROGRESS BAR
+// =============================================
+
+.progress-section {
+    margin-top: $spacing-6;
+    padding: $spacing-4;
+    background: var(--bg-table-header);
+    border-radius: $radius-lg;
+
+    .progress-info {
+        display: flex;
+        justify-content: space-between;
+        font-size: $font-size-sm;
+        color: var(--text-secondary);
+        margin-bottom: $spacing-2;
+    }
+
+    .progress-bar-wrapper {
+        height: 8px;
+        background: var(--border-color);
+        border-radius: $radius-full;
+        overflow: hidden;
+
+        .progress-bar {
+            height: 100%;
+            background: $gradient-primary;
+            border-radius: $radius-full;
+            transition: width 0.3s ease;
+        }
+    }
+}
+
+// =============================================
 // RESULTS SECTION
 // =============================================
 
@@ -241,23 +274,33 @@
             }
         }
 
-        .results-stats {
+        .results-actions {
             display: flex;
-            gap: $spacing-4;
+            gap: $spacing-2;
+            flex-wrap: wrap;
+            align-items: center;
 
-            .stat {
-                display: flex;
-                align-items: center;
-                gap: $spacing-2;
+            .badge {
+                padding: $spacing-2 $spacing-4;
                 font-size: $font-size-sm;
                 font-weight: $font-weight-medium;
+                border-radius: $radius-full;
+            }
 
-                &.success {
-                    color: $success;
-                }
+            .clear-btn {
+                padding: $spacing-2 $spacing-4;
+                background: $danger-bg;
+                color: $danger;
+                border: none;
+                border-radius: $radius-md;
+                font-size: $font-size-sm;
+                font-weight: $font-weight-medium;
+                cursor: pointer;
+                transition: all $transition-fast;
 
-                &.failed {
-                    color: $danger;
+                &:hover {
+                    background: $danger;
+                    color: $white;
                 }
             }
         }

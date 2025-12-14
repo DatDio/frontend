@@ -38,6 +38,10 @@ export class CheckLiveMailComponent implements OnInit, OnDestroy {
     totalCount = 0;
     processedCount = 0;
 
+    // Copy state tracking
+    copiedType: string | null = null;
+    private copyTimeout: any;
+
     ngOnInit(): void {
         this.checkForm = this.formBuilder.group({
             emailData: ['', [Validators.required, Validators.minLength(10)]]
@@ -46,6 +50,9 @@ export class CheckLiveMailComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.closeEventSource();
+        if (this.copyTimeout) {
+            clearTimeout(this.copyTimeout);
+        }
     }
 
     private closeEventSource(): void {
@@ -162,19 +169,38 @@ export class CheckLiveMailComponent implements OnInit, OnDestroy {
     copyLive(): void {
         const data = this.liveResults.map(r => `${r.email}|${r.password}${r.refreshToken ? '|' + r.refreshToken : ''}${r.clientId ? '|' + r.clientId : ''}`).join('\n');
         if (!data) { this.notificationService.warning('Không có email live'); return; }
-        navigator.clipboard.writeText(data).then(() => this.notificationService.success(`Đã copy ${this.liveCount} email live!`));
+        navigator.clipboard.writeText(data).then(() => {
+            this.setCopied('live');
+            this.notificationService.success(`Đã copy ${this.liveCount} email live!`);
+        });
     }
 
     copyDie(): void {
         const data = this.dieResults.map(r => `${r.email}|${r.password}`).join('\n');
         if (!data) { this.notificationService.warning('Không có email die'); return; }
-        navigator.clipboard.writeText(data).then(() => this.notificationService.success(`Đã copy ${this.dieCount} email die!`));
+        navigator.clipboard.writeText(data).then(() => {
+            this.setCopied('die');
+            this.notificationService.success(`Đã copy ${this.dieCount} email die!`);
+        });
     }
 
     copyUnknown(): void {
         const data = this.unknownResults.map(r => `${r.email}|${r.password}`).join('\n');
         if (!data) { this.notificationService.warning('Không có email unknown'); return; }
-        navigator.clipboard.writeText(data).then(() => this.notificationService.success(`Đã copy ${this.unknownCount} email unknown!`));
+        navigator.clipboard.writeText(data).then(() => {
+            this.setCopied('unknown');
+            this.notificationService.success(`Đã copy ${this.unknownCount} email unknown!`);
+        });
+    }
+
+    private setCopied(type: string): void {
+        if (this.copyTimeout) {
+            clearTimeout(this.copyTimeout);
+        }
+        this.copiedType = type;
+        this.copyTimeout = setTimeout(() => {
+            this.copiedType = null;
+        }, 2000);
     }
 
     clearResults(): void {
@@ -184,12 +210,6 @@ export class CheckLiveMailComponent implements OnInit, OnDestroy {
         this.processedCount = 0;
         this.totalCount = 0;
         this.showResults = false;
-    }
-
-    filter(): void {
-        const data = this.liveResults.map(r => `${r.email}|${r.password}${r.refreshToken ? '|' + r.refreshToken : ''}${r.clientId ? '|' + r.clientId : ''}`).join('\n');
-        this.checkForm.patchValue({ emailData: data });
-        this.notificationService.success('Đã lọc, chỉ giữ lại email live');
     }
 
     stopCheck(): void {

@@ -235,36 +235,6 @@
             color: $primary;
         }
     }
-
-    // Submit Button
-    .get-code-btn {
-        width: 100%;
-        padding: $spacing-4 $spacing-6;
-        background: $gradient-primary;
-        color: $white;
-        border: none;
-        border-radius: $radius-lg;
-        font-size: $font-size-base;
-        font-weight: $font-weight-semibold;
-        cursor: pointer;
-        transition: all $transition-base;
-        box-shadow: $shadow-primary;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: $spacing-2;
-
-        &:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: $shadow-lg, 0 6px 20px rgba($primary, 0.4);
-        }
-
-        &:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-            transform: none;
-        }
-    }
 }
 
 // =============================================
@@ -282,6 +252,40 @@
     justify-content: flex-end;
     gap: $spacing-3;
     margin-top: $spacing-4;
+
+    .stop-btn {
+        padding: $spacing-3 $spacing-5;
+        background: $warning;
+        color: $white;
+        border: none;
+        border-radius: $radius-md;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-medium;
+        cursor: pointer;
+        transition: all $transition-base;
+
+        &:hover {
+            background: darken($warning, 10%);
+            transform: translateY(-2px);
+        }
+    }
+
+    .clear-btn {
+        padding: $spacing-3 $spacing-5;
+        background: $danger-bg;
+        color: $danger;
+        border: none;
+        border-radius: $radius-md;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-medium;
+        cursor: pointer;
+        transition: all $transition-base;
+
+        &:hover {
+            background: $danger;
+            color: $white;
+        }
+    }
 
     .filter-btn {
         padding: $spacing-3 $spacing-5;
@@ -302,7 +306,7 @@
 
     .get-code-btn {
         padding: $spacing-3 $spacing-5;
-        background: $success;
+        background: $gradient-primary;
         color: $white;
         border: none;
         border-radius: $radius-md;
@@ -313,10 +317,11 @@
         display: flex;
         align-items: center;
         gap: $spacing-2;
+        box-shadow: $shadow-primary;
 
         &:hover:not(:disabled) {
-            background: darken($success, 10%);
             transform: translateY(-2px);
+            box-shadow: $shadow-lg, 0 6px 20px rgba($primary, 0.4);
         }
 
         &:disabled {
@@ -454,17 +459,39 @@
         color: var(--text-primary);
     }
 
-    .email {
-        max-width: 200px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        color: var(--text-primary);
+    .email-info {
+        min-width: 200px;
+        max-width: 300px;
     }
 
-    .password {
+    .email-info-content {
         font-family: 'Consolas', 'Monaco', monospace;
-        color: var(--text-secondary);
+        font-size: $font-size-xs;
+        color: var(--text-primary);
+        background: var(--bg-input);
+        padding: $spacing-2 $spacing-3;
+        border-radius: $radius-sm;
+        overflow-x: auto;
+        white-space: nowrap;
+        max-width: 280px;
+        display: block;
+
+        &::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: rgba($primary, 0.3);
+            border-radius: 2px;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+            background: rgba($primary, 0.5);
+        }
     }
 
     .status {
@@ -491,6 +518,12 @@
 
     .code {
         white-space: nowrap;
+    }
+
+    .code-wrapper {
+        display: inline-flex;
+        align-items: center;
+        gap: $spacing-2;
     }
 
     .code-value {
@@ -524,11 +557,10 @@
     }
 
     .content {
-        max-width: 200px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        min-width: 200px;
         color: var(--text-secondary);
+        word-break: break-word;
+        white-space: normal;
     }
 
     .date {
@@ -611,7 +643,7 @@
             padding: $spacing-2;
         }
 
-        .email,
+        .email-info-content,
         .content {
             max-width: 120px;
         }

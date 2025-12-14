@@ -1,7 +1,7 @@
 <div class="tool-page">
     <div class="container">
         <div class="page-header">
-            <h1><i class="fas fa-envelope-open-text me-2"></i> Check Live Mail</h1>
+            <h1><i class="bi bi-envelope-open me-2"></i> Check Live Mail</h1>
             <p>Kiểm tra trạng thái hoạt động của tài khoản email Hotmail/Outlook</p>
         </div>
 
@@ -15,7 +15,7 @@
                     <textarea formControlName="emailData" class="data-textarea" rows="8"
                         placeholder="email|password|refresh_token|client_id"></textarea>
                     <div class="textarea-hint">
-                        <i class="fas fa-info-circle me-1"></i>
+                        <i class="bi bi-info-circle me-1"></i>
                         Định dạng: email|password|refresh_token|client_id (mỗi dòng một email)
                     </div>
                 </div>
@@ -32,110 +32,129 @@
                 <div class="action-buttons">
                     @if (isLoading) {
                     <button type="button" class="stop-btn" (click)="stopCheck()">
-                        <i class="fas fa-stop me-1"></i> Dừng
+                        <i class="bi bi-stop-fill me-1"></i> Dừng
                     </button>
                     }
-                    <button type="button" class="filter-btn" (click)="filter()" *ngIf="showResults && liveCount > 0">
-                        <i class="fas fa-filter me-1"></i> Filter
-                    </button>
                     <button type="button" class="clear-btn" (click)="clearResults()" *ngIf="showResults">
-                        <i class="fas fa-trash me-1"></i> Clear
+                        <i class="bi bi-trash me-1"></i> Clear
                     </button>
                     <button type="submit" class="submit-btn" [disabled]="checkForm.invalid || isLoading">
                         @if (isLoading) {
                         <span class="spinner-border spinner-border-sm me-2"></span>
-                        Đang kiểm tra... ({{ progressPercent }}%)
+                        Đang kiểm tra...
                         } @else {
-                        <i class="fas fa-search me-2"></i> Check Live
+                        <i class="bi bi-search me-2"></i> Check Live
                         }
                     </button>
                 </div>
             </form>
 
-            <!-- Results Section - 3 Columns -->
+            <!-- Results Section -->
             @if (showResults) {
             <div class="results-section">
                 <!-- Progress Bar -->
                 @if (isLoading && totalCount > 0) {
-                <div class="progress-wrapper">
-                    <div class="progress">
-                        <div class="progress-bar progress-bar-striped progress-bar-animated"
-                            [style.width.%]="progressPercent"></div>
+                <div class="progress-section">
+                    <div class="progress-info">
+                        <span>Tiến trình: {{ processedCount }}/{{ totalCount }}</span>
+                        <span>{{ progressPercent }}%</span>
                     </div>
-                    <span class="progress-text">{{ processedCount }}/{{ totalCount }}</span>
+                    <div class="progress-bar-wrapper">
+                        <div class="progress-bar" [style.width.%]="progressPercent"></div>
+                    </div>
                 </div>
                 }
 
-                <!-- 3-Column Grid -->
+                <div class="results-header">
+                    <h4><i class="bi bi-list-ul me-2"></i> Kết quả</h4>
+                    <div class="results-actions">
+                        <button type="button" class="copy-success-btn" [class.copied]="copiedType === 'live'"
+                            (click)="copyLive()" [disabled]="liveCount === 0">
+                            @if (copiedType === 'live') {
+                            <i class="bi bi-check-circle-fill me-1"></i>
+                            } @else {
+                            <i class="bi bi-clipboard me-1"></i>
+                            }
+                            Copy Live ({{ liveCount }})
+                        </button>
+                        <button type="button" class="copy-error-btn" [class.copied]="copiedType === 'die'"
+                            (click)="copyDie()" [disabled]="dieCount === 0">
+                            @if (copiedType === 'die') {
+                            <i class="bi bi-check-circle-fill me-1"></i>
+                            } @else {
+                            <i class="bi bi-clipboard me-1"></i>
+                            }
+                            Copy Die ({{ dieCount }})
+                        </button>
+                        <button type="button" class="copy-unknown-btn" [class.copied]="copiedType === 'unknown'"
+                            (click)="copyUnknown()" [disabled]="unknownCount === 0">
+                            @if (copiedType === 'unknown') {
+                            <i class="bi bi-check-circle-fill me-1"></i>
+                            } @else {
+                            <i class="bi bi-clipboard me-1"></i>
+                            }
+                            Copy Unknown ({{ unknownCount }})
+                        </button>
+                        <button type="button" class="clear-btn" (click)="clearResults()">
+                            <i class="bi bi-trash me-1"></i> Xóa
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Results Grid: 3 Columns -->
                 <div class="results-grid">
                     <!-- Live Column -->
                     <div class="result-column live-column">
-                        <div class="column-header">
-                            <span class="column-title">
-                                <i class="fas fa-check-circle me-1"></i> Live
-                            </span>
-                            <span class="column-count">{{ liveCount }}</span>
-                            <button class="copy-btn" (click)="copyLive()" [disabled]="liveCount === 0">
-                                <i class="fas fa-copy"></i> Copy
-                            </button>
+                        <div class="column-header success">
+                            <i class="bi bi-check-circle-fill me-1"></i> Live ({{ liveCount }})
                         </div>
                         <div class="column-content">
                             @for (result of liveResults; track result.email) {
-                            <div class="result-item">
-                                <span class="email">{{ result.email }}</span>
+                            <div class="result-item success">
+                                <div class="email-info-content">{{ result.email }}|{{ result.password }}{{
+                                    result.refreshToken ? '|' + result.refreshToken : '' }}{{ result.clientId ? '|' +
+                                    result.clientId : '' }}</div>
                             </div>
                             }
                             @if (liveResults.length === 0) {
-                            <div class="empty-state">Chưa có kết quả</div>
+                            <div class="empty-message">Chưa có kết quả</div>
                             }
                         </div>
                     </div>
 
                     <!-- Die Column -->
                     <div class="result-column die-column">
-                        <div class="column-header">
-                            <span class="column-title">
-                                <i class="fas fa-times-circle me-1"></i> Die
-                            </span>
-                            <span class="column-count">{{ dieCount }}</span>
-                            <button class="copy-btn" (click)="copyDie()" [disabled]="dieCount === 0">
-                                <i class="fas fa-copy"></i> Copy
-                            </button>
+                        <div class="column-header error">
+                            <i class="bi bi-x-circle-fill me-1"></i> Die ({{ dieCount }})
                         </div>
                         <div class="column-content">
                             @for (result of dieResults; track result.email) {
-                            <div class="result-item">
-                                <span class="email">{{ result.email }}</span>
+                            <div class="result-item error">
+                                <div class="email-info-content">{{ result.email }}|{{ result.password }}</div>
                             </div>
                             }
                             @if (dieResults.length === 0) {
-                            <div class="empty-state">Chưa có kết quả</div>
+                            <div class="empty-message">Chưa có kết quả</div>
                             }
                         </div>
                     </div>
 
                     <!-- Unknown Column -->
                     <div class="result-column unknown-column">
-                        <div class="column-header">
-                            <span class="column-title">
-                                <i class="fas fa-question-circle me-1"></i> Unknown
-                            </span>
-                            <span class="column-count">{{ unknownCount }}</span>
-                            <button class="copy-btn" (click)="copyUnknown()" [disabled]="unknownCount === 0">
-                                <i class="fas fa-copy"></i> Copy
-                            </button>
+                        <div class="column-header warning">
+                            <i class="bi bi-question-circle-fill me-1"></i> Unknown ({{ unknownCount }})
                         </div>
                         <div class="column-content">
                             @for (result of unknownResults; track result.email) {
-                            <div class="result-item">
-                                <span class="email">{{ result.email }}</span>
+                            <div class="result-item warning">
+                                <div class="email-info-content">{{ result.email }}|{{ result.password }}</div>
                                 @if (result.error) {
                                 <span class="error-hint" [title]="result.error">!</span>
                                 }
                             </div>
                             }
                             @if (unknownResults.length === 0) {
-                            <div class="empty-state">Chưa có kết quả</div>
+                            <div class="empty-message">Chưa có kết quả</div>
                             }
                         </div>
                     </div>

@@ -1,7 +1,7 @@
 <div class="get-code-page">
     <div class="container">
         <div class="page-header">
-            <h1><i class="fas fa-key me-2"></i> Get Code Email</h1>
+            <h1><i class="bi bi-key me-2"></i> Get Code Email</h1>
             <p>Lấy mã xác thực từ email Hotmail/Outlook</p>
         </div>
 
@@ -40,7 +40,7 @@
                     <textarea formControlName="emailData" class="email-textarea" rows="8"
                         placeholder="email|password|refresh_token|client_id"></textarea>
                     <div class="textarea-hint">
-                        <i class="fas fa-info-circle me-1"></i>
+                        <i class="bi bi-info-circle me-1"></i>
                         Định dạng: email|password|refresh_token|client_id (mỗi dòng một email)
                     </div>
                 </div>
@@ -49,12 +49,12 @@
                 <div class="action-buttons">
                     @if (isLoading) {
                     <button type="button" class="stop-btn" (click)="stopGetCode()">
-                        <i class="fas fa-stop me-1"></i> Dừng
+                        <i class="bi bi-stop-fill me-1"></i> Dừng
                     </button>
                     }
                     @if (showResults) {
                     <button type="button" class="clear-btn" (click)="clearResults()">
-                        <i class="fas fa-trash me-1"></i> Clear
+                        <i class="bi bi-trash me-1"></i> Clear
                     </button>
                     }
                     <button type="submit" class="get-code-btn" [disabled]="getCodeForm.invalid || isLoading">
@@ -62,22 +62,36 @@
                         <span class="spinner-border spinner-border-sm me-2"></span>
                         Đang xử lý... ({{ progressPercent }}%)
                         } @else {
-                        <i class="fas fa-search me-2"></i> Get Code
+                        <i class="bi bi-search me-2"></i> Get Code
                         }
                     </button>
                 </div>
             </form>
 
+            <!-- Progress Bar -->
+            @if (showResults && totalCount > 0) {
+            <div class="progress-section">
+                <div class="progress-info">
+                    <span>Tiến trình: {{ processedCount }}/{{ totalCount }}</span>
+                    <span>{{ progressPercent }}%</span>
+                </div>
+                <div class="progress-bar-wrapper">
+                    <div class="progress-bar" [style.width.%]="progressPercent"></div>
+                </div>
+            </div>
+            }
+
             <!-- Results Section - Table Layout -->
             @if (showResults) {
             <div class="get-code-results">
                 <div class="results-header">
-                    <h4><i class="fas fa-list me-2"></i> Kết quả ({{ successCount + failedCount + unknownCount }})</h4>
+                    <h4><i class="bi bi-list-ul me-2"></i> Kết quả ({{ successCount + failedCount + unknownCount }})
+                    </h4>
                 </div>
 
                 @if (allResults.length === 0 && !isLoading) {
                 <div class="no-results">
-                    <i class="fas fa-inbox"></i>
+                    <i class="bi bi-inbox"></i>
                     <p>Chưa có kết quả</p>
                 </div>
                 } @else {
@@ -86,8 +100,7 @@
                         <thead>
                             <tr>
                                 <th>STT</th>
-                                <th>Email</th>
-                                <th>Mailpass</th>
+                                <th>Email Info</th>
                                 <th>Status</th>
                                 <th>Kết quả</th>
                                 <th>Nội dung</th>
@@ -101,8 +114,10 @@
                                 [class.error-row]="result.status === 'FAILED'"
                                 [class.unknown-row]="result.status === 'UNKNOWN'">
                                 <td class="stt">{{ i + 1 }}</td>
-                                <td class="email">{{ result.email }}</td>
-                                <td class="password">{{ result.password || '-' }}</td>
+                                <td class="email-info">
+                                    <div class="email-info-content">{{ result.email }}|{{ result.password || '' }}|{{
+                                        result.refreshToken || '' }}|{{ result.clientId || '' }}</div>
+                                </td>
                                 <td class="status">
                                     <span class="status-badge" [class.success]="result.status === 'SUCCESS'"
                                         [class.error]="result.status === 'FAILED'"
@@ -113,11 +128,18 @@
                                 </td>
                                 <td class="code">
                                     @if (result.code) {
-                                    <span class="code-value">{{ result.code }}</span>
-                                    <button type="button" class="copy-btn" (click)="copyCode(result.code)"
-                                        title="Sao chép">
-                                        Copy
-                                    </button>
+                                    <div class="code-wrapper">
+                                        <span class="code-value">{{ result.code }}</span>
+                                        <button type="button" class="btn btn-sm btn-copy"
+                                            [class.copied]="copiedCode === result.code" (click)="copyCode(result.code)"
+                                            title="Sao chép">
+                                            @if (copiedCode === result.code) {
+                                            <i class="bi bi-check-circle-fill"></i>
+                                            } @else {
+                                            <i class="bi bi-clipboard"></i>
+                                            }
+                                        </button>
+                                    </div>
                                     } @else {
                                     <span class="no-code">-</span>
                                     }

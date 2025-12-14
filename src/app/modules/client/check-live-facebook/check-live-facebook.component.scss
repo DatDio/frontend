@@ -125,6 +125,40 @@
     gap: $spacing-3;
     margin-top: $spacing-4;
 
+    .stop-btn {
+        padding: $spacing-3 $spacing-5;
+        background: $warning;
+        color: $white;
+        border: none;
+        border-radius: $radius-md;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-medium;
+        cursor: pointer;
+        transition: all $transition-base;
+
+        &:hover {
+            background: darken($warning, 10%);
+            transform: translateY(-2px);
+        }
+    }
+
+    .clear-btn {
+        padding: $spacing-3 $spacing-5;
+        background: $danger-bg;
+        color: $danger;
+        border: none;
+        border-radius: $radius-md;
+        font-size: $font-size-sm;
+        font-weight: $font-weight-medium;
+        cursor: pointer;
+        transition: all $transition-base;
+
+        &:hover {
+            background: $danger;
+            color: $white;
+        }
+    }
+
     .submit-btn {
         padding: $spacing-3 $spacing-6;
         background: $gradient-primary;
@@ -257,8 +291,8 @@
 
         .clear-btn {
             padding: $spacing-2 $spacing-4;
-            background: var(--bg-table-header);
-            color: var(--text-secondary);
+            background: $danger-bg;
+            color: $danger;
             border: none;
             border-radius: $radius-md;
             font-size: $font-size-sm;
@@ -267,7 +301,8 @@
             transition: all $transition-fast;
 
             &:hover {
-                background: var(--border-color);
+                background: $danger;
+                color: $white;
             }
         }
     }
@@ -637,6 +672,38 @@
 
     .actions {
         text-align: center;
+    }
+}
+
+// =============================================
+// BTN-COPY UNIFIED STYLE (from orders)
+// =============================================
+
+.btn-copy {
+    background: $gradient-primary;
+    color: $white;
+    border: none;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    transition: all $transition-base;
+    box-shadow: $shadow-primary;
+
+    &:hover:not(.copied) {
+        transform: translateY(-2px);
+        box-shadow: $shadow-md, $shadow-primary;
+    }
+
+    &.copied {
+        background: $gradient-card-green;
+        box-shadow: none;
+    }
+
+    i {
+        font-size: $font-size-sm;
     }
 }
 

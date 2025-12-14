@@ -9,6 +9,8 @@ import { PaginationComponent, PaginationConfig } from '../../../../shared/compon
 import { PaginationService } from '../../../../shared/services/pagination.service';
 import { convertToISO } from '../../../../Utils/functions/date-time-utils';
 import { environment } from '../../../../../environments/environment';
+import { RankService } from '../../../../core/services/rank.service';
+import { UserRankInfo } from '../../../../core/models/rank.model';
 
 declare global {
   interface Window {
@@ -35,6 +37,7 @@ export class ClientTransactionListComponent implements OnInit {
   private readonly notificationService = inject(NotificationService);
   private readonly fb = inject(FormBuilder);
   private readonly paginationService = inject(PaginationService);
+  private readonly rankService = inject(RankService);
 
   transactions: TransactionResponse[] = [];
   loading = true;
@@ -53,10 +56,39 @@ export class ClientTransactionListComponent implements OnInit {
   depositAmount: number = 10000;
   depositAmountDisplay: string = '10,000';
 
+  // ========== RANK INFO ==========
+  userRankInfo: UserRankInfo | null = null;
+
   ngOnInit(): void {
     this.initForm();
     this.loadTransactions();
+    this.loadRankInfo();
     this.depositAmountDisplay = this.formatNumber(this.depositAmount);
+  }
+
+  // Load user rank info
+  private loadRankInfo(): void {
+    this.rankService.getMyRank().subscribe({
+      next: (res) => {
+        if (res.success) {
+          this.userRankInfo = res.data;
+        }
+      },
+      error: (err) => {
+        console.error('Error loading rank info:', err);
+      }
+    });
+  }
+
+  // Calculate bonus amount based on deposit
+  calculateBonus(): number {
+    if (!this.userRankInfo || !this.userRankInfo.bonusPercent) return 0;
+    return Math.floor((this.depositAmount * this.userRankInfo.bonusPercent) / 100);
+  }
+
+  // Calculate total amount (deposit + bonus)
+  calculateTotal(): number {
+    return this.depositAmount + this.calculateBonus();
   }
 
   // Format number with thousand separators
@@ -308,5 +340,5 @@ export class ClientTransactionListComponent implements OnInit {
     return map[status] || 'badge-secondary';
   }
 
- 
+
 }

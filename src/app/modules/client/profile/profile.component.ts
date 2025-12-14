@@ -100,7 +100,7 @@ export class ProfileComponent implements OnInit {
 
   private initCreateApiKeyForm(): void {
     this.createApiKeyForm = this.formBuilder.group({
-      name: ['', Validators.maxLength(50)]
+      name: ['', [Validators.required, Validators.maxLength(50)]]
     });
   }
 

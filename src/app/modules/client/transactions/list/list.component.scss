@@ -58,99 +58,332 @@ body:has(#payos-modal:not(:empty)) {
 }
 
 // =============================================
-// DEPOSIT CARD
+// DEPOSIT SECTION - PREMIUM DESIGN
 // =============================================
+
+.deposit-section {
+  display: block;
+}
 
 .deposit-card {
   background: var(--bg-card);
   border: 1px solid var(--border-card);
-  border-radius: $radius-xl;
-  box-shadow: var(--shadow-card);
-  padding: $spacing-6;
-  transition: background-color 0.3s ease;
+  border-radius: $radius-2xl;
+  box-shadow: var(--shadow-card), 0 8px 32px rgba($primary, 0.08);
+  overflow: hidden;
+  transition: all 0.3s ease;
 
-  h3 {
-    color: var(--text-heading);
-    font-size: $font-size-2xl;
-    font-weight: $font-weight-bold;
-    margin-bottom: $spacing-5;
+  &:hover {
+    box-shadow: var(--shadow-lg), 0 12px 40px rgba($primary, 0.12);
+  }
+}
+
+.deposit-header {
+  text-align: center;
+  padding: $spacing-8 $spacing-6 $spacing-6;
+  background: $gradient-primary;
+  position: relative;
+
+  .deposit-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba($white, 0.2);
+    border-radius: $radius-full;
     display: flex;
     align-items: center;
-    gap: $spacing-3;
+    justify-content: center;
+    margin: 0 auto $spacing-4;
+    backdrop-filter: blur(10px);
 
     i {
-      color: $primary;
+      font-size: 28px;
+      color: $white;
+    }
+  }
+
+  h3 {
+    color: $white;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    margin: 0 0 $spacing-2;
+  }
+
+  .deposit-subtitle {
+    color: rgba($white, 0.85);
+    font-size: $font-size-sm;
+    margin: 0;
+  }
+}
+
+// =============================================
+// RANK INFO SECTION
+// =============================================
+
+.rank-info-section {
+  padding: $spacing-5 $spacing-6;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.rank-badge {
+  display: flex;
+  align-items: center;
+  gap: $spacing-4;
+  padding: $spacing-4 $spacing-5;
+  background: linear-gradient(135deg, $primary, rgba($primary, 0.7));
+  border-radius: $radius-xl;
+  color: $white;
+
+  .rank-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: $radius-lg;
+    object-fit: cover;
+  }
+
+  .rank-icon-default {
+    font-size: 32px;
+    color: $warning;
+  }
+
+  .rank-details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    .rank-label {
+      font-size: $font-size-xs;
+      opacity: 0.85;
+    }
+
+    .rank-name {
+      font-size: $font-size-lg;
+      font-weight: $font-weight-bold;
+    }
+  }
+
+  .bonus-badge {
+    text-align: center;
+    background: rgba($white, 0.2);
+    padding: $spacing-2 $spacing-4;
+    border-radius: $radius-lg;
+    backdrop-filter: blur(8px);
+
+    .bonus-percent {
+      display: block;
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+      line-height: 1;
+    }
+
+    .bonus-label {
+      font-size: $font-size-xs;
+      opacity: 0.9;
     }
   }
 }
 
-.bank-box {
-  border: 1px solid var(--border-color) !important;
-  background: var(--bg-table-header);
-  border-radius: $radius-lg !important;
-  padding: $spacing-4;
+.next-rank-progress {
+  margin-top: $spacing-4;
+
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: $font-size-xs;
+    color: var(--text-secondary);
+    margin-bottom: $spacing-2;
+
+    strong {
+      color: $primary;
+    }
+  }
+
+  .progress-bar-container {
+    height: 8px;
+    background: var(--bg-table-header);
+    border-radius: $radius-full;
+    overflow: hidden;
+
+    .progress-bar-fill {
+      height: 100%;
+      background: $gradient-primary;
+      border-radius: $radius-full;
+      transition: width 0.5s ease;
+      max-width: 100%;
+    }
+  }
+}
+
+// =============================================
+// DEPOSIT FORM
+// =============================================
+
+.deposit-form {
+  padding: $spacing-6;
+
+  .input-label {
+    display: block;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: var(--text-secondary);
+    margin-bottom: $spacing-3;
+  }
+
+  .amount-input-wrapper {
+    display: flex;
+    align-items: stretch;
+    margin-bottom: $spacing-4;
+    border: 2px solid var(--border-input);
+    border-radius: $radius-xl;
+    overflow: hidden;
+    transition: all $transition-base;
+
+    &:focus-within {
+      border-color: $primary;
+      box-shadow: 0 0 0 4px rgba($primary, 0.15);
+    }
+
+    .amount-input {
+      flex: 1;
+      padding: $spacing-3 $spacing-4;
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+      text-align: right;
+      border: none;
+      background: var(--bg-input);
+      color: var(--text-primary);
+
+      &:focus {
+        outline: none;
+      }
+
+      &::placeholder {
+        color: var(--text-muted);
+        font-weight: $font-weight-normal;
+      }
+    }
+
+    .currency-tag {
+      padding: $spacing-3 $spacing-4;
+      background: $gradient-primary;
+      color: $white;
+      font-weight: $font-weight-bold;
+      font-size: $font-size-sm;
+      display: flex;
+      align-items: center;
+    }
+  }
+}
+
+// Quick Amount Buttons
+.quick-amounts {
   display: flex;
-  align-items: center;
-  gap: $spacing-3;
+  flex-wrap: wrap;
+  gap: $spacing-2;
+  margin-bottom: $spacing-5;
 
-  img {
-    border-radius: $radius-md;
-  }
+  .quick-amount-btn {
+    flex: 1;
+    min-width: 60px;
+    padding: $spacing-2 $spacing-3;
+    background: var(--bg-table-header);
+    border: 1px solid var(--border-color);
+    border-radius: $radius-lg;
+    color: var(--text-secondary);
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transition: all $transition-fast;
 
-  strong {
-    color: var(--text-heading);
-    font-size: $font-size-base;
+    &:hover {
+      background: rgba($primary, 0.1);
+      border-color: $primary;
+      color: $primary;
+      transform: translateY(-2px);
+    }
   }
 }
 
-.deposit-input {
-  max-width: 300px;
-  font-size: $font-size-2xl !important;
-  font-weight: $font-weight-bold;
-  color: var(--text-primary) !important;
-  background: var(--bg-input) !important;
-  border: 2px solid var(--border-input);
+// Bonus Preview
+.bonus-preview {
+  background: var(--bg-table-header);
   border-radius: $radius-lg;
-  padding: $spacing-3 $spacing-4;
-  transition: all $transition-base;
+  padding: $spacing-4;
+  margin-bottom: $spacing-5;
 
-  &:focus {
-    border-color: $primary;
-    box-shadow: 0 0 0 3px rgba($primary, 0.15);
-    background: var(--bg-input) !important;
+  .bonus-row {
+    display: flex;
+    justify-content: space-between;
+    padding: $spacing-2 0;
+    font-size: $font-size-sm;
+    color: var(--text-secondary);
+
+    &:not(:last-child) {
+      border-bottom: 1px dashed var(--border-color);
+    }
+
+    &.highlight {
+      color: $success;
+
+      .bonus-value {
+        font-weight: $font-weight-bold;
+        color: $success;
+      }
+    }
+
+    &.total {
+      padding-top: $spacing-3;
+      font-size: $font-size-base;
+      font-weight: $font-weight-bold;
+      color: var(--text-heading);
+
+      .total-value {
+        color: $primary;
+        font-size: $font-size-lg;
+      }
+    }
   }
 }
 
-.currency-badge {
-  background: $gradient-primary;
-  color: $white;
-  padding: $spacing-3 $spacing-5;
-  border-radius: $radius-lg;
-  font-weight: $font-weight-semibold;
-  font-size: $font-size-base;
-  box-shadow: $shadow-primary;
-}
-
-.btn-primary-action {
+// Deposit Button
+.deposit-btn {
+  width: 100%;
+  padding: $spacing-4;
   background: $gradient-primary;
   color: $white;
   border: none;
-  border-radius: $radius-lg;
-  font-size: $font-size-base;
-  font-weight: $font-weight-semibold;
-  padding: $spacing-3 $spacing-8;
+  border-radius: $radius-xl;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  cursor: pointer;
   transition: all $transition-base;
   box-shadow: $shadow-primary;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: $shadow-md, $shadow-primary;
+  i {
+    font-size: $font-size-xl;
   }
 
-  &:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-    transform: none;
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: $shadow-lg, 0 8px 25px rgba($primary, 0.4);
+  }
+
+  &:active {
+    transform: translateY(-1px);
+  }
+}
+
+.deposit-note {
+  text-align: center;
+  margin: $spacing-4 0 0;
+  font-size: $font-size-xs;
+  color: var(--text-muted);
+
+  i {
+    color: $success;
   }
 }
 
@@ -340,13 +573,70 @@ body:has(#payos-modal:not(:empty)) {
 }
 
 @media (max-width: $breakpoint-md) {
-  .deposit-card {
+  .deposit-header {
+    padding: $spacing-6 $spacing-4 $spacing-4;
+
+    .deposit-icon {
+      width: 52px;
+      height: 52px;
+
+      i {
+        font-size: 24px;
+      }
+    }
+
+    h3 {
+      font-size: $font-size-xl;
+    }
+  }
+
+  .rank-info-section {
     padding: $spacing-4;
   }
 
-  .deposit-input {
-    max-width: 100%;
-    font-size: $font-size-lg !important;
+  .rank-badge {
+    flex-wrap: wrap;
+    gap: $spacing-3;
+    padding: $spacing-3;
+
+    .rank-icon {
+      width: 40px;
+      height: 40px;
+    }
+
+    .rank-details {
+      .rank-name {
+        font-size: $font-size-base;
+      }
+    }
+
+    .bonus-badge {
+      .bonus-percent {
+        font-size: $font-size-lg;
+      }
+    }
+  }
+
+  .deposit-form {
+    padding: $spacing-4;
+
+    .amount-input-wrapper {
+      .amount-input {
+        padding: $spacing-3 $spacing-4;
+        font-size: $font-size-xl;
+      }
+
+      .currency-tag {
+        padding: $spacing-2 $spacing-3;
+        font-size: $font-size-sm;
+      }
+    }
+  }
+
+  .quick-amounts {
+    .quick-amount-btn {
+      flex: 0 0 calc(33.333% - #{$spacing-2});
+    }
   }
 
   .search-card {

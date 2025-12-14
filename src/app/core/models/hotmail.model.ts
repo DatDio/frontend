@@ -60,14 +60,15 @@ export interface GetOAuth2Request {
 }
 
 /**
- * Response DTO for get OAuth2 token result
+ * Response DTO for renew refresh token result
  */
 export interface GetOAuth2Response {
     email: string;
     password?: string;
-    refreshToken?: string;
+    refreshToken?: string;  // New refresh token after renewal
     clientId?: string;
     accessToken?: string;
+    fullData?: string;
     success: boolean;
     status?: CheckStatus;
     error?: string;

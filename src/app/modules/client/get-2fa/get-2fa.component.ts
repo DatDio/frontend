@@ -41,6 +41,10 @@ export class Get2FAComponent implements OnInit, OnDestroy {
     showResults = false;
     private intervalId: any;
 
+    // Copy state tracking
+    copiedCode: string | null = null;
+    private copyTimeout: any;
+
     ngOnInit(): void {
         this.initForm();
     }
@@ -48,6 +52,9 @@ export class Get2FAComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         if (this.intervalId) {
             clearInterval(this.intervalId);
+        }
+        if (this.copyTimeout) {
+            clearTimeout(this.copyTimeout);
         }
     }
 
@@ -155,7 +162,14 @@ export class Get2FAComponent implements OnInit, OnDestroy {
 
     copyCode(code: string): void {
         navigator.clipboard.writeText(code).then(() => {
+            if (this.copyTimeout) {
+                clearTimeout(this.copyTimeout);
+            }
+            this.copiedCode = code;
             this.notificationService.success('Đã copy mã 2FA!');
+            this.copyTimeout = setTimeout(() => {
+                this.copiedCode = null;
+            }, 2000);
         });
     }
 

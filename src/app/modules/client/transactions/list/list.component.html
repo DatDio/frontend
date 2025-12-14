@@ -2,34 +2,106 @@
 
   <div id="payos-modal"></div>
 
-
-
-  <div class="card deposit-card mb-5 p-4">
-    <h3 class="mb-4 text-center d-flex justify-content-center">Nạp tiền vào tài khoản</h3>
-
-    <div class="text-center mb-3">
-      <img src="assets/images/bank-building.png" alt="Bank" style="width: 80px; height: auto; opacity: 0.9;">
-    </div>
-    <div class="payment-form text-center">
-
-      <div class="d-flex justify-content-center mb-4">
-        <!-- <div class="bank-box p-3 rounded d-flex align-items-center gap-3 border">
-          <i class="fas fa-credit-card text-primary-blue fa-2x"></i>
-          <strong>Thanh toán qua Ngân Hàng</strong>
-        </div> -->
+  <!-- Premium Deposit Card -->
+  <div class="deposit-section mb-5">
+    <div class="deposit-card">
+      <!-- Header -->
+      <div class="deposit-header">
+        <div class="deposit-icon">
+          <i class="bi bi-wallet2"></i>
+        </div>
+        <h3>Nạp tiền vào tài khoản</h3>
+        <p class="deposit-subtitle">Thanh toán nhanh chóng, an toàn qua PayOS</p>
       </div>
 
-      <div class="d-flex justify-content-center gap-2 align-items-center mb-4">
-        <input type="text" class="form-control deposit-input text-end" [value]="depositAmountDisplay"
-          (input)="onDepositAmountChange($event)" placeholder="Nhập số tiền">
+      <!-- Rank Info Badge -->
+      @if (userRankInfo) {
+      <div class="rank-info-section">
+        <div class="rank-badge"
+          [style.background]="userRankInfo.color ? 'linear-gradient(135deg, ' + userRankInfo.color + ', ' + userRankInfo.color + '99)' : null">
+          @if (userRankInfo.iconUrl) {
+          <img [src]="userRankInfo.iconUrl" alt="Rank Icon" class="rank-icon">
+          } @else {
+          <i class="bi bi-trophy-fill"></i>
+          }
+          <div class="rank-details">
+            <span class="rank-label">Hạng hiện tại</span>
+            <span class="rank-name">{{ userRankInfo.rankName }}</span>
+          </div>
+          <div class="bonus-badge">
+            <span class="bonus-percent">+{{ userRankInfo.bonusPercent }}%</span>
+            <span class="bonus-label">Bonus</span>
+          </div>
+        </div>
 
-        <span class="currency-badge">VNĐ</span>
+        <!-- Progress to next rank -->
+        @if (userRankInfo.nextRankName) {
+        <div class="next-rank-progress">
+          <div class="progress-info">
+            <span>Tiến độ đến <strong>{{ userRankInfo.nextRankName }}</strong></span>
+            <span>{{ userRankInfo.currentDeposit | number:'1.0-0' }} / {{ userRankInfo.nextRankMinDeposit |
+              number:'1.0-0' }} VNĐ</span>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar-fill"
+              [style.width.%]="(userRankInfo.currentDeposit / (userRankInfo.nextRankMinDeposit || 1)) * 100"></div>
+          </div>
+        </div>
+        }
       </div>
+      }
 
-      <button class="btn btn-primary-action px-5 fw-bold" (click)="createDeposit()">
-        Thanh toán ngay
-      </button>
+      <!-- Deposit Form -->
+      <div class="deposit-form">
+        <label class="input-label">Số tiền nạp</label>
+        <div class="amount-input-wrapper">
+          <input type="text" class="amount-input" [value]="depositAmountDisplay" (input)="onDepositAmountChange($event)"
+            placeholder="Nhập số tiền">
+          <span class="currency-tag">VNĐ</span>
+        </div>
 
+        <!-- Quick Amount Buttons -->
+        <div class="quick-amounts">
+          <button type="button" class="quick-amount-btn"
+            (click)="depositAmount = 50000; depositAmountDisplay = '50,000'">50K</button>
+          <button type="button" class="quick-amount-btn"
+            (click)="depositAmount = 100000; depositAmountDisplay = '100,000'">100K</button>
+          <button type="button" class="quick-amount-btn"
+            (click)="depositAmount = 200000; depositAmountDisplay = '200,000'">200K</button>
+          <button type="button" class="quick-amount-btn"
+            (click)="depositAmount = 500000; depositAmountDisplay = '500,000'">500K</button>
+          <button type="button" class="quick-amount-btn"
+            (click)="depositAmount = 1000000; depositAmountDisplay = '1,000,000'">1M</button>
+        </div>
+
+        <!-- Bonus Preview -->
+        @if (userRankInfo && userRankInfo.bonusPercent > 0) {
+        <div class="bonus-preview">
+          <div class="bonus-row">
+            <span>Số tiền nạp:</span>
+            <span>{{ depositAmount | number:'1.0-0' }} VNĐ</span>
+          </div>
+          <div class="bonus-row highlight">
+            <span><i class="bi bi-gift-fill me-1"></i>Bonus ({{ userRankInfo.bonusPercent }}%):</span>
+            <span class="bonus-value">+{{ calculateBonus() | number:'1.0-0' }} VNĐ</span>
+          </div>
+          <div class="bonus-row total">
+            <span>Tổng nhận:</span>
+            <span class="total-value">{{ calculateTotal() | number:'1.0-0' }} VNĐ</span>
+          </div>
+        </div>
+        }
+
+        <button class="deposit-btn" (click)="createDeposit()">
+          <i class="bi bi-credit-card me-2"></i>
+          Thanh toán ngay
+        </button>
+
+        <p class="deposit-note">
+          <i class="bi bi-shield-check me-1"></i>
+          Giao dịch được bảo mật bởi PayOS
+        </p>
+      </div>
     </div>
   </div>
 

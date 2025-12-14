@@ -294,8 +294,13 @@
                 <form [formGroup]="createApiKeyForm" (ngSubmit)="onCreateApiKey()">
                   <div class="row align-items-end">
                     <div class="col-md-8 mb-3 mb-md-0">
-                      <label class="form-label">Tên Key</label>
-                      <input type="text" class="form-control" formControlName="name" placeholder="VD: ApiKey-MailShop ">
+                      <label class="form-label">Tên Key *</label>
+                      <input type="text" class="form-control" formControlName="name" placeholder="VD: ApiKey-MailShop"
+                        [class.is-invalid]="apiKeySubmitted && createApiKeyForm.get('name')?.invalid">
+                      <div class="text-danger small mt-1"
+                        *ngIf="apiKeySubmitted && createApiKeyForm.get('name')?.errors?.['required']">
+                        Tên key là bắt buộc
+                      </div>
                     </div>
                     <div class="col-md-4">
                       <button type="submit" class="btn btn-primary w-100" [disabled]="apiKeyLoading">

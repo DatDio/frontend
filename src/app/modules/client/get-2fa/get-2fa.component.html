@@ -1,7 +1,7 @@
 <div class="tool-page">
     <div class="container">
         <div class="page-header">
-            <h1><i class="fas fa-shield-alt me-2"></i> Get 2FA Code</h1>
+            <h1><i class="bi bi-shield-lock me-2"></i> Get 2FA Code</h1>
             <p>Lấy mã xác thực 2 bước (TOTP) từ secret key</p>
         </div>
 
@@ -13,24 +13,24 @@
                         2FA Secret <span class="item-count">[{{ itemCount }}]</span>
                     </label>
                     <textarea formControlName="secretData" class="data-textarea" rows="8"
-                        placeholder="Nhập 2FA Secret Key&#10;Ví dụ: JBSWY3DPEHPK3PXP&#10;Mỗi dòng một secret"></textarea>
+                        placeholder="Nhập 2FA Secret Key"></textarea>
                     <div class="textarea-hint">
-                        <i class="fas fa-info-circle me-1"></i>
-                        Chỉ cần nhập 2FA secret key (Base32), mỗi dòng một key
+                        <i class="bi bi-info-circle me-1"></i>
+                        Mỗi dòng một key
                     </div>
                 </div>
 
                 <!-- Action Buttons -->
                 <div class="action-buttons">
                     <button type="button" class="filter-btn" (click)="refreshCodes()" *ngIf="showResults">
-                        <i class="fas fa-sync-alt me-1"></i> Refresh
+                        <i class="bi bi-arrow-clockwise me-1"></i> Refresh
                     </button>
                     <button type="submit" class="submit-btn" [disabled]="getForm.invalid || isLoading">
                         @if (isLoading) {
                         <span class="spinner-border spinner-border-sm me-2"></span>
                         Đang tạo...
                         } @else {
-                        <i class="fas fa-key me-2"></i> Get 2FA
+                        <i class="bi bi-key me-2"></i> Get 2FA
                         }
                     </button>
                 </div>
@@ -40,12 +40,12 @@
             @if (showResults) {
             <div class="results-section">
                 <div class="results-header">
-                    <h4><i class="fas fa-list me-2"></i> Kết quả ({{ results.length }})</h4>
+                    <h4><i class="bi bi-list-ul me-2"></i> Kết quả ({{ results.length }})</h4>
                     <div class="results-actions">
                         <span class="badge bg-success me-2">Thành công: {{ successCount }}</span>
                         <span class="badge bg-danger me-2">Lỗi: {{ errorCount }}</span>
                         <button type="button" class="clear-btn" (click)="clearResults()">
-                            <i class="fas fa-times me-1"></i> Xóa
+                            <i class="bi bi-trash me-1"></i> Xóa
                         </button>
                     </div>
                 </div>
@@ -72,7 +72,7 @@
                                     <span class="code-value">{{ result.code }}</span>
                                     } @else if (result.status === 'generating') {
                                     <span class="status-badge checking">
-                                        <i class="fas fa-spinner fa-spin"></i>
+                                        <span class="spinner-border spinner-border-sm"></span>
                                     </span>
                                     } @else {
                                     <span class="text-danger">{{ result.error }}</span>
@@ -87,8 +87,13 @@
                                 </td>
                                 <td class="actions">
                                     @if (result.status === 'success') {
-                                    <button type="button" class="copy-btn" (click)="copyCode(result.code)">
-                                        <i class="fas fa-copy me-1"></i> Copy
+                                    <button type="button" class="btn btn-sm btn-copy"
+                                        [class.copied]="copiedCode === result.code" (click)="copyCode(result.code)">
+                                        @if (copiedCode === result.code) {
+                                        <i class="bi bi-check-circle-fill"></i>
+                                        } @else {
+                                        <i class="bi bi-clipboard"></i>
+                                        }
                                     </button>
                                     }
                                 </td>

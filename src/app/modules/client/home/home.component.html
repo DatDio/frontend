@@ -7,7 +7,7 @@
         Mailshop cung cấp các tài khoản email chất lượng cao cho mục đích marketing và quảng cáo.
       </p>
       <button class="cta-button">
-        <i class="fas fa-arrow-down me-2"></i> Bắt đầu ngay
+        <i class="bi bi-arrow-down me-2"></i> Bắt đầu ngay
       </button>
     </div>
     <div class="hero-image">
@@ -19,7 +19,7 @@
   <section class="tools-section d-none d-lg-block">
     <div class="container">
       <div class="section-header">
-        <h2><i class="fas fa-tools me-2"></i>Công cụ tiện ích</h2>
+        <h2><i class="bi bi-tools me-2"></i>Công cụ tiện ích</h2>
         <p>Các công cụ hỗ trợ marketing tự động</p>
       </div>
 
@@ -55,7 +55,7 @@
           </div>
           <div class="tool-info">
             <h4>Check Live Mail</h4>
-            <p>Kiểm tra email còn sống</p>
+            <p>Kiểm tra live, die</p>
           </div>
           <span class="tool-status active">Hoạt động</span>
         </a>
@@ -79,7 +79,7 @@
           </div>
           <div class="tool-info">
             <h4>Get OAuth2</h4>
-            <p>Lấy token OAuth2</p>
+            <p>Renew refresh token</p>
           </div>
           <span class="tool-status active">Hoạt động</span>
         </a>
@@ -91,7 +91,7 @@
           </div>
           <div class="tool-info">
             <h4>Đọc Hòm Thư</h4>
-            <p>Đọc danh sách email</p>
+            <p>Đọc danh sách thư</p>
           </div>
           <span class="tool-status active">Hoạt động</span>
         </a>
@@ -111,7 +111,7 @@
           <img [src]="category.imageUrl" alt="{{ category.name }}" class="category-image">
           } @else {
           <div class="category-image-placeholder">
-            <i class="fas fa-layer-group"></i>
+            <i class="bi bi-layers"></i>
           </div>
           }
           <div class="group-header-text">
@@ -123,11 +123,11 @@
         <div class="product-list">
 
           <div class="product-header">
-            <div class="col-name"><i class="fas fa-envelope me-2"></i>Sản phẩm</div>
-            <div class="col-live"><i class="fas fa-hourglass-half me-2"></i>LiveTime</div>
-            <div class="col-country"><i class="fas fa-globe me-2"></i>Quốc gia</div>
-            <div class="col-price text-start"><i class="fas fa-tag me-2"></i>Giá</div>
-            <div class="col-quantity text-start"><i class="fas fa-shopping-cart me-2"></i>Số lượng</div>
+            <div class="col-name"><i class="bi bi-envelope me-2"></i>Sản phẩm</div>
+            <div class="col-live"><i class="bi bi-hourglass-split me-2"></i>LiveTime</div>
+            <div class="col-country"><i class="bi bi-globe me-2"></i>Quốc gia</div>
+            <div class="col-price text-start"><i class="bi bi-tag me-2"></i>Giá</div>
+            <div class="col-quantity text-start"><i class="bi bi-cart me-2"></i>Số lượng</div>
             <div class="col-action"></div>
           </div>
 
@@ -140,7 +140,7 @@
                 <img [src]="product.imageUrl" alt="{{ product.name }}" class="product-image">
                 } @else {
                 <div class="product-image-placeholder">
-                  <i class="fas fa-envelope"></i>
+                  <i class="bi bi-envelope"></i>
                 </div>
                 }
                 <div class="product-text">
@@ -156,7 +156,7 @@
 
             <div class="country-col" data-label="Quốc gia">
               <span class="country-chip">
-                <i class="fas fa-flag me-1"></i>{{ product.country || '—' }}
+                <i class="bi bi-flag me-1"></i>{{ product.country || '—' }}
               </span>
             </div>
 
@@ -170,7 +170,7 @@
 
             <div class="action-col" data-label="Thao tác">
               <button class="buy-btn" (click)="prepareOrder(product)">
-                <i class="fas fa-plus me-1"></i> Mua
+                <i class="bi bi-plus me-1"></i> Mua
               </button>
             </div>
 
@@ -200,7 +200,7 @@
 
       <div class="modal-header">
         <h5 class="modal-title" id="orderModalLabel">
-          <i class="fas fa-shopping-cart me-2"></i>Xác nhận đơn hàng
+          <i class="bi bi-cart me-2"></i>Xác nhận đơn hàng
         </h5>
         <button type="button" class="btn-close" (click)="closeOrderModal()" aria-label="Close"></button>
       </div>
@@ -239,7 +239,7 @@
           (click)="onSubmitOrder()">
           <span *ngIf="orderLoading" class="spinner-border spinner-border-sm me-2" role="status"
             aria-hidden="true"></span>
-          <i class="fas fa-check me-2" *ngIf="!orderLoading"></i>
+          <i class="bi bi-check me-2" *ngIf="!orderLoading"></i>
           {{ orderLoading ? 'Đang xử lý...' : 'Xác nhận mua' }}
         </button>
       </div>

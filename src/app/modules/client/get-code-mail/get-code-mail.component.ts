@@ -34,6 +34,10 @@ export class GetCodeMailComponent implements OnInit, OnDestroy {
   isLoading = false;
   showResults = false;
 
+  // Copy state tracking
+  copiedCode: string | null = null;
+  private copyTimeout: any;
+
   private eventSource: EventSource | null = null;
 
   selectedGetTypes: Set<string> = new Set(['Oauth2']);
@@ -53,6 +57,9 @@ export class GetCodeMailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.closeEventSource();
+    if (this.copyTimeout) {
+      clearTimeout(this.copyTimeout);
+    }
   }
 
   private closeEventSource(): void {
@@ -214,7 +221,16 @@ export class GetCodeMailComponent implements OnInit, OnDestroy {
   }
 
   copyCode(code: string): void {
-    navigator.clipboard.writeText(code).then(() => this.notificationService.success('Đã copy mã!'));
+    navigator.clipboard.writeText(code).then(() => {
+      if (this.copyTimeout) {
+        clearTimeout(this.copyTimeout);
+      }
+      this.copiedCode = code;
+      this.notificationService.success('Đã copy mã!');
+      this.copyTimeout = setTimeout(() => {
+        this.copiedCode = null;
+      }, 2000);
+    });
   }
 
   copySuccess(): void {

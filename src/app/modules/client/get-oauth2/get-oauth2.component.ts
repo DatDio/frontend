@@ -8,9 +8,10 @@ import { HotmailApi } from '../../../Utils/apis/hotmail/hotmail.api';
 interface OAuth2Result {
     email: string;
     password: string;
-    refreshToken: string;
+    refreshToken: string;  // New refresh token after renewal
     clientId: string;
     accessToken?: string;
+    fullData?: string;
     status: CheckStatus;
     error?: string;
 }
@@ -39,6 +40,10 @@ export class GetOAuth2Component implements OnInit, OnDestroy {
     totalCount = 0;
     processedCount = 0;
 
+    // Copy state tracking
+    copiedType: string | null = null;
+    private copyTimeout: any;
+
     ngOnInit(): void {
         this.getForm = this.formBuilder.group({
             emailData: ['', [Validators.required, Validators.minLength(10)]]
@@ -47,6 +52,9 @@ export class GetOAuth2Component implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.closeEventSource();
+        if (this.copyTimeout) {
+            clearTimeout(this.copyTimeout);
+        }
     }
 
     private closeEventSource(): void {
@@ -130,7 +138,7 @@ export class GetOAuth2Component implements OnInit, OnDestroy {
             this.closeEventSource();
             this.isLoading = false;
             this.notificationService.success(
-                `Hoàn thành: ${this.successCount} success, ${this.errorCount} error, ${this.unknownCount} unknown`
+                `Hoàn thành: ${this.successCount} thành công, ${this.errorCount} thất bại, ${this.unknownCount} unknown`
             );
         });
 
@@ -148,6 +156,7 @@ export class GetOAuth2Component implements OnInit, OnDestroy {
             refreshToken: result.refreshToken || '',
             clientId: result.clientId || '',
             accessToken: result.accessToken,
+            fullData: result.fullData || '',
             status: result.status || (result.success ? 'SUCCESS' : 'FAILED'),
             error: result.error
         };
@@ -162,31 +171,54 @@ export class GetOAuth2Component implements OnInit, OnDestroy {
     }
 
     copyToken(token: string): void {
-        navigator.clipboard.writeText(token).then(() => this.notificationService.success('Đã copy access token!'));
+        navigator.clipboard.writeText(token).then(() => {
+            this.setCopied('token');
+            this.notificationService.success('Đã copy access token!');
+        });
+    }
+
+    copyFullData(fullData: string): void {
+        if (!fullData) { this.notificationService.warning('Không có dữ liệu'); return; }
+        navigator.clipboard.writeText(fullData).then(() => {
+            this.notificationService.success('Đã copy dữ liệu!');
+        });
     }
 
     copySuccess(): void {
-        const data = this.successResults.map(r => `${r.email}|${r.accessToken}`).join('\n');
-        if (!data) { this.notificationService.warning('Không có token'); return; }
-        navigator.clipboard.writeText(data).then(() => this.notificationService.success(`Đã copy ${this.successCount} tokens!`));
+        const data = this.successResults.map(r => r.fullData || `${r.email}|${r.password}|${r.refreshToken}|${r.clientId}`).join('\n');
+        if (!data) { this.notificationService.warning('Không có dữ liệu'); return; }
+        navigator.clipboard.writeText(data).then(() => {
+            this.setCopied('success');
+            this.notificationService.success(`Đã copy ${this.successCount} email với new refresh token!`);
+        });
     }
 
     copyError(): void {
         const data = this.errorResults.map(r => `${r.email}|${r.password}|${r.refreshToken}|${r.clientId}`).join('\n');
         if (!data) { this.notificationService.warning('Không có email lỗi'); return; }
-        navigator.clipboard.writeText(data).then(() => this.notificationService.success(`Đã copy ${this.errorCount} email lỗi!`));
+        navigator.clipboard.writeText(data).then(() => {
+            this.setCopied('error');
+            this.notificationService.success(`Đã copy ${this.errorCount} email lỗi!`);
+        });
     }
 
     copyUnknown(): void {
         const data = this.unknownResults.map(r => `${r.email}|${r.password}`).join('\n');
         if (!data) { this.notificationService.warning('Không có email unknown'); return; }
-        navigator.clipboard.writeText(data).then(() => this.notificationService.success(`Đã copy ${this.unknownCount} email!`));
+        navigator.clipboard.writeText(data).then(() => {
+            this.setCopied('unknown');
+            this.notificationService.success(`Đã copy ${this.unknownCount} email!`);
+        });
     }
 
-    filter(): void {
-        const data = this.successResults.map(r => `${r.email}|${r.password}|${r.refreshToken}|${r.clientId}`).join('\n');
-        this.getForm.patchValue({ emailData: data });
-        this.notificationService.success('Đã lọc, chỉ giữ lại email thành công');
+    private setCopied(type: string): void {
+        if (this.copyTimeout) {
+            clearTimeout(this.copyTimeout);
+        }
+        this.copiedType = type;
+        this.copyTimeout = setTimeout(() => {
+            this.copiedType = null;
+        }, 2000);
     }
 
     clearResults(): void {

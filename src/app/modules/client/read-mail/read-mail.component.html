@@ -9,10 +9,9 @@
             <form [formGroup]="readMailForm" (ngSubmit)="onReadMail()" class="read-mail-form">
                 <!-- Message Count -->
                 <div class="form-row">
-                    <label class="form-label">Số lượng email mỗi hòm thư</label>
+                    <label class="form-label">Số lượng mail mỗi hòm thư</label>
                     <div class="message-count-input">
                         <input type="number" formControlName="messageCount" min="5" max="50" class="count-input">
-                        <span class="count-hint">emails (5-50)</span>
                     </div>
                 </div>
 
@@ -34,15 +33,10 @@
                         <i class="bi bi-stop-fill me-1"></i> Dừng
                     </button>
                     }
-                    @if (showResults) {
-                    <button type="button" class="clear-btn" (click)="clearResults()">
-                        <i class="bi bi-trash me-1"></i> Clear
-                    </button>
-                    }
                     <button type="submit" class="read-mail-btn" [disabled]="readMailForm.invalid || isLoading">
                         @if (isLoading) {
                         <span class="spinner-border spinner-border-sm me-2"></span>
-                        Đang đọc... ({{ progressPercent }}%)
+                        Đang đọc...
                         } @else {
                         <i class="bi bi-envelope-open me-2"></i> Đọc Mail
                         }
@@ -50,14 +44,30 @@
                 </div>
             </form>
 
+            <!-- Progress Bar -->
+            @if (showResults && totalCount > 0) {
+            <div class="progress-section">
+                <div class="progress-info">
+                    <span>Tiến trình: {{ processedCount }}/{{ totalCount }}</span>
+                    <span>{{ progressPercent }}%</span>
+                </div>
+                <div class="progress-bar-wrapper">
+                    <div class="progress-bar" [style.width.%]="progressPercent"></div>
+                </div>
+            </div>
+            }
+
             <!-- Results Section -->
             @if (showResults) {
             <div class="read-mail-results">
                 <div class="results-header">
                     <h4><i class="bi bi-list-ul me-2"></i> Kết quả ({{ results.length }})</h4>
-                    <div class="results-stats">
-                        <span class="stat success"><i class="bi bi-check-circle-fill"></i> {{ successCount }}</span>
-                        <span class="stat failed"><i class="bi bi-x-circle-fill"></i> {{ failedCount }}</span>
+                    <div class="results-actions">
+                        <span class="badge bg-success me-2">Thành công: {{ successCount }}</span>
+                        <span class="badge bg-danger me-2">Lỗi: {{ failedCount }}</span>
+                        <button type="button" class="clear-btn" (click)="clearResults()">
+                            <i class="bi bi-trash me-1"></i> Xóa
+                        </button>
                     </div>
                 </div>
 

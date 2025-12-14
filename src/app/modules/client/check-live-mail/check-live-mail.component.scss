@@ -99,6 +99,36 @@
         }
     }
 
+    .email-info-content {
+        font-family: 'Consolas', 'Monaco', monospace;
+        font-size: 0.75rem;
+        color: var(--text-primary);
+        background: var(--bg-input);
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        overflow-x: auto;
+        white-space: nowrap;
+        max-width: 100%;
+        display: block;
+
+        &::-webkit-scrollbar {
+            height: 4px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 2px;
+        }
+
+        &::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+    }
+
     .empty-state {
         text-align: center;
         padding: 2rem;
