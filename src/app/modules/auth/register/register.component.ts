@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { SeoService } from '../../../core/services/seo.service';
+import { RecaptchaService } from '../../../core/services/recaptcha.service';
 
 @Component({
   selector: 'app-register',
@@ -21,7 +22,9 @@ export class RegisterComponent implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private seoService: SeoService
+    private seoService: SeoService,
+    private recaptchaService: RecaptchaService,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.registerForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -41,19 +44,24 @@ export class RegisterComponent implements OnInit {
     if (this.authService.isAuthenticated()) {
       this.router.navigate(['/']);
     }
+
+    // Preload reCAPTCHA script
+    if (isPlatformBrowser(this.platformId)) {
+      this.recaptchaService.loadScript();
+    }
   }
 
   passwordMatchValidator(form: FormGroup): { [key: string]: boolean } | null {
     const password = form.get('password');
     const confirmPassword = form.get('confirmPassword');
-    
+
     if (password && confirmPassword && password.value !== confirmPassword.value) {
       return { passwordMismatch: true };
     }
     return null;
   }
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
       return;
@@ -62,22 +70,34 @@ export class RegisterComponent implements OnInit {
     this.loading = true;
     this.errorMessage = '';
 
-    const { confirmPassword, ...registerData } = this.registerForm.value;
+    try {
+      // Get reCAPTCHA token
+      const recaptchaToken = await this.recaptchaService.execute('register');
 
-    this.authService.register(registerData).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.router.navigate(['/']);
-        } else {
-          this.errorMessage = response.message || 'Registration failed';
+      const { confirmPassword, ...registerData } = this.registerForm.value;
+      const registerPayload = {
+        ...registerData,
+        recaptchaToken
+      };
+
+      this.authService.register(registerPayload).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.router.navigate(['/']);
+          } else {
+            this.errorMessage = response.message || 'Registration failed';
+            this.loading = false;
+          }
+        },
+        error: (error) => {
+          this.errorMessage = error.error?.message || 'An error occurred during registration';
           this.loading = false;
         }
-      },
-      error: (error) => {
-        this.errorMessage = error.error?.message || 'An error occurred during registration';
-        this.loading = false;
-      }
-    });
+      });
+    } catch (error) {
+      this.errorMessage = 'Không thể xác thực captcha. Vui lòng thử lại.';
+      this.loading = false;
+    }
   }
 
   get email() {

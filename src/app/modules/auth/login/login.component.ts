@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { SeoService } from '../../../core/services/seo.service';
+import { RecaptchaService } from '../../../core/services/recaptcha.service';
 import { Role } from '../../../Utils/enums/commom.enum';
 import { environment } from '../../../../environments/environment';
 
@@ -30,6 +31,7 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private seoService: SeoService,
+    private recaptchaService: RecaptchaService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.loginForm = this.fb.group({
@@ -54,9 +56,12 @@ export class LoginComponent implements OnInit {
     }
 
     this.initGoogleIdentity();
+
+    // Preload reCAPTCHA script
+    this.recaptchaService.loadScript();
   }
 
-  onSubmit(): void {
+  async onSubmit(): Promise<void> {
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
@@ -65,20 +70,33 @@ export class LoginComponent implements OnInit {
     this.loading = true;
     this.errorMessage = '';
 
-    this.authService.login(this.loginForm.value).subscribe({
-      next: (response) => {
-        if (response.success) {
-          this.handleLoginSuccess();
-        } else {
-          this.errorMessage = response.message || 'Đăng nhập thất bại';
+    try {
+      // Get reCAPTCHA token
+      const recaptchaToken = await this.recaptchaService.execute('login');
+
+      const loginData = {
+        ...this.loginForm.value,
+        recaptchaToken
+      };
+
+      this.authService.login(loginData).subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.handleLoginSuccess();
+          } else {
+            this.errorMessage = response.message || 'Đăng nhập thất bại';
+            this.loading = false;
+          }
+        },
+        error: (error) => {
+          this.errorMessage = error.error?.message || 'Có lỗi xảy ra';
           this.loading = false;
         }
-      },
-      error: (error) => {
-        this.errorMessage = error.error?.message || 'Có lỗi xảy ra';
-        this.loading = false;
-      }
-    });
+      });
+    } catch (error) {
+      this.errorMessage = 'Không thể xác thực captcha. Vui lòng thử lại.';
+      this.loading = false;
+    }
   }
 
   get email() {

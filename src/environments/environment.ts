@@ -5,5 +5,6 @@ export const environment = {
   wsUrl: 'http://localhost:8080/ws',
   googleClientId: '558354084862-p0nv0cls220qem34e8mno0a8le2ug1fo.apps.googleusercontent.com',
   payOSReturnUrl: 'http://localhost:4200/transactions',
-  payOSCancelUrl: 'http://localhost:4200/transactions'
+  payOSCancelUrl: 'http://localhost:4200/transactions',
+  recaptchaSiteKey: '6LcXKiwsAAAAAJwzrxmyqBvNp1zgyawEffT9cP8l'
 };
