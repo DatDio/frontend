@@ -40,6 +40,7 @@ export class ClientTransactionListComponent implements OnInit {
   private readonly rankService = inject(RankService);
 
   transactions: TransactionResponse[] = [];
+  orderCode: number = 0;
   loading = true;
 
   paginationConfig: PaginationConfig = {
@@ -75,7 +76,6 @@ export class ClientTransactionListComponent implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Error loading rank info:', err);
       }
     });
   }
@@ -136,8 +136,9 @@ export class ClientTransactionListComponent implements OnInit {
 
         if (res.success && res.data?.checkoutUrl) {
           this.openPayOSPopup(res.data.checkoutUrl);
+          this.orderCode = res.data.orderCode;
         } else {
-          this.notificationService.error('Không thể tạo giao dịch PayOS');
+          this.notificationService.error('Không thể tạo giao dịch');
         }
       },
       error: (error) => {
@@ -177,12 +178,13 @@ export class ClientTransactionListComponent implements OnInit {
           if (exitFn) exitFn();
         }, 10);
         this.transactionService.refreshBalance();
+        this.deleteTransaction(this.orderCode);
         this.loadTransactions();
       },
 
-      // ❌ KHÔNG GỌI exit() ở đây nữa
       onExit: () => {
         this.transactionService.refreshBalance();
+        this.deleteTransaction(this.orderCode);
         this.loadTransactions();
       }
     };
