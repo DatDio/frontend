@@ -18,7 +18,7 @@ export class ProductItemService {
    * Get list of product items with pagination
    */
   list(productId: number | string, filter?: ProductItemFilter): Observable<ApiResponse<PaginatedResponse<ProductItem>>> {
-   
+
 
     let params = new HttpParams()
       .set('productId', productId.toString())
@@ -27,6 +27,7 @@ export class ProductItemService {
       .set('sort', filter?.sort ?? 'id,desc');
 
     if (filter?.sold !== undefined) params = params.set('sold', filter.sold.toString());
+    if (filter?.accountData !== undefined) params = params.set('accountData', filter.accountData.toString());
 
     return this.httpClient
       .get<ApiResponse<PaginatedResponse<ProductItem>>>(AdminProductItemApi.SEARCH, { params })

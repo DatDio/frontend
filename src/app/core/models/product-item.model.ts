@@ -5,10 +5,10 @@ export interface ProductItem {
   productId: number;
   accountData: string;     // mail|pass|recovery
   sold: boolean;
-  buyerId?: number; 
-  buyerName?: string;          
-  orderId?: number;       
-  soldAt?: string;        
+  buyerId?: number;
+  buyerName?: string;
+  orderId?: number;
+  soldAt?: string;
 }
 export interface ProductItemCreate {
   productId: number;
@@ -18,4 +18,5 @@ export interface ProductItemCreate {
 export interface ProductItemFilter extends PageFilter {
   productId?: number;
   sold?: boolean;
+  accountData?: string;
 }

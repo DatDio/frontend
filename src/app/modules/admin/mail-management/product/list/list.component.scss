@@ -16,7 +16,7 @@ h1 {
     border: 1px solid #ddd;
     padding: 8px 12px;
     border-radius: 4px;
-    
+
     &:focus {
       border-color: #007bff;
       box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
@@ -42,7 +42,7 @@ h1 {
   tbody {
     tr {
       border-bottom: 1px solid #dee2e6;
-      
+
       &:hover {
         background-color: #f8f9fa;
       }
@@ -62,7 +62,7 @@ h1 {
 
 .btn {
   font-size: 12px;
-  
+
   &:hover {
     text-decoration: none;
   }
@@ -85,11 +85,22 @@ h1 {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     transition: all 0.15s ease;
 
-    i { font-size: 16px; }
+    i {
+      font-size: 16px;
+    }
 
-    &.info { background: linear-gradient(135deg, #4dabf7, #228be6); }
-    &.warning { background: linear-gradient(135deg, #ffd43b, #f08c00); color: #4d3700; }
-    &.danger { background: linear-gradient(135deg, #ff6b6b, #d6336c); }
+    &.info {
+      background: linear-gradient(135deg, #4dabf7, #228be6);
+    }
+
+    &.warning {
+      background: linear-gradient(135deg, #ffd43b, #f08c00);
+      color: #4d3700;
+    }
+
+    &.danger {
+      background: linear-gradient(135deg, #ff6b6b, #d6336c);
+    }
 
     &:hover {
       transform: translateY(-1px);
@@ -105,4 +116,29 @@ h1 {
 
 .card-footer {
   padding: 0px;
+}
+
+// Product Image Thumbnail
+.product-thumbnail {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #dee2e6);
+}
+
+.product-placeholder {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-table-header, #f8f9fa);
+  border-radius: 8px;
+  border: 1px dashed var(--border-color, #dee2e6);
+  color: var(--text-muted, #6c757d);
+
+  i {
+    font-size: 20px;
+  }
 }

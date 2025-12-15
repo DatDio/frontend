@@ -11,14 +11,13 @@
           <i class="bi bi-wallet2"></i>
         </div>
         <h3>Nạp tiền vào tài khoản</h3>
-        <p class="deposit-subtitle">Thanh toán nhanh chóng, an toàn qua PayOS</p>
+        <p class="deposit-subtitle">Thanh toán nhanh chóng, an toàn qua ngân hàng</p>
       </div>
 
       <!-- Rank Info Badge -->
       @if (userRankInfo) {
       <div class="rank-info-section">
-        <div class="rank-badge"
-          [style.background]="userRankInfo.color ? 'linear-gradient(135deg, ' + userRankInfo.color + ', ' + userRankInfo.color + '99)' : null">
+        <div class="rank-badge">
           @if (userRankInfo.iconUrl) {
           <img [src]="userRankInfo.iconUrl" alt="Rank Icon" class="rank-icon">
           } @else {
@@ -99,7 +98,7 @@
 
         <p class="deposit-note">
           <i class="bi bi-shield-check me-1"></i>
-          Giao dịch được bảo mật bởi PayOS
+          Giao dịch được bảo mật tuyệt đối
         </p>
       </div>
     </div>

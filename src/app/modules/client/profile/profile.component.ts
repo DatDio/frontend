@@ -273,8 +273,10 @@ export class ProfileComponent implements OnInit {
       next: (response) => {
         if (response.success) {
           this.notificationService.success('Cập nhật hồ sơ thành công');
-          if (response.data) {
-            this.currentUser = response.data;
+          if (response.data && this.currentUser) {
+            this.currentUser.fullName = response.data.fullName ?? '';
+            this.currentUser.phone = response.data.phone ?? '';
+            this.currentUser.address = response.data.address ?? '';
             this.authService['currentUserSubject'].next(response.data);
           }
           this.submitted = false;

@@ -63,6 +63,7 @@
           <thead>
             <tr>
               <th>STT</th>
+              <th>Hình ảnh</th>
               <th>Tên</th>
               <th>Mô tả</th>
               <th>Trạng thái</th>
@@ -74,6 +75,15 @@
             @for (category of categories; track category.id; let index = $index) {
             <tr>
               <td>{{ index + 1 }}</td>
+              <td>
+                @if (category.imageUrl) {
+                <img [src]="category.imageUrl" alt="{{ category.name }}" class="category-thumbnail">
+                } @else {
+                <div class="category-placeholder">
+                  <i class="bi bi-image"></i>
+                </div>
+                }
+              </td>
               <td>
                 <strong>{{ category.name }}</strong>
               </td>

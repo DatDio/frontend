@@ -29,7 +29,7 @@ export class ClientOrderListComponent implements OnInit, OnDestroy {
   loading = true;
   formSearch!: FormGroup;
   dataFormSearch: OrderSearchFilter = {};
-  
+
   // Tracking copy state
   copiedOrderId: number | null = null;
   private copyTimeout: any;
@@ -187,6 +187,27 @@ export class ClientOrderListComponent implements OnInit, OnDestroy {
     }).catch(err => {
       this.notificationService.error('Lỗi copy, vui lòng thử lại');
     });
+  }
+
+  /**
+   * Download accounts as txt file
+   */
+  downloadAccounts(order: Order): void {
+    if (!order.accountData || order.accountData.length === 0) {
+      this.notificationService.warning('Không có tài khoản để tải xuống');
+      return;
+    }
+
+    const content = order.accountData.join('\n');
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${order.orderNumber}.txt`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+
+    this.notificationService.success('Đã tải xuống file thành công!');
   }
 
   /**

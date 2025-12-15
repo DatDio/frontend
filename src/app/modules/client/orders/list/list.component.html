@@ -87,14 +87,19 @@
                   <textarea class="form-control account-preview" rows="2" readonly
                     [value]="order.accountData.join('\n')">
                         </textarea>
-                  <button class="btn btn-sm btn-copy" [class.copied]="copiedOrderId === order.id"
-                    (click)="copyAccounts(order)">
-                    @if(copiedOrderId === order.id) {
-                    <i class="bi bi-check-circle-fill"></i>
-                    } @else {
-                    <i class="bi bi-clipboard"></i>
-                    }
-                  </button>
+                  <div class="action-btn-group">
+                    <button class="btn btn-sm btn-copy" [class.copied]="copiedOrderId === order.id"
+                      (click)="copyAccounts(order)" title="Copy">
+                      @if(copiedOrderId === order.id) {
+                      <i class="bi bi-check-circle-fill"></i>
+                      } @else {
+                      <i class="bi bi-clipboard"></i>
+                      }
+                    </button>
+                    <button class="btn btn-sm btn-download" (click)="downloadAccounts(order)" title="Tải xuống">
+                      <i class="bi bi-download"></i>
+                    </button>
+                  </div>
                 </div>
                 }
               </td>
