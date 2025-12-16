@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { NotificationService } from '../../../core/services/notification.service';
+import { SeoService } from '../../../core/services/seo.service';
 import { CheckLiveMailResponse, CheckStatus } from '../../../core/models/hotmail.model';
 import { HotmailApi } from '../../../Utils/apis/hotmail/hotmail.api';
 
@@ -24,6 +25,7 @@ interface MailCheckResult {
 export class CheckLiveMailComponent implements OnInit, OnDestroy {
     private readonly formBuilder = inject(FormBuilder);
     private readonly notificationService = inject(NotificationService);
+    private readonly seoService = inject(SeoService);
 
     checkForm!: FormGroup;
     isLoading = false;
@@ -43,6 +45,11 @@ export class CheckLiveMailComponent implements OnInit, OnDestroy {
     private copyTimeout: any;
 
     ngOnInit(): void {
+        this.seoService.setPageMeta(
+            'Kiểm Tra Live Mail - MailShop',
+            'Công cụ kiểm tra trạng thái hoạt động của email Hotmail/Outlook nhanh chóng và chính xác.',
+            'check live mail, kiểm tra email, Hotmail, Outlook, MailShop'
+        );
         this.checkForm = this.formBuilder.group({
             emailData: ['', [Validators.required, Validators.minLength(10)]]
         });

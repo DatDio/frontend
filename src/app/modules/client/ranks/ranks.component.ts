@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RankService } from '../../../core/services/rank.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
+import { SeoService } from '../../../core/services/seo.service';
 import { Rank, UserRankInfo } from '../../../core/models/rank.model';
 
 @Component({
@@ -16,6 +17,7 @@ export class RanksComponent implements OnInit {
     readonly #rankService = inject(RankService);
     readonly #authService = inject(AuthService);
     readonly #notificationService = inject(NotificationService);
+    readonly #seoService = inject(SeoService);
 
     ranks: Rank[] = [];
     myRankInfo: UserRankInfo | null = null;
@@ -23,6 +25,11 @@ export class RanksComponent implements OnInit {
     isLoggedIn = false;
 
     ngOnInit(): void {
+        this.#seoService.setPageMeta(
+            'Hạng Thành Viên - MailShop',
+            'Xem các cấp bậc thành viên và ưu đãi đặc biệt. Nạp tiền để nâng cấp hạng và nhận bonus hấp dẫn.',
+            'hạng thành viên, membership, rank, bonus, ưu đãi, MailShop'
+        );
         this.isLoggedIn = this.#authService.isAuthenticated();
         this.loadRanks();
         if (this.isLoggedIn) {

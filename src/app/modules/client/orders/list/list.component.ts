@@ -5,6 +5,7 @@ import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule }
 import { Order, OrderFilter } from '../../../../core/models/order.model';
 import { OrderService } from '../../../../core/services/order.service';
 import { NotificationService } from '../../../../core/services/notification.service';
+import { SeoService } from '../../../../core/services/seo.service';
 import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
 import { PaginationService } from '../../../../shared/services/pagination.service';
 
@@ -23,6 +24,7 @@ export class ClientOrderListComponent implements OnInit, OnDestroy {
   private readonly orderService = inject(OrderService);
   private readonly notificationService = inject(NotificationService);
   private readonly paginationService = inject(PaginationService);
+  private readonly seoService = inject(SeoService);
   private readonly fb = inject(FormBuilder);
 
   orders: Order[] = [];
@@ -42,6 +44,11 @@ export class ClientOrderListComponent implements OnInit, OnDestroy {
   };
 
   ngOnInit(): void {
+    this.seoService.setPageMeta(
+      'Quản Lý Đơn Hàng - MailShop',
+      'Xem và quản lý tất cả đơn hàng của bạn. Theo dõi trạng thái đơn hàng, tải xuống tài khoản đã mua.',
+      'đơn hàng, quản lý đơn hàng, order management, MailShop'
+    );
     this.initForm();
     this.loadOrders();
   }

@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { NotificationService } from '../../../core/services/notification.service';
+import { SeoService } from '../../../core/services/seo.service';
 import { GetOAuth2Response, CheckStatus } from '../../../core/models/hotmail.model';
 import { HotmailApi } from '../../../Utils/apis/hotmail/hotmail.api';
 
@@ -26,6 +27,7 @@ interface OAuth2Result {
 export class GetOAuth2Component implements OnInit, OnDestroy {
     private readonly formBuilder = inject(FormBuilder);
     private readonly notificationService = inject(NotificationService);
+    private readonly seoService = inject(SeoService);
 
     getForm!: FormGroup;
     isLoading = false;
@@ -45,6 +47,11 @@ export class GetOAuth2Component implements OnInit, OnDestroy {
     private copyTimeout: any;
 
     ngOnInit(): void {
+        this.seoService.setPageMeta(
+            'Lấy OAuth2 Token - MailShop',
+            'Công cụ lấy Access Token từ Refresh Token cho email Hotmail/Outlook.',
+            'get OAuth2, access token, refresh token, Hotmail, Outlook, MailShop'
+        );
         this.getForm = this.formBuilder.group({
             emailData: ['', [Validators.required, Validators.minLength(10)]]
         });

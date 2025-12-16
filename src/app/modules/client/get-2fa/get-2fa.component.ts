@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { HttpClient } from '@angular/common/http';
 
 import { NotificationService } from '../../../core/services/notification.service';
+import { SeoService } from '../../../core/services/seo.service';
 import { CommonApi } from '../../../Utils/apis/commom.api';
 
 interface TwoFAResult {
@@ -32,6 +33,7 @@ export class Get2FAComponent implements OnInit, OnDestroy {
     private readonly formBuilder = inject(FormBuilder);
     private readonly notificationService = inject(NotificationService);
     private readonly http = inject(HttpClient);
+    private readonly seoService = inject(SeoService);
 
     private readonly API_BASE = `${CommonApi.CONTEXT_PATH}/tools/totp`;
 
@@ -46,6 +48,11 @@ export class Get2FAComponent implements OnInit, OnDestroy {
     private copyTimeout: any;
 
     ngOnInit(): void {
+        this.seoService.setPageMeta(
+            'Lấy Mã 2FA - MailShop',
+            'Công cụ lấy mã xác thực 2 bước (TOTP) từ secret key nhanh chóng và tự động cập nhật.',
+            'get 2FA, TOTP, mã xác thực, two-factor authentication, MailShop'
+        );
         this.initForm();
     }
 

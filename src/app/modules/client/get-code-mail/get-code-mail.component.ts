@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NotificationService } from '../../../core/services/notification.service';
+import { SeoService } from '../../../core/services/seo.service';
 import { HotmailGetCodeResponse, EMAIL_TYPES, GET_TYPES, EmailType, CheckStatus } from '../../../core/models/hotmail.model';
 import { HotmailApi } from '../../../Utils/apis/hotmail/hotmail.api';
 
@@ -27,6 +28,7 @@ interface CodeResult {
 export class GetCodeMailComponent implements OnInit, OnDestroy {
   private readonly formBuilder = inject(FormBuilder);
   private readonly notificationService = inject(NotificationService);
+  private readonly seoService = inject(SeoService);
 
   getCodeForm!: FormGroup;
   emailTypes = EMAIL_TYPES;
@@ -50,6 +52,11 @@ export class GetCodeMailComponent implements OnInit, OnDestroy {
   processedCount = 0;
 
   ngOnInit(): void {
+    this.seoService.setPageMeta(
+      'Lấy Mã Xác Thực Email - MailShop',
+      'Công cụ lấy mã xác thực OTP từ email Hotmail/Outlook nhanh chóng và tự động. Hỗ trợ nhiều định dạng email khác nhau.',
+      'get code mail, lấy mã xác thực, OTP, Hotmail, Outlook, email verification'
+    );
     this.getCodeForm = this.formBuilder.group({
       emailData: ['', [Validators.required, Validators.minLength(10)]]
     });

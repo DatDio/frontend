@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NotificationService } from '../../../core/services/notification.service';
+import { SeoService } from '../../../core/services/seo.service';
 import { HotmailApi } from '../../../Utils/apis/hotmail/hotmail.api';
 
 interface EmailMessage {
@@ -35,6 +36,7 @@ interface ReadMailResult {
 export class ReadMailComponent implements OnInit, OnDestroy {
     private readonly formBuilder = inject(FormBuilder);
     private readonly notificationService = inject(NotificationService);
+    private readonly seoService = inject(SeoService);
 
     readMailForm!: FormGroup;
     isLoading = false;
@@ -52,6 +54,11 @@ export class ReadMailComponent implements OnInit, OnDestroy {
     selectedAccountEmail = '';
 
     ngOnInit(): void {
+        this.seoService.setPageMeta(
+            'Đọc Mail - MailShop',
+            'Công cụ đọc email từ hộp thư Hotmail/Outlook. Xem nội dung thư đến nhanh chóng.',
+            'đọc mail, read mail, Hotmail, Outlook, inbox, MailShop'
+        );
         this.readMailForm = this.formBuilder.group({
             emailData: ['', [Validators.required, Validators.minLength(10)]],
             messageCount: [20, [Validators.min(5), Validators.max(50)]]

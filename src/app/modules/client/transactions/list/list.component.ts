@@ -5,6 +5,7 @@ import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule }
 import { TransactionFilter, TransactionResponse } from '../../../../core/models/transaction.model';
 import { TransactionService } from '../../../../core/services/wallet.service';
 import { NotificationService } from '../../../../core/services/notification.service';
+import { SeoService } from '../../../../core/services/seo.service';
 import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
 import { PaginationService } from '../../../../shared/services/pagination.service';
 import { convertToISO } from '../../../../Utils/functions/date-time-utils';
@@ -38,6 +39,7 @@ export class ClientTransactionListComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly paginationService = inject(PaginationService);
   private readonly rankService = inject(RankService);
+  private readonly seoService = inject(SeoService);
 
   transactions: TransactionResponse[] = [];
   orderCode: number = 0;
@@ -61,6 +63,11 @@ export class ClientTransactionListComponent implements OnInit {
   userRankInfo: UserRankInfo | null = null;
 
   ngOnInit(): void {
+    this.seoService.setPageMeta(
+      'Lịch Sử Giao Dịch - MailShop',
+      'Xem lịch sử giao dịch, nạp tiền và quản lý số dư tài khoản của bạn trên MailShop.',
+      'lịch sử giao dịch, nạp tiền, transaction history, MailShop'
+    );
     this.initForm();
     this.loadTransactions();
     this.loadRankInfo();

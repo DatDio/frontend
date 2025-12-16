@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { NotificationService } from '../../../core/services/notification.service';
+import { SeoService } from '../../../core/services/seo.service';
 import { FacebookApi } from '../../../Utils/apis/facebook/facebook.api';
 import { CheckStatus } from '../../../core/models/hotmail.model';
 
@@ -22,6 +23,7 @@ interface FacebookCheckResult {
 export class CheckLiveFacebookComponent implements OnInit, OnDestroy {
     private readonly formBuilder = inject(FormBuilder);
     private readonly notificationService = inject(NotificationService);
+    private readonly seoService = inject(SeoService);
 
     checkForm!: FormGroup;
     isLoading = false;
@@ -37,6 +39,11 @@ export class CheckLiveFacebookComponent implements OnInit, OnDestroy {
     processedCount = 0;
 
     ngOnInit(): void {
+        this.seoService.setPageMeta(
+            'Kiểm Tra Live Facebook - MailShop',
+            'Công cụ kiểm tra trạng thái hoạt động của tài khoản Facebook theo UID nhanh chóng và chính xác.',
+            'check live facebook, kiểm tra facebook, facebook UID, MailShop'
+        );
         this.checkForm = this.formBuilder.group({
             uidData: ['', [Validators.required, Validators.minLength(5)]]
         });

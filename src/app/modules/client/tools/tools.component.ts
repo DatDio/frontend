@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { SeoService } from '../../../core/services/seo.service';
 
 interface Tool {
     id: string;
@@ -19,7 +20,8 @@ interface Tool {
     templateUrl: './tools.component.html',
     styleUrls: ['./tools.component.scss']
 })
-export class ToolsComponent {
+export class ToolsComponent implements OnInit {
+    private readonly seoService = inject(SeoService);
     tools: Tool[] = [
         {
             id: 'get-code',
@@ -67,4 +69,12 @@ export class ToolsComponent {
             gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)'
         }
     ];
+
+    ngOnInit(): void {
+        this.seoService.setPageMeta(
+            'Công Cụ Hỗ Trợ - MailShop',
+            'Bộ công cụ hỗ trợ mạnh mẽ: Lấy mã OTP, kiểm tra live Facebook, kiểm tra live Mail, Get 2FA, Get OAuth2 Token.',
+            'tools, công cụ, get code, check live, 2FA, OAuth2, MailShop'
+        );
+    }
 }
