@@ -1,10 +1,10 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://added-leanora-mailshop-f29e0bf1.koyeb.app',
-  apiUrl: 'https://added-leanora-mailshop-f29e0bf1.koyeb.app/api',
-  wsUrl: 'https://added-leanora-mailshop-f29e0bf1.koyeb.app/ws',
+  apiBaseUrl: 'http://140.245.56.228',
+  apiUrl: 'http://140.245.56.228/api',
+  wsUrl: 'ws://140.245.56.228/ws',
   googleClientId: '558354084862-p0nv0cls220qem34e8mno0a8le2ug1fo.apps.googleusercontent.com',
-  payOSReturnUrl: 'https://added-leanora-mailshop-f29e0bf1.koyeb.app/transactions',
-  payOSCancelUrl: 'https://added-leanora-mailshop-f29e0bf1.koyeb.app/transactions',
+  payOSReturnUrl: 'http://140.245.56.228/transactions',
+  payOSCancelUrl: 'http://140.245.56.228/transactions',
   recaptchaSiteKey: '6LcXKiwsAAAAAJwzrxmyqBvNp1zgyawEffT9cP8l'
 };
