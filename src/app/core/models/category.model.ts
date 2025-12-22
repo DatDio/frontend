@@ -7,6 +7,7 @@ export interface Category {
   description?: string;
   imageUrl?: string;
   status: number;
+  sortOrder?: number;
   products: Product[];
   createdAt: Date;
   updatedAt: Date;
@@ -16,6 +17,7 @@ export interface CategoryCreate {
   name: string;
   description?: string;
   status?: string;
+  sortOrder?: number;
 }
 
 export interface CategoryUpdate {
@@ -23,6 +25,7 @@ export interface CategoryUpdate {
   name: string;
   description?: string;
   status: number;
+  sortOrder?: number;
 }
 
 export interface CategoryFilter extends PageFilter {

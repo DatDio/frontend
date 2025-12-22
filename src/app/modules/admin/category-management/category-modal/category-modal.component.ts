@@ -41,14 +41,16 @@ export class CategoryModalComponent implements OnInit {
     this.form = this.#formBuilder.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       description: [''],
-      status: [STATUS_ENUM.ACTIVE, Validators.required]
+      status: [STATUS_ENUM.ACTIVE, Validators.required],
+      sortOrder: [0]
     });
 
     if (this.mode === 'update' && this.category) {
       this.form.patchValue({
         name: this.category.name,
         description: this.category.description || '',
-        status: String(this.category.status)
+        status: String(this.category.status),
+        sortOrder: this.category.sortOrder || 0
       });
       // Set preview for existing image
       if (this.category.imageUrl) {
@@ -100,6 +102,7 @@ export class CategoryModalComponent implements OnInit {
       formData.append('description', formValue.description.trim());
     }
     formData.append('status', formValue.status.toString());
+    formData.append('sortOrder', (formValue.sortOrder ?? 0).toString());
 
     if (this.imageFile) {
       formData.append('image', this.imageFile);

@@ -10,9 +10,9 @@ import { PaginationService } from '../../../../shared/services/pagination.servic
 
 interface TransactionSearchFilter {
   transactionCode?: string;
-  status?: string;
-  minAmount?: number;
-  maxAmount?: number;
+  email?: string;
+  status?: number | string;
+  type?: number | string;
   pagination?: any;
 }
 
@@ -30,7 +30,7 @@ export class TransactionListComponent implements OnInit {
   private readonly paginationService = inject(PaginationService);
 
   transactions: TransactionResponse[] = [];
-  
+
   paginationConfig: PaginationConfig = {
     currentPage: 0,
     totalPages: 1,
@@ -53,9 +53,9 @@ export class TransactionListComponent implements OnInit {
   private createSearchForm(): FormGroup {
     return this.fb.group({
       transactionCode: new FormControl(''),
+      email: new FormControl(''),
       status: new FormControl(''),
-      minAmount: new FormControl(''),
-      maxAmount: new FormControl(''),
+      type: new FormControl(''),
       searchPage: new FormControl('')
     });
   }
@@ -74,9 +74,9 @@ export class TransactionListComponent implements OnInit {
     if (!pageNum) {
       return;
     }
-    
+
     if (pageNum > this.paginationConfig.totalPages || pageNum < 1) {
-      this.notificationService.error(`Page must be between 1 and ${this.paginationConfig.totalPages}`);
+      this.notificationService.error(`Trang phải từ 1 đến ${this.paginationConfig.totalPages}`);
     } else {
       this.paginationConfig.currentPage = pageNum - 1;
       this.dataFormSearch = {
@@ -119,25 +119,25 @@ export class TransactionListComponent implements OnInit {
       page: this.paginationConfig.currentPage,
       limit: this.paginationConfig.pageSize
     };
-    
+
     if (this.dataFormSearch.transactionCode) {
       params.transactionCode = this.dataFormSearch.transactionCode;
     }
-    if (this.dataFormSearch.status) {
-      params.status = this.dataFormSearch.status;
+    if (this.dataFormSearch.status !== '' && this.dataFormSearch.status !== undefined) {
+      params.status = Number(this.dataFormSearch.status);
     }
-    if (this.dataFormSearch.minAmount) {
-      params.minAmount = Number.parseFloat(this.dataFormSearch.minAmount as any);
+    if (this.dataFormSearch.type !== '' && this.dataFormSearch.type !== undefined) {
+      params.type = Number(this.dataFormSearch.type);
     }
-    if (this.dataFormSearch.maxAmount) {
-      params.maxAmount = Number.parseFloat(this.dataFormSearch.maxAmount as any);
+    if (this.dataFormSearch.email) {
+      params.email = this.dataFormSearch.email;
     }
 
-    this.transactionService.list(params).subscribe({
+    this.transactionService.adminList(params).subscribe({
       next: (response: any) => {
         if (response.success && response.data?.content) {
           this.transactions = response.data.content;
-          
+
           // Extract pagination từ backend
           const paginationInfo = this.paginationService.extractPaginationInfo(response.data);
           this.paginationConfig = {
@@ -155,43 +155,123 @@ export class TransactionListComponent implements OnInit {
     });
   }
 
-  getTypeLabel(type: string): string {
+  // ========== HELPER: CHECK IF STATUS IS PENDING ==========
+  isPending(status: string | number): boolean {
+    const pendingValues = [0, '0', 'PENDING'];
+    return pendingValues.includes(status);
+  }
+
+  // ========== APPROVE TRANSACTION (PENDING -> SUCCESS) ==========
+  approveTransaction(transaction: TransactionResponse): void {
+    const confirmed = window.confirm(
+      `Xác nhận duyệt giao dịch #${transaction.transactionCode}?\nSố tiền: ${transaction.amount.toLocaleString()} VNĐ\n\nNếu là giao dịch nạp tiền, số dư sẽ được cộng vào ví người dùng.`
+    );
+
+    if (confirmed) {
+      this.transactionService.updateStatus(transaction.id, 2, 'Admin duyệt giao dịch').subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.notificationService.success('Duyệt giao dịch thành công');
+            this.loadTransactions();
+          } else {
+            this.notificationService.error(response.message || 'Có lỗi xảy ra');
+          }
+        },
+        error: (error: any) => {
+          this.notificationService.error(error.error?.message || 'Có lỗi xảy ra');
+        }
+      });
+    }
+  }
+
+  // ========== REJECT TRANSACTION (PENDING -> FAILED) ==========
+  rejectTransaction(transaction: TransactionResponse): void {
+    const reason = prompt('Nhập lý do từ chối giao dịch:');
+    if (reason === null) return; // User cancelled
+
+    const confirmed = window.confirm(
+      `Xác nhận từ chối giao dịch #${transaction.transactionCode}?\nLý do: ${reason || 'Không có'}`
+    );
+
+    if (confirmed) {
+      this.transactionService.updateStatus(transaction.id, 3, reason || 'Admin từ chối giao dịch').subscribe({
+        next: (response) => {
+          if (response.success) {
+            this.notificationService.success('Từ chối giao dịch thành công');
+            this.loadTransactions();
+          } else {
+            this.notificationService.error(response.message || 'Có lỗi xảy ra');
+          }
+        },
+        error: (error: any) => {
+          this.notificationService.error(error.error?.message || 'Có lỗi xảy ra');
+        }
+      });
+    }
+  }
+
+  getTypeLabel(type: string | number): string {
     const typeMap: { [key: string]: string } = {
-      deposit: 'Nạp tiền',
-      withdrawal: 'Rút tiền',
-      purchase: 'Mua hàng',
-      refund: 'Hoàn tiền'
+      '0': 'Nạp tiền',
+      '1': 'Mua hàng',
+      '2': 'Hoàn tiền',
+      '3': 'Admin điều chỉnh',
+      'DEPOSIT': 'Nạp tiền',
+      'PURCHASE': 'Mua hàng',
+      'REFUND': 'Hoàn tiền',
+      'ADMIN_ADJUST': 'Admin điều chỉnh'
     };
-    return typeMap[type] || type;
+    return typeMap[type?.toString()] || type?.toString() || '';
   }
 
-  getTypeClass(type: string): string {
+  getTypeClass(type: string | number): string {
     const classMap: { [key: string]: string } = {
-      deposit: 'badge-success',
-      withdrawal: 'badge-warning',
-      purchase: 'badge-danger',
-      refund: 'badge-info'
+      '0': 'bg-success',
+      '1': 'bg-danger',
+      '2': 'bg-info',
+      '3': 'bg-primary',
+      'DEPOSIT': 'bg-success',
+      'PURCHASE': 'bg-danger',
+      'REFUND': 'bg-info',
+      'ADMIN_ADJUST': 'bg-primary'
     };
-    return classMap[type] || 'badge-secondary';
+    return classMap[type?.toString()] || 'bg-secondary';
   }
 
-  getStatusLabel(status: string): string {
+  getStatusLabel(status: string | number): string {
     const statusMap: { [key: string]: string } = {
-      pending: 'Chờ xử lý',
-      processing: 'Đang xử lý',
-      completed: 'Hoàn thành',
-      failed: 'Thất bại'
+      '0': 'Chờ xử lý',
+      '1': 'Đang xử lý',
+      '2': 'Thành công',
+      '3': 'Thất bại',
+      '4': 'Đã hủy',
+      '5': 'Đã hoàn tiền',
+      'PENDING': 'Chờ xử lý',
+      'PROCESSING': 'Đang xử lý',
+      'SUCCESS': 'Thành công',
+      'FAILED': 'Thất bại',
+      'CANCELLED': 'Đã hủy',
+      'REFUNDED': 'Đã hoàn tiền'
     };
-    return statusMap[status] || status;
+    return statusMap[status?.toString()] || status?.toString() || '';
   }
 
-  getStatusClass(status: string): string {
+  getStatusClass(status: string | number): string {
     const classMap: { [key: string]: string } = {
-      pending: 'bg-warning',
-      processing: 'bg-info',
-      completed: 'bg-success',
-      failed: 'bg-danger'
+      '0': 'bg-warning',
+      '1': 'bg-info',
+      '2': 'bg-success',
+      '3': 'bg-danger',
+      '4': 'bg-secondary',
+      '5': 'bg-info',
+      'PENDING': 'bg-warning',
+      'PROCESSING': 'bg-info',
+      'SUCCESS': 'bg-success',
+      'FAILED': 'bg-danger',
+      'CANCELLED': 'bg-secondary',
+      'REFUNDED': 'bg-info'
     };
-    return classMap[status] || 'bg-secondary';
+    return classMap[status?.toString()] || 'bg-secondary';
   }
 }
+

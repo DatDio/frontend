@@ -6,6 +6,7 @@ import { LoaderService } from './loader.service';
 import { TransactionResponse, TransactionFilter } from '../models/transaction.model';
 import { ApiResponse, PaginatedResponse } from '../models/common.model';
 import { WalletApi } from '../../Utils/apis/wallets/client-wallet.api';
+import { AdminTransactionApi } from '../../Utils/apis/transactions/admin-transaction.api';
 import { WalletResponse } from '../models/wallet.model';
 
 @Injectable({
@@ -44,7 +45,7 @@ export class TransactionService {
   setBalance(balance: number): void {
     this.balanceSubject.next(balance);
   }
-  
+
   // ================== CREATE DEPOSIT (CHỈ AMOUNT) ==================
   createDeposit(amount: number): Observable<ApiResponse<any>> {
     this.loaderService.show();
@@ -91,6 +92,15 @@ export class TransactionService {
     if (filter.transactionCode)
       params = params.set('transactionCode', filter.transactionCode);
 
+    if (filter.status !== undefined && filter.status !== null)
+      params = params.set('status', filter.status.toString());
+
+    if (filter.type !== undefined && filter.type !== null)
+      params = params.set('type', filter.type.toString());
+
+    if (filter.email)
+      params = params.set('email', filter.email);
+
     if (filter.dateFrom)
       params = params.set('dateFrom', filter.dateFrom);
 
@@ -103,5 +113,26 @@ export class TransactionService {
   delete(id: number): Observable<ApiResponse<void>> {
     return this.httpClient
       .delete<ApiResponse<void>>(WalletApi.DELETE(id))
+  }
+
+  // ================== ADMIN: SEARCH ALL TRANSACTIONS ==================
+  adminList(filter?: TransactionFilter): Observable<ApiResponse<PaginatedResponse<TransactionResponse>>> {
+    const params = this.createTransactionFilter(filter);
+    return this.httpClient
+      .get<ApiResponse<PaginatedResponse<TransactionResponse>>>(
+        AdminTransactionApi.SEARCH,
+        { params }
+      );
+  }
+
+  // ================== ADMIN: UPDATE TRANSACTION STATUS ==================
+  updateStatus(id: number, status: number, reason?: string): Observable<ApiResponse<TransactionResponse>> {
+    this.loaderService.show();
+    return this.httpClient
+      .put<ApiResponse<TransactionResponse>>(
+        AdminTransactionApi.UPDATE_STATUS(id),
+        { status, reason }
+      )
+      .pipe(finalize(() => this.loaderService.hide()));
   }
 }

@@ -38,7 +38,7 @@ export class UserService {
       );
   }
 
-   getByClient(id: number): Observable<ApiResponse<User>> {
+  getByClient(id: number): Observable<ApiResponse<User>> {
     this.loaderService.show();
 
     return this.httpClient
@@ -116,7 +116,7 @@ export class UserService {
       );
   }
 
-  
+
 
   // ===== FILTER BUILDER =====
   private createUserFilter(filter?: UserFilter): HttpParams {
@@ -139,5 +139,18 @@ export class UserService {
     return params;
   }
 
+  // ===== ADJUST BALANCE =====
+  adjustBalance(userId: number, amount: number, reason?: string): Observable<ApiResponse<any>> {
+    this.loaderService.show();
+
+    return this.httpClient
+      .post<ApiResponse<any>>(AdminUserApi.ADJUST_BALANCE(userId), {
+        amount,
+        reason
+      })
+      .pipe(
+        finalize(() => this.loaderService.hide())
+      );
+  }
 
 }

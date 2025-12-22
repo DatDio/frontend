@@ -20,4 +20,7 @@ export class AdminUserApi {
 
   public static readonly EXPORT =
     AdminUserApi.BASE + '/export';
+
+  public static readonly ADJUST_BALANCE = (userId: string | number) =>
+    AdminUserApi.BASE + `/${userId}/adjust-balance`;
 }

@@ -24,6 +24,12 @@ export class SettingsComponent implements OnInit {
     // Specific settings
     rankPeriodDays = 7;
 
+    // PayOS settings
+    payosClientId = '';
+    payosApiKey = '';
+    payosChecksumKey = '';
+    payosSaving = false;
+
     ngOnInit(): void {
         this.loadSettings();
     }
@@ -46,10 +52,21 @@ export class SettingsComponent implements OnInit {
     }
 
     private parseSettings(): void {
+        // Rank period
         const rankPeriod = this.settings.find(s => s.settingKey === 'rank.period_days');
         if (rankPeriod) {
             this.rankPeriodDays = parseInt(rankPeriod.settingValue) || 7;
         }
+
+        // PayOS settings
+        const clientId = this.settings.find(s => s.settingKey === 'payos.client_id');
+        if (clientId) this.payosClientId = clientId.settingValue || '';
+
+        const apiKey = this.settings.find(s => s.settingKey === 'payos.api_key');
+        if (apiKey) this.payosApiKey = apiKey.settingValue || '';
+
+        const checksumKey = this.settings.find(s => s.settingKey === 'payos.checksum_key');
+        if (checksumKey) this.payosChecksumKey = checksumKey.settingValue || '';
     }
 
     startEdit(setting: SystemSetting): void {
@@ -106,8 +123,43 @@ export class SettingsComponent implements OnInit {
 
     getSettingLabel(key: string): string {
         const labels: Record<string, string> = {
-            'rank.period_days': 'Số ngày tính hạng'
+            'rank.period_days': 'Số ngày tính hạng',
+            'payos.client_id': 'PayOS Client ID',
+            'payos.api_key': 'PayOS API Key',
+            'payos.checksum_key': 'PayOS Checksum Key'
         };
         return labels[key] || key;
+    }
+
+    savePayOSSettings(): void {
+        this.payosSaving = true;
+
+        // Save all 3 settings in sequence
+        const saveClientId = () => this.#settingService.update('payos.client_id', {
+            settingValue: this.payosClientId,
+            description: 'PayOS Client ID'
+        }).toPromise();
+
+        const saveApiKey = () => this.#settingService.update('payos.api_key', {
+            settingValue: this.payosApiKey,
+            description: 'PayOS API Key'
+        }).toPromise();
+
+        const saveChecksumKey = () => this.#settingService.update('payos.checksum_key', {
+            settingValue: this.payosChecksumKey,
+            description: 'PayOS Checksum Key'
+        }).toPromise();
+
+        Promise.all([saveClientId(), saveApiKey(), saveChecksumKey()])
+            .then(() => {
+                this.#notificationService.success('Lưu cấu hình PayOS thành công');
+                this.loadSettings();
+            })
+            .catch((error) => {
+                this.#notificationService.error('Lỗi khi lưu cấu hình PayOS');
+            })
+            .finally(() => {
+                this.payosSaving = false;
+            });
     }
 }

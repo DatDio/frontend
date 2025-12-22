@@ -41,7 +41,8 @@ export class ProductCreateModalComponent implements OnInit {
       liveTime: [''],
       country: [''],
       categoryId: ['', Validators.required],
-      status: ['1', Validators.required]
+      status: ['1', Validators.required],
+      sortOrder: [0]
     });
   }
 
@@ -87,6 +88,7 @@ export class ProductCreateModalComponent implements OnInit {
       formData.append('country', formValue.country.trim());
     }
     formData.append('categoryId', formValue.categoryId.toString());
+    formData.append('sortOrder', (formValue.sortOrder ?? 0).toString());
 
     if (this.imageFile) {
       formData.append('image', this.imageFile);

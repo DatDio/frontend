@@ -12,30 +12,35 @@
           <input id="codeInput" type="text" class="form-control" placeholder="Mã giao dịch..."
             formControlName="transactionCode">
         </div>
+        <div class="col-md-3">
+          <label for="emailInput" class="form-label">Email người dùng</label>
+          <input id="emailInput" type="text" class="form-control" placeholder="Email..." formControlName="email">
+        </div>
+        <div class="col-md-2">
+          <label for="typeSelect" class="form-label">Loại giao dịch</label>
+          <select id="typeSelect" class="form-select" formControlName="type">
+            <option value="">-- Tất cả --</option>
+            <option value="0">Nạp tiền</option>
+            <option value="1">Mua hàng</option>
+            <option value="2">Hoàn tiền</option>
+            <option value="3">Admin điều chỉnh</option>
+          </select>
+        </div>
         <div class="col-md-2">
           <label for="statusSelect" class="form-label">Trạng thái</label>
           <select id="statusSelect" class="form-select" formControlName="status">
             <option value="">-- Tất cả --</option>
-            <option value="pending">Chờ xử lý</option>
-            <option value="completed">Hoàn thành</option>
-            <option value="failed">Thất bại</option>
+            <option value="0">Chờ xử lý</option>
+            <option value="2">Thành công</option>
+            <option value="3">Thất bại</option>
           </select>
         </div>
-        <div class="col-md-2">
-          <label for="minAmountInput" class="form-label">Từ (VNĐ)</label>
-          <input id="minAmountInput" type="number" class="form-control" placeholder="Từ..." formControlName="minAmount">
-        </div>
-        <div class="col-md-2">
-          <label for="maxAmountInput" class="form-label">Đến (VNĐ)</label>
-          <input id="maxAmountInput" type="number" class="form-control" placeholder="Đến..."
-            formControlName="maxAmount">
-        </div>
-        <div class="col-md-4 d-flex align-items-end gap-2">
+        <div class="col-md-3 d-flex align-items-end gap-2">
           <button type="button" class="btn btn-primary flex-grow-1" (click)="handleSearch()">
-            <i class="fas fa-search"></i> Tìm kiếm
+            <i class="bi bi-search"></i> Tìm
           </button>
           <button type="button" class="btn btn-secondary flex-grow-1" (click)="clearForm()">
-            <i class="fas fa-redo"></i> Xóa bộ lọc
+            <i class="bi bi-x-lg"></i> Xóa
           </button>
         </div>
       </form>
@@ -56,7 +61,7 @@
               formControlName="searchPage" placeholder="Trang #" min="1" [max]="paginationConfig.totalPages"
               (keyup.enter)="handleSearchPage()">
             <button class="btn btn-sm btn-outline-primary" (click)="handleSearchPage()">
-              <i class="fas fa-arrow-right"></i>
+              <i class="bi bi-arrow-right"></i>
             </button>
           </div>
         </div>
@@ -68,24 +73,27 @@
           <tr>
             <th>ID</th>
             <th>Mã giao dịch</th>
+            <th>Email</th>
             <th>Loại</th>
             <th>Số tiền</th>
             <th>Số dư trước/sau</th>
             <th>Trạng thái</th>
             <th>Phương thức</th>
             <th>Ngày tạo</th>
+            <th class="text-center">Thao tác</th>
           </tr>
         </thead>
         <tbody>
           @if (transactions.length === 0) {
           <tr>
-            <td colspan="8" class="text-center text-muted py-4">Không có dữ liệu</td>
+            <td colspan="10" class="text-center text-muted py-4">Không có dữ liệu</td>
           </tr>
           }
           @for (transaction of transactions; track transaction.id) {
           <tr>
             <td>{{ transaction.id }}</td>
             <td class="fw-bold">{{ transaction.transactionCode }}</td>
+            <td>{{ transaction.userEmail || '-' }}</td>
             <td>
               <span [ngClass]="'badge ' + getTypeClass(transaction.type)">
                 {{ getTypeLabel(transaction.type) }}
@@ -94,7 +102,7 @@
             <td class="text-end">{{ transaction.amount | number: '1.0-0' }}</td>
             <td class="small">
               <span class="badge bg-light text-dark">{{ transaction.balanceBefore | number: '1.0-0' }}</span>
-              <i class="fas fa-arrow-right text-muted mx-1"></i>
+              <i class="bi bi-arrow-right text-muted mx-1"></i>
               <span class="badge bg-light text-dark">{{ transaction.balanceAfter | number: '1.0-0' }}</span>
             </td>
             <td>
@@ -104,6 +112,21 @@
             </td>
             <td>{{ transaction.paymentMethod || '-' }}</td>
             <td>{{ transaction.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td class="text-center">
+              @if (isPending(transaction.status)) {
+              <div class="btn-group btn-group-sm">
+                <button class="btn btn-success btn-sm" title="Duyệt thành công"
+                  (click)="approveTransaction(transaction)">
+                  <i class="bi bi-check-lg"></i>
+                </button>
+                <button class="btn btn-danger btn-sm" title="Từ chối" (click)="rejectTransaction(transaction)">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+              </div>
+              } @else {
+              <span class="text-muted">-</span>
+              }
+            </td>
           </tr>
           }
         </tbody>

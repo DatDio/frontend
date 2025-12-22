@@ -44,7 +44,8 @@ export class ProductUpdateModalComponent implements OnInit {
       liveTime: [''],
       country: [''],
       categoryId: ['', Validators.required],
-      status: ['1', Validators.required]
+      status: ['1', Validators.required],
+      sortOrder: [0]
     });
   }
 
@@ -57,7 +58,8 @@ export class ProductUpdateModalComponent implements OnInit {
         liveTime: this.product.liveTime,
         country: this.product.country,
         categoryId: this.product.categoryId,
-        status: this.product.status
+        status: this.product.status,
+        sortOrder: this.product.sortOrder ?? 0
       });
       // Set preview for existing image
       if (this.product.imageUrl) {
@@ -118,6 +120,7 @@ export class ProductUpdateModalComponent implements OnInit {
     }
     formData.append('categoryId', formValue.categoryId.toString());
     formData.append('status', formValue.status.toString());
+    formData.append('sortOrder', (formValue.sortOrder ?? 0).toString());
 
     if (this.imageFile) {
       formData.append('image', this.imageFile);

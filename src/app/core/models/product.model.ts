@@ -12,6 +12,7 @@ export interface Product {
   categoryName: string;
   status: number;
   quantity: number;
+  sortOrder?: number;
 }
 
 export interface ProductCreate {
@@ -21,6 +22,7 @@ export interface ProductCreate {
   liveTime?: string;
   country?: string;
   categoryId: number;
+  sortOrder?: number;
 }
 
 export interface ProductUpdate {
@@ -32,6 +34,7 @@ export interface ProductUpdate {
   country?: string;
   categoryId?: number;
   status?: string;
+  sortOrder?: number;
 }
 
 export interface ProductFilter extends PageFilter {

@@ -8,6 +8,7 @@ import { ConfirmService } from '../../../../shared/services/confirm.service';
 import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
 import { PaginationService } from '../../../../shared/services/pagination.service';
 import { UserDetailModalComponent } from '../detail-modal/detail-modal.component';
+import { AdjustBalanceModalComponent } from '../adjust-balance-modal/adjust-balance-modal.component';
 import { User } from '../../../../core/models/user.model';
 import { ActiveStatusSelectComponent } from '../../../../shared/components/active-status-select/active-status-select.component';
 import { ActiveStatusBadgeComponent } from '../../../../shared/components/active-status-badge/active-status-badge.component';
@@ -20,7 +21,7 @@ interface UserSearchFilter {
 @Component({
   selector: 'app-users-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, PaginationComponent, UserDetailModalComponent, ActiveStatusSelectComponent, ActiveStatusBadgeComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, PaginationComponent, UserDetailModalComponent, AdjustBalanceModalComponent, ActiveStatusSelectComponent, ActiveStatusBadgeComponent],
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss']
 })
@@ -46,6 +47,10 @@ export class UsersListComponent implements OnInit {
 
   dataFormSearch: UserSearchFilter = {};
   formSearch!: FormGroup;
+
+  // Adjust Balance Modal
+  showAdjustBalanceModal = false;
+  selectedUserForBalance: User | null = null;
 
   ngOnInit(): void {
     this.initForm();
@@ -195,5 +200,21 @@ export class UsersListComponent implements OnInit {
         }
       });
     }
+  }
+
+  // ====== ADJUST BALANCE ======
+  onAdjustBalance(user: User): void {
+    this.selectedUserForBalance = user;
+    this.showAdjustBalanceModal = true;
+  }
+
+  closeAdjustBalanceModal(): void {
+    this.showAdjustBalanceModal = false;
+    this.selectedUserForBalance = null;
+  }
+
+  onAdjustBalanceSuccess(): void {
+    this.closeAdjustBalanceModal();
+    this.loadUsers();
   }
 }

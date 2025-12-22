@@ -87,6 +87,10 @@
               <td>{{ user.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
               <td style="text-align: center;">
                 <div class="action-buttons">
+                  <button (click)="onAdjustBalance(user)" class="icon-btn success" title="Điều chỉnh số dư"
+                    data-bs-toggle="tooltip">
+                    <i class="bi bi-wallet2"></i>
+                  </button>
                   <button (click)="onView(user.id)" class="icon-btn info" title="Xem chi tiết" data-bs-toggle="tooltip">
                     <i class="bi bi-eye"></i>
                   </button>
@@ -125,3 +129,9 @@
 </div>
 
 <app-user-detail-modal #userDetailModal></app-user-detail-modal>
+
+@if (showAdjustBalanceModal && selectedUserForBalance) {
+<app-adjust-balance-modal [user]="selectedUserForBalance" (closeModal)="closeAdjustBalanceModal()"
+  (success)="onAdjustBalanceSuccess()">
+</app-adjust-balance-modal>
+}

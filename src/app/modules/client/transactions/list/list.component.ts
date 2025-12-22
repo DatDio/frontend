@@ -185,13 +185,13 @@ export class ClientTransactionListComponent implements OnInit {
           if (exitFn) exitFn();
         }, 10);
         this.transactionService.refreshBalance();
-        this.deleteTransaction(this.orderCode);
+        //this.deleteTransaction(this.orderCode);
         this.loadTransactions();
       },
 
       onExit: () => {
         this.transactionService.refreshBalance();
-        this.deleteTransaction(this.orderCode);
+        //this.deleteTransaction(this.orderCode);
         this.loadTransactions();
       }
     };

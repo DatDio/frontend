@@ -63,6 +63,13 @@
                 <option *ngFor="let opt of statusOptions" [value]="opt.value">{{ opt.label }}</option>
               </select>
             </div>
+
+            <div class="mb-3">
+              <label for="sortOrder" class="form-label">Thứ tự hiển thị (STT)</label>
+              <input type="number" class="form-control" id="sortOrder" formControlName="sortOrder"
+                placeholder="Nhập số thứ tự (số nhỏ hiển thị trước)" min="0">
+              <small class="text-muted">Số nhỏ hơn sẽ hiển thị trước. Mặc định là 0.</small>
+            </div>
           </div>
         </div>
       </div>

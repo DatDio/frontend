@@ -1,0 +1,70 @@
+<div class="modal-overlay" (click)="onClose()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h5 class="modal-title">
+                <i class="bi bi-wallet2 me-2"></i>Điều chỉnh số dư
+            </h5>
+            <button type="button" class="btn-close" (click)="onClose()"></button>
+        </div>
+
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <div class="modal-body">
+                <div class="user-info-card mb-4">
+                    <div class="d-flex align-items-center">
+                        <div class="user-avatar">
+                            {{ (user.email || 'U').charAt(0).toUpperCase() }}
+                        </div>
+                        <div class="ms-3">
+                            <div class="fw-semibold">{{ user.fullName || user.email }}</div>
+                            <small class="text-muted">{{ user.email }}</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label">Loại giao dịch <span class="text-danger">*</span></label>
+                    <div class="btn-group w-100" role="group">
+                        <input type="radio" class="btn-check" id="typeAdd" value="add" formControlName="type">
+                        <label class="btn btn-outline-success" for="typeAdd">
+                            <i class="bi bi-plus-circle me-1"></i> Cộng tiền
+                        </label>
+
+                        <input type="radio" class="btn-check" id="typeSubtract" value="subtract" formControlName="type">
+                        <label class="btn btn-outline-danger" for="typeSubtract">
+                            <i class="bi bi-dash-circle me-1"></i> Trừ tiền
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="amount" class="form-label">Số tiền <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="number" class="form-control form-control-lg" id="amount" formControlName="amount"
+                            placeholder="Nhập số tiền..." min="1">
+                        <span class="input-group-text">VNĐ</span>
+                    </div>
+                    @if (amount?.invalid && amount?.touched) {
+                    <div class="text-danger small mt-1">Số tiền phải lớn hơn 0</div>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <label for="reason" class="form-label">Lý do</label>
+                    <textarea class="form-control" id="reason" formControlName="reason" rows="3"
+                        placeholder="Nhập lý do điều chỉnh (ví dụ: Bù lỗi nạp tiền tự động, Hoàn tiền đơn hàng...)"></textarea>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="onClose()" [disabled]="isLoading">Hủy</button>
+                <button type="submit" class="btn" [class.btn-success]="type?.value === 'add'"
+                    [class.btn-danger]="type?.value === 'subtract'" [disabled]="isLoading">
+                    @if (isLoading) {
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    }
+                    {{ type?.value === 'add' ? 'Cộng tiền' : 'Trừ tiền' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
