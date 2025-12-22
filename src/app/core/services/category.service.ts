@@ -87,11 +87,11 @@ export class CategoryService {
     /**
      * Delete category
      */
-    delete(id: number | string): Observable<ApiResponse<void>> {
+    delete(id: number): Observable<ApiResponse<void>> {
         this.loaderService.show();
 
         return this.httpClient
-            .post<ApiResponse<void>>(AdminCategoryApi.DELETE, { id })
+            .delete<ApiResponse<void>>(AdminCategoryApi.DELETE(id))
             .pipe(
                 finalize(() => this.loaderService.hide())
             );
