@@ -47,17 +47,6 @@ export class ProductItemService {
   }
 
   /**
-   * Bulk create multiple product items
-   */
-  // bulkCreate(items: ProductItemCreate[]): Observable<ApiResponse<ProductItem[]>> {
-  //   this.loaderService.show();
-
-  //   return this.httpClient
-  //     .post<ApiResponse<ProductItem[]>>(`${API_URL}/bulk`, { items })
-  //     .pipe(finalize(() => this.loaderService.hide()));
-  // }
-
-  /**
    * Delete product item
    */
   delete(id: number): Observable<ApiResponse<void>> {
@@ -67,4 +56,56 @@ export class ProductItemService {
       .delete<ApiResponse<void>>(AdminProductItemApi.DELETE(id))
       .pipe(finalize(() => this.loaderService.hide()));
   }
+
+  // ============ BULK OPERATIONS ============
+
+  /**
+   * Import items from TXT file
+   */
+  importFile(productId: number | string, file: File): Observable<ApiResponse<string>> {
+    const formData = new FormData();
+    formData.append('file', file);
+    this.loaderService.show();
+
+    return this.httpClient
+      .post<ApiResponse<string>>(AdminProductItemApi.IMPORT_TXT(productId), formData)
+      .pipe(finalize(() => this.loaderService.hide()));
+  }
+
+  /**
+   * Bulk delete items by account data list
+   */
+  bulkDelete(productId: number | string, accountDataList: string): Observable<ApiResponse<{ deleted: number; message: string }>> {
+    this.loaderService.show();
+
+    return this.httpClient
+      .post<ApiResponse<{ deleted: number; message: string }>>(
+        AdminProductItemApi.BULK_DELETE(productId),
+        { accountDataList }
+      )
+      .pipe(finalize(() => this.loaderService.hide()));
+  }
+
+  /**
+   * Get expired items for export
+   */
+  getExpiredItems(productId: number | string): Observable<ApiResponse<ProductItem[]>> {
+    this.loaderService.show();
+
+    return this.httpClient
+      .get<ApiResponse<ProductItem[]>>(AdminProductItemApi.EXPIRED(productId))
+      .pipe(finalize(() => this.loaderService.hide()));
+  }
+
+  /**
+   * Delete all expired items
+   */
+  deleteExpiredItems(productId: number | string): Observable<ApiResponse<{ deleted: number; message: string }>> {
+    this.loaderService.show();
+
+    return this.httpClient
+      .delete<ApiResponse<{ deleted: number; message: string }>>(AdminProductItemApi.EXPIRED(productId))
+      .pipe(finalize(() => this.loaderService.hide()));
+  }
 }
+

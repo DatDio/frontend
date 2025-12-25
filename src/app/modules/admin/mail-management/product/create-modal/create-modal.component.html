@@ -93,6 +93,44 @@
                 placeholder="Nhập số thứ tự (số nhỏ hiển thị trước)" min="0">
               <small class="text-muted">Số nhỏ hơn sẽ hiển thị trước. Mặc định là 0.</small>
             </div>
+
+            <!-- Cấu hình kho phụ -->
+            <div class="row">
+              <div class="col-12 mb-2">
+                <label class="form-label fw-bold text-primary">
+                  <i class="bi bi-box-seam me-1"></i> Cấu hình kho phụ
+                </label>
+                <small class="text-muted d-block">Thiết lập số lượng hiển thị cho khách hàng</small>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="minSecondaryStock" class="form-label">SL tối thiểu</label>
+                <input id="minSecondaryStock" type="number" class="form-control" formControlName="minSecondaryStock"
+                  placeholder="Ngưỡng trigger chuyển kho" min="0">
+                <small class="text-muted">Khi kho phụ dưới mức này sẽ tự động bổ sung từ kho chính</small>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="maxSecondaryStock" class="form-label">SL tối đa</label>
+                <input id="maxSecondaryStock" type="number" class="form-control" formControlName="maxSecondaryStock"
+                  placeholder="Số lượng hiển thị tối đa" min="1">
+                <small class="text-muted">Số lượng tối đa hiển thị cho khách hàng</small>
+              </div>
+              <!-- Cấu hình thời gian hết hạn -->
+              <div class="row">
+                <div class="col-12 mb-2">
+                  <label class="form-label fw-bold text-warning">
+                    <i class="bi bi-clock-history me-1"></i> Thời gian hết hạn
+                  </label>
+                  <small class="text-muted d-block">Mail sẽ bị loại bỏ sau thời gian này kể từ khi upload</small>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="expirationHours" class="form-label">Hết hạn sau (giờ)</label>
+                  <input id="expirationHours" type="number" class="form-control" formControlName="expirationHours"
+                    placeholder="Nhập số giờ (0 = không hết hạn)" min="0">
+                  <small class="text-muted">VD: Hotmail New = 3 giờ (mail sống ~5h). Để 0 nếu mail không hết
+                    hạn.</small>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </form>
