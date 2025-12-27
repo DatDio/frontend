@@ -36,13 +36,28 @@ export class ProductItemService {
 
 
   /**
-   * Create single product item
+   * Create product items from text
    */
   create(data: ProductItemCreate): Observable<ApiResponse<ProductItem>> {
     this.loaderService.show();
 
     return this.httpClient
       .post<ApiResponse<ProductItem>>(AdminProductItemApi.CREATE, data)
+      .pipe(finalize(() => this.loaderService.hide()));
+  }
+
+  /**
+   * Create product items from textarea with ExpirationType
+   */
+  createWithExpirationType(productId: number, accountData: string, expirationType: string): Observable<ApiResponse<string>> {
+    this.loaderService.show();
+
+    return this.httpClient
+      .post<ApiResponse<string>>(AdminProductItemApi.CREATE, {
+        productId,
+        accountData,
+        expirationType
+      })
       .pipe(finalize(() => this.loaderService.hide()));
   }
 
@@ -60,15 +75,18 @@ export class ProductItemService {
   // ============ BULK OPERATIONS ============
 
   /**
-   * Import items from TXT file
+   * Import items from TXT file with expirationType
    */
-  importFile(productId: number | string, file: File): Observable<ApiResponse<string>> {
+  importFile(productId: number | string, file: File, expirationType: string = 'NONE'): Observable<ApiResponse<string>> {
     const formData = new FormData();
     formData.append('file', file);
+
+    // Thêm expirationType vào URL params
+    const params = new HttpParams().set('expirationType', expirationType);
     this.loaderService.show();
 
     return this.httpClient
-      .post<ApiResponse<string>>(AdminProductItemApi.IMPORT_TXT(productId), formData)
+      .post<ApiResponse<string>>(AdminProductItemApi.IMPORT_TXT(productId), formData, { params })
       .pipe(finalize(() => this.loaderService.hide()));
   }
 

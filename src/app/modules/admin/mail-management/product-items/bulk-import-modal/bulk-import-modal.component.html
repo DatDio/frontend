@@ -1,22 +1,73 @@
 <div class="modal-overlay" (click)="onClose()" (keydown.escape)="onClose()">
   <div class="modal-content" (click)="$event.stopPropagation()" (keydown)="$event.stopPropagation()">
     <div class="modal-header">
-      <h5 class="modal-title">Nhập tài khoản email</h5>
+      <h5 class="modal-title">Import tài khoản</h5>
       <button type="button" class="btn-close" (click)="onClose()"></button>
     </div>
     <div class="modal-body">
+      <!-- Expiration Type Selection (matching backend enum) -->
+      <div class="mb-4">
+        <label class="form-label fw-bold">
+          <i class="bi bi-clock-history me-1"></i> Thời gian hết hạn
+        </label>
+        <div class="d-flex flex-wrap gap-3">
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="expirationType" id="expNone" [(ngModel)]="expirationType"
+              value="NONE">
+            <label class="form-check-label" for="expNone">Không hết hạn</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="expirationType" id="exp3h" [(ngModel)]="expirationType"
+              value="HOURS_3">
+            <label class="form-check-label" for="exp3h">3 giờ</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="expirationType" id="exp6h" [(ngModel)]="expirationType"
+              value="HOURS_6">
+            <label class="form-check-label" for="exp6h">6 giờ</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="expirationType" id="exp1m" [(ngModel)]="expirationType"
+              value="MONTH_1">
+            <label class="form-check-label" for="exp1m">1 tháng</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="expirationType" id="exp6m" [(ngModel)]="expirationType"
+              value="MONTH_6">
+            <label class="form-check-label" for="exp6m">6 tháng</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Option 1: File Upload -->
       <div class="mb-3">
-        <label for="accountsInput" class="form-label">Dán danh sách tài khoản (mỗi dòng một tài khoản)</label>
-        <textarea
-          id="accountsInput"
-          class="form-control"
-          rows="10"
-          [(ngModel)]="accountsText"
-          placeholder="email@example.com|password&#10;mail2@example.com|pass2"
+        <label class="form-label fw-bold">
+          <i class="bi bi-file-earmark-text me-1"></i> Chọn file TXT
+        </label>
+        <input type="file" id="fileInput" class="form-control" accept=".txt" (change)="onFileSelected($event)"
           [disabled]="isLoading">
+        @if (selectedFileName) {
+        <div class="mt-2 text-success">
+          <i class="bi bi-check-circle me-1"></i> Đã chọn: <strong>{{ selectedFileName }}</strong>
+          <button type="button" class="btn btn-link btn-sm text-danger p-0 ms-2" (click)="clearFile()">
+            <i class="bi bi-x-circle"></i> Xóa
+          </button>
+        </div>
+        }
+      </div>
+
+      <div class="text-center text-muted mb-3">— hoặc —</div>
+
+      <!-- Option 2: Textarea Input -->
+      <div class="mb-3">
+        <label for="accountsInput" class="form-label fw-bold">
+          <i class="bi bi-list-ul me-1"></i> Nhập trực tiếp
+        </label>
+        <textarea id="accountsInput" class="form-control" rows="8" [(ngModel)]="accountsText"
+          placeholder="email@example.com|password&#10;mail2@example.com|pass2" [disabled]="isLoading || !!selectedFile">
         </textarea>
         <small class="text-muted d-block mt-2">
-          Định dạng: email|mật khẩu, hoặc bất kỳ định dạng nào bạn hỗ trợ
+          Mỗi dòng một tài khoản. Định dạng: email|mật khẩu
         </small>
       </div>
     </div>
@@ -24,12 +75,13 @@
       <button type="button" class="btn btn-secondary" (click)="onClose()" [disabled]="isLoading">
         Hủy
       </button>
-      <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="isLoading">
+      <button type="button" class="btn btn-primary" (click)="onSubmit()"
+        [disabled]="isLoading || (!selectedFile && !accountsText.trim())">
         @if (isLoading) {
-          <span class="spinner-border spinner-border-sm me-2"></span>
-          Đang xử lý...
+        <span class="spinner-border spinner-border-sm me-2"></span>
+        Đang xử lý...
         } @else {
-          <i class="fas fa-upload"></i> Nhập
+        <i class="bi bi-upload me-1"></i> Import
         }
       </button>
     </div>

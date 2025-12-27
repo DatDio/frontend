@@ -1,9 +1,20 @@
 <div class="container-fluid p-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Danh sách tài khoản email @if (productName) {<span class="text-primary">{{ productName }}</span>}</h1>
-    <button class="btn btn-success" (click)="onImportClick()">
-      <i class="fas fa-upload"></i> Nhập tài khoản
-    </button>
+    <div class="btn-group">
+      <button class="btn btn-success" (click)="onImportClick()">
+        <i class="bi bi-upload me-1"></i> Nhập tài khoản
+      </button>
+      <button class="btn btn-warning" (click)="onDownloadExpired()" title="Tải danh sách mail hết hạn">
+        <i class="bi bi-download me-1"></i> Tải mail hết hạn
+      </button>
+      <button class="btn btn-danger" (click)="onDeleteExpired()" title="Xóa tất cả mail hết hạn">
+        <i class="bi bi-trash me-1"></i> Xóa mail hết hạn
+      </button>
+      <button class="btn btn-outline-danger" (click)="onBulkDeleteClick()" title="Xóa nhiều mail theo data">
+        <i class="bi bi-trash3 me-1"></i> Xóa theo data
+      </button>
+    </div>
   </div>
 
   <!-- Search Form -->
@@ -11,17 +22,28 @@
     <div class="card-body">
       <form [formGroup]="searchForm">
         <div class="row g-3">
-          <div class="col-md-4">
+          <div class="col-md-3">
             <label for="accountData" class="form-label">Dữ liệu tài khoản</label>
             <input id="accountData" type="text" class="form-control" formControlName="accountData"
               placeholder="Nhập dữ liệu tài khoản...">
           </div>
-          <div class="col-md-4">
+          <div class="col-md-2">
             <label for="sold" class="form-label">Đã bán</label>
             <select id="sold" class="form-select" formControlName="sold">
-              <option value="">Tất cả trạng thái</option>
+              <option value="">Tất cả</option>
               <option value="true">Có</option>
               <option value="false">Không</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label for="expirationType" class="form-label">Loại hết hạn</label>
+            <select id="expirationType" class="form-select" formControlName="expirationType">
+              <option value="">Tất cả</option>
+              <option value="NONE">Không hết hạn</option>
+              <option value="HOURS_3">3 giờ</option>
+              <option value="HOURS_6">6 giờ</option>
+              <option value="MONTH_1">1 tháng</option>
+              <option value="MONTH_6">6 tháng</option>
             </select>
           </div>
           <div class="col-md-4 d-flex align-items-end gap-2">
@@ -44,7 +66,9 @@
         <tr>
           <th>STT</th>
           <th>Dữ liệu tài khoản</th>
-          <th>Đã bán</th>
+          <th>Trạng thái</th>
+          <th>Loại hết hạn</th>
+          <th>Thời gian hết hạn</th>
           <th>Người mua</th>
           <th>Ngày bán</th>
           <th>Hành động</th>
@@ -53,24 +77,44 @@
       <tbody>
         @if (items.length === 0) {
         <tr>
-          <td colspan="6" class="text-center text-muted py-4">Không có dữ liệu</td>
+          <td colspan="7" class="text-center text-muted py-4">Không có dữ liệu</td>
         </tr>
         }
         @for (item of items; track item.id; let i = $index) {
-        <tr>
+        <tr [class.table-danger]="item.expired">
           <td>{{ i + 1 + (currentPage * pageSize) }}</td>
           <td class="text-monospace">{{ item.accountData }}</td>
           <td>
-            <span [ngClass]="item.sold ? 'badge bg-success' : 'badge bg-secondary'">
-              {{ item.sold ? 'Có' : 'Không' }}
+            @if (item.sold) {
+            <span class="badge bg-success">Đã bán</span>
+            } @else if (item.expired) {
+            <span class="badge bg-danger">Hết hạn</span>
+            } @else {
+            <span class="badge bg-secondary">Còn hàng</span>
+            }
+          </td>
+          <td>
+            <span class="badge" [class.bg-secondary]="item.expirationType === 'NONE'"
+              [class.bg-warning]="item.expirationType === 'HOURS_3' || item.expirationType === 'HOURS_6'"
+              [class.bg-info]="item.expirationType === 'MONTH_1' || item.expirationType === 'MONTH_6'">
+              {{ item.expirationLabel || 'Không hết hạn' }}
             </span>
+          </td>
+          <td>
+            @if (item.expiresAt) {
+            <small [class.text-danger]="item.expired">
+              {{ item.expiresAt | date:'dd/MM/yyyy HH:mm' }}
+            </small>
+            } @else {
+            <span class="text-muted">-</span>
+            }
           </td>
           <td>{{ item.buyerName || '-' }}</td>
           <td>{{ item.soldAt ? (item.soldAt | date: 'dd/MM/yyyy') : '-' }}</td>
           <td>
             <button class="btn btn-sm btn-danger" (click)="onDeleteItem(item.id)" [disabled]="item.buyerName"
               [title]="item.buyerName ? 'Không thể xóa tài khoản đã bán' : 'Xóa tài khoản'">
-              <i class="fas fa-trash"></i> Xóa
+              <i class="bi bi-trash"></i> Xóa
             </button>
           </td>
         </tr>
@@ -89,8 +133,36 @@
   </app-pagination>
 </div>
 
-<!-- Import Modal -->
 @if (showImportModal) {
 <app-bulk-import-modal [productId]="productId" (closeModal)="onModalClose()" (successImport)="onImportSuccess()">
 </app-bulk-import-modal>
+}
+
+<!-- Bulk Delete Modal -->
+@if (showBulkDeleteModal) {
+<div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-trash3 me-2"></i>Xóa nhiều tài khoản theo data</h5>
+        <button type="button" class="btn-close" (click)="showBulkDeleteModal = false"></button>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-warning">
+          <i class="bi bi-exclamation-triangle me-2"></i>
+          Nhập danh sách tài khoản cần xóa, mỗi dòng một tài khoản (đúng format đã nhập).
+        </div>
+        <textarea class="form-control" rows="10" [(ngModel)]="bulkDeleteData"
+          placeholder="mail1|pass1|recovery1&#10;mail2|pass2|recovery2&#10;..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="showBulkDeleteModal = false">Hủy</button>
+        <button type="button" class="btn btn-danger" (click)="onConfirmBulkDelete()"
+          [disabled]="!bulkDeleteData?.trim()">
+          <i class="bi bi-trash me-1"></i> Xóa tài khoản
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 }

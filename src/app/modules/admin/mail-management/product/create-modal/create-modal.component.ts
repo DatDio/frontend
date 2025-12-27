@@ -44,8 +44,7 @@ export class ProductCreateModalComponent implements OnInit {
       status: ['1', Validators.required],
       sortOrder: [0],
       minSecondaryStock: [500, [Validators.min(0)]],
-      maxSecondaryStock: [1000, [Validators.min(1)]],
-      expirationHours: [0, [Validators.min(0)]]
+      maxSecondaryStock: [1000, [Validators.min(1)]]
     });
   }
 
@@ -94,7 +93,6 @@ export class ProductCreateModalComponent implements OnInit {
     formData.append('sortOrder', (formValue.sortOrder ?? 0).toString());
     formData.append('minSecondaryStock', (formValue.minSecondaryStock ?? 500).toString());
     formData.append('maxSecondaryStock', (formValue.maxSecondaryStock ?? 1000).toString());
-    formData.append('expirationHours', (formValue.expirationHours ?? 0).toString());
 
     if (this.imageFile) {
       formData.append('image', this.imageFile);

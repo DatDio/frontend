@@ -15,7 +15,6 @@ export interface Product {
   primaryQuantity?: number;   // Số lượng kho chính (chỉ admin xem)
   minSecondaryStock?: number; // Ngưỡng tối thiểu kho phụ
   maxSecondaryStock?: number; // Giới hạn tối đa kho phụ
-  expirationHours?: number;   // Thời gian hết hạn (giờ, 0 = không hết hạn)
   sortOrder?: number;
 }
 
@@ -29,7 +28,6 @@ export interface ProductCreate {
   sortOrder?: number;
   minSecondaryStock?: number;
   maxSecondaryStock?: number;
-  expirationHours?: number;
 }
 
 export interface ProductUpdate {
@@ -44,7 +42,6 @@ export interface ProductUpdate {
   sortOrder?: number;
   minSecondaryStock?: number;
   maxSecondaryStock?: number;
-  expirationHours?: number;
 }
 
 export interface ProductFilter extends PageFilter {

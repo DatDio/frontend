@@ -1,7 +1,7 @@
 import { Component, OnInit, inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
-import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ProductItem } from '../../../../../core/models/product-item.model';
 import { ProductItemService } from '../../../../../core/services/product-item.service';
 import { NotificationService } from '../../../../../core/services/notification.service';
@@ -12,7 +12,7 @@ import { PaginationComponent } from '../../../../../shared/components/pagination
 @Component({
   selector: 'app-product-item-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, BulkImportModalComponent, PaginationComponent],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, FormsModule, BulkImportModalComponent, PaginationComponent],
   templateUrl: './product-item-list.component.html',
   styleUrl: './product-item-list.component.scss'
 })
@@ -33,6 +33,8 @@ export class ProductItemListComponent implements OnInit {
   totalPages = 0;
   totalElements = 0;
   showImportModal = false;
+  showBulkDeleteModal = false;
+  bulkDeleteData = '';
   searchForm!: FormGroup;
 
   ngOnInit(): void {
@@ -59,7 +61,8 @@ export class ProductItemListComponent implements OnInit {
   initSearchForm(): void {
     this.searchForm = this.fb.group({
       accountData: [''],
-      sold: ['']
+      sold: [''],
+      expirationType: ['']
     });
   }
 
@@ -73,12 +76,16 @@ export class ProductItemListComponent implements OnInit {
 
     const accountData = this.searchForm.get('accountData')?.value;
     const sold = this.searchForm.get('sold')?.value;
+    const expirationType = this.searchForm.get('expirationType')?.value;
 
     if (accountData) {
       params.accountData = accountData;
     }
     if (sold !== '') {
       params.sold = sold === 'true';
+    }
+    if (expirationType) {
+      params.expirationType = expirationType;
     }
 
     this.productItemService
@@ -169,5 +176,119 @@ export class ProductItemListComponent implements OnInit {
     this.searchForm.reset();
     this.currentPage = 0;
     this.loadItems();
+  }
+
+  // ============ BULK OPERATIONS ============
+
+  /**
+   * Tải danh sách email hết hạn
+   */
+  onDownloadExpired(): void {
+    if (!this.productId) return;
+
+    this.productItemService.getExpiredItems(this.productId).subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          const expiredItems = response.data;
+          if (expiredItems.length === 0) {
+            this.notificationService.info('Không có tài khoản hết hạn');
+            return;
+          }
+
+          // Create download content
+          const content = expiredItems.map(item => item.accountData).join('\n');
+          const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = `expired_emails_${this.productName || this.productId}_${new Date().toISOString().slice(0, 10)}.txt`;
+          link.click();
+          window.URL.revokeObjectURL(url);
+
+          this.notificationService.success(`Đã tải ${expiredItems.length} tài khoản hết hạn`);
+        }
+      },
+      error: (error) => {
+        console.error('Error downloading expired items:', error);
+        this.notificationService.error('Lỗi khi tải danh sách hết hạn');
+      }
+    });
+  }
+
+  /**
+   * Xóa tất cả email hết hạn
+   */
+  async onDeleteExpired(): Promise<void> {
+    if (!this.productId) return;
+
+    const confirmed = await this.confirmService.confirm({
+      title: 'Xác nhận xóa mail hết hạn',
+      message: 'Bạn có chắc muốn xóa TẤT CẢ tài khoản đã hết hạn? Hành động này không thể hoàn tác!',
+      confirmText: 'Xóa tất cả',
+      cancelText: 'Hủy'
+    });
+
+    if (confirmed) {
+      this.productItemService.deleteExpiredItems(this.productId).subscribe({
+        next: (response) => {
+          if (response.success && response.data) {
+            this.notificationService.success(response.data.message);
+            this.loadItems();
+          }
+        },
+        error: (error) => {
+          console.error('Error deleting expired items:', error);
+          this.notificationService.error('Lỗi khi xóa tài khoản hết hạn');
+        }
+      });
+    }
+  }
+
+  /**
+   * Mở modal xóa nhiều theo data
+   */
+  onBulkDeleteClick(): void {
+    this.bulkDeleteData = '';
+    this.showBulkDeleteModal = true;
+  }
+
+  /**
+   * Xác nhận xóa nhiều theo data
+   */
+  async onConfirmBulkDelete(): Promise<void> {
+    if (!this.productId || !this.bulkDeleteData?.trim()) return;
+
+    const lines = this.bulkDeleteData.trim().split(/\r?\n/).filter(l => l.trim());
+    const confirmed = await this.confirmService.confirm({
+      title: 'Xác nhận xóa',
+      message: `Bạn có chắc muốn xóa ${lines.length} tài khoản? Hành động này không thể hoàn tác!`,
+      confirmText: 'Xóa',
+      cancelText: 'Hủy'
+    });
+
+    if (confirmed) {
+      this.productItemService.bulkDelete(this.productId, this.bulkDeleteData).subscribe({
+        next: (response) => {
+          if (response.success && response.data) {
+            this.notificationService.success(response.data.message);
+            this.showBulkDeleteModal = false;
+            this.bulkDeleteData = '';
+            this.loadItems();
+          }
+        },
+        error: (error) => {
+          console.error('Error bulk deleting items:', error);
+          this.notificationService.error('Lỗi khi xóa tài khoản');
+        }
+      });
+    }
+  }
+
+  /**
+   * Tính thời gian hết hạn từ createdAt và expirationHours
+   */
+  getExpiryTime(createdAt: string, expirationHours: number): Date {
+    const created = new Date(createdAt);
+    return new Date(created.getTime() + expirationHours * 60 * 60 * 1000);
   }
 }

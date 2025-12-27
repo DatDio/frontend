@@ -52,9 +52,13 @@ export class OrderService {
   }
 
   buy(request: OrderCreate): Observable<ApiResponse<Order>> {
-    return this.httpClient.post<ApiResponse<Order>>(
+    const params = new HttpParams()
+      .set('productId', request.productId.toString())
+      .set('quantity', request.quantity.toString());
+
+    return this.httpClient.get<ApiResponse<Order>>(
       OrderApi.BUY,
-      request
+      { params }
     );
   }
 
