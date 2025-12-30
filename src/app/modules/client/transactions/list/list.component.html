@@ -1,6 +1,77 @@
 <div class="transactions-management">
 
-  <div id="payos-modal"></div>
+  <!-- Web2m QR Modal -->
+  @if (showQrModal) {
+  <div class="qr-modal-overlay" (click)="closeQrModal()">
+    <div class="qr-modal-content" (click)="$event.stopPropagation()">
+      <div class="qr-modal-header">
+        <h3><i class="bi bi-qr-code me-2"></i>Quét mã QR để thanh toán</h3>
+        <button class="qr-close-btn" (click)="closeQrModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="qr-modal-body">
+        <!-- QR Code Image -->
+        <div class="qr-code-container">
+          <img [src]="qrCodeUrl" alt="QR Code" class="qr-code-image">
+        </div>
+
+        <!-- Bank Info -->
+        <div class="bank-info">
+          <div class="bank-info-row">
+            <span class="label">Ngân hàng:</span>
+            <span class="value">{{ bankName }}</span>
+          </div>
+          <div class="bank-info-row">
+            <span class="label">Số tài khoản:</span>
+            <span class="value">
+              {{ accountNumber }}
+              <button class="copy-btn" (click)="copyAccountNumber()" title="Sao chép">
+                <i class="bi bi-clipboard"></i>
+              </button>
+            </span>
+          </div>
+          <div class="bank-info-row">
+            <span class="label">Chủ tài khoản:</span>
+            <span class="value">{{ accountName }}</span>
+          </div>
+          <div class="bank-info-row">
+            <span class="label">Số tiền:</span>
+            <span class="value amount">{{ depositAmount | number:'1.0-0' }} VNĐ</span>
+          </div>
+          <div class="bank-info-row content-row">
+            <span class="label">Nội dung CK:</span>
+            <span class="value transfer-content">
+              {{ transferContent }}
+              <button class="copy-btn" (click)="copyTransferContent()" title="Sao chép">
+                <i class="bi bi-clipboard"></i>
+              </button>
+            </span>
+          </div>
+        </div>
+
+        <div class="qr-note">
+          <i class="bi bi-info-circle me-1"></i>
+          <span>Vui lòng nhập <strong>đúng nội dung chuyển khoản</strong> để giao dịch được xử lý tự động.</span>
+        </div>
+
+        <!-- Waiting State -->
+        <div class="qr-waiting-state">
+          <div class="waiting-spinner">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            <span>Đang chờ xác nhận thanh toán...</span>
+          </div>
+          <p class="waiting-note">Hệ thống sẽ tự động cập nhật khi nhận được giao dịch của bạn</p>
+        </div>
+
+        <button class="qr-close-btn" (click)="closeQrModal()">
+          <i class="bi bi-x-lg me-2"></i>Đóng
+        </button>
+      </div>
+    </div>
+  </div>
+  }
 
   <!-- Premium Deposit Card -->
   <div class="deposit-section mb-5">

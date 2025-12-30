@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -12,6 +12,19 @@ import { convertToISO } from '../../../../Utils/functions/date-time-utils';
 import { environment } from '../../../../../environments/environment';
 import { RankService } from '../../../../core/services/rank.service';
 import { UserRankInfo } from '../../../../core/models/rank.model';
+import { WebSocketService } from '../../../../core/services/websocket.service';
+import { AuthService } from '../../../../core/services/auth.service';
+
+// WebSocket message interface for deposit notifications
+interface DepositSuccessMessage {
+  userId: number;
+  transactionCode: number;
+  amount: number;
+  bonusAmount: number;
+  totalAmount: number;
+  newBalance: number;
+  message: string;
+}
 
 declare global {
   interface Window {
@@ -32,7 +45,7 @@ declare global {
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss'
 })
-export class ClientTransactionListComponent implements OnInit {
+export class ClientTransactionListComponent implements OnInit, OnDestroy {
 
   private readonly transactionService = inject(TransactionService);
   private readonly notificationService = inject(NotificationService);
@@ -40,6 +53,8 @@ export class ClientTransactionListComponent implements OnInit {
   private readonly paginationService = inject(PaginationService);
   private readonly rankService = inject(RankService);
   private readonly seoService = inject(SeoService);
+  private readonly webSocketService = inject(WebSocketService);
+  private readonly authService = inject(AuthService);
 
   transactions: TransactionResponse[] = [];
   orderCode: number = 0;
@@ -59,6 +74,16 @@ export class ClientTransactionListComponent implements OnInit {
   depositAmount: number = 10000;
   depositAmountDisplay: string = '10,000';
 
+  // ========== WEB2M QR MODAL ==========
+  showQrModal = false;
+  qrCodeUrl = '';
+  transferContent = '';
+  bankName = '';
+  accountNumber = '';
+  accountName = '';
+  currentTransactionCode = 0;
+  private depositWsUnsub?: () => void;
+
   // ========== RANK INFO ==========
   userRankInfo: UserRankInfo | null = null;
 
@@ -72,6 +97,10 @@ export class ClientTransactionListComponent implements OnInit {
     this.loadTransactions();
     this.loadRankInfo();
     this.depositAmountDisplay = this.formatNumber(this.depositAmount);
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribeDepositWs();
   }
 
   // Load user rank info
@@ -131,75 +160,101 @@ export class ClientTransactionListComponent implements OnInit {
     });
   }
 
-  // ================== CREATE DEPOSIT ==================
+  // ================== CREATE DEPOSIT (WEB2M) ==================
   createDeposit(): void {
     if (!this.depositAmount || this.depositAmount < 10000) {
       this.notificationService.error('Số tiền tối thiểu là 10.000đ');
       return;
     }
 
-    this.transactionService.createDeposit(this.depositAmount).subscribe({
+    this.transactionService.createDepositCasso(this.depositAmount).subscribe({
       next: (res: any) => {
+        if (res.success && res.data?.qrCodeUrl) {
+          // Show QR Modal
+          this.qrCodeUrl = res.data.qrCodeUrl;
+          this.transferContent = res.data.transferContent;
+          this.bankName = res.data.bankName;
+          this.accountNumber = res.data.accountNumber;
+          this.accountName = res.data.accountName;
+          this.currentTransactionCode = res.data.transactionCode;
+          this.showQrModal = true;
 
-        if (res.success && res.data?.checkoutUrl) {
-          this.openPayOSPopup(res.data.checkoutUrl);
-          this.orderCode = res.data.orderCode;
+          // Subscribe to WebSocket for real-time updates
+          this.subscribeToDepositWebSocket();
         } else {
-          this.notificationService.error('Không thể tạo giao dịch');
+          this.notificationService.error('Không thể tạo mã QR thanh toán');
         }
       },
-      error: (error) => {
+      error: (error: any) => {
         this.notificationService.error(
           error.error?.message || 'Lỗi khi tạo yêu cầu thanh toán'
         );
       }
     });
-
   }
 
-  // ================== PAYOS POPUP ==================
-  private openPayOSPopup(checkoutUrl: string): void {
-    if (!window.PayOSCheckout) {
-      this.notificationService.error('Có lỗi xảy ra. Vui lòng tải lại trang.');
-      return;
+  // ================== WEBSOCKET DEPOSIT NOTIFICATION ==================
+  private subscribeToDepositWebSocket(): void {
+    const user = this.authService.getCurrentUser();
+    if (!user?.id) return;
+
+    const topic = `/topic/deposit/${user.id}`;
+
+    this.depositWsUnsub = this.webSocketService.subscribe<DepositSuccessMessage>(
+      topic,
+      (payload) => this.handleDepositSuccess(payload)
+    );
+  }
+
+  private handleDepositSuccess(payload: DepositSuccessMessage): void {
+    // Verify this is for the current transaction
+    if (payload.transactionCode !== this.currentTransactionCode) return;
+
+    // Cleanup WebSocket subscription
+    this.unsubscribeDepositWs();
+
+    // Show success notification with bonus info
+    let message = `🎉 Nạp tiền thành công! +${payload.amount.toLocaleString()} VNĐ`;
+    if (payload.bonusAmount > 0) {
+      message += ` (Bonus: +${payload.bonusAmount.toLocaleString()} VNĐ)`;
     }
+    this.notificationService.success(message);
 
-    let exitFn: any;
+    // Update balance and close modal
+    this.transactionService.refreshBalance();
+    this.showQrModal = false;
+    this.loadTransactions();
+  }
 
-    const payOSConfig = {
-      RETURN_URL: environment.payOSReturnUrl,
-      ELEMENT_ID: 'payos-modal',
-      CHECKOUT_URL: checkoutUrl,
-      embedded: false,
+  private unsubscribeDepositWs(): void {
+    if (this.depositWsUnsub) {
+      this.depositWsUnsub();
+      this.depositWsUnsub = undefined;
+    }
+  }
 
-      onSuccess: () => {
-        setTimeout(() => {
-          if (exitFn) exitFn();
-        }, 10);
-        this.transactionService.refreshBalance();
-        this.loadTransactions();
-      },
+  // ================== QR MODAL ACTIONS ==================
+  closeQrModal(): void {
+    this.unsubscribeDepositWs();
+    this.showQrModal = false;
+    this.loadTransactions();
+    this.transactionService.refreshBalance();
+  }
 
-      onCancel: () => {
-        setTimeout(() => {
-          if (exitFn) exitFn();
-        }, 10);
-        this.transactionService.refreshBalance();
-        //this.deleteTransaction(this.orderCode);
-        this.loadTransactions();
-      },
+  copyTransferContent(): void {
+    navigator.clipboard.writeText(this.transferContent).then(() => {
+      this.notificationService.success('Đã sao chép nội dung chuyển khoản!');
+    }).catch(() => {
+      this.notificationService.error('Không thể sao chép. Vui lòng copy thủ công.');
+    });
+  }
 
-      onExit: () => {
-        this.transactionService.refreshBalance();
-        //this.deleteTransaction(this.orderCode);
-        this.loadTransactions();
-      }
-    };
-
-    const { open, exit } = window.PayOSCheckout.usePayOS(payOSConfig);
-    exitFn = exit;
-
-    open();
+  copyAccountNumber(): void {
+    navigator.clipboard.writeText(this.accountNumber).then(() => {
+      this.notificationService.success('Đã sao chép số tài khoản!');
+    }).catch(() => {
+      this.notificationService.error('Không thể sao chép. Vui lòng copy thủ công.');
+    });
   }
 
   // ================= SEARCH =================

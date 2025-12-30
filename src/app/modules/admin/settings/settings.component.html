@@ -51,6 +51,7 @@
                     <h6 class="section-title">
                         <i class="bi bi-credit-card me-2"></i>
                         Cấu hình Thanh toán PayOS
+                        <span class="badge bg-secondary ms-2">Ẩn - Đang dùng Casso</span>
                     </h6>
                     <p class="text-muted small mb-3">
                         Nhập thông tin xác thực PayOS để kích hoạt thanh toán. Nếu để trống, hệ thống sẽ sử dụng giá trị
@@ -75,10 +76,69 @@
                         </div>
                     </div>
                     <div class="mt-3">
-                        <button class="btn btn-primary" (click)="savePayOSSettings()" [disabled]="payosSaving">
+                        <button class="btn btn-secondary" (click)="savePayOSSettings()" [disabled]="payosSaving">
                             <i class="bi bi-check-lg me-1" *ngIf="!payosSaving"></i>
                             <span class="spinner-border spinner-border-sm me-1" *ngIf="payosSaving"></span>
                             {{ payosSaving ? 'Đang lưu...' : 'Lưu cấu hình PayOS' }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Casso Settings Section -->
+                <div class="settings-section mt-4">
+                    <h6 class="section-title">
+                        <i class="bi bi-qr-code me-2"></i>
+                        Cấu hình Thanh toán Casso (VietQR)
+                        <span class="badge bg-success ms-2">Đang sử dụng</span>
+                    </h6>
+                    <p class="text-muted small mb-3">
+                        Nhập thông tin ngân hàng để nhận tiền qua chuyển khoản VietQR.
+                        Secure Token dùng để xác thực webhook callback từ Casso.
+                    </p>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Secure Token (Webhook)</label>
+                            <input type="password" class="form-control" [(ngModel)]="cassoSecureToken"
+                                placeholder="Nhập Secure Token từ Casso...">
+                            <small class="text-muted">Để xác thực webhook callback từ Casso</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Mã Ngân Hàng</label>
+                            <select class="form-select" [(ngModel)]="cassoBankCode">
+                                <option value="">-- Chọn ngân hàng --</option>
+                                <option value="ACB">ACB - Ngân hàng Á Châu</option>
+                                <option value="VCB">VCB - Vietcombank</option>
+                                <option value="TCB">TCB - Techcombank</option>
+                                <option value="MB">MB - Quân Đội</option>
+                                <option value="VPB">VPB - VPBank</option>
+                                <option value="TPB">TPB - TPBank</option>
+                                <option value="BIDV">BIDV</option>
+                                <option value="VTB">VTB - Vietinbank</option>
+                                <option value="STB">STB - Sacombank</option>
+                                <option value="MSB">MSB - Maritime Bank</option>
+                                <option value="HDB">HDB - HDBank</option>
+                                <option value="OCB">OCB - Phương Đông</option>
+                                <option value="SHB">SHB - Sài Gòn Hà Nội</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Số Tài Khoản</label>
+                            <input type="text" class="form-control" [(ngModel)]="cassoBankAccount"
+                                placeholder="VD: 123456789">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tên Chủ Tài Khoản</label>
+                            <input type="text" class="form-control" [(ngModel)]="cassoAccountName"
+                                placeholder="VD: NGUYEN VAN A (không dấu, viết hoa)">
+                            <small class="text-muted">Không dấu, viết hoa toàn bộ</small>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button class="btn btn-primary" (click)="saveCassoSettings()" [disabled]="cassoSaving">
+                            <i class="bi bi-check-lg me-1" *ngIf="!cassoSaving"></i>
+                            <span class="spinner-border spinner-border-sm me-1" *ngIf="cassoSaving"></span>
+                            {{ cassoSaving ? 'Đang lưu...' : 'Lưu cấu hình Casso' }}
                         </button>
                     </div>
                 </div>

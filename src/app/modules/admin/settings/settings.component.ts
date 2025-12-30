@@ -30,6 +30,13 @@ export class SettingsComponent implements OnInit {
     payosChecksumKey = '';
     payosSaving = false;
 
+    // Casso settings
+    cassoSecureToken = '';
+    cassoBankCode = '';
+    cassoBankAccount = '';
+    cassoAccountName = '';
+    cassoSaving = false;
+
     ngOnInit(): void {
         this.loadSettings();
     }
@@ -67,6 +74,19 @@ export class SettingsComponent implements OnInit {
 
         const checksumKey = this.settings.find(s => s.settingKey === 'payos.checksum_key');
         if (checksumKey) this.payosChecksumKey = checksumKey.settingValue || '';
+
+        // Casso settings
+        const secureToken = this.settings.find(s => s.settingKey === 'casso.secure_token');
+        if (secureToken) this.cassoSecureToken = secureToken.settingValue || '';
+
+        const bankCode = this.settings.find(s => s.settingKey === 'casso.bank_code');
+        if (bankCode) this.cassoBankCode = bankCode.settingValue || '';
+
+        const bankAccount = this.settings.find(s => s.settingKey === 'casso.bank_account');
+        if (bankAccount) this.cassoBankAccount = bankAccount.settingValue || '';
+
+        const accountName = this.settings.find(s => s.settingKey === 'casso.account_name');
+        if (accountName) this.cassoAccountName = accountName.settingValue || '';
     }
 
     startEdit(setting: SystemSetting): void {
@@ -126,7 +146,11 @@ export class SettingsComponent implements OnInit {
             'rank.period_days': 'Số ngày tính hạng',
             'payos.client_id': 'PayOS Client ID',
             'payos.api_key': 'PayOS API Key',
-            'payos.checksum_key': 'PayOS Checksum Key'
+            'payos.checksum_key': 'PayOS Checksum Key',
+            'casso.secure_token': 'Casso Secure Token',
+            'casso.bank_code': 'Casso Mã Ngân Hàng',
+            'casso.bank_account': 'Casso Số Tài Khoản',
+            'casso.account_name': 'Casso Tên Chủ TK'
         };
         return labels[key] || key;
     }
@@ -162,4 +186,41 @@ export class SettingsComponent implements OnInit {
                 this.payosSaving = false;
             });
     }
+
+    saveCassoSettings(): void {
+        this.cassoSaving = true;
+
+        const saveSecureToken = () => this.#settingService.update('casso.secure_token', {
+            settingValue: this.cassoSecureToken,
+            description: 'Casso Secure Token (cho webhook verification)'
+        }).toPromise();
+
+        const saveBankCode = () => this.#settingService.update('casso.bank_code', {
+            settingValue: this.cassoBankCode,
+            description: 'Mã ngân hàng (VD: ACB, VCB, TCB, MB...)'
+        }).toPromise();
+
+        const saveBankAccount = () => this.#settingService.update('casso.bank_account', {
+            settingValue: this.cassoBankAccount,
+            description: 'Số tài khoản ngân hàng nhận tiền'
+        }).toPromise();
+
+        const saveAccountName = () => this.#settingService.update('casso.account_name', {
+            settingValue: this.cassoAccountName,
+            description: 'Tên chủ tài khoản (không dấu, viết hoa)'
+        }).toPromise();
+
+        Promise.all([saveSecureToken(), saveBankCode(), saveBankAccount(), saveAccountName()])
+            .then(() => {
+                this.#notificationService.success('Lưu cấu hình Casso thành công');
+                this.loadSettings();
+            })
+            .catch((error) => {
+                this.#notificationService.error('Lỗi khi lưu cấu hình Casso');
+            })
+            .finally(() => {
+                this.cassoSaving = false;
+            });
+    }
 }
+
