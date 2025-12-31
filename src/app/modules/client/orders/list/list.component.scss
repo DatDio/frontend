@@ -219,6 +219,7 @@
 .account-preview {
   resize: none;
   min-width: 240px;
+  max-width: 300px;
   background: var(--bg-table-header);
   border: 1px dashed var(--border-color);
   border-radius: $radius-md;
@@ -226,6 +227,9 @@
   font-size: $font-size-xs;
   padding: $spacing-2;
   color: var(--text-primary);
+  white-space: pre;
+  overflow-x: auto;
+  overflow-y: auto;
 }
 
 .btn-copy {

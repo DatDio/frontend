@@ -1,7 +1,7 @@
 <div class="container-fluid p-4">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>Danh sách tài khoản email @if (productName) {<span class="text-primary">{{ productName }}</span>}</h1>
-    <div class="btn-group">
+    <div class="d-flex gap-2">
       <button class="btn btn-success" (click)="onImportClick()">
         <i class="bi bi-upload me-1"></i> Nhập tài khoản
       </button>
@@ -11,7 +11,7 @@
       <button class="btn btn-danger" (click)="onDeleteExpired()" title="Xóa tất cả mail hết hạn">
         <i class="bi bi-trash me-1"></i> Xóa mail hết hạn
       </button>
-      <button class="btn btn-outline-danger" (click)="onBulkDeleteClick()" title="Xóa nhiều mail theo data">
+      <button class="btn btn-secondary" (click)="onBulkDeleteClick()" title="Xóa nhiều mail theo data">
         <i class="bi bi-trash3 me-1"></i> Xóa theo data
       </button>
     </div>
@@ -61,6 +61,13 @@
 
   <!-- Items Table -->
   <div class="table-responsive bg-white rounded shadow-sm">
+    <div class="card-header">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <span class="text-muted">Tổng: {{ totalElements }} sản phẩm</span>
+        </div>
+      </div>
+    </div>
     <table class="table table-hover mb-0">
       <thead class="table-light">
         <tr>
@@ -83,7 +90,9 @@
         @for (item of items; track item.id; let i = $index) {
         <tr [class.table-danger]="item.expired">
           <td>{{ i + 1 + (currentPage * pageSize) }}</td>
-          <td class="text-monospace">{{ item.accountData }}</td>
+          <td>
+            <textarea class="account-data-input" readonly rows="1">{{ item.accountData }}</textarea>
+          </td>
           <td>
             @if (item.sold) {
             <span class="badge bg-success">Đã bán</span>
@@ -150,10 +159,11 @@
       <div class="modal-body">
         <div class="alert alert-warning">
           <i class="bi bi-exclamation-triangle me-2"></i>
-          Nhập danh sách tài khoản cần xóa, mỗi dòng một tài khoản (đúng format đã nhập).
+          Nhập danh sách tài khoản cần xóa, mỗi dòng một tài khoản (có thể nhập full account hoặc chỉ email, mỗi dòng 1
+          email).
         </div>
         <textarea class="form-control" rows="10" [(ngModel)]="bulkDeleteData"
-          placeholder="mail1|pass1|recovery1&#10;mail2|pass2|recovery2&#10;..."></textarea>
+          placeholder="mail|pass|refresh_token|client_id"></textarea>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="showBulkDeleteModal = false">Hủy</button>

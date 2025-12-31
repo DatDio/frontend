@@ -144,7 +144,12 @@ export class MailManagementListComponent implements OnInit {
   }
 
   clearForm(): void {
-    this.formSearch.reset();
+    this.formSearch.reset({
+      name: '',
+      categoryId: '',
+      status: '',
+      searchPage: ''
+    });
     this.paginationConfig.currentPage = 0;
     this.dataFormSearch = {};
     this.loadProducts();

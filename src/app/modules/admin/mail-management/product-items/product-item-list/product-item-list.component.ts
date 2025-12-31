@@ -173,7 +173,11 @@ export class ProductItemListComponent implements OnInit {
   }
 
   clearForm(): void {
-    this.searchForm.reset();
+    this.searchForm.reset({
+      accountData: '',
+      sold: '',
+      expirationType: ''
+    });
     this.currentPage = 0;
     this.loadItems();
   }

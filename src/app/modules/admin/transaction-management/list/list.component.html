@@ -80,6 +80,7 @@
             <th>Trạng thái</th>
             <th>Phương thức</th>
             <th>Ngày tạo</th>
+            <th>Ngày hoàn thành</th>
             <th class="text-center">Thao tác</th>
           </tr>
         </thead>
@@ -112,9 +113,10 @@
             </td>
             <td>{{ transaction.paymentMethod || '-' }}</td>
             <td>{{ transaction.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ transaction.completedAt | date: 'dd/MM/yyyy HH:mm' }}</td>
             <td class="text-center">
               @if (isPending(transaction.status)) {
-              <div class="btn-group btn-group-sm">
+              <div class="btn-group btn-group-sm gap-2">
                 <button class="btn btn-success btn-sm" title="Duyệt thành công"
                   (click)="approveTransaction(transaction)">
                   <i class="bi bi-check-lg"></i>

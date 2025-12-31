@@ -24,7 +24,7 @@ h1 {
   tbody {
     tr {
       border-bottom: 1px solid #dee2e6;
-      
+
       &:hover {
         background-color: #f8f9fa;
       }
@@ -37,15 +37,48 @@ h1 {
   }
 }
 
-.text-monospace {
-  font-family: 'Courier New', monospace;
-  font-size: 12px;
-  word-break: break-all;
+.scroll-container {
+  max-width: 300px;
+  overflow-x: auto;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 3px;
+  }
 }
 
-.badge {
+.account-data-input {
+  font-family: 'Courier New', monospace;
   font-size: 12px;
-  padding: 4px 8px;
+  border: none;
+  background: transparent;
+  width: 300px;
+  height: 24px;
+  cursor: text;
+  resize: none;
+  overflow-x: auto;
+  overflow-y: hidden;
+  white-space: nowrap;
+  line-height: 18px;
+  padding: 0;
+
+  &:focus {
+    outline: none;
+    background-color: #f0f7ff;
+  }
+
+  &::-webkit-scrollbar {
+    height: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #aaa;
+    border-radius: 2px;
+  }
 }
 
 .pagination {
@@ -78,7 +111,7 @@ h1 {
 
 .btn {
   font-size: 12px;
-  
+
   &:hover {
     text-decoration: none;
   }
