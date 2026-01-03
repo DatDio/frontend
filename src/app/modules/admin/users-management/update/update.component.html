@@ -44,7 +44,7 @@
           <div class="col-md-6">
             <label for="status" class="form-label">Trạng thái</label>
             <select class="form-select" id="status" formControlName="status">
-              <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+              <option *ngFor="let s of statuses" [ngValue]="s.value">{{ s.label }}</option>
             </select>
           </div>
         </div>

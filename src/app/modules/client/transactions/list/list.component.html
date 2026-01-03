@@ -73,6 +73,55 @@
   </div>
   }
 
+  <!-- Note Modal -->
+  @if (showNoteModal && selectedTransaction) {
+  <div class="note-modal-overlay" (click)="closeNoteModal()">
+    <div class="note-modal-content" (click)="$event.stopPropagation()">
+      <div class="note-modal-header">
+        <h4><i class="bi bi-file-text me-2"></i>Chi tiết giao dịch</h4>
+        <button class="note-close-btn" (click)="closeNoteModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+      <div class="note-modal-body">
+        <div class="note-info-row">
+          <span class="note-label">Mã GD:</span>
+          <span class="note-value">{{ selectedTransaction.transactionCode }}</span>
+        </div>
+        <div class="note-info-row">
+          <span class="note-label">Loại:</span>
+          <span class="badge" [ngClass]="getTypeClass(selectedTransaction.type)">
+            {{ getTypeLabel(selectedTransaction.type) }}
+          </span>
+        </div>
+        <div class="note-info-row">
+          <span class="note-label">Trạng thái:</span>
+          <span class="badge" [ngClass]="getStatusClass(selectedTransaction.status)">
+            {{ getStatusLabel(selectedTransaction.status) }}
+          </span>
+        </div>
+        @if (selectedTransaction.description) {
+        <div class="note-section">
+          <span class="note-section-title"><i class="bi bi-chat-left-text me-1"></i>Mô tả:</span>
+          <p class="note-content">{{ selectedTransaction.description }}</p>
+        </div>
+        }
+        @if (selectedTransaction.status === 'FAILED' && selectedTransaction.errorMessage) {
+        <div class="note-section error-section">
+          <span class="note-section-title"><i class="bi bi-exclamation-triangle me-1"></i>Lý do thất bại:</span>
+          <p class="note-content">{{ selectedTransaction.errorMessage }}</p>
+        </div>
+        }
+      </div>
+      <div class="note-modal-footer">
+        <button class="btn btn-secondary" (click)="closeNoteModal()">
+          <i class="bi bi-x me-1"></i>Đóng
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
   <!-- Premium Deposit Card -->
   <div class="deposit-section mb-5">
     <div class="deposit-card">
@@ -248,6 +297,8 @@
               <th>Số tiền</th>
               <th>Trạng thái</th>
               <th>Ngày tạo</th>
+              <th>Ngày hoàn thành</th>
+              <th style="width: 80px; text-align: center;">Thao tác</th>
             </tr>
           </thead>
           <tbody>
@@ -278,14 +329,28 @@
               </td>
 
               <td>
+                {{ transaction.createdAt | date:'dd/MM/yyyy HH:mm' }}
+              </td>
+
+              <td>
                 {{ transaction.completedAt | date:'dd/MM/yyyy HH:mm' }}
+              </td>
+
+              <td class="text-center">
+                @if (hasNote(transaction)) {
+                <button class="btn btn-sm btn-outline-info" title="Xem ghi chú" (click)="openNoteModal(transaction)">
+                  <i class="bi bi-eye"></i>
+                </button>
+                } @else {
+                <span class="text-muted">-</span>
+                }
               </td>
             </tr>
             }
 
             @if (transactions.length === 0) {
             <tr>
-              <td colspan="6" class="text-center py-4 text-muted">
+              <td colspan="8" class="text-center py-4 text-muted">
                 Không có giao dịch nào
               </td>
             </tr>

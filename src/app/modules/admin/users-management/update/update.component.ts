@@ -26,7 +26,10 @@ export class UsersUpdateComponent implements OnInit {
   userId: number | null = null;
 
   roles = ['ADMIN', 'USER'];
-  statuses = ['ACTIVE', 'INACTIVE'];
+  statuses = [
+    { value: 1, label: 'Hoạt động' },
+    { value: 0, label: 'Không hoạt động' }
+  ];
 
   ngOnInit(): void {
     this.initForm();
@@ -45,7 +48,7 @@ export class UsersUpdateComponent implements OnInit {
       phone: [''],
       address: [''],
       roles: ['USER', Validators.required],
-      status: ['ACTIVE']
+      status: [1]
     });
   }
 
@@ -63,7 +66,7 @@ export class UsersUpdateComponent implements OnInit {
             phone: user.phone || '',
             address: user.address || '',
             roles: user.roles && user.roles.length > 0 ? user.roles[0] : 'USER',
-            status: user.status || 'ACTIVE'
+            status: user.status ?? 1
           });
         } else {
           this.#notificationService.error(response.message || 'Không thể tải thông tin người dùng');
@@ -94,7 +97,7 @@ export class UsersUpdateComponent implements OnInit {
       phone: formValue.phone || undefined,
       address: formValue.address || undefined,
       roles: [formValue.roles],
-      status: formValue.status
+      status: Number(formValue.status)
     };
 
     this.#userService.update(request).subscribe({

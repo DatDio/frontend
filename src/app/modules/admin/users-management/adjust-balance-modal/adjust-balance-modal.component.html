@@ -39,8 +39,8 @@
                 <div class="mb-3">
                     <label for="amount" class="form-label">Số tiền <span class="text-danger">*</span></label>
                     <div class="input-group">
-                        <input type="number" class="form-control form-control-lg" id="amount" formControlName="amount"
-                            placeholder="Nhập số tiền..." min="1">
+                        <input type="text" class="form-control form-control-lg" id="amount" [value]="amountDisplay"
+                            (input)="onAmountInput($event)" placeholder="Nhập số tiền...">
                         <span class="input-group-text">VNĐ</span>
                     </div>
                     @if (amount?.invalid && amount?.touched) {

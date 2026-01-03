@@ -23,6 +23,7 @@ export class AdjustBalanceModalComponent implements OnInit {
 
     form!: FormGroup;
     isLoading = false;
+    amountDisplay = '';
 
     ngOnInit(): void {
         this.initForm();
@@ -39,6 +40,28 @@ export class AdjustBalanceModalComponent implements OnInit {
     get type() { return this.form.get('type'); }
     get amount() { return this.form.get('amount'); }
     get reason() { return this.form.get('reason'); }
+
+    onAmountInput(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        // Remove all non-digit characters
+        const rawValue = input.value.replace(/[^0-9]/g, '');
+
+        if (rawValue) {
+            const numValue = parseInt(rawValue, 10);
+            this.form.patchValue({ amount: numValue });
+            this.amountDisplay = this.formatNumber(numValue);
+        } else {
+            this.form.patchValue({ amount: 0 });
+            this.amountDisplay = '';
+        }
+
+        // Update input with formatted value
+        input.value = this.amountDisplay;
+    }
+
+    private formatNumber(value: number): string {
+        return value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
 
     onClose(): void {
         this.closeModal.emit();

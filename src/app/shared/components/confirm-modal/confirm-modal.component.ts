@@ -2,17 +2,17 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-    selector: 'app-confirm-modal',
-    standalone: true,
-    imports: [CommonModule],
-    template: `
+  selector: 'app-confirm-modal',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
     <div class="confirm-modal-overlay">
       <div class="confirm-modal-content">
         <div class="confirm-modal-header">
           <h5 class="confirm-modal-title">{{ title }}</h5>
         </div>
         <div class="confirm-modal-body">
-          <p>{{ message }}</p>
+          <p [innerHTML]="message"></p>
         </div>
         <div class="confirm-modal-footer">
           <button type="button" class="btn btn-secondary" (click)="onCancel()">
@@ -25,7 +25,7 @@ import { CommonModule } from '@angular/common';
       </div>
     </div>
   `,
-    styles: [`
+  styles: [`
     .confirm-modal-overlay {
       position: fixed;
       top: 0;
@@ -132,23 +132,33 @@ import { CommonModule } from '@angular/common';
     .confirm-modal-footer .btn-primary:hover {
       background-color: #0b5ed7;
     }
+
+    .confirm-modal-footer .btn-success {
+      background-color: #198754;
+      border: 1px solid #198754;
+      color: white;
+    }
+
+    .confirm-modal-footer .btn-success:hover {
+      background-color: #157347;
+    }
   `]
 })
 export class ConfirmModalComponent {
-    @Input() title = 'Xác nhận';
-    @Input() message = '';
-    @Input() confirmText = 'Xác nhận';
-    @Input() cancelText = 'Hủy';
-    @Input() confirmButtonClass = 'btn-danger';
+  @Input() title = 'Xác nhận';
+  @Input() message = '';
+  @Input() confirmText = 'Xác nhận';
+  @Input() cancelText = 'Hủy';
+  @Input() confirmButtonClass = 'btn-danger';
 
-    @Output() confirmed = new EventEmitter<void>();
-    @Output() cancelled = new EventEmitter<void>();
+  @Output() confirmed = new EventEmitter<void>();
+  @Output() cancelled = new EventEmitter<void>();
 
-    onConfirm(): void {
-        this.confirmed.emit();
-    }
+  onConfirm(): void {
+    this.confirmed.emit();
+  }
 
-    onCancel(): void {
-        this.cancelled.emit();
-    }
+  onCancel(): void {
+    this.cancelled.emit();
+  }
 }

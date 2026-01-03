@@ -11,6 +11,7 @@ export interface TransactionResponse {
   balanceAfter: number;
   status: string;
   description: string;
+  errorMessage?: string; // Lý do thất bại hoặc ghi chú admin
   paymentMethod: string;
   paymentReference: string;
   createdAt: string;   // ISO datetime

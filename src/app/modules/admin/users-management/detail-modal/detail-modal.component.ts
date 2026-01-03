@@ -60,4 +60,12 @@ export class UserDetailModalComponent implements OnInit {
     }
     this.user = null;
   }
+
+  getProgressPercent(): number {
+    if (!this.user?.rank?.nextRankMinDeposit) return 0;
+    const current = this.user.rank.currentDeposit || 0;
+    const target = this.user.rank.nextRankMinDeposit;
+    if (target <= 0) return 0;
+    return Math.min(100, Math.round((current / target) * 100));
+  }
 }

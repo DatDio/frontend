@@ -87,6 +87,10 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
   // ========== RANK INFO ==========
   userRankInfo: UserRankInfo | null = null;
 
+  // ========== NOTE MODAL ==========
+  showNoteModal = false;
+  selectedTransaction: TransactionResponse | null = null;
+
   ngOnInit(): void {
     this.seoService.setPageMeta(
       'Lịch Sử Giao Dịch - MailShop',
@@ -404,5 +408,18 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
     return map[status] || 'badge-secondary';
   }
 
+  // ================= NOTE MODAL =================
+  hasNote(transaction: TransactionResponse): boolean {
+    return !!(transaction.description || transaction.errorMessage);
+  }
 
+  openNoteModal(transaction: TransactionResponse): void {
+    this.selectedTransaction = transaction;
+    this.showNoteModal = true;
+  }
+
+  closeNoteModal(): void {
+    this.showNoteModal = false;
+    this.selectedTransaction = null;
+  }
 }

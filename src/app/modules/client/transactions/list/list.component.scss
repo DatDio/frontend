@@ -858,3 +858,146 @@ h1 {
 .card-footer {
   padding: 0px;
 }
+
+// =============================================
+// NOTE MODAL
+// =============================================
+
+.note-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba($dark, 0.7);
+  backdrop-filter: blur(6px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-4;
+}
+
+.note-modal-content {
+  background: var(--bg-card);
+  border-radius: $radius-xl;
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 20px 50px rgba($dark, 0.4);
+  animation: modalSlideIn 0.25s ease;
+}
+
+.note-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-4 $spacing-5;
+  background: var(--bg-table-header);
+  border-radius: $radius-xl $radius-xl 0 0;
+  border-bottom: 1px solid var(--border-color);
+
+  h4 {
+    margin: 0;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: var(--text-heading);
+  }
+
+  .note-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: $spacing-2;
+    border-radius: $radius-md;
+    transition: all $transition-fast;
+
+    &:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+  }
+}
+
+.note-modal-body {
+  padding: $spacing-5;
+
+  .note-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-2 0;
+    border-bottom: 1px dashed var(--border-color);
+
+    &:last-of-type {
+      border-bottom: none;
+      margin-bottom: $spacing-3;
+    }
+
+    .note-label {
+      font-size: $font-size-sm;
+      color: var(--text-secondary);
+    }
+
+    .note-value {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      color: var(--text-primary);
+    }
+  }
+
+  .note-section {
+    background: var(--bg-table-header);
+    border-radius: $radius-lg;
+    padding: $spacing-4;
+    margin-top: $spacing-3;
+
+    .note-section-title {
+      display: block;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      color: var(--text-secondary);
+      margin-bottom: $spacing-2;
+
+      i {
+        color: $info;
+      }
+    }
+
+    .note-content {
+      margin: 0;
+      font-size: $font-size-sm;
+      color: var(--text-primary);
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    &.error-section {
+      background: rgba($danger, 0.08);
+      border: 1px solid rgba($danger, 0.2);
+
+      .note-section-title i {
+        color: $danger;
+      }
+
+      .note-content {
+        color: $danger;
+      }
+    }
+  }
+}
+
+.note-modal-footer {
+  padding: $spacing-4 $spacing-5;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+
+  .btn {
+    padding: $spacing-2 $spacing-4;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-medium;
+    border-radius: $radius-lg;
+  }
+}

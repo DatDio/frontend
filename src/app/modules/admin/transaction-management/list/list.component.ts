@@ -5,6 +5,7 @@ import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule }
 import { TransactionResponse } from '../../../../core/models/transaction.model';
 import { TransactionService } from '../../../../core/services/wallet.service';
 import { NotificationService } from '../../../../core/services/notification.service';
+import { ConfirmService } from '../../../../shared/services/confirm.service';
 import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
 import { PaginationService } from '../../../../shared/services/pagination.service';
 
@@ -26,6 +27,7 @@ interface TransactionSearchFilter {
 export class TransactionListComponent implements OnInit {
   private readonly transactionService = inject(TransactionService);
   private readonly notificationService = inject(NotificationService);
+  private readonly confirmService = inject(ConfirmService);
   private readonly fb = inject(FormBuilder);
   private readonly paginationService = inject(PaginationService);
 
@@ -40,6 +42,10 @@ export class TransactionListComponent implements OnInit {
 
   dataFormSearch: TransactionSearchFilter = {};
   formSearch!: FormGroup;
+
+  // ========== NOTE MODAL ==========
+  showNoteModal = false;
+  selectedTransaction: TransactionResponse | null = null;
 
   ngOnInit(): void {
     this.initForm();
@@ -162,10 +168,14 @@ export class TransactionListComponent implements OnInit {
   }
 
   // ========== APPROVE TRANSACTION (PENDING -> SUCCESS) ==========
-  approveTransaction(transaction: TransactionResponse): void {
-    const confirmed = window.confirm(
-      `Xác nhận duyệt giao dịch #${transaction.transactionCode}?\nSố tiền: ${transaction.amount.toLocaleString()} VNĐ\n\nNếu là giao dịch nạp tiền, số dư sẽ được cộng vào ví người dùng.`
-    );
+  async approveTransaction(transaction: TransactionResponse): Promise<void> {
+    const confirmed = await this.confirmService.confirm({
+      title: 'Xác nhận duyệt giao dịch',
+      message: `Duyệt giao dịch <strong>#${transaction.transactionCode}</strong>?<br><br>Số tiền: <strong>${transaction.amount.toLocaleString()} VNĐ</strong><br><br>Nếu là giao dịch nạp tiền, số dư sẽ được cộng vào ví người dùng.`,
+      confirmText: 'Duyệt',
+      cancelText: 'Hủy',
+      confirmButtonClass: 'btn-success'
+    });
 
     if (confirmed) {
       this.transactionService.updateStatus(transaction.id, 2, 'Admin duyệt giao dịch').subscribe({
@@ -185,30 +195,35 @@ export class TransactionListComponent implements OnInit {
   }
 
   // ========== REJECT TRANSACTION (PENDING -> FAILED) ==========
-  rejectTransaction(transaction: TransactionResponse): void {
-    const reason = prompt('Nhập lý do từ chối giao dịch:');
+  async rejectTransaction(transaction: TransactionResponse): Promise<void> {
+    const reason = await this.confirmService.prompt({
+      title: 'Từ chối giao dịch',
+      message: `Từ chối giao dịch <strong>#${transaction.transactionCode}</strong><br>Số tiền: <strong>${transaction.amount.toLocaleString()} VNĐ</strong>`,
+      inputLabel: 'Lý do từ chối',
+      placeholder: 'Nhập lý do từ chối giao dịch...',
+      confirmText: 'Từ chối',
+      cancelText: 'Hủy',
+      confirmButtonClass: 'btn-danger',
+      rows: 2
+    });
+
     if (reason === null) return; // User cancelled
 
-    const confirmed = window.confirm(
-      `Xác nhận từ chối giao dịch #${transaction.transactionCode}?\nLý do: ${reason || 'Không có'}`
-    );
-
-    if (confirmed) {
-      this.transactionService.updateStatus(transaction.id, 3, reason || 'Admin từ chối giao dịch').subscribe({
-        next: (response) => {
-          if (response.success) {
-            this.notificationService.success('Từ chối giao dịch thành công');
-            this.loadTransactions();
-          } else {
-            this.notificationService.error(response.message || 'Có lỗi xảy ra');
-          }
-        },
-        error: (error: any) => {
-          this.notificationService.error(error.error?.message || 'Có lỗi xảy ra');
+    this.transactionService.updateStatus(transaction.id, 3, reason || 'Admin từ chối giao dịch').subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.notificationService.success('Từ chối giao dịch thành công');
+          this.loadTransactions();
+        } else {
+          this.notificationService.error(response.message || 'Có lỗi xảy ra');
         }
-      });
-    }
+      },
+      error: (error: any) => {
+        this.notificationService.error(error.error?.message || 'Có lỗi xảy ra');
+      }
+    });
   }
+
 
   getTypeLabel(type: string | number): string {
     const typeMap: { [key: string]: string } = {
@@ -273,5 +288,24 @@ export class TransactionListComponent implements OnInit {
     };
     return classMap[status?.toString()] || 'bg-secondary';
   }
-}
 
+  // ================= NOTE MODAL =================
+  hasNote(transaction: TransactionResponse): boolean {
+    return !!(transaction.description || transaction.errorMessage);
+  }
+
+  isFailed(status: string | number): boolean {
+    const failedValues = [3, '3', 'FAILED'];
+    return failedValues.includes(status);
+  }
+
+  openNoteModal(transaction: TransactionResponse): void {
+    this.selectedTransaction = transaction;
+    this.showNoteModal = true;
+  }
+
+  closeNoteModal(): void {
+    this.showNoteModal = false;
+    this.selectedTransaction = null;
+  }
+}
