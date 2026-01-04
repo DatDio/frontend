@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+﻿import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { SeoService } from '../../../core/services/seo.service';
@@ -72,9 +72,9 @@ export class ToolsComponent implements OnInit {
 
     ngOnInit(): void {
         this.seoService.setPageMeta(
-            'Công Cụ Hỗ Trợ - MailShop',
+            'Công Cụ Hỗ Trợ - EmailSieuRe',
             'Bộ công cụ hỗ trợ mạnh mẽ: Lấy mã OTP, kiểm tra live Facebook, kiểm tra live Mail, Get 2FA, Get OAuth2 Token.',
-            'tools, công cụ, get code, check live, 2FA, OAuth2, MailShop'
+            'tools, công cụ, get code, check live, 2FA, OAuth2, EmailSieuRe'
         );
     }
 }

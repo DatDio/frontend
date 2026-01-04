@@ -1,4 +1,4 @@
-<div class="modal fade" id="apiKeyModal" tabindex="-1" aria-labelledby="apiKeyModalLabel" aria-hidden="true">
+﻿<div class="modal fade" id="apiKeyModal" tabindex="-1" aria-labelledby="apiKeyModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
@@ -295,7 +295,7 @@
                   <div class="row align-items-end">
                     <div class="col-md-8 mb-3 mb-md-0">
                       <label class="form-label">Tên Key *</label>
-                      <input type="text" class="form-control" formControlName="name" placeholder="VD: ApiKey-MailShop"
+                      <input type="text" class="form-control" formControlName="name" placeholder="VD: ApiKey-EmailSieuRe"
                         [class.is-invalid]="apiKeySubmitted && createApiKeyForm.get('name')?.invalid">
                       <div class="text-danger small mt-1"
                         *ngIf="apiKeySubmitted && createApiKeyForm.get('name')?.errors?.['required']">

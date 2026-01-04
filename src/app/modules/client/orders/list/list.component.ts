@@ -45,9 +45,9 @@ export class ClientOrderListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.seoService.setPageMeta(
-      'Quản Lý Đơn Hàng - MailShop',
+      'Quản Lý Đơn Hàng - EmailSieuRe',
       'Xem và quản lý tất cả đơn hàng của bạn. Theo dõi trạng thái đơn hàng, tải xuống tài khoản đã mua.',
-      'đơn hàng, quản lý đơn hàng, order management, MailShop'
+      'đơn hàng, quản lý đơn hàng, order management, EmailSieuRe'
     );
     this.initForm();
     this.loadOrders();

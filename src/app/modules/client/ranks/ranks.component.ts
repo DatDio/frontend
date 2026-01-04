@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+﻿import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RankService } from '../../../core/services/rank.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -26,9 +26,9 @@ export class RanksComponent implements OnInit {
 
     ngOnInit(): void {
         this.#seoService.setPageMeta(
-            'Hạng Thành Viên - MailShop',
+            'Hạng Thành Viên - EmailSieuRe',
             'Xem các cấp bậc thành viên và ưu đãi đặc biệt. Nạp tiền để nâng cấp hạng và nhận bonus hấp dẫn.',
-            'hạng thành viên, membership, rank, bonus, ưu đãi, MailShop'
+            'hạng thành viên, membership, rank, bonus, ưu đãi, EmailSieuRe'
         );
         this.isLoggedIn = this.#authService.isAuthenticated();
         this.loadRanks();

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+﻿import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NotificationService } from '../../../core/services/notification.service';
@@ -55,9 +55,9 @@ export class ReadMailComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.seoService.setPageMeta(
-            'Đọc Mail - MailShop',
+            'Đọc Mail - EmailSieuRe',
             'Công cụ đọc email từ hộp thư Hotmail/Outlook. Xem nội dung thư đến nhanh chóng.',
-            'đọc mail, read mail, Hotmail, Outlook, inbox, MailShop'
+            'đọc mail, read mail, Hotmail, Outlook, inbox, EmailSieuRe'
         );
         this.readMailForm = this.formBuilder.group({
             emailData: ['', [Validators.required, Validators.minLength(10)]],

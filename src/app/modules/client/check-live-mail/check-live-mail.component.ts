@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+﻿import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { NotificationService } from '../../../core/services/notification.service';
@@ -46,9 +46,9 @@ export class CheckLiveMailComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.seoService.setPageMeta(
-            'Kiểm Tra Live Mail - MailShop',
+            'Kiểm Tra Live Mail - EmailSieuRe',
             'Công cụ kiểm tra trạng thái hoạt động của email Hotmail/Outlook nhanh chóng và chính xác.',
-            'check live mail, kiểm tra email, Hotmail, Outlook, MailShop'
+            'check live mail, kiểm tra email, Hotmail, Outlook, EmailSieuRe'
         );
         this.checkForm = this.formBuilder.group({
             emailData: ['', [Validators.required, Validators.minLength(10)]]

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+﻿import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -93,9 +93,9 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.seoService.setPageMeta(
-      'Lịch Sử Giao Dịch - MailShop',
-      'Xem lịch sử giao dịch, nạp tiền và quản lý số dư tài khoản của bạn trên MailShop.',
-      'lịch sử giao dịch, nạp tiền, transaction history, MailShop'
+      'Lịch Sử Giao Dịch - EmailSieuRe',
+      'Xem lịch sử giao dịch, nạp tiền và quản lý số dư tài khoản của bạn trên EmailSieuRe.',
+      'lịch sử giao dịch, nạp tiền, transaction history, EmailSieuRe'
     );
     this.initForm();
     this.loadTransactions();

@@ -1,4 +1,4 @@
-import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+﻿import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { BehaviorSubject } from 'rxjs';
 
@@ -8,7 +8,7 @@ export type Theme = 'light' | 'dark';
     providedIn: 'root'
 })
 export class ThemeService {
-    private readonly THEME_KEY = 'mailshop-theme';
+    private readonly THEME_KEY = 'EmailSieuRe-theme';
     private readonly themeSubject = new BehaviorSubject<Theme>('light');
 
     theme$ = this.themeSubject.asObservable();

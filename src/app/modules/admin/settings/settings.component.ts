@@ -36,6 +36,12 @@ export class SettingsComponent implements OnInit {
     cassoBankAccount = '';
     cassoAccountName = '';
     cassoSaving = false;
+    showSecureToken = false;
+
+    // Social settings
+    telegramGroupUrl = '';
+    telegramChannelUrl = '';
+    socialSaving = false;
 
     ngOnInit(): void {
         this.loadSettings();
@@ -87,6 +93,13 @@ export class SettingsComponent implements OnInit {
 
         const accountName = this.settings.find(s => s.settingKey === 'casso.account_name');
         if (accountName) this.cassoAccountName = accountName.settingValue || '';
+
+        // Social settings
+        const telegramGroup = this.settings.find(s => s.settingKey === 'social.telegram_group');
+        if (telegramGroup) this.telegramGroupUrl = telegramGroup.settingValue || '';
+
+        const telegramChannel = this.settings.find(s => s.settingKey === 'social.telegram_channel');
+        if (telegramChannel) this.telegramChannelUrl = telegramChannel.settingValue || '';
     }
 
     startEdit(setting: SystemSetting): void {
@@ -150,7 +163,9 @@ export class SettingsComponent implements OnInit {
             'casso.secure_token': 'Casso Secure Token',
             'casso.bank_code': 'Casso Mã Ngân Hàng',
             'casso.bank_account': 'Casso Số Tài Khoản',
-            'casso.account_name': 'Casso Tên Chủ TK'
+            'casso.account_name': 'Casso Tên Chủ TK',
+            'social.telegram_group': 'Link Telegram Nhóm Chat',
+            'social.telegram_channel': 'Link Liên Hệ Admin'
         };
         return labels[key] || key;
     }
@@ -220,6 +235,32 @@ export class SettingsComponent implements OnInit {
             })
             .finally(() => {
                 this.cassoSaving = false;
+            });
+    }
+
+    saveSocialSettings(): void {
+        this.socialSaving = true;
+
+        const saveTelegramGroup = () => this.#settingService.update('social.telegram_group', {
+            settingValue: this.telegramGroupUrl,
+            description: 'Link Telegram nhóm chat hỗ trợ'
+        }).toPromise();
+
+        const saveTelegramChannel = () => this.#settingService.update('social.telegram_channel', {
+            settingValue: this.telegramChannelUrl,
+            description: 'Link liên hệ admin'
+        }).toPromise();
+
+        Promise.all([saveTelegramGroup(), saveTelegramChannel()])
+            .then(() => {
+                this.#notificationService.success('Lưu cấu hình liên kết thành công');
+                this.loadSettings();
+            })
+            .catch((error) => {
+                this.#notificationService.error('Lỗi khi lưu cấu hình liên kết');
+            })
+            .finally(() => {
+                this.socialSaving = false;
             });
     }
 }

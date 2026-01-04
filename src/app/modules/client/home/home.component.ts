@@ -63,7 +63,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.seoService.setTitle('MailShop - Chuyên cung cấp tài nguyên marketing');
+    this.seoService.setTitle('EmailSieuRe - Chuyên cung cấp tài nguyên marketing');
     this.initOrderForm();
     this.loadCategories();
     this.subscribeToQuantityUpdates();

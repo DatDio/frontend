@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+﻿import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -49,9 +49,9 @@ export class Get2FAComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.seoService.setPageMeta(
-            'Lấy Mã 2FA - MailShop',
+            'Lấy Mã 2FA - EmailSieuRe',
             'Công cụ lấy mã xác thực 2 bước (TOTP) từ secret key nhanh chóng và tự động cập nhật.',
-            'get 2FA, TOTP, mã xác thực, two-factor authentication, MailShop'
+            'get 2FA, TOTP, mã xác thực, two-factor authentication, EmailSieuRe'
         );
         this.initForm();
     }

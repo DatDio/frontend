@@ -2,16 +2,19 @@
 
   <div class="hero-content">
     <div class="container">
-      <h1>Chuyên cung cấp tài nguyên marketing, quảng cáo uy tín, chất lượng cao!</h1>
+      <h1>EmailSieuRe chuyên cung cấp các tài khoản email chất lượng cao giá rẻ cho mục đích marketing và quảng cáo</h1>
       <p>
-        Mailshop cung cấp các tài khoản email chất lượng cao cho mục đích marketing và quảng cáo.
+        - Nghiêm cấm sử dụng tài khoản email với mục đích trái pháp luật
       </p>
-      <button class="cta-button">
+      <p>
+        - Chúng tôi không chịu trách nhiệm cho bất kì hành vi nào sử dụng tài nguyên sai mục đích.
+      </p>
+      <!-- <button class="cta-button">
         <i class="bi bi-arrow-down me-2"></i> Bắt đầu ngay
-      </button>
+      </button> -->
     </div>
     <div class="hero-image">
-      <img src="assets/images/facebook-advertising.9544591b.png" alt="Hero Image">
+      <img src="assets/images/ChatGPTImage2.png" alt="Hero Image">
     </div>
   </div>
 
@@ -169,9 +172,15 @@
             </div>
 
             <div class="action-col" data-label="Thao tác">
+              @if (product.quantity > 0) {
               <button class="buy-btn" (click)="prepareOrder(product)">
                 <i class="bi bi-plus me-1"></i> Mua
               </button>
+              } @else {
+              <button class="buy-btn sold-out" disabled>
+                <i class="bi bi-x-circle me-1"></i> Hết hàng
+              </button>
+              }
             </div>
 
           </div>

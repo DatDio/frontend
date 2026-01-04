@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+﻿import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ToastComponent } from './shared/components/toast/toast.component';
 import { LoaderComponent } from './shared/components/loader/loader.component';
@@ -15,5 +15,5 @@ import { LoaderComponent } from './shared/components/loader/loader.component';
   styles: []
 })
 export class AppComponent {
-  title = 'mailshop-fe';
+  title = 'EmailSieuRe-fe';
 }

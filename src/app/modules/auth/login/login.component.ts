@@ -42,9 +42,9 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     this.seoService.setPageMeta(
-      'Login - MailShop',
-      'Sign in to your MailShop account to manage your mail accounts',
-      'login, sign in, mailshop'
+      'Login - EmailSieuRe',
+      'Sign in to your EmailSieuRe account to manage your mail accounts',
+      'login, sign in, EmailSieuRe'
     );
 
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';

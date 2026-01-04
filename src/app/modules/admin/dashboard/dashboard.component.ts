@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+﻿import { Component, OnInit, OnDestroy, inject, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -46,7 +46,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedPeriod: 'WEEK' | 'MONTH' | 'YEAR' = 'WEEK';
 
   ngOnInit(): void {
-    this.seoService.setTitle('Admin Dashboard - MailShop');
+    this.seoService.setTitle('Admin Dashboard - EmailSieuRe');
     this.loadOverviewStats();
   }
 

@@ -486,6 +486,15 @@
         box-shadow: none;
         cursor: not-allowed;
       }
+
+      &.sold-out {
+        background: linear-gradient(135deg, $gray-500 0%, $gray-600 100%);
+        opacity: 0.7;
+
+        &:hover {
+          transform: none;
+        }
+      }
     }
   }
 

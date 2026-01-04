@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+﻿import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -54,7 +54,7 @@ export class ProfileComponent implements OnInit {
   newlyGeneratedKey: { key: string, warning: string } = { key: '', warning: '' };
 
   ngOnInit(): void {
-    this.seoService.setTitle('Hồ sơ cá nhân - MailShop');
+    this.seoService.setTitle('Hồ sơ cá nhân - EmailSieuRe');
     this.seoService.setMetaDescription('Quản lý hồ sơ cá nhân và cài đặt tài khoản của bạn');
 
     this.initProfileForm(); // Initialize with empty values first

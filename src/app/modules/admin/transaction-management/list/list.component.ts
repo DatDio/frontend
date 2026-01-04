@@ -228,11 +228,9 @@ export class TransactionListComponent implements OnInit {
   getTypeLabel(type: string | number): string {
     const typeMap: { [key: string]: string } = {
       '0': 'Nạp tiền',
-      '1': 'Mua hàng',
       '2': 'Hoàn tiền',
       '3': 'Admin điều chỉnh',
       'DEPOSIT': 'Nạp tiền',
-      'PURCHASE': 'Mua hàng',
       'REFUND': 'Hoàn tiền',
       'ADMIN_ADJUST': 'Admin điều chỉnh'
     };
@@ -242,11 +240,9 @@ export class TransactionListComponent implements OnInit {
   getTypeClass(type: string | number): string {
     const classMap: { [key: string]: string } = {
       '0': 'bg-success',
-      '1': 'bg-danger',
       '2': 'bg-info',
       '3': 'bg-primary',
       'DEPOSIT': 'bg-success',
-      'PURCHASE': 'bg-danger',
       'REFUND': 'bg-info',
       'ADMIN_ADJUST': 'bg-primary'
     };

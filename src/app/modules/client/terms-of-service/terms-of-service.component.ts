@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+﻿import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { SeoService } from '../../../core/services/seo.service';
 
@@ -14,9 +14,9 @@ export class TermsOfServiceComponent implements OnInit {
 
   ngOnInit(): void {
     this.seoService.setPageMeta(
-      'Điều Khoản Dịch Vụ - MailShop',
-      'Điều khoản và điều kiện sử dụng dịch vụ MailShop. Quy định về quyền và trách nhiệm của người dùng.',
-      'điều khoản dịch vụ, terms of service, quy định, MailShop'
+      'Điều Khoản Dịch Vụ - EmailSieuRe',
+      'Điều khoản và điều kiện sử dụng dịch vụ EmailSieuRe. Quy định về quyền và trách nhiệm của người dùng.',
+      'điều khoản dịch vụ, terms of service, quy định, EmailSieuRe'
     );
   }
 }

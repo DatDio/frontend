@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+﻿import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { NotificationService } from '../../../core/services/notification.service';
@@ -48,9 +48,9 @@ export class GetOAuth2Component implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.seoService.setPageMeta(
-            'Lấy OAuth2 Token - MailShop',
+            'Lấy OAuth2 Token - EmailSieuRe',
             'Công cụ lấy Refresh Token mới cho email Hotmail/Outlook.',
-            'get OAuth2, refresh token, Hotmail, Outlook, MailShop'
+            'get OAuth2, refresh token, Hotmail, Outlook, EmailSieuRe'
         );
         this.getForm = this.formBuilder.group({
             emailData: ['', [Validators.required, Validators.minLength(10)]]

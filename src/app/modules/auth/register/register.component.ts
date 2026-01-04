@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+﻿import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -36,9 +36,9 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit(): void {
     this.seoService.setPageMeta(
-      'Sign Up - MailShop',
-      'Create your MailShop account and start managing mail accounts today',
-      'register, sign up, create account, mailshop'
+      'Sign Up - EmailSieuRe',
+      'Create your EmailSieuRe account and start managing mail accounts today',
+      'register, sign up, create account, EmailSieuRe'
     );
 
     if (this.authService.isAuthenticated()) {

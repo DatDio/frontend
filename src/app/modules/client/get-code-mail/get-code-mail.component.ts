@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+﻿import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NotificationService } from '../../../core/services/notification.service';
@@ -53,7 +53,7 @@ export class GetCodeMailComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.seoService.setPageMeta(
-      'Lấy Mã Xác Thực Email - MailShop',
+      'Lấy Mã Xác Thực Email - EmailSieuRe',
       'Công cụ lấy mã xác thực OTP từ email Hotmail/Outlook nhanh chóng và tự động. Hỗ trợ nhiều định dạng email khác nhau.',
       'get code mail, lấy mã xác thực, OTP, Hotmail, Outlook, email verification'
     );

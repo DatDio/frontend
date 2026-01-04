@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+﻿import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
 import { NotificationService } from '../../../core/services/notification.service';
@@ -40,9 +40,9 @@ export class CheckLiveFacebookComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.seoService.setPageMeta(
-            'Kiểm Tra Live Facebook - MailShop',
+            'Kiểm Tra Live Facebook - EmailSieuRe',
             'Công cụ kiểm tra trạng thái hoạt động của tài khoản Facebook theo UID nhanh chóng và chính xác.',
-            'check live facebook, kiểm tra facebook, facebook UID, MailShop'
+            'check live facebook, kiểm tra facebook, facebook UID, EmailSieuRe'
         );
         this.checkForm = this.formBuilder.group({
             uidData: ['', [Validators.required, Validators.minLength(5)]]

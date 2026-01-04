@@ -6,6 +6,7 @@ import { LoaderService } from './loader.service';
 import { SystemSetting, SystemSettingCreate, SystemSettingUpdate } from '../models/system-setting.model';
 import { ApiResponse } from '../models/common.model';
 import { AdminSettingApi } from '../../Utils/apis/settings/admin-setting.api';
+import { PublicSettingApi } from '../../Utils/apis/settings/public-setting.api';
 
 @Injectable({
     providedIn: 'root'
@@ -13,6 +14,13 @@ import { AdminSettingApi } from '../../Utils/apis/settings/admin-setting.api';
 export class SystemSettingService {
     private readonly httpClient = inject(HttpClient);
     private readonly loaderService = inject(LoaderService);
+
+    /**
+     * Get public settings (no auth required, for footer/client usage)
+     */
+    getPublicSettings(): Observable<ApiResponse<Record<string, string>>> {
+        return this.httpClient.get<ApiResponse<Record<string, string>>>(PublicSettingApi.GET_PUBLIC);
+    }
 
     /**
      * Get all system settings (admin)
