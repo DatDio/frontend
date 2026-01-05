@@ -60,5 +60,9 @@ export const adminRoutes: Routes = [
   {
     path: 'settings',
     loadComponent: () => import('../../modules/admin/settings/settings.component').then(m => m.SettingsComponent)
+  },
+  {
+    path: 'api-doc',
+    loadComponent: () => import('../../modules/admin/api-doc/api-doc.component').then(m => m.ApiDocComponent)
   }
 ];

@@ -1,0 +1,190 @@
+<div class="api-doc-container">
+    <h2 class="mb-4">
+        <i class="bi bi-file-code me-2"></i>
+        API Documentation
+    </h2>
+    <p class="text-muted mb-4">Tài liệu API dành cho Admin - Quản lý tài khoản sản phẩm</p>
+
+    <!-- API: Create Items -->
+    <div class="api-card">
+        <div class="api-header">
+            <span class="method-badge post">POST</span>
+            <code class="endpoint">/admin/product-items/create</code>
+        </div>
+        <div class="api-body">
+            <h5>Thêm tài khoản mới</h5>
+            <p class="text-muted">Thêm một hoặc nhiều tài khoản vào sản phẩm. Hệ thống tự động kiểm tra trùng lặp.</p>
+
+            <div class="section">
+                <h6><i class="bi bi-key me-1"></i> Authentication</h6>
+                <p class="mb-1"><code>Authorization: Bearer &lt;admin_token&gt;</code></p>
+                <p class="mb-0 text-muted">hoặc</p>
+                <p class="mb-0"><code>X-API-KEY: &lt;your_api_key&gt;</code></p>
+            </div>
+
+            <div class="section">
+                <h6><i class="bi bi-send me-1"></i> Request Body</h6>
+                <pre class="code-block">{{createRequestExample}}</pre>
+            </div>
+
+            <div class="section">
+                <h6><i class="bi bi-list-ul me-1"></i> Parameters</h6>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>productId</code></td>
+                            <td>Long</td>
+                            <td><span class="badge bg-danger">Yes</span></td>
+                            <td>ID của sản phẩm</td>
+                        </tr>
+                        <tr>
+                            <td><code>accountData</code></td>
+                            <td>String</td>
+                            <td><span class="badge bg-danger">Yes</span></td>
+                            <td>Danh sách tài khoản, mỗi dòng một tài khoản</td>
+                        </tr>
+                        <tr>
+                            <td><code>expirationType</code></td>
+                            <td>Enum</td>
+                            <td><span class="badge bg-secondary">No</span></td>
+                            <td>NONE | HOURS_3 | HOURS_6 | MONTH_1 | MONTH_6</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="section">
+                <h6><i class="bi bi-terminal me-1"></i> cURL Example</h6>
+                <pre class="code-block">{{createCurlExample}}</pre>
+            </div>
+            <div class="section">
+                <h6><i class="bi bi-check-circle me-1"></i> Response</h6>
+                <pre class="code-block">{{createResponseExample}}</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- API: Import Items -->
+    <div class="api-card">
+        <div class="api-header">
+            <span class="method-badge post">POST</span>
+            <code class="endpoint">/admin/product-items/import/&#123;productId&#125;</code>
+        </div>
+        <div class="api-body">
+            <h5>Import tài khoản từ file TXT</h5>
+            <p class="text-muted">Upload file .txt chứa danh sách tài khoản, mỗi dòng một tài khoản.</p>
+
+            <div class="section">
+                <h6><i class="bi bi-key me-1"></i> Authentication</h6>
+                <p class="mb-1"><code>Authorization: Bearer &lt;admin_token&gt;</code></p>
+                <p class="mb-0 text-muted">hoặc</p>
+                <p class="mb-0"><code>X-API-KEY: &lt;your_api_key&gt;</code></p>
+            </div>
+
+            <div class="section">
+                <h6><i class="bi bi-list-ul me-1"></i> Path Parameters</h6>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>productId</code></td>
+                            <td>Long</td>
+                            <td>ID của sản phẩm cần import tài khoản</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h6><i class="bi bi-upload me-1"></i> Form Data</h6>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Required</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>file</code></td>
+                            <td>File</td>
+                            <td><span class="badge bg-danger">Yes</span></td>
+                            <td>File .txt chứa danh sách tài khoản</td>
+                        </tr>
+                        <tr>
+                            <td><code>expirationType</code></td>
+                            <td>String</td>
+                            <td><span class="badge bg-secondary">No</span></td>
+                            <td>NONE (default) | HOURS_3 | HOURS_6 | MONTH_1 | MONTH_6</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h6><i class="bi bi-terminal me-1"></i> cURL Example</h6>
+                <pre class="code-block">{{importCurlExample}}</pre>
+            </div>
+
+            <div class="section">
+                <h6><i class="bi bi-check-circle me-1"></i> Response</h6>
+                <pre class="code-block">{{importResponseExample}}</pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expiration Types -->
+    <div class="api-card">
+        <div class="api-header">
+            <i class="bi bi-clock-history me-2"></i>
+            <span class="fw-bold">Expiration Types Reference</span>
+        </div>
+        <div class="api-body">
+            <table class="table table-sm">
+                <thead>
+                    <tr>
+                        <th>Value</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>NONE</code></td>
+                        <td>Không hết hạn</td>
+                    </tr>
+                    <tr>
+                        <td><code>HOURS_3</code></td>
+                        <td>Hết hạn sau 3 giờ</td>
+                    </tr>
+                    <tr>
+                        <td><code>HOURS_6</code></td>
+                        <td>Hết hạn sau 6 giờ</td>
+                    </tr>
+                    <tr>
+                        <td><code>MONTH_1</code></td>
+                        <td>Hết hạn sau 1 tháng (30 ngày)</td>
+                    </tr>
+                    <tr>
+                        <td><code>MONTH_6</code></td>
+                        <td>Hết hạn sau 6 tháng</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

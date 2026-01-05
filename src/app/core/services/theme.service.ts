@@ -27,7 +27,7 @@ export class ThemeService {
         const savedTheme = localStorage.getItem(this.THEME_KEY) as Theme | null;
         const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-        const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+        const theme = savedTheme || 'dark';
         this.setTheme(theme);
     }
 
