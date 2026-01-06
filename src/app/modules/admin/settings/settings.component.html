@@ -149,6 +149,62 @@
                     </div>
                 </div>
 
+                <!-- Scheduler Settings Section -->
+                <div class="settings-section mt-4">
+                    <h6 class="section-title">
+                        <i class="bi bi-clock-history me-2"></i>
+                        Cài đặt Tác vụ tự động
+                    </h6>
+                    <p class="text-muted small mb-3">
+                        Cấu hình thời gian cho các tác vụ tự động của hệ thống.
+                    </p>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <label class="setting-label">Timeout giao dịch thanh toán</label>
+                                    <p class="setting-description text-muted mb-0">
+                                        Giao dịch PENDING sẽ tự động chuyển thành FAILED sau thời gian này.
+                                    </p>
+                                </div>
+                                <div class="setting-control mt-2">
+                                    <div class="input-group" style="width: 150px;">
+                                        <input type="number" class="form-control"
+                                            [(ngModel)]="transactionTimeoutMinutes" min="1" max="60" placeholder="10">
+                                        <span class="input-group-text">phút</span>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm ms-2" (click)="saveTransactionTimeout()">
+                                        <i class="bi bi-check-lg me-1"></i>
+                                        Lưu
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <label class="setting-label">Xoá đơn hàng cũ sau</label>
+                                    <p class="setting-description text-muted mb-0">
+                                        Đơn hàng và dữ liệu liên quan sẽ tự động bị xoá sau số ngày này.
+                                    </p>
+                                </div>
+                                <div class="setting-control mt-2">
+                                    <div class="input-group" style="width: 150px;">
+                                        <input type="number" class="form-control" [(ngModel)]="orderCleanupDays" min="1"
+                                            max="365" placeholder="3">
+                                        <span class="input-group-text">ngày</span>
+                                    </div>
+                                    <button class="btn btn-primary btn-sm ms-2" (click)="saveOrderCleanupDays()">
+                                        <i class="bi bi-check-lg me-1"></i>
+                                        Lưu
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Social Settings Section -->
                 <div class="settings-section mt-4">
                     <h6 class="section-title">

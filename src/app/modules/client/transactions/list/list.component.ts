@@ -9,22 +9,10 @@ import { SeoService } from '../../../../core/services/seo.service';
 import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
 import { PaginationService } from '../../../../shared/services/pagination.service';
 import { convertToISO } from '../../../../Utils/functions/date-time-utils';
-import { environment } from '../../../../../environments/environment';
 import { RankService } from '../../../../core/services/rank.service';
 import { UserRankInfo } from '../../../../core/models/rank.model';
-import { WebSocketService } from '../../../../core/services/websocket.service';
-import { AuthService } from '../../../../core/services/auth.service';
-
-// WebSocket message interface for deposit notifications
-interface DepositSuccessMessage {
-  userId: number;
-  transactionCode: number;
-  amount: number;
-  bonusAmount: number;
-  totalAmount: number;
-  newBalance: number;
-  message: string;
-}
+import { DepositNotificationService } from '../../../../core/services/deposit-notification.service';
+import { Subscription } from 'rxjs';
 
 declare global {
   interface Window {
@@ -43,7 +31,7 @@ declare global {
     PaginationComponent
   ],
   templateUrl: './list.component.html',
-  styleUrl: './list.component.scss'
+  styleUrls: ['./list.component.scss']
 })
 export class ClientTransactionListComponent implements OnInit, OnDestroy {
 
@@ -53,8 +41,7 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
   private readonly paginationService = inject(PaginationService);
   private readonly rankService = inject(RankService);
   private readonly seoService = inject(SeoService);
-  private readonly webSocketService = inject(WebSocketService);
-  private readonly authService = inject(AuthService);
+  private readonly depositNotificationService = inject(DepositNotificationService);
 
   transactions: TransactionResponse[] = [];
   orderCode: number = 0;
@@ -82,7 +69,6 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
   accountNumber = '';
   accountName = '';
   currentTransactionCode = 0;
-  private depositWsUnsub?: () => void;
 
   // ========== RANK INFO ==========
   userRankInfo: UserRankInfo | null = null;
@@ -90,6 +76,9 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
   // ========== NOTE MODAL ==========
   showNoteModal = false;
   selectedTransaction: TransactionResponse | null = null;
+
+  // Subscription for deposit success
+  private depositSuccessSub?: Subscription;
 
   ngOnInit(): void {
     this.seoService.setPageMeta(
@@ -101,10 +90,16 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
     this.loadTransactions();
     this.loadRankInfo();
     this.depositAmountDisplay = this.formatNumber(this.depositAmount);
+
+    // Subscribe to deposit success events to close modal and reload data
+    this.depositSuccessSub = this.depositNotificationService.depositSuccess$.subscribe(() => {
+      this.showQrModal = false;
+      this.loadTransactions();
+    });
   }
 
   ngOnDestroy(): void {
-    this.unsubscribeDepositWs();
+    this.depositSuccessSub?.unsubscribe();
   }
 
   // Load user rank info
@@ -183,8 +178,9 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
           this.currentTransactionCode = res.data.transactionCode;
           this.showQrModal = true;
 
-          // Subscribe to WebSocket for real-time updates
-          this.subscribeToDepositWebSocket();
+          // Start listening for deposit notification via global service
+          // This persists across page navigations with 10-minute timeout
+          this.depositNotificationService.startListening(this.currentTransactionCode);
         } else {
           this.notificationService.error('Không thể tạo mã QR thanh toán');
         }
@@ -197,49 +193,10 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ================== WEBSOCKET DEPOSIT NOTIFICATION ==================
-  private subscribeToDepositWebSocket(): void {
-    const user = this.authService.getCurrentUser();
-    if (!user?.id) return;
 
-    const topic = `/topic/deposit/${user.id}`;
-
-    this.depositWsUnsub = this.webSocketService.subscribe<DepositSuccessMessage>(
-      topic,
-      (payload) => this.handleDepositSuccess(payload)
-    );
-  }
-
-  private handleDepositSuccess(payload: DepositSuccessMessage): void {
-    // Verify this is for the current transaction
-    if (payload.transactionCode !== this.currentTransactionCode) return;
-
-    // Cleanup WebSocket subscription
-    this.unsubscribeDepositWs();
-
-    // Show success notification with bonus info
-    let message = `🎉 Nạp tiền thành công! +${payload.amount.toLocaleString()} VNĐ`;
-    if (payload.bonusAmount > 0) {
-      message += ` (Bonus: +${payload.bonusAmount.toLocaleString()} VNĐ)`;
-    }
-    this.notificationService.success(message);
-
-    // Update balance and close modal
-    this.transactionService.refreshBalance();
-    this.showQrModal = false;
-    this.loadTransactions();
-  }
-
-  private unsubscribeDepositWs(): void {
-    if (this.depositWsUnsub) {
-      this.depositWsUnsub();
-      this.depositWsUnsub = undefined;
-    }
-  }
 
   // ================== QR MODAL ACTIONS ==================
   closeQrModal(): void {
-    this.unsubscribeDepositWs();
     this.showQrModal = false;
     this.loadTransactions();
     this.transactionService.refreshBalance();

@@ -167,6 +167,17 @@ export class TransactionListComponent implements OnInit {
     return pendingValues.includes(status);
   }
 
+  // ========== HELPER: CHECK IF STATUS IS FAILED ==========
+  isFailed(status: string | number): boolean {
+    const failedValues = [3, '3', 'FAILED'];
+    return failedValues.includes(status);
+  }
+
+  // ========== HELPER: CHECK IF CAN APPROVE (PENDING or FAILED) ==========
+  canApprove(status: string | number): boolean {
+    return this.isPending(status) || this.isFailed(status);
+  }
+
   // ========== APPROVE TRANSACTION (PENDING -> SUCCESS) ==========
   async approveTransaction(transaction: TransactionResponse): Promise<void> {
     const confirmed = await this.confirmService.confirm({
@@ -288,11 +299,6 @@ export class TransactionListComponent implements OnInit {
   // ================= NOTE MODAL =================
   hasNote(transaction: TransactionResponse): boolean {
     return !!(transaction.description || transaction.errorMessage);
-  }
-
-  isFailed(status: string | number): boolean {
-    const failedValues = [3, '3', 'FAILED'];
-    return failedValues.includes(status);
   }
 
   openNoteModal(transaction: TransactionResponse): void {

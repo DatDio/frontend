@@ -43,6 +43,10 @@ export class SettingsComponent implements OnInit {
     telegramChannelUrl = '';
     socialSaving = false;
 
+    // Scheduler settings
+    transactionTimeoutMinutes = 10;
+    orderCleanupDays = 3;
+
     ngOnInit(): void {
         this.loadSettings();
     }
@@ -100,6 +104,13 @@ export class SettingsComponent implements OnInit {
 
         const telegramChannel = this.settings.find(s => s.settingKey === 'social.telegram_channel');
         if (telegramChannel) this.telegramChannelUrl = telegramChannel.settingValue || '';
+
+        // Scheduler settings
+        const transactionTimeout = this.settings.find(s => s.settingKey === 'scheduler.transaction_timeout_minutes');
+        if (transactionTimeout) this.transactionTimeoutMinutes = parseInt(transactionTimeout.settingValue) || 10;
+
+        const orderCleanup = this.settings.find(s => s.settingKey === 'scheduler.order_cleanup_days');
+        if (orderCleanup) this.orderCleanupDays = parseInt(orderCleanup.settingValue) || 3;
     }
 
     startEdit(setting: SystemSetting): void {
@@ -262,6 +273,45 @@ export class SettingsComponent implements OnInit {
             .finally(() => {
                 this.socialSaving = false;
             });
+    }
+
+    // ========== SCHEDULER SETTINGS ==========
+    saveTransactionTimeout(): void {
+        this.#settingService.update('scheduler.transaction_timeout_minutes', {
+            settingValue: String(this.transactionTimeoutMinutes),
+            description: 'Thời gian timeout giao dịch thanh toán (phút)'
+        }).subscribe({
+            next: (response) => {
+                if (response.success) {
+                    this.#notificationService.success('Cập nhật thời gian timeout thành công');
+                    this.loadSettings();
+                } else {
+                    this.#notificationService.error(response.message || 'Có lỗi xảy ra');
+                }
+            },
+            error: (error) => {
+                this.#notificationService.error(error.error?.message || 'Có lỗi xảy ra');
+            }
+        });
+    }
+
+    saveOrderCleanupDays(): void {
+        this.#settingService.update('scheduler.order_cleanup_days', {
+            settingValue: String(this.orderCleanupDays),
+            description: 'Số ngày xoá đơn hàng cũ'
+        }).subscribe({
+            next: (response) => {
+                if (response.success) {
+                    this.#notificationService.success('Cập nhật số ngày xoá đơn hàng thành công');
+                    this.loadSettings();
+                } else {
+                    this.#notificationService.error(response.message || 'Có lỗi xảy ra');
+                }
+            },
+            error: (error) => {
+                this.#notificationService.error(error.error?.message || 'Có lỗi xảy ra');
+            }
+        });
     }
 }
 

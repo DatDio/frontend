@@ -168,11 +168,13 @@
                   <i class="bi bi-eye"></i>
                 </button>
                 }
-                @if (isPending(transaction.status)) {
+                @if (canApprove(transaction.status)) {
                 <button class="btn btn-success btn-sm" title="Duyệt thành công"
                   (click)="approveTransaction(transaction)">
                   <i class="bi bi-check-lg"></i>
                 </button>
+                }
+                @if (isPending(transaction.status)) {
                 <button class="btn btn-danger btn-sm" title="Từ chối" (click)="rejectTransaction(transaction)">
                   <i class="bi bi-x-lg"></i>
                 </button>
