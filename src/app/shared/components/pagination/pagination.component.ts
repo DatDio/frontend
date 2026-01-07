@@ -1,6 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { PaginationService } from '../../services/pagination.service';
 
 export interface PaginationConfig {
@@ -18,7 +19,7 @@ export interface PageSizeOption {
 @Component({
   selector: 'app-pagination',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule],
   templateUrl: './pagination.component.html',
   styleUrl: './pagination.component.scss'
 })
@@ -41,7 +42,7 @@ export class PaginationComponent implements OnInit, OnChanges {
 
   private readonly fb = inject(FormBuilder);
   private readonly paginationService = inject(PaginationService);
-  
+
   formSearch!: FormGroup;
   searchPageInput = '';
   visiblePages: number[] = [];

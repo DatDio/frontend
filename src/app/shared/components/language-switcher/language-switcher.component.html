@@ -1,0 +1,21 @@
+<div class="language-switcher dropdown">
+    <button class="language-btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"
+        title="Chọn ngôn ngữ / Select language">
+        <!-- <span class="lang-flag">{{ getCurrentLanguageOption().flag }}</span> -->
+        <span class="lang-code">{{ getCurrentLanguageOption().code | uppercase }}</span>
+    </button>
+
+    <ul class="dropdown-menu dropdown-menu-end language-dropdown">
+        @for (lang of supportedLanguages; track lang.code) {
+        <li>
+            <button class="dropdown-item" [class.active]="isCurrentLanguage(lang.code)"
+                (click)="switchLanguage(lang.code)">
+                <span class="lang-name">{{ lang.name }}</span>
+                @if (isCurrentLanguage(lang.code)) {
+                <i class="bi bi-check2 ms-auto"></i>
+                }
+            </button>
+        </li>
+        }
+    </ul>
+</div>

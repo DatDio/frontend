@@ -1,5 +1,6 @@
-import { inject } from '@angular/core';
-import { HttpInterceptorFn, HttpErrorResponse, HttpEvent } from '@angular/common/http';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { HttpInterceptorFn, HttpErrorResponse, HttpEvent, HttpRequest } from '@angular/common/http';
 import { throwError, BehaviorSubject, Observable, EMPTY } from 'rxjs';
 import { catchError, filter, take, switchMap } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
@@ -7,7 +8,7 @@ import { AuthService } from '../services/auth.service';
 let isRefreshing = false;
 const refreshTokenSubject = new BehaviorSubject<string | null>(null);
 
-const addToken = (request: any, token: string) => {
+const addToken = (request: HttpRequest<any>, token: string): HttpRequest<any> => {
   return request.clone({
     setHeaders: {
       Authorization: `Bearer ${token}`
@@ -15,7 +16,36 @@ const addToken = (request: any, token: string) => {
   });
 };
 
-const handle401Error = (request: any, next: any, authService: AuthService): Observable<HttpEvent<any>> => {
+/**
+ * Get current language from localStorage directly.
+ * Avoids circular dependency with LanguageService which uses TranslateService -> HttpClient.
+ */
+const getCurrentLanguage = (platformId: Object): string => {
+  if (isPlatformBrowser(platformId)) {
+    const savedLang = localStorage.getItem('preferred_language');
+    if (savedLang === 'vi' || savedLang === 'en') {
+      return savedLang;
+    }
+  }
+  return 'vi'; // Default language
+};
+
+/**
+ * Add language query parameter to API requests.
+ * This allows the backend to return localized error messages.
+ */
+const addLanguageParam = (request: HttpRequest<any>, lang: string): HttpRequest<any> => {
+  // Only add lang param to API requests (not static assets)
+  if (request.url.includes('/api/')) {
+    // Check if URL already has query params
+    const separator = request.url.includes('?') ? '&' : '?';
+    const urlWithLang = `${request.url}${separator}lang=${lang}`;
+    return request.clone({ url: urlWithLang });
+  }
+  return request;
+};
+
+const handle401Error = (request: HttpRequest<any>, next: any, authService: AuthService): Observable<HttpEvent<any>> => {
   if (isRefreshing) {
     return refreshTokenSubject.pipe(
       filter((token): token is string => token !== null),
@@ -51,13 +81,26 @@ const handle401Error = (request: any, next: any, authService: AuthService): Obse
   );
 };
 
+/**
+ * Auth interceptor that:
+ * 1. Adds JWT token to Authorization header
+ * 2. Adds language query parameter to API requests
+ * 3. Handles 401 errors with token refresh
+ */
 export const authInterceptor: HttpInterceptorFn = (request, next): Observable<HttpEvent<any>> => {
   const authService = inject(AuthService);
-  const token = authService.getAccessToken();
+  const platformId = inject(PLATFORM_ID);
 
+  const token = authService.getAccessToken();
+  const currentLang = getCurrentLanguage(platformId);
+
+  // Add auth token if available
   if (token) {
     request = addToken(request, token);
   }
+
+  // Add language parameter for API requests
+  request = addLanguageParam(request, currentLang);
 
   return next(request).pipe(
     catchError((error: HttpErrorResponse) => {

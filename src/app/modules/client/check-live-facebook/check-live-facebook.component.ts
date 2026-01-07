@@ -1,6 +1,7 @@
 ﻿import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { NotificationService } from '../../../core/services/notification.service';
 import { SeoService } from '../../../core/services/seo.service';
 import { FacebookApi } from '../../../Utils/apis/facebook/facebook.api';
@@ -16,7 +17,7 @@ interface FacebookCheckResult {
 @Component({
     selector: 'app-check-live-facebook',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, FormsModule],
+    imports: [CommonModule, ReactiveFormsModule, FormsModule, TranslateModule],
     templateUrl: './check-live-facebook.component.html',
     styleUrls: ['./check-live-facebook.component.scss']
 })

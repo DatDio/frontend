@@ -1,74 +1,63 @@
 ﻿<div class="auth-container">
   <div class="auth-card">
     <div class="text-center mb-4">
-      <h2 class="auth-card__title">Chào mừng quay trở lại</h2>
-      <p class="text-muted">Đăng nhập vào tài khoản của bạn</p>
+      <h2 class="auth-card__title">{{ 'AUTH.WELCOME_BACK' | translate }}</h2>
+      <p class="text-muted">{{ 'AUTH.LOGIN_SUBTITLE' | translate }}</p>
     </div>
 
     @if (errorMessage) {
-      <div class="alert alert-danger" role="alert">
-        {{ errorMessage }}
-      </div>
+    <div class="alert alert-danger" role="alert">
+      {{ errorMessage }}
+    </div>
     }
 
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
       <div class="mb-3">
-        <label for="email" class="form-label">Email </label>
-        <input
-          type="email"
-          class="form-control"
-          id="email"
-          formControlName="email"
-          placeholder="Nhập email của bạn"
-          [class.is-invalid]="email?.invalid && email?.touched"
-        >
+        <label for="email" class="form-label">{{ 'AUTH.EMAIL' | translate }}</label>
+        <input type="email" class="form-control" id="email" formControlName="email"
+          [placeholder]="'AUTH.EMAIL_PLACEHOLDER' | translate" [class.is-invalid]="email?.invalid && email?.touched">
         @if (email?.invalid && email?.touched) {
-          <div class="invalid-feedback">
-            @if (email?.errors?.['required']) {
-              <span>Email là bắt buộc</span>
-            }
-            @if (email?.errors?.['email']) {
-              <span>Vui lòng nhập email hợp lệ</span>
-            }
-          </div>
+        <div class="invalid-feedback">
+          @if (email?.errors?.['required']) {
+          <span>{{ 'VALIDATION.REQUIRED' | translate }}</span>
+          }
+          @if (email?.errors?.['email']) {
+          <span>{{ 'VALIDATION.EMAIL_INVALID' | translate }}</span>
+          }
+        </div>
         }
       </div>
 
       <div class="mb-3">
-        <label for="password" class="form-label">Mật khẩu</label>
-        <input
-          type="password"
-          class="form-control"
-          id="password"
-          formControlName="password"
-          placeholder="Nhập mật khẩu của bạn"
-          [class.is-invalid]="password?.invalid && password?.touched"
-        >
+        <label for="password" class="form-label">{{ 'AUTH.PASSWORD' | translate }}</label>
+        <input type="password" class="form-control" id="password" formControlName="password"
+          [placeholder]="'AUTH.PASSWORD_PLACEHOLDER' | translate"
+          [class.is-invalid]="password?.invalid && password?.touched">
         @if (password?.invalid && password?.touched) {
-          <div class="invalid-feedback">
-            @if (password?.errors?.['required']) {
-              <span>Mật khẩu là bắt buộc</span>
-            }
-            @if (password?.errors?.['minlength']) {
-              <span>Mật khẩu phải có ít nhất 6 ký tự</span>
-            }
-          </div>
+        <div class="invalid-feedback">
+          @if (password?.errors?.['required']) {
+          <span>{{ 'VALIDATION.REQUIRED' | translate }}</span>
+          }
+          @if (password?.errors?.['minlength']) {
+          <span>{{ 'AUTH.PASSWORD_MIN_LENGTH' | translate }}</span>
+          }
+        </div>
         }
       </div>
 
       <div class="d-grid gap-2 mb-3">
         <button type="submit" class="btn btn-primary" [disabled]="loading">
           @if (loading) {
-            <span class="spinner-border spinner-border-sm me-2"></span>
-            Đang đăng nhập...
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          {{ 'COMMON.PROCESSING' | translate }}
           } @else {
-            Đăng nhập
+          {{ 'AUTH.LOGIN' | translate }}
           }
         </button>
       </div>
 
       <div class="text-center mb-3">
-        <span class="text-muted small">Hoặc</span>
+        <span class="text-muted small">{{ 'AUTH.OR_LOGIN_WITH' | translate }}</span>
       </div>
 
       <div class="text-center mb-3">
@@ -77,8 +66,8 @@
 
       <div class="text-center">
         <p class="mb-0">
-          Bạn chưa có tài khoản?
-          <a routerLink="/auth/register" class="text-decoration-none">Đăng ký</a>
+          {{ 'AUTH.DONT_HAVE_ACCOUNT' | translate }}
+          <a routerLink="/auth/register" class="text-decoration-none">{{ 'AUTH.REGISTER' | translate }}</a>
         </p>
       </div>
     </form>

@@ -1,12 +1,13 @@
 ﻿import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { SeoService } from '../../../core/services/seo.service';
 import { SystemSettingService } from '../../../core/services/system-setting.service';
 
 @Component({
     selector: 'app-support',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, TranslateModule],
     templateUrl: './support.component.html',
     styleUrls: ['./support.component.scss']
 })

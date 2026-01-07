@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-
+import { TranslateModule } from '@ngx-translate/core';
 import { NotificationService } from '../../../core/services/notification.service';
 import { SeoService } from '../../../core/services/seo.service';
 import { CommonApi } from '../../../Utils/apis/commom.api';
@@ -25,7 +25,7 @@ interface ApiResponse<T> {
 @Component({
     selector: 'app-get-2fa',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule, TranslateModule],
     templateUrl: './get-2fa.component.html',
     styleUrls: ['./get-2fa.component.scss']
 })

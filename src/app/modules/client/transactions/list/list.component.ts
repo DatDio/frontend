@@ -2,6 +2,7 @@
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { TransactionFilter, TransactionResponse } from '../../../../core/models/transaction.model';
 import { TransactionService } from '../../../../core/services/wallet.service';
 import { NotificationService } from '../../../../core/services/notification.service';
@@ -28,7 +29,8 @@ declare global {
     RouterModule,
     FormsModule,
     ReactiveFormsModule,
-    PaginationComponent
+    PaginationComponent,
+    TranslateModule
   ],
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss']
@@ -42,6 +44,7 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
   private readonly rankService = inject(RankService);
   private readonly seoService = inject(SeoService);
   private readonly depositNotificationService = inject(DepositNotificationService);
+  private readonly translate = inject(TranslateService);
 
   transactions: TransactionResponse[] = [];
   orderCode: number = 0;
@@ -162,7 +165,7 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
   // ================== CREATE DEPOSIT (WEB2M) ==================
   createDeposit(): void {
     if (!this.depositAmount || this.depositAmount < 10000) {
-      this.notificationService.error('Số tiền tối thiểu là 10.000đ');
+      this.notificationService.error(this.translate.instant('MESSAGE.MIN_DEPOSIT_ERROR'));
       return;
     }
 
@@ -182,12 +185,12 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
           // This persists across page navigations with 10-minute timeout
           this.depositNotificationService.startListening(this.currentTransactionCode);
         } else {
-          this.notificationService.error('Không thể tạo mã QR thanh toán');
+          this.notificationService.error(this.translate.instant('MESSAGE.QR_CREATE_ERROR'));
         }
       },
       error: (error: any) => {
         this.notificationService.error(
-          error.error?.message || 'Lỗi khi tạo yêu cầu thanh toán'
+          error.error?.message || this.translate.instant('MESSAGE.REQ_ERROR')
         );
       }
     });
@@ -204,17 +207,17 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
 
   copyTransferContent(): void {
     navigator.clipboard.writeText(this.transferContent).then(() => {
-      this.notificationService.success('Đã sao chép nội dung chuyển khoản!');
+      this.notificationService.success(this.translate.instant('MESSAGE.COPIED_CONTENT'));
     }).catch(() => {
-      this.notificationService.error('Không thể sao chép. Vui lòng copy thủ công.');
+      this.notificationService.error(this.translate.instant('MESSAGE.MANUAL_COPY'));
     });
   }
 
   copyAccountNumber(): void {
     navigator.clipboard.writeText(this.accountNumber).then(() => {
-      this.notificationService.success('Đã sao chép số tài khoản!');
+      this.notificationService.success(this.translate.instant('MESSAGE.COPIED_ACCOUNT'));
     }).catch(() => {
-      this.notificationService.error('Không thể sao chép. Vui lòng copy thủ công.');
+      this.notificationService.error(this.translate.instant('MESSAGE.MANUAL_COPY'));
     });
   }
 
@@ -233,7 +236,9 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
     if (!pageNum) return;
 
     if (pageNum > this.paginationConfig.totalPages || pageNum < 1) {
-      this.notificationService.error(`Page must be between 1 and ${this.paginationConfig.totalPages}`);
+      this.notificationService.error(
+        this.translate.instant('MESSAGE.PAGE_RANGE_ERROR', { max: this.paginationConfig.totalPages })
+      );
     } else {
       this.paginationConfig.currentPage = pageNum - 1;
       this.dataFormSearch = {
@@ -302,13 +307,13 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
             totalPages: p.totalPages
           };
         } else {
-          this.notificationService.error(response.message || 'Có lỗi xảy ra');
+          this.notificationService.error(response.message || this.translate.instant('MESSAGE.ERROR'));
         }
 
         this.loading = false;
       },
       error: (error) => {
-        this.notificationService.error(error.error?.message || 'Có lỗi xảy ra');
+        this.notificationService.error(error.error?.message || this.translate.instant('MESSAGE.ERROR'));
         this.loading = false;
       }
     });

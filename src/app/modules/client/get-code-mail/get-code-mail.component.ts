@@ -1,6 +1,7 @@
 ﻿import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../core/services/notification.service';
 import { SeoService } from '../../../core/services/seo.service';
 import { HotmailGetCodeResponse, EMAIL_TYPES, GET_TYPES, EmailType, CheckStatus } from '../../../core/models/hotmail.model';
@@ -21,7 +22,7 @@ interface CodeResult {
 @Component({
   selector: 'app-get-code-mail',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, TranslateModule],
   templateUrl: './get-code-mail.component.html',
   styleUrls: ['./get-code-mail.component.scss']
 })
@@ -29,6 +30,7 @@ export class GetCodeMailComponent implements OnInit, OnDestroy {
   private readonly formBuilder = inject(FormBuilder);
   private readonly notificationService = inject(NotificationService);
   private readonly seoService = inject(SeoService);
+  private readonly translateService = inject(TranslateService);
 
   getCodeForm!: FormGroup;
   emailTypes = EMAIL_TYPES;
@@ -133,7 +135,7 @@ export class GetCodeMailComponent implements OnInit, OnDestroy {
 
   onGetCode(): void {
     if (this.getCodeForm.invalid || this.selectedGetTypes.size === 0 || this.selectedEmailTypes.size === 0) {
-      this.notificationService.warning('Vui lòng nhập đầy đủ thông tin');
+      this.notificationService.warning(this.translateService.instant('TOOLS.FILL_INFO'));
       return;
     }
 
@@ -169,7 +171,7 @@ export class GetCodeMailComponent implements OnInit, OnDestroy {
       })
       .catch(error => {
         this.isLoading = false;
-        this.notificationService.error('Lỗi: ' + error.message);
+        this.notificationService.error(this.translateService.instant('TOOLS.ERROR') + ': ' + error.message);
       });
   }
 
@@ -195,7 +197,7 @@ export class GetCodeMailComponent implements OnInit, OnDestroy {
       this.closeEventSource();
       this.isLoading = false;
       this.notificationService.success(
-        `Hoàn thành: ${this.successCount} success, ${this.failedCount} failed, ${this.unknownCount} unknown`
+        `${this.translateService.instant('TOOLS.COMPLETED')}: ${this.successCount} success, ${this.failedCount} failed, ${this.unknownCount} unknown`
       );
     });
 
@@ -233,7 +235,7 @@ export class GetCodeMailComponent implements OnInit, OnDestroy {
         clearTimeout(this.copyTimeout);
       }
       this.copiedCode = code;
-      this.notificationService.success('Đã copy mã!');
+      this.notificationService.success(this.translateService.instant('TOOLS.COPIED'));
       this.copyTimeout = setTimeout(() => {
         this.copiedCode = null;
       }, 2000);
@@ -242,20 +244,20 @@ export class GetCodeMailComponent implements OnInit, OnDestroy {
 
   copySuccess(): void {
     const data = this.successResults.map(r => `${r.email}|${r.code}`).join('\n');
-    if (!data) { this.notificationService.warning('Không có dữ liệu'); return; }
-    navigator.clipboard.writeText(data).then(() => this.notificationService.success(`Đã copy ${this.successCount} kết quả!`));
+    if (!data) { this.notificationService.warning(this.translateService.instant('TOOLS.NO_DATA')); return; }
+    navigator.clipboard.writeText(data).then(() => this.notificationService.success(this.translateService.instant('TOOLS.COPIED_RESULTS', { count: this.successCount })));
   }
 
   copyFailed(): void {
     const data = this.failedResults.map(r => `${r.email}|${r.password || ''}`).join('\n');
-    if (!data) { this.notificationService.warning('Không có dữ liệu'); return; }
-    navigator.clipboard.writeText(data).then(() => this.notificationService.success(`Đã copy ${this.failedCount} email!`));
+    if (!data) { this.notificationService.warning(this.translateService.instant('TOOLS.NO_DATA')); return; }
+    navigator.clipboard.writeText(data).then(() => this.notificationService.success(this.translateService.instant('TOOLS.COPIED_EMAILS', { count: this.failedCount })));
   }
 
   copyUnknown(): void {
     const data = this.unknownResults.map(r => `${r.email}|${r.password || ''}`).join('\n');
-    if (!data) { this.notificationService.warning('Không có dữ liệu'); return; }
-    navigator.clipboard.writeText(data).then(() => this.notificationService.success(`Đã copy ${this.unknownCount} email!`));
+    if (!data) { this.notificationService.warning(this.translateService.instant('TOOLS.NO_DATA')); return; }
+    navigator.clipboard.writeText(data).then(() => this.notificationService.success(this.translateService.instant('TOOLS.COPIED_EMAILS', { count: this.unknownCount })));
   }
 
   clearResults(): void {
@@ -270,7 +272,7 @@ export class GetCodeMailComponent implements OnInit, OnDestroy {
   stopGetCode(): void {
     this.closeEventSource();
     this.isLoading = false;
-    this.notificationService.info('Đã dừng lấy mã');
+    this.notificationService.info(this.translateService.instant('TOOLS.STOPPED'));
   }
 
   retryRow(item: CodeResult): void {
@@ -348,7 +350,7 @@ export class GetCodeMailComponent implements OnInit, OnDestroy {
     // Add to new array
     if (newStatus === 'SUCCESS') {
       this.successResults = [...this.successResults, updatedResult];
-      this.notificationService.success(`${result.email}: Thành công!`);
+      this.notificationService.success(`${result.email}: ${this.translateService.instant('COMMON.SUCCESS')}!`);
     } else if (newStatus === 'FAILED') {
       this.failedResults = [...this.failedResults, updatedResult];
     } else {

@@ -1,6 +1,7 @@
 ﻿import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { SeoService } from '../../../core/services/seo.service';
 
 interface Tool {
@@ -16,7 +17,7 @@ interface Tool {
 @Component({
     selector: 'app-tools',
     standalone: true,
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule, RouterModule, TranslateModule],
     templateUrl: './tools.component.html',
     styleUrls: ['./tools.component.scss']
 })

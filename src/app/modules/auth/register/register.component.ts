@@ -2,6 +2,7 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { SeoService } from '../../../core/services/seo.service';
 import { RecaptchaService } from '../../../core/services/recaptcha.service';
@@ -9,7 +10,7 @@ import { RecaptchaService } from '../../../core/services/recaptcha.service';
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, TranslateModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
@@ -95,7 +96,7 @@ export class RegisterComponent implements OnInit {
         }
       });
     } catch (error) {
-      this.errorMessage = 'Không thể xác thực captcha. Vui lòng thử lại.';
+      this.errorMessage = 'Could not verify captcha. Please try again.';
       this.loading = false;
     }
   }

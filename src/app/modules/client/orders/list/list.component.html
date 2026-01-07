@@ -1,24 +1,24 @@
 ﻿<div class="orders-management">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Đơn hàng của tôi</h1>
+    <h1>{{ 'ORDER.MY_ORDERS' | translate }}</h1>
   </div>
 
   <div class="card search-card mb-4">
     <div class="card-body">
       <form [formGroup]="formSearch" class="row g-3">
         <div class="col-md-6">
-          <label class="form-label">Mã đơn hàng</label>
-          <input type="text" class="form-control" placeholder="Nhập mã đơn hàng..." formControlName="orderNumber"
-            (keyup.enter)="handleSearch()">
+          <label class="form-label">{{ 'ORDER.ORDER_ID' | translate }}</label>
+          <input type="text" class="form-control" [placeholder]="'ORDER.ENTER_ORDER_ID' | translate"
+            formControlName="orderNumber" (keyup.enter)="handleSearch()">
         </div>
 
         <div class="col-md-6 d-flex align-items-end gap-2 mt-4">
           <button type="button" class="btn btn-search w-50" (click)="handleSearch()">
-            <i class="bi bi-search"></i> Tìm kiếm
+            <i class="bi bi-search"></i> {{ 'COMMON.SEARCH' | translate }}
           </button>
 
           <button type="button" class="btn btn-refresh w-50" (click)="clearForm()">
-            <i class="bi bi-arrow-clockwise"></i> Xóa bộ lọc
+            <i class="bi bi-arrow-clockwise"></i> {{ 'COMMON.RESET_FILTER' | translate }}
           </button>
         </div>
       </form>
@@ -30,7 +30,7 @@
       <div class="row align-items-center">
         <div class="col">
           <span class="text-muted">
-            Tổng đơn hàng: {{ paginationConfig.totalElements }}
+            {{ 'ORDER.TOTAL_ORDERS' | translate }}: {{ paginationConfig.totalElements }}
           </span>
         </div>
       </div>
@@ -46,14 +46,14 @@
         <table class="table table-hover mb-0">
           <thead>
             <tr>
-              <th style="width: 50px; text-align:center;">#</th>
-              <th>Mã đơn hàng</th>
-              <th>Sản phẩm</th>
-              <th>Số lượng</th>
-              <th>Danh sách tài khoản</th>
-              <th>Trạng thái</th>
-              <th>Tổng tiền</th>
-              <th>Ngày tạo</th>
+              <th style="width: 50px; text-align:center;">{{ 'TABLE.NO' | translate }}</th>
+              <th>{{ 'ORDER.ORDER_ID' | translate }}</th>
+              <th>{{ 'HOME.PRODUCT' | translate }}</th>
+              <th>{{ 'HOME.QUANTITY' | translate }}</th>
+              <th>{{ 'ORDER.ACCOUNTS' | translate }}</th>
+              <th>{{ 'ORDER.STATUS' | translate }}</th>
+              <th>{{ 'ORDER.TOTAL_PAYMENT' | translate }}</th>
+              <th>{{ 'ORDER.ORDER_DATE' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -80,7 +80,7 @@
               <td class="account-data-cell">
                 @if(!order.accountData || order.accountData.length === 0) {
                 <span class="no-data-text">
-                  <i class="bi bi-info-circle me-1"></i>Chưa có dữ liệu
+                  <i class="bi bi-info-circle me-1"></i>{{ 'COMMON.NO_DATA' | translate }}
                 </span>
                 } @else {
                 <div class="account-preview-wrapper">
@@ -89,14 +89,15 @@
                         </textarea>
                   <div class="action-btn-group">
                     <button class="btn btn-sm btn-copy" [class.copied]="copiedOrderId === order.id"
-                      (click)="copyAccounts(order)" title="Copy">
+                      (click)="copyAccounts(order)" title="{{ 'COMMON.COPY' | translate }}">
                       @if(copiedOrderId === order.id) {
                       <i class="bi bi-check-circle-fill"></i>
                       } @else {
                       <i class="bi bi-clipboard"></i>
                       }
                     </button>
-                    <button class="btn btn-sm btn-download" (click)="downloadAccounts(order)" title="Tải xuống">
+                    <button class="btn btn-sm btn-download" (click)="downloadAccounts(order)"
+                      title="{{ 'COMMON.DOWNLOAD' | translate }}">
                       <i class="bi bi-download"></i>
                     </button>
                   </div>
@@ -106,12 +107,12 @@
 
               <td>
                 <span class="badge" [ngClass]="getStatusClass(order.orderStatus)">
-                  {{ getStatusLabel(order.orderStatus) }}
+                  {{ ('ORDER.' + order.orderStatus) | translate }}
                 </span>
               </td>
 
               <td class="fw-bold amount-cell">
-                {{ order.totalAmount | number:'1.0-0' }} VND
+                {{ order.totalAmount | number:'1.0-0' }} VNĐ
               </td>
 
               <td class="date-cell">
@@ -125,7 +126,7 @@
               <td colspan="8" class="text-center py-4 text-muted">
                 <div class="empty-state-inline">
                   <i class="bi bi-inbox"></i>
-                  <p class="mb-0 mt-2">Chưa có đơn hàng nào</p>
+                  <p class="mb-0 mt-2">{{ 'ORDER.NO_ORDERS' | translate }}</p>
                 </div>
               </td>
             </tr>

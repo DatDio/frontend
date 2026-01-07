@@ -2,12 +2,13 @@
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="apiKeyModalLabel"><i class="bi bi-shield-lock me-2"></i>API Key mới (Lưu ý)</h5>
+        <h5 class="modal-title" id="apiKeyModalLabel"><i class="bi bi-shield-lock me-2"></i>{{ 'PROFILE.API_KEY_NEW' |
+          translate }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div class="alert alert-warning">
-          <p class="fw-bold m-0">⚠️ Key này chỉ hiển thị một lần. Hãy sao chép ngay!</p>
+          <p class="fw-bold m-0">⚠️ {{ 'PROFILE.API_KEY_WARNING' | translate }}</p>
         </div>
 
         <div class="form-label mt-3">Plaintext Key:</div>
@@ -15,13 +16,14 @@
           <input type="text" class="form-control fw-bold" [value]="newlyGeneratedKey.key" id="plaintextKeyInput"
             readonly>
           <button type="button" class="btn btn-primary" (click)="copyKeyToClipboard()" id="copyKeyButton">
-            <i class="bi bi-clipboard"></i> Copy
+            <i class="bi bi-clipboard"></i> {{ 'COMMON.COPY' | translate }}
           </button>
         </div>
         <small class="text-muted mt-2 d-block">{{ newlyGeneratedKey.warning }}</small>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đã sao chép & Đóng</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ 'PROFILE.COPIED_AND_CLOSE' |
+          translate }}</button>
       </div>
     </div>
   </div>
@@ -36,7 +38,7 @@
           <div class="modal-header bg-warning">
             <h5 class="modal-title" id="apiKeyModalLabel">
               <i class="bi bi-exclamation-triangle-fill me-2"></i>
-              API Key mới (Lưu ý)
+              {{ 'PROFILE.API_KEY_NEW' | translate }}
             </h5>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
@@ -50,14 +52,14 @@
               <input type="text" class="form-control font-monospace" id="plaintextKeyInput"
                 [value]="newlyGeneratedKey.key" readonly>
               <button class="btn btn-outline-secondary" type="button" id="copyKeyButton" (click)="copyKeyToClipboard()">
-                <i class="bi bi-clipboard"></i> Copy
+                <i class="bi bi-clipboard"></i> {{ 'COMMON.COPY' | translate }}
               </button>
             </div>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
               <i class="bi bi-check-circle me-1"></i>
-              Đã sao chép & Đóng
+              {{ 'PROFILE.COPIED_AND_CLOSE' | translate }}
             </button>
           </div>
         </div>
@@ -84,7 +86,7 @@
                 <i class="bi bi-wallet2"></i>
               </div>
               <div class="stat-info">
-                <span class="stat-label">Số dư hiện tại</span>
+                <span class="stat-label">{{ 'PROFILE.CURRENT_BALANCE' | translate }}</span>
                 <span class="stat-value text-primary">{{ (currentUser?.balance || 0) | number }} VNĐ</span>
               </div>
             </div>
@@ -93,7 +95,7 @@
                 <i class="bi bi-arrow-down-circle"></i>
               </div>
               <div class="stat-info">
-                <span class="stat-label">Tổng đã nạp</span>
+                <span class="stat-label">{{ 'PROFILE.TOTAL_DEPOSITED' | translate }}</span>
                 <span class="stat-value text-success">{{ (currentUser?.totalDeposit || 0) | number }} VNĐ</span>
               </div>
             </div>
@@ -102,7 +104,7 @@
                 <i class="bi bi-arrow-up-circle"></i>
               </div>
               <div class="stat-info">
-                <span class="stat-label">Tổng đã tiêu</span>
+                <span class="stat-label">{{ 'PROFILE.TOTAL_SPENT' | translate }}</span>
                 <span class="stat-value text-danger">{{ (currentUser?.totalSpent || 0) | number }} VNĐ</span>
               </div>
             </div>
@@ -116,15 +118,16 @@
                 <i class="bi bi-trophy-fill"></i>
               </div>
               <div class="rank-info">
-                <span class="rank-label">Hạng của bạn</span>
+                <span class="rank-label">{{ 'PROFILE.YOUR_RANK' | translate }}</span>
                 <span class="rank-name" [style.color]="currentUser?.rank?.color || '#6c757d'">
                   {{ currentUser?.rank?.rankName }}
                 </span>
-                <span class="rank-bonus">+{{ currentUser?.rank?.bonusPercent || 0 }}% khi nạp</span>
+                <span class="rank-bonus">+{{ currentUser?.rank?.bonusPercent || 0 }}% {{ 'PROFILE.WHEN_DEPOSIT' |
+                  translate }}</span>
               </div>
             </div>
             <a routerLink="/ranks" class="view-all-ranks">
-              Xem tất cả thứ hạng <i class="bi bi-chevron-right"></i>
+              {{ 'PROFILE.VIEW_ALL_RANKS' | translate }} <i class="bi bi-chevron-right"></i>
             </a>
           </div>
           }
@@ -133,12 +136,12 @@
             <button class="profile-nav__item" [class.active]="activeTab === 'profile'"
               (click)="setActiveTab('profile')">
               <i class="bi bi-person"></i>
-              <span>Thông tin cá nhân</span>
+              <span>{{ 'PROFILE.PERSONAL_INFO' | translate }}</span>
             </button>
             <button class="profile-nav__item" [class.active]="activeTab === 'password'"
               (click)="setActiveTab('password')">
               <i class="bi bi-lock"></i>
-              <span>Đổi mật khẩu</span>
+              <span>{{ 'PROFILE.CHANGE_PASSWORD' | translate }}</span>
             </button>
             <button class="profile-nav__item" [class.active]="activeTab === 'apikeys'"
               (click)="setActiveTab('apikeys')">
@@ -154,16 +157,17 @@
         <div class="profile-content">
           <!-- Tab: Profile -->
           <div *ngIf="activeTab === 'profile'">
-            <h4 class="profile-section__title mb-4">Thông tin cá nhân</h4>
+            <h4 class="profile-section__title mb-4">{{ 'PROFILE.PERSONAL_INFO' | translate }}</h4>
             <form [formGroup]="profileForm" (ngSubmit)="onUpdateProfile()">
               <div class="row">
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Họ tên *</label>
+                  <label class="form-label">{{ 'PROFILE.FULL_NAME' | translate }} *</label>
                   <input type="text" class="form-control" formControlName="fullName"
                     [class.is-invalid]="submitted && fullName?.invalid">
                   <div class="invalid-feedback" [class.d-block]="submitted && fullName?.invalid">
-                    <div *ngIf="fullName?.errors?.['required']">Họ tên là bắt buộc</div>
-                    <div *ngIf="fullName?.errors?.['minlength']">Họ tên phải có ít nhất 2 ký tự</div>
+                    <div *ngIf="fullName?.errors?.['required']">{{ 'VALIDATION.REQUIRED' | translate }}</div>
+                    <div *ngIf="fullName?.errors?.['minlength']">{{ 'VALIDATION.MIN_LENGTH' | translate: { min: 2 } }}
+                    </div>
                   </div>
                 </div>
 
@@ -173,12 +177,12 @@
                 </div>
 
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Số điện thoại</label>
+                  <label class="form-label">{{ 'PROFILE.PHONE' | translate }}</label>
                   <input type="tel" class="form-control" formControlName="phone">
                 </div>
 
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Địa chỉ</label>
+                  <label class="form-label">{{ 'PROFILE.ADDRESS' | translate }}</label>
                   <input type="text" class="form-control" formControlName="address">
                 </div>
               </div>
@@ -187,11 +191,11 @@
                 <button type="submit" class="btn btn-primary" [disabled]="loading">
                   <span *ngIf="!loading">
                     <i class="bi bi-save me-1"></i>
-                    Lưu thay đổi
+                    {{ 'COMMON.SAVE' | translate }}
                   </span>
                   <span *ngIf="loading">
                     <span class="spinner-border spinner-border-sm me-1"></span>
-                    Đang lưu...
+                    {{ 'COMMON.LOADING' | translate }}
                   </span>
                 </button>
               </div>
@@ -200,11 +204,11 @@
 
           <!-- Tab: Password -->
           <div *ngIf="activeTab === 'password'">
-            <h4 class="profile-section__title mb-4">Đổi mật khẩu</h4>
+            <h4 class="profile-section__title mb-4">{{ 'PROFILE.CHANGE_PASSWORD' | translate }}</h4>
             <form [formGroup]="changePasswordForm" (ngSubmit)="onChangePassword()">
               <div class="row">
                 <div class="col-md-12 mb-3">
-                  <label class="form-label">Mật khẩu hiện tại *</label>
+                  <label class="form-label">{{ 'PROFILE.CURRENT_PASSWORD' | translate }} *</label>
                   <div class="input-group">
                     <input [type]="showCurrentPassword ? 'text' : 'password'" class="form-control"
                       formControlName="currentPassword"
@@ -216,12 +220,12 @@
                   </div>
                   <div class="text-danger small mt-1"
                     *ngIf="passwordSubmitted && currentPassword?.errors?.['required']">
-                    Mật khẩu hiện tại là bắt buộc
+                    {{ 'VALIDATION.REQUIRED' | translate }}
                   </div>
                 </div>
 
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Mật khẩu mới *</label>
+                  <label class="form-label">{{ 'PROFILE.NEW_PASSWORD' | translate }} *</label>
                   <div class="input-group">
                     <input [type]="showNewPassword ? 'text' : 'password'" class="form-control"
                       formControlName="newPassword" [class.is-invalid]="passwordSubmitted && newPassword?.invalid">
@@ -231,15 +235,15 @@
                     </button>
                   </div>
                   <div class="text-danger small mt-1" *ngIf="passwordSubmitted && newPassword?.errors?.['required']">
-                    Mật khẩu mới là bắt buộc
+                    {{ 'VALIDATION.REQUIRED' | translate }}
                   </div>
                   <div class="text-danger small mt-1" *ngIf="passwordSubmitted && newPassword?.errors?.['minlength']">
-                    Mật khẩu phải có ít nhất 6 ký tự
+                    {{ 'VALIDATION.PASSWORD_MIN_LENGTH' | translate: { min: 6 } }}
                   </div>
                 </div>
 
                 <div class="col-md-6 mb-3">
-                  <label class="form-label">Xác nhận mật khẩu *</label>
+                  <label class="form-label">{{ 'PROFILE.CONFIRM_PASSWORD' | translate }} *</label>
                   <div class="input-group">
                     <input [type]="showConfirmPassword ? 'text' : 'password'" class="form-control"
                       formControlName="confirmPassword"
@@ -251,11 +255,11 @@
                   </div>
                   <div class="text-danger small mt-1"
                     *ngIf="passwordSubmitted && confirmPassword?.errors?.['required']">
-                    Xác nhận mật khẩu là bắt buộc
+                    {{ 'VALIDATION.REQUIRED' | translate }}
                   </div>
                   <div class="text-danger small mt-1"
                     *ngIf="passwordSubmitted && changePasswordForm.errors?.['passwordMismatch']">
-                    Mật khẩu không khớp
+                    {{ 'VALIDATION.PASSWORD_MISMATCH' | translate }}
                   </div>
                 </div>
               </div>
@@ -264,11 +268,11 @@
                 <button type="submit" class="btn btn-primary" [disabled]="loading">
                   <span *ngIf="!loading">
                     <i class="bi bi-shield-check me-1"></i>
-                    Cập nhật mật khẩu
+                    {{ 'PROFILE.UPDATE_PASSWORD' | translate }}
                   </span>
                   <span *ngIf="loading">
                     <span class="spinner-border spinner-border-sm me-1"></span>
-                    Đang cập nhật...
+                    {{ 'COMMON.LOADING' | translate }}
                   </span>
                 </button>
               </div>
@@ -277,40 +281,40 @@
 
           <!-- Tab: API Keys -->
           <div *ngIf="activeTab === 'apikeys'">
-            <h4 class="profile-section__title mb-4">Quản lý API Keys</h4>
+            <h4 class="profile-section__title mb-4">{{ 'PROFILE.MANAGE_API_KEYS' | translate }}</h4>
 
             <div class="alert alert-info">
               <i class="bi bi-info-circle me-2"></i>
-              API Key dùng để truy cập dịch vụ qua API. Hãy lưu trữ key an toàn, key chỉ được hiển thị một lần duy nhất
-              khi tạo.
+              {{ 'PROFILE.API_KEY_INFO' | translate }}
             </div>
 
             <!-- Create API Key Form -->
             <div class="card mb-4">
               <div class="card-header">
-                <h5 class="mb-0 api-keys-lenght">Tạo API Key mới</h5>
+                <h5 class="mb-0 api-keys-lenght">{{ 'PROFILE.CREATE_API_KEY' | translate }}</h5>
               </div>
               <div class="card-body">
                 <form [formGroup]="createApiKeyForm" (ngSubmit)="onCreateApiKey()">
                   <div class="row align-items-end">
                     <div class="col-md-8 mb-3 mb-md-0">
-                      <label class="form-label">Tên Key *</label>
-                      <input type="text" class="form-control" formControlName="name" placeholder="VD: ApiKey-EmailSieuRe"
+                      <label class="form-label">{{ 'PROFILE.KEY_NAME' | translate }} *</label>
+                      <input type="text" class="form-control" formControlName="name"
+                        placeholder="VD: ApiKey-EmailSieuRe"
                         [class.is-invalid]="apiKeySubmitted && createApiKeyForm.get('name')?.invalid">
                       <div class="text-danger small mt-1"
                         *ngIf="apiKeySubmitted && createApiKeyForm.get('name')?.errors?.['required']">
-                        Tên key là bắt buộc
+                        {{ 'VALIDATION.REQUIRED' | translate }}
                       </div>
                     </div>
                     <div class="col-md-4">
                       <button type="submit" class="btn btn-primary w-100" [disabled]="apiKeyLoading">
                         <span *ngIf="!apiKeyLoading">
                           <i class="bi bi-plus-circle me-1"></i>
-                          Tạo Key
+                          {{ 'PROFILE.CREATE_KEY' | translate }}
                         </span>
                         <span *ngIf="apiKeyLoading">
                           <span class="spinner-border spinner-border-sm me-1"></span>
-                          Đang tạo...
+                          {{ 'COMMON.LOADING' | translate }}
                         </span>
                       </button>
                     </div>
@@ -320,16 +324,16 @@
             </div>
 
             <!-- API Keys List -->
-            <h5 class="mb-3 api-keys-lenght">Các API Keys hiện có ({{ apiKeys.length }})</h5>
+            <h5 class="mb-3 api-keys-lenght">{{ 'PROFILE.EXISTING_API_KEYS' | translate }} ({{ apiKeys.length }})</h5>
             <div class="table-responsive">
               <table class="table table-hover api-keys-table">
                 <thead>
                   <tr>
-                    <th>STT</th>
-                    <th>Tên Key</th>
-                    <th>Trạng thái</th>
-                    <th>Ngày tạo</th>
-                    <th>Hành động</th>
+                    <th>{{ 'TABLE.NO' | translate }}</th>
+                    <th>{{ 'PROFILE.KEY_NAME' | translate }}</th>
+                    <th>{{ 'COMMON.STATUS' | translate }}</th>
+                    <th>{{ 'COMMON.CREATED_DATE' | translate }}</th>
+                    <th>{{ 'COMMON.ACTION' | translate }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -338,25 +342,25 @@
                       <div class="spinner-border text-primary" role="status">
                         <span class="visually-hidden">Loading...</span>
                       </div>
-                      <p class="mt-2 mb-0">Đang tải...</p>
+                      <p class="mt-2 mb-0">{{ 'COMMON.LOADING' | translate }}</p>
                     </td>
                   </tr>
                   <tr *ngFor="let key of apiKeys; let i = index">
                     <td>{{ i + 1 }}</td>
                     <td>{{ key.name || '—' }}</td>
                     <td>
-                      <app-active-status-badge [status]="key.status"></app-active-status-badge>
+                      <app-active-status-badge [status]="key.status" [useI18n]="true"></app-active-status-badge>
                     </td>
                     <td>{{ key.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
                     <td>
                       <button class="btn btn-sm btn-danger" (click)="onDeleteApiKey(key.id)" [disabled]="apiKeyLoading">
-                        <i class="bi bi-trash"></i> Xóa
+                        <i class="bi bi-trash"></i> {{ 'COMMON.DELETE' | translate }}
                       </button>
                     </td>
                   </tr>
                   <tr *ngIf="!apiKeyLoading && apiKeys.length === 0">
                     <td colspan="5" class="text-center py-4 text-muted">
-                      Bạn chưa có API Key nào.
+                      {{ 'PROFILE.NO_API_KEYS' | translate }}
                     </td>
                   </tr>
                 </tbody>

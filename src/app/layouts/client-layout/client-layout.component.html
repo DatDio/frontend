@@ -27,16 +27,20 @@
     <!-- Desktop navbar -->
     <div class="collapse navbar-collapse d-none d-lg-flex" id="navbarNav">
       <ul class="navbar-nav ms-auto align-items-lg-center gap-2">
+        <!-- Language Switcher -->
+        <li class="nav-item">
+          <app-language-switcher></app-language-switcher>
+        </li>
         <!-- Theme Toggle -->
         <li class="nav-item">
-          <button class="theme-toggle-btn" (click)="toggleTheme()" title="Chuyển đổi giao diện">
+          <button class="theme-toggle-btn" (click)="toggleTheme()" [title]="'COMMON.SWITCH_THEME' | translate">
             <i class="bi" [class.bi-sun-fill]="(theme$ | async) === 'dark'"
               [class.bi-moon-fill]="(theme$ | async) === 'light'"></i>
           </button>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="https://docs.emailsieure.com/" target="_blank" rel="noopener noreferrer">
-            Tài liệu API
+            {{ 'COMMON.API_DOCS' | translate }}
           </a>
         </li>
 
@@ -55,24 +59,24 @@
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
             @if (authService.isAdmin()) {
-            <li><a class="dropdown-item" routerLink="/admin">Quản trị</a></li>
+            <li><a class="dropdown-item" routerLink="/admin">{{ 'COMMON.ADMIN' | translate }}</a></li>
             <li>
               <hr class="dropdown-divider">
             </li>
             }
-            <li><a class="dropdown-item" routerLink="/profile">Profile</a></li>
+            <li><a class="dropdown-item" routerLink="/profile">{{ 'COMMON.PROFILE' | translate }}</a></li>
             <li>
               <hr class="dropdown-divider">
             </li>
-            <li><a class="dropdown-item" (click)="logout()">Logout</a></li>
+            <li><a class="dropdown-item" (click)="logout()">{{ 'AUTH.LOGOUT' | translate }}</a></li>
           </ul>
         </li>
         } @else {
         <li class="nav-item">
-          <a class="nav-link" routerLink="/auth/login">Đăng nhập</a>
+          <a class="nav-link" routerLink="/auth/login">{{ 'AUTH.LOGIN' | translate }}</a>
         </li>
         <li class="nav-item">
-          <a class="btn custom-signup-btn btn-sm" routerLink="/auth/register">Đăng ký</a>
+          <a class="btn custom-signup-btn btn-sm" routerLink="/auth/register">{{ 'AUTH.REGISTER' | translate }}</a>
         </li>
         }
         } @else {
@@ -106,51 +110,56 @@
     <nav class="nav flex-column sidebar-nav">
       <a class="nav-link" routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}"
         data-bs-dismiss="offcanvas">
-        <i class="bi bi-house-door-fill me-2"></i>Trang chủ
+        <i class="bi bi-house-door-fill me-2"></i>{{ 'COMMON.HOME' | translate }}
       </a>
       <a class="nav-link" routerLink="/profile" routerLinkActive="active" data-bs-dismiss="offcanvas">
-        <i class="bi bi-person-fill me-2"></i>Tài khoản
+        <i class="bi bi-person-fill me-2"></i>{{ 'COMMON.PROFILE' | translate }}
       </a>
       <a class="nav-link" routerLink="/transactions" routerLinkActive="active" data-bs-dismiss="offcanvas">
-        <i class="bi bi-credit-card-fill me-2"></i>Nạp tiền
+        <i class="bi bi-credit-card-fill me-2"></i>{{ 'COMMON.DEPOSIT' | translate }}
       </a>
       <a class="nav-link" routerLink="/orders" routerLinkActive="active" data-bs-dismiss="offcanvas">
-        <i class="bi bi-cart-fill me-2"></i>Lịch sử mua hàng
+        <i class="bi bi-cart-fill me-2"></i>{{ 'COMMON.ORDER_HISTORY' | translate }}
       </a>
       <a class="nav-link" routerLink="/ranks" routerLinkActive="active" data-bs-dismiss="offcanvas">
-        <i class="bi bi-trophy-fill me-2"></i>Hạng
+        <i class="bi bi-trophy-fill me-2"></i>{{ 'COMMON.RANK' | translate }}
       </a>
       <a class="nav-link" routerLink="/tools" routerLinkActive="active" data-bs-dismiss="offcanvas">
-        <i class="bi bi-tools me-2"></i>Công cụ
+        <i class="bi bi-tools me-2"></i>{{ 'COMMON.TOOLS' | translate }}
       </a>
       <a class="nav-link" routerLink="/support" routerLinkActive="active" data-bs-dismiss="offcanvas">
-        <i class="bi bi-headset me-2"></i>Hỗ trợ
+        <i class="bi bi-headset me-2"></i>{{ 'COMMON.SUPPORT' | translate }}
       </a>
       <hr>
       <a class="nav-link" href="https://dat-dio.gitbook.io/EmailSieuRedocs" target="_blank" rel="noopener noreferrer">
-        <i class="bi bi-book me-2"></i>Tài liệu API
+        <i class="bi bi-book me-2"></i>{{ 'COMMON.API_DOCS' | translate }}
       </a>
       <!-- Theme Toggle in Sidebar -->
       <a class="nav-link" (click)="toggleTheme()">
         <i class="bi me-2" [class.bi-sun-fill]="(theme$ | async) === 'dark'"
           [class.bi-moon-fill]="(theme$ | async) === 'light'"></i>
-        {{ (theme$ | async) === 'dark' ? 'Giao diện sáng' : 'Giao diện tối' }}
+        {{ (theme$ | async) === 'dark' ? ('COMMON.LIGHT_THEME' | translate) : ('COMMON.DARK_THEME' | translate) }}
+      </a>
+      <!-- Language Toggle in Sidebar -->
+      <a class="nav-link" (click)="toggleLanguage()">
+        <i class="bi bi-globe me-2"></i>
+        {{ (currentLang$ | async) === 'vi' ? '🇬🇧 English' : '🇻🇳 Tiếng Việt' }}
       </a>
       <a class="nav-link text-danger" (click)="logout()" data-bs-dismiss="offcanvas">
-        <i class="bi bi-box-arrow-right me-2"></i>Đăng xuất
+        <i class="bi bi-box-arrow-right me-2"></i>{{ 'AUTH.LOGOUT' | translate }}
       </a>
     </nav>
     } @else {
     <nav class="nav flex-column sidebar-nav">
       <a class="nav-link" routerLink="/auth/login" data-bs-dismiss="offcanvas">
-        <i class="bi bi-box-arrow-in-right me-2"></i>Đăng nhập
+        <i class="bi bi-box-arrow-in-right me-2"></i>{{ 'AUTH.LOGIN' | translate }}
       </a>
       <a class="nav-link" routerLink="/auth/register" data-bs-dismiss="offcanvas">
-        <i class="bi bi-person-plus me-2"></i>Đăng ký
+        <i class="bi bi-person-plus me-2"></i>{{ 'AUTH.REGISTER' | translate }}
       </a>
       <hr>
       <a class="nav-link" href="https://dat-dio.gitbook.io/EmailSieuRedocs" target="_blank" rel="noopener noreferrer">
-        <i class="bi bi-book me-2"></i>Tài liệu API
+        <i class="bi bi-book me-2"></i>{{ 'COMMON.API_DOCS' | translate }}
       </a>
     </nav>
     }
@@ -166,27 +175,27 @@
     <div class="hero-menu">
       <a routerLink="/" class="hero-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
         <i class="bi bi-house-door-fill"></i>
-        <span>Trang chủ</span>
+        <span>{{ 'COMMON.HOME' | translate }}</span>
       </a>
       <a routerLink="/profile" class="hero-link" routerLinkActive="active">
         <i class="bi bi-person-fill"></i>
-        <span>Tài khoản</span>
+        <span>{{ 'COMMON.PROFILE' | translate }}</span>
       </a>
       <a routerLink="/transactions" class="hero-link" routerLinkActive="active">
         <i class="bi bi-credit-card-fill"></i>
-        <span>Nạp tiền</span>
+        <span>{{ 'COMMON.DEPOSIT' | translate }}</span>
       </a>
       <a routerLink="/orders" class="hero-link" routerLinkActive="active">
         <i class="bi bi-cart-fill"></i>
-        <span>Lịch sử mua hàng</span>
+        <span>{{ 'COMMON.ORDER_HISTORY' | translate }}</span>
       </a>
       <a routerLink="/ranks" class="hero-link" routerLinkActive="active">
         <i class="bi bi-trophy-fill"></i>
-        <span>Hạng</span>
+        <span>{{ 'COMMON.RANK' | translate }}</span>
       </a>
       <a routerLink="/support" class="hero-link" routerLinkActive="active">
         <i class="bi bi-headset"></i>
-        <span>Hỗ trợ</span>
+        <span>{{ 'COMMON.SUPPORT' | translate }}</span>
       </a>
     </div>
   </div>
@@ -216,27 +225,27 @@
     <div class="row text-center text-md-start">
       <div class="col-md-4 mb-3">
         <h5>EmailSieuRe</h5>
-        <p>Cung cấp email marketing chất lượng giá cạnh tranh</p>
+        <p>{{ 'FOOTER.ABOUT' | translate }}</p>
       </div>
       <div class="col-md-4 mb-3">
-        <h6>Quick Links</h6>
+        <h6>{{ 'FOOTER.QUICK_LINKS' | translate }}</h6>
         <ul class="list-unstyled">
-          <li><a routerLink="/">Home</a></li>
-          <li><a routerLink="/terms-of-service">Điều khoản sử dụng</a></li>
-          <li><a routerLink="/policy">Chính sách bảo mật</a></li>
+          <li><a routerLink="/">{{ 'COMMON.HOME' | translate }}</a></li>
+          <li><a routerLink="/terms-of-service">{{ 'FOOTER.TERMS_OF_SERVICE' | translate }}</a></li>
+          <li><a routerLink="/policy">{{ 'FOOTER.PRIVACY_POLICY' | translate }}</a></li>
         </ul>
       </div>
       <div class="col-md-4 mb-3">
-        <h6 class="mr-2">Liên hệ</h6>
+        <h6 class="mr-2">{{ 'FOOTER.CONTACT' | translate }}</h6>
         <ul class="list-unstyled">
           <li>
             <a [href]="telegramGroupUrl" target="_blank" rel="noopener noreferrer">
-              <i class="bi bi-telegram me-2"></i>Group Chat - Tham gia nhóm chat hỗ trợ
+              <i class="bi bi-telegram me-2"></i>{{ 'FOOTER.GROUP_CHAT' | translate }}
             </a>
           </li>
           <li>
             <a [href]="telegramChannelUrl" target="_blank" rel="noopener noreferrer">
-              <i class="bi bi-telegram me-2"></i>Liên hệ Admin
+              <i class="bi bi-telegram me-2"></i>{{ 'FOOTER.CONTACT_ADMIN' | translate }}
             </a>
           </li>
         </ul>

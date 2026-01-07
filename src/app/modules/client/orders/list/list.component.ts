@@ -2,6 +2,7 @@
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { Order, OrderFilter } from '../../../../core/models/order.model';
 import { OrderService } from '../../../../core/services/order.service';
 import { NotificationService } from '../../../../core/services/notification.service';
@@ -16,7 +17,7 @@ interface OrderSearchFilter extends OrderFilter {
 @Component({
   selector: 'app-client-order-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, PaginationComponent],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, PaginationComponent, TranslateModule],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss'
 })
@@ -26,6 +27,7 @@ export class ClientOrderListComponent implements OnInit, OnDestroy {
   private readonly paginationService = inject(PaginationService);
   private readonly seoService = inject(SeoService);
   private readonly fb = inject(FormBuilder);
+  private readonly translate = inject(TranslateService);
 
   orders: Order[] = [];
   loading = true;
@@ -104,7 +106,7 @@ export class ClientOrderListComponent implements OnInit, OnDestroy {
             totalPages: 1,
             currentPage: 0
           };
-          this.notificationService.error(response.message || 'Lỗi khi tải danh sách đơn hàng');
+          this.notificationService.error(response.message || this.translate.instant('MESSAGE.ERROR'));
         }
 
         this.loading = false;
@@ -112,7 +114,7 @@ export class ClientOrderListComponent implements OnInit, OnDestroy {
       error: (error: any) => {
         this.loading = false;
         console.error(error);
-        this.notificationService.error(error.error?.message || 'Lỗi khi tải danh sách đơn hàng');
+        this.notificationService.error(error.error?.message || this.translate.instant('MESSAGE.ERROR'));
       }
     });
   }
@@ -157,7 +159,9 @@ export class ClientOrderListComponent implements OnInit, OnDestroy {
     if (!pageNum) return;
 
     if (pageNum > this.paginationConfig.totalPages || pageNum < 1) {
-      this.notificationService.error(`Page must be between 1 and ${this.paginationConfig.totalPages}`);
+      this.notificationService.error(
+        this.translate.instant('MESSAGE.PAGE_RANGE_ERROR', { max: this.paginationConfig.totalPages })
+      );
     } else {
       this.paginationConfig.currentPage = pageNum - 1;
       this.dataFormSearch = {
@@ -174,7 +178,7 @@ export class ClientOrderListComponent implements OnInit, OnDestroy {
    */
   copyAccounts(order: Order): void {
     if (!order.accountData || order.accountData.length === 0) {
-      this.notificationService.warning('Không có tài khoản để copy');
+      this.notificationService.warning(this.translate.instant('MESSAGE.NO_ACCOUNT_TO_COPY'));
       return;
     }
 
@@ -186,13 +190,13 @@ export class ClientOrderListComponent implements OnInit, OnDestroy {
       }
 
       this.copiedOrderId = order.id;
-      this.notificationService.success('Đã copy danh sách tài khoản!');
+      this.notificationService.success(this.translate.instant('MESSAGE.ACCOUNTS_COPIED'));
 
       this.copyTimeout = setTimeout(() => {
         this.copiedOrderId = null;
       }, 2000);
     }).catch(err => {
-      this.notificationService.error('Lỗi copy, vui lòng thử lại');
+      this.notificationService.error(this.translate.instant('MESSAGE.COPY_FAILED'));
     });
   }
 
@@ -201,7 +205,7 @@ export class ClientOrderListComponent implements OnInit, OnDestroy {
    */
   downloadAccounts(order: Order): void {
     if (!order.accountData || order.accountData.length === 0) {
-      this.notificationService.warning('Không có tài khoản để tải xuống');
+      this.notificationService.warning(this.translate.instant('MESSAGE.NO_ACCOUNT_TO_DOWNLOAD'));
       return;
     }
 
@@ -214,7 +218,7 @@ export class ClientOrderListComponent implements OnInit, OnDestroy {
     link.click();
     window.URL.revokeObjectURL(url);
 
-    this.notificationService.success('Đã tải xuống file thành công!');
+    this.notificationService.success(this.translate.instant('MESSAGE.DOWNLOAD_SUCCESS'));
   }
 
   /**

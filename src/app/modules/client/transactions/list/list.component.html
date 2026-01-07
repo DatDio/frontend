@@ -5,7 +5,7 @@
   <div class="qr-modal-overlay" (click)="closeQrModal()">
     <div class="qr-modal-content" (click)="$event.stopPropagation()">
       <div class="qr-modal-header">
-        <h3><i class="bi bi-qr-code me-2"></i>Quét mã QR để thanh toán</h3>
+        <h3><i class="bi bi-qr-code me-2"></i>{{ 'TRANSACTION.QR_TITLE' | translate }}</h3>
         <button class="qr-close-btn" (click)="closeQrModal()">
           <i class="bi bi-x-lg"></i>
         </button>
@@ -20,31 +20,31 @@
         <!-- Bank Info -->
         <div class="bank-info">
           <div class="bank-info-row">
-            <span class="label">Ngân hàng:</span>
+            <span class="label">{{ 'TRANSACTION.BANK' | translate }}:</span>
             <span class="value">{{ bankName }}</span>
           </div>
           <div class="bank-info-row">
-            <span class="label">Số tài khoản:</span>
+            <span class="label">{{ 'TRANSACTION.ACCOUNT_NUMBER' | translate }}:</span>
             <span class="value">
               {{ accountNumber }}
-              <button class="copy-btn" (click)="copyAccountNumber()" title="Sao chép">
+              <button class="copy-btn" (click)="copyAccountNumber()" title="{{ 'COMMON.COPY' | translate }}">
                 <i class="bi bi-clipboard"></i>
               </button>
             </span>
           </div>
           <div class="bank-info-row">
-            <span class="label">Chủ tài khoản:</span>
+            <span class="label">{{ 'TRANSACTION.ACCOUNT_NAME' | translate }}:</span>
             <span class="value">{{ accountName }}</span>
           </div>
           <div class="bank-info-row">
-            <span class="label">Số tiền:</span>
+            <span class="label">{{ 'TRANSACTION.AMOUNT' | translate }}:</span>
             <span class="value amount">{{ depositAmount | number:'1.0-0' }} VNĐ</span>
           </div>
           <div class="bank-info-row content-row">
-            <span class="label">Nội dung CK:</span>
+            <span class="label">{{ 'TRANSACTION.CONTENT' | translate }}:</span>
             <span class="value transfer-content">
               {{ transferContent }}
-              <button class="copy-btn" (click)="copyTransferContent()" title="Sao chép">
+              <button class="copy-btn" (click)="copyTransferContent()" title="{{ 'COMMON.COPY' | translate }}">
                 <i class="bi bi-clipboard"></i>
               </button>
             </span>
@@ -53,20 +53,20 @@
 
         <div class="qr-note">
           <i class="bi bi-info-circle me-1"></i>
-          <span>Vui lòng nhập <strong>đúng nội dung chuyển khoản</strong> để giao dịch được xử lý tự động.</span>
+          <span>{{ 'TRANSACTION.QR_NOTE' | translate }}</span>
         </div>
 
         <!-- Waiting State -->
         <div class="qr-waiting-state">
           <div class="waiting-spinner">
             <span class="spinner-border spinner-border-sm me-2"></span>
-            <span>Đang chờ xác nhận thanh toán...</span>
+            <span>{{ 'TRANSACTION.WAITING' | translate }}</span>
           </div>
-          <p class="waiting-note">Hệ thống sẽ tự động cập nhật khi nhận được giao dịch của bạn</p>
+          <p class="waiting-note">{{ 'TRANSACTION.AUTO_UPDATE' | translate }}</p>
         </div>
 
         <button class="qr-close-btn" (click)="closeQrModal()">
-          <i class="bi bi-x-lg me-2"></i>Đóng
+          <i class="bi bi-x-lg me-2"></i>{{ 'COMMON.CLOSE' | translate }}
         </button>
       </div>
     </div>
@@ -78,44 +78,46 @@
   <div class="note-modal-overlay" (click)="closeNoteModal()">
     <div class="note-modal-content" (click)="$event.stopPropagation()">
       <div class="note-modal-header">
-        <h4><i class="bi bi-file-text me-2"></i>Chi tiết giao dịch</h4>
+        <h4><i class="bi bi-file-text me-2"></i>{{ 'TRANSACTION.DETAIL' | translate }}</h4>
         <button class="note-close-btn" (click)="closeNoteModal()">
           <i class="bi bi-x-lg"></i>
         </button>
       </div>
       <div class="note-modal-body">
         <div class="note-info-row">
-          <span class="note-label">Mã GD:</span>
+          <span class="note-label">{{ 'TRANSACTION.CODE' | translate }}:</span>
           <span class="note-value">{{ selectedTransaction.transactionCode }}</span>
         </div>
         <div class="note-info-row">
-          <span class="note-label">Loại:</span>
+          <span class="note-label">{{ 'TRANSACTION.TYPE' | translate }}:</span>
           <span class="badge" [ngClass]="getTypeClass(selectedTransaction.type)">
-            {{ getTypeLabel(selectedTransaction.type) }}
+            {{ ('WALLET.' + selectedTransaction.type) | translate }}
           </span>
         </div>
         <div class="note-info-row">
-          <span class="note-label">Trạng thái:</span>
+          <span class="note-label">{{ 'TRANSACTION.STATUS' | translate }}:</span>
           <span class="badge" [ngClass]="getStatusClass(selectedTransaction.status)">
-            {{ getStatusLabel(selectedTransaction.status) }}
+            {{ ('TRANSACTION.' + selectedTransaction.status) | translate }}
           </span>
         </div>
         @if (selectedTransaction.description) {
         <div class="note-section">
-          <span class="note-section-title"><i class="bi bi-chat-left-text me-1"></i>Mô tả:</span>
+          <span class="note-section-title"><i class="bi bi-chat-left-text me-1"></i>{{ 'TRANSACTION.DESCRIPTION' |
+            translate }}:</span>
           <p class="note-content">{{ selectedTransaction.description }}</p>
         </div>
         }
         @if (selectedTransaction.status === 'FAILED' && selectedTransaction.errorMessage) {
         <div class="note-section error-section">
-          <span class="note-section-title"><i class="bi bi-exclamation-triangle me-1"></i>Lý do thất bại:</span>
+          <span class="note-section-title"><i class="bi bi-exclamation-triangle me-1"></i>{{
+            'TRANSACTION.FAILURE_REASON' | translate }}:</span>
           <p class="note-content">{{ selectedTransaction.errorMessage }}</p>
         </div>
         }
       </div>
       <div class="note-modal-footer">
         <button class="btn btn-secondary" (click)="closeNoteModal()">
-          <i class="bi bi-x me-1"></i>Đóng
+          <i class="bi bi-x me-1"></i>{{ 'COMMON.CLOSE' | translate }}
         </button>
       </div>
     </div>
@@ -130,8 +132,8 @@
         <div class="deposit-icon">
           <i class="bi bi-wallet2"></i>
         </div>
-        <h3>Nạp tiền vào tài khoản</h3>
-        <p class="deposit-subtitle">Thanh toán nhanh chóng, an toàn qua ngân hàng</p>
+        <h3>{{ 'TRANSACTION.DEPOSIT_TITLE' | translate }}</h3>
+        <p class="deposit-subtitle">{{ 'TRANSACTION.DEPOSIT_SUBTITLE' | translate }}</p>
       </div>
 
       <!-- Rank Info Badge -->
@@ -144,12 +146,12 @@
           <i class="bi bi-trophy-fill"></i>
           }
           <div class="rank-details">
-            <span class="rank-label">Hạng hiện tại</span>
+            <span class="rank-label">{{ 'TRANSACTION.CURRENT_RANK' | translate }}</span>
             <span class="rank-name">{{ userRankInfo.rankName }}</span>
           </div>
           <div class="bonus-badge">
             <span class="bonus-percent">+{{ userRankInfo.bonusPercent }}%</span>
-            <span class="bonus-label">Bonus</span>
+            <span class="bonus-label">{{ 'TRANSACTION.BONUS' | translate }}</span>
           </div>
         </div>
 
@@ -157,7 +159,8 @@
         @if (userRankInfo.nextRankName) {
         <div class="next-rank-progress">
           <div class="progress-info">
-            <span>Tiến độ đến <strong>{{ userRankInfo.nextRankName }}</strong></span>
+            <span>{{ 'TRANSACTION.NEXT_RANK_PROGRESS' | translate }} <strong>{{ userRankInfo.nextRankName
+                }}</strong></span>
             <span>{{ userRankInfo.currentDeposit | number:'1.0-0' }} / {{ userRankInfo.nextRankMinDeposit |
               number:'1.0-0' }} VNĐ</span>
           </div>
@@ -172,10 +175,10 @@
 
       <!-- Deposit Form -->
       <div class="deposit-form">
-        <label class="input-label">Số tiền nạp</label>
+        <label class="input-label">{{ 'TRANSACTION.DEPOSIT_AMOUNT' | translate }}</label>
         <div class="amount-input-wrapper">
           <input type="text" class="amount-input" [value]="depositAmountDisplay" (input)="onDepositAmountChange($event)"
-            placeholder="Nhập số tiền">
+            [placeholder]="'TRANSACTION.ENTER_AMOUNT' | translate">
           <span class="currency-tag">VNĐ</span>
         </div>
 
@@ -197,15 +200,16 @@
         @if (userRankInfo && userRankInfo.bonusPercent > 0) {
         <div class="bonus-preview">
           <div class="bonus-row">
-            <span>Số tiền nạp:</span>
+            <span>{{ 'TRANSACTION.DEPOSIT_AMOUNT' | translate }}:</span>
             <span>{{ depositAmount | number:'1.0-0' }} VNĐ</span>
           </div>
           <div class="bonus-row highlight">
-            <span><i class="bi bi-gift-fill me-1"></i>Bonus ({{ userRankInfo.bonusPercent }}%):</span>
+            <span><i class="bi bi-gift-fill me-1"></i>{{ 'TRANSACTION.BONUS' | translate }} ({{
+              userRankInfo.bonusPercent }}%):</span>
             <span class="bonus-value">+{{ calculateBonus() | number:'1.0-0' }} VNĐ</span>
           </div>
           <div class="bonus-row total">
-            <span>Tổng nhận:</span>
+            <span>{{ 'TRANSACTION.TOTAL_RECEIVED' | translate }}:</span>
             <span class="total-value">{{ calculateTotal() | number:'1.0-0' }} VNĐ</span>
           </div>
         </div>
@@ -213,26 +217,27 @@
 
         <button class="deposit-btn" (click)="createDeposit()">
           <i class="bi bi-credit-card me-2"></i>
-          Thanh toán ngay
+          {{ 'TRANSACTION.PAY_NOW' | translate }}
         </button>
 
         <p class="deposit-note">
           <i class="bi bi-shield-check me-1"></i>
-          Giao dịch được bảo mật tuyệt đối
+          {{ 'TRANSACTION.SECURITY_NOTE' | translate }}
         </p>
       </div>
     </div>
   </div>
 
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Lịch sử giao dịch</h1>
+    <h1>{{ 'TRANSACTION.TITLE' | translate }}</h1>
   </div>
   <div class="card search-card mb-4">
     <div class="card-body">
       <form [formGroup]="formSearch" class="row g-3">
         <div class="col-md-3">
-          <label class="form-label">Mã giao dịch</label>
-          <input type="text" class="form-control" placeholder="Nhập mã giao dịch..." formControlName="transactionCode">
+          <label class="form-label">{{ 'TRANSACTION.CODE' | translate }}</label>
+          <input type="text" class="form-control" [placeholder]="'TRANSACTION.ENTER_CODE' | translate"
+            formControlName="transactionCode">
         </div>
 
         <!-- <div class="col-md-3">
@@ -247,22 +252,22 @@
         </div> -->
 
         <div class="col-md-3">
-          <label class="form-label">Từ ngày</label>
+          <label class="form-label">{{ 'TRANSACTION.FROM_DATE' | translate }}</label>
           <input type="date" class="form-control" formControlName="dateFrom">
         </div>
 
         <div class="col-md-3">
-          <label class="form-label">Đến ngày</label>
+          <label class="form-label">{{ 'TRANSACTION.TO_DATE' | translate }}</label>
           <input type="date" class="form-control" formControlName="dateTo">
         </div>
 
         <div class="col-md-6 d-flex align-items-end gap-2 mt-4">
           <button type="button" class="btn btn-search w-50" (click)="handleSearch()">
-            <i class="bi bi-search"></i> Tìm kiếm
+            <i class="bi bi-search"></i> {{ 'COMMON.SEARCH' | translate }}
           </button>
 
           <button type="button" class="btn btn-refresh w-50" (click)="clearForm()">
-            <i class="bi bi-arrow-clockwise"></i> Xóa bộ lọc
+            <i class="bi bi-arrow-clockwise"></i> {{ 'COMMON.RESET_FILTER' | translate }}
           </button>
         </div>
 
@@ -275,7 +280,7 @@
       <div class="row align-items-center">
         <div class="col-md-6">
           <span class="text-muted">
-            Tổng giao dịch: {{ paginationConfig.totalElements }}
+            {{ 'TRANSACTION.TOTAL_TRANSACTIONS' | translate }}: {{ paginationConfig.totalElements }}
           </span>
         </div>
       </div>
@@ -291,14 +296,14 @@
         <table class="table table-hover mb-0">
           <thead>
             <tr>
-              <th style="width: 50px; text-align:center;">#</th>
-              <th>Mã GD</th>
-              <th>Loại</th>
-              <th>Số tiền</th>
-              <th>Trạng thái</th>
-              <th>Ngày tạo</th>
-              <th>Ngày hoàn thành</th>
-              <th style="width: 80px; text-align: center;">Thao tác</th>
+              <th style="width: 50px; text-align:center;">{{ 'TABLE.NO' | translate }}</th>
+              <th>{{ 'TRANSACTION.CODE' | translate }}</th>
+              <th>{{ 'TRANSACTION.TYPE' | translate }}</th>
+              <th>{{ 'TRANSACTION.AMOUNT' | translate }}</th>
+              <th>{{ 'TRANSACTION.STATUS' | translate }}</th>
+              <th>{{ 'TRANSACTION.CREATED_AT' | translate }}</th>
+              <th>{{ 'TRANSACTION.COMPLETED_AT' | translate }}</th>
+              <th style="width: 80px; text-align: center;">{{ 'COMMON.ACTIONS' | translate }}</th>
             </tr>
           </thead>
           <tbody>
@@ -314,7 +319,7 @@
 
               <td>
                 <span class="badge" [ngClass]="getTypeClass(transaction.type)">
-                  {{ getTypeLabel(transaction.type) }}
+                  {{ ('WALLET.' + transaction.type) | translate }}
                 </span>
               </td>
 
@@ -324,7 +329,7 @@
 
               <td>
                 <span class="badge" [ngClass]="getStatusClass(transaction.status)">
-                  {{ getStatusLabel(transaction.status) }}
+                  {{ ('TRANSACTION.' + transaction.status) | translate }}
                 </span>
               </td>
 
@@ -338,7 +343,8 @@
 
               <td class="text-center">
                 @if (hasNote(transaction)) {
-                <button class="btn btn-sm btn-outline-info" title="Xem ghi chú" (click)="openNoteModal(transaction)">
+                <button class="btn btn-sm btn-outline-info" title="{{ 'TRANSACTION.NOTE' | translate }}"
+                  (click)="openNoteModal(transaction)">
                   <i class="bi bi-eye"></i>
                 </button>
                 } @else {
@@ -351,7 +357,7 @@
             @if (transactions.length === 0) {
             <tr>
               <td colspan="8" class="text-center py-4 text-muted">
-                Không có giao dịch nào
+                {{ 'TRANSACTION.NO_TRANSACTIONS' | translate }}
               </td>
             </tr>
             }

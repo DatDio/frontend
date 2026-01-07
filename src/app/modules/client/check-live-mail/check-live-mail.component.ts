@@ -1,6 +1,7 @@
 ﻿import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../core/services/notification.service';
 import { SeoService } from '../../../core/services/seo.service';
 import { CheckLiveMailResponse, CheckStatus } from '../../../core/models/hotmail.model';
@@ -18,7 +19,7 @@ interface MailCheckResult {
 @Component({
     selector: 'app-check-live-mail',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, FormsModule],
+    imports: [CommonModule, ReactiveFormsModule, FormsModule, TranslateModule],
     templateUrl: './check-live-mail.component.html',
     styleUrls: ['./check-live-mail.component.scss']
 })
@@ -26,6 +27,7 @@ export class CheckLiveMailComponent implements OnInit, OnDestroy {
     private readonly formBuilder = inject(FormBuilder);
     private readonly notificationService = inject(NotificationService);
     private readonly seoService = inject(SeoService);
+    private readonly translate = inject(TranslateService);
 
     checkForm!: FormGroup;
     isLoading = false;
@@ -83,7 +85,7 @@ export class CheckLiveMailComponent implements OnInit, OnDestroy {
 
     onCheck(): void {
         if (this.checkForm.invalid) {
-            this.notificationService.warning('Vui lòng nhập danh sách email');
+            this.notificationService.warning(this.translate.instant('MESSAGE.NO_EMAIL_INPUT'));
             return;
         }
 
@@ -117,7 +119,7 @@ export class CheckLiveMailComponent implements OnInit, OnDestroy {
             })
             .catch(error => {
                 this.isLoading = false;
-                this.notificationService.error('Lỗi: ' + error.message);
+                this.notificationService.error(this.translate.instant('COMMON.ERROR') + ': ' + error.message);
             });
     }
 
@@ -143,7 +145,11 @@ export class CheckLiveMailComponent implements OnInit, OnDestroy {
             this.closeEventSource();
             this.isLoading = false;
             this.notificationService.success(
-                `Hoàn thành: ${this.liveCount} live, ${this.dieCount} die, ${this.unknownCount} unknown`
+                this.translate.instant('MESSAGE.CHECK_COMPLETED', {
+                    live: this.liveCount,
+                    die: this.dieCount,
+                    unknown: this.unknownCount
+                })
             );
         });
 
@@ -175,28 +181,28 @@ export class CheckLiveMailComponent implements OnInit, OnDestroy {
 
     copyLive(): void {
         const data = this.liveResults.map(r => `${r.email}|${r.password}${r.refreshToken ? '|' + r.refreshToken : ''}${r.clientId ? '|' + r.clientId : ''}`).join('\n');
-        if (!data) { this.notificationService.warning('Không có email live'); return; }
+        if (!data) { this.notificationService.warning(this.translate.instant('MESSAGE.NO_EMAIL_LIVE')); return; }
         navigator.clipboard.writeText(data).then(() => {
             this.setCopied('live');
-            this.notificationService.success(`Đã copy ${this.liveCount} email live!`);
+            this.notificationService.success(this.translate.instant('MESSAGE.COPIED_LIVE', { count: this.liveCount }));
         });
     }
 
     copyDie(): void {
         const data = this.dieResults.map(r => `${r.email}|${r.password}`).join('\n');
-        if (!data) { this.notificationService.warning('Không có email die'); return; }
+        if (!data) { this.notificationService.warning(this.translate.instant('MESSAGE.NO_EMAIL_DIE')); return; }
         navigator.clipboard.writeText(data).then(() => {
             this.setCopied('die');
-            this.notificationService.success(`Đã copy ${this.dieCount} email die!`);
+            this.notificationService.success(this.translate.instant('MESSAGE.COPIED_DIE', { count: this.dieCount }));
         });
     }
 
     copyUnknown(): void {
         const data = this.unknownResults.map(r => `${r.email}|${r.password}`).join('\n');
-        if (!data) { this.notificationService.warning('Không có email unknown'); return; }
+        if (!data) { this.notificationService.warning(this.translate.instant('MESSAGE.NO_EMAIL_UNKNOWN')); return; }
         navigator.clipboard.writeText(data).then(() => {
             this.setCopied('unknown');
-            this.notificationService.success(`Đã copy ${this.unknownCount} email unknown!`);
+            this.notificationService.success(this.translate.instant('MESSAGE.COPIED_UNKNOWN', { count: this.unknownCount }));
         });
     }
 
@@ -222,6 +228,6 @@ export class CheckLiveMailComponent implements OnInit, OnDestroy {
     stopCheck(): void {
         this.closeEventSource();
         this.isLoading = false;
-        this.notificationService.info('Đã dừng kiểm tra');
+        this.notificationService.info(this.translate.instant('MESSAGE.CHECK_STOPPED'));
     }
 }

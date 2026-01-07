@@ -1,6 +1,7 @@
 ﻿import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { NotificationService } from '../../../core/services/notification.service';
 import { SeoService } from '../../../core/services/seo.service';
 import { GetOAuth2Response, CheckStatus } from '../../../core/models/hotmail.model';
@@ -20,7 +21,7 @@ interface OAuth2Result {
 @Component({
     selector: 'app-get-oauth2',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule, FormsModule],
+    imports: [CommonModule, ReactiveFormsModule, FormsModule, TranslateModule],
     templateUrl: './get-oauth2.component.html',
     styleUrls: ['./get-oauth2.component.scss']
 })

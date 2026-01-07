@@ -1,15 +1,15 @@
 <div class="get-code-page">
     <div class="container">
         <div class="page-header">
-            <h1><i class="bi bi-key me-2"></i> Get Code Email</h1>
-            <p>Lấy mã xác thực từ email Hotmail/Outlook</p>
+            <h1><i class="bi bi-key me-2"></i> {{ 'TOOLS.GET_CODE_MAIL' | translate }}</h1>
+            <p>{{ 'TOOLS.GET_CODE_MAIL_SUBTITLE' | translate }}</p>
         </div>
 
         <div class="get-code-card">
             <form [formGroup]="getCodeForm" (ngSubmit)="onGetCode()" class="get-code-form">
                 <!-- Type Get -->
                 <div class="form-row">
-                    <label class="form-label">Type Get</label>
+                    <label class="form-label">{{ 'TOOLS.TYPE_GET' | translate }}</label>
                     <div class="checkbox-group">
                         @for (type of getTypes; track type) {
                         <label class="checkbox-item" [class.active]="isGetTypeSelected(type)"
@@ -23,7 +23,8 @@
 
                 <!-- Email Type -->
                 <div class="form-row">
-                    <label class="form-label">Email <span class="email-count">[{{ emailCount }}]</span></label>
+                    <label class="form-label">{{ 'TOOLS.EMAIL_TYPES' | translate }} <span class="email-count">[{{
+                            emailCount }}]</span></label>
                     <div class="checkbox-group">
                         @for (emailType of emailTypes; track emailType) {
                         <label class="checkbox-item" [class.active]="isEmailTypeSelected(emailType)"
@@ -41,7 +42,7 @@
                         placeholder="email|password|refresh_token|client_id"></textarea>
                     <div class="textarea-hint">
                         <i class="bi bi-info-circle me-1"></i>
-                        Định dạng: email|password|refresh_token|client_id (mỗi dòng một email)
+                        {{ 'TOOLS.INPUT_FORMAT' | translate }}
                     </div>
                 </div>
 
@@ -49,20 +50,20 @@
                 <div class="action-buttons">
                     @if (isLoading) {
                     <button type="button" class="stop-btn" (click)="stopGetCode()">
-                        <i class="bi bi-stop-fill me-1"></i> Dừng
+                        <i class="bi bi-stop-fill me-1"></i> {{ 'TOOLS.STOP' | translate }}
                     </button>
                     }
                     @if (showResults) {
                     <button type="button" class="clear-btn" (click)="clearResults()">
-                        <i class="bi bi-trash me-1"></i> Clear
+                        <i class="bi bi-trash me-1"></i> {{ 'TOOLS.CLEAR' | translate }}
                     </button>
                     }
                     <button type="submit" class="get-code-btn" [disabled]="getCodeForm.invalid || isLoading">
                         @if (isLoading) {
                         <span class="spinner-border spinner-border-sm me-2"></span>
-                        Đang xử lý... ({{ progressPercent }}%)
+                        {{ 'TOOLS.PROCESSING' | translate }} ({{ progressPercent }}%)
                         } @else {
-                        <i class="bi bi-search me-2"></i> Get Code
+                        <i class="bi bi-search me-2"></i> {{ 'TOOLS.GET_CODE' | translate }}
                         }
                     </button>
                 </div>
@@ -72,7 +73,7 @@
             @if (showResults && totalCount > 0) {
             <div class="progress-section">
                 <div class="progress-info">
-                    <span>Tiến trình: {{ processedCount }}/{{ totalCount }}</span>
+                    <span>{{ 'TOOLS.PROGRESS' | translate }}: {{ processedCount }}/{{ totalCount }}</span>
                     <span>{{ progressPercent }}%</span>
                 </div>
                 <div class="progress-bar-wrapper">
@@ -85,27 +86,28 @@
             @if (showResults) {
             <div class="get-code-results">
                 <div class="results-header">
-                    <h4><i class="bi bi-list-ul me-2"></i> Kết quả ({{ successCount + failedCount + unknownCount }})
+                    <h4><i class="bi bi-list-ul me-2"></i> {{ 'TOOLS.RESULTS' | translate }} ({{ successCount +
+                        failedCount + unknownCount }})
                     </h4>
                 </div>
 
                 @if (allResults.length === 0 && !isLoading) {
                 <div class="no-results">
                     <i class="bi bi-inbox"></i>
-                    <p>Chưa có kết quả</p>
+                    <p>{{ 'TOOLS.NO_RESULT' | translate }}</p>
                 </div>
                 } @else {
                 <div class="results-table-wrapper">
                     <table class="results-table">
                         <thead>
                             <tr>
-                                <th>STT</th>
-                                <th>Email Info</th>
-                                <th>Status</th>
-                                <th>Kết quả</th>
-                                <th>Nội dung</th>
-                                <th>Thời gian</th>
-                                <th>Hành động</th>
+                                <th>{{ 'TABLE.NO' | translate }}</th>
+                                <th>{{ 'TOOLS.EMAIL_INFO' | translate }}</th>
+                                <th>{{ 'TABLE.STATUS' | translate }}</th>
+                                <th>{{ 'TOOLS.RESULT' | translate }}</th>
+                                <th>{{ 'TOOLS.CONTENT' | translate }}</th>
+                                <th>{{ 'TOOLS.TIME' | translate }}</th>
+                                <th>{{ 'TOOLS.ACTIONS' | translate }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -122,8 +124,9 @@
                                     <span class="status-badge" [class.success]="result.status === 'SUCCESS'"
                                         [class.error]="result.status === 'FAILED'"
                                         [class.unknown]="result.status === 'UNKNOWN'">
-                                        {{ result.status === 'SUCCESS' ? 'Thành công' : result.status === 'FAILED' ?
-                                        'Thất bại' : 'Unknown' }}
+                                        {{ result.status === 'SUCCESS' ? ('COMMON.SUCCESS' | translate) : result.status
+                                        === 'FAILED' ?
+                                        ('COMMON.ERROR' | translate) : ('COMMON.UNKNOWN' | translate) }}
                                     </span>
                                 </td>
                                 <td class="code">
@@ -132,7 +135,7 @@
                                         <span class="code-value">{{ result.code }}</span>
                                         <button type="button" class="btn btn-sm btn-copy"
                                             [class.copied]="copiedCode === result.code" (click)="copyCode(result.code)"
-                                            title="Sao chép">
+                                            [title]="'TOOLS.COPY' | translate">
                                             @if (copiedCode === result.code) {
                                             <i class="bi bi-check-circle-fill"></i>
                                             } @else {
@@ -148,11 +151,11 @@
                                 <td class="date">{{ result.date || '-' }}</td>
                                 <td class="actions">
                                     <button type="button" class="retry-btn" (click)="retryRow(result)"
-                                        [disabled]="result.retrying" title="Thử lại">
+                                        [disabled]="result.retrying" [title]="'TOOLS.RETRY' | translate">
                                         @if (result.retrying) {
                                         <span class="spinner-border spinner-border-sm"></span>
                                         } @else {
-                                        Thử lại
+                                        {{ 'TOOLS.RETRY' | translate }}
                                         }
                                     </button>
                                 </td>

@@ -2,6 +2,7 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { SeoService } from '../../../core/services/seo.service';
 import { RecaptchaService } from '../../../core/services/recaptcha.service';
@@ -13,7 +14,7 @@ declare const google: any;
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, TranslateModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
@@ -84,17 +85,17 @@ export class LoginComponent implements OnInit {
           if (response.success) {
             this.handleLoginSuccess();
           } else {
-            this.errorMessage = response.message || 'Đăng nhập thất bại';
+            this.errorMessage = response.message || 'Login failed';
             this.loading = false;
           }
         },
         error: (error) => {
-          this.errorMessage = error.error?.message || 'Có lỗi xảy ra';
+          this.errorMessage = error.error?.message || 'An error occurred';
           this.loading = false;
         }
       });
     } catch (error) {
-      this.errorMessage = 'Không thể xác thực captcha. Vui lòng thử lại.';
+      this.errorMessage = 'Could not verify captcha. Please try again.';
       this.loading = false;
     }
   }

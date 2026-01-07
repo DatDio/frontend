@@ -2,16 +2,13 @@
 
   <div class="hero-content">
     <div class="container">
-      <h1>EmailSieuRe chuyên cung cấp các tài khoản email chất lượng cao giá rẻ cho mục đích marketing và quảng cáo</h1>
+      <h1>{{ 'HOME.HERO_TITLE' | translate }}</h1>
       <p>
-        - Nghiêm cấm sử dụng tài khoản email với mục đích trái pháp luật
+        - {{ 'HOME.HERO_TEXT_1' | translate }}
       </p>
       <p>
-        - Chúng tôi không chịu trách nhiệm cho bất kì hành vi nào sử dụng tài nguyên sai mục đích.
+        - {{ 'HOME.HERO_TEXT_2' | translate }}
       </p>
-      <!-- <button class="cta-button">
-        <i class="bi bi-arrow-down me-2"></i> Bắt đầu ngay
-      </button> -->
     </div>
     <div class="hero-image">
       <img src="assets/images/ChatGPTImage2.png" alt="Hero Image">
@@ -22,8 +19,8 @@
   <section class="tools-section d-none d-lg-block">
     <div class="container">
       <div class="section-header">
-        <h2><i class="bi bi-tools me-2"></i>Công cụ tiện ích</h2>
-        <p>Các công cụ hỗ trợ marketing tự động</p>
+        <h2><i class="bi bi-tools me-2"></i>{{ 'TOOLS.TITLE' | translate }}</h2>
+        <p>{{ 'HOME.TOOLS_SUBTITLE' | translate }}</p>
       </div>
 
       <div class="tools-grid">
@@ -33,10 +30,10 @@
             <i class="bi bi-code-slash"></i>
           </div>
           <div class="tool-info">
-            <h4>Get Code</h4>
-            <p>Lấy mã OTP từ Hotmail</p>
+            <h4>{{ 'TOOLS.GET_CODE_MAIL' | translate }}</h4>
+            <p>{{ 'TOOLS.GET_CODE_MAIL_DESC' | translate }}</p>
           </div>
-          <span class="tool-status active">Hoạt động</span>
+          <span class="tool-status active">{{ 'COMMON.ACTIVE' | translate }}</span>
         </a>
 
         <!-- Check Live FB -->
@@ -45,10 +42,10 @@
             <i class="bi bi-facebook"></i>
           </div>
           <div class="tool-info">
-            <h4>Check Live FB</h4>
-            <p>Kiểm tra tài khoản Facebook</p>
+            <h4>{{ 'TOOLS.CHECK_LIVE_FB' | translate }}</h4>
+            <p>{{ 'TOOLS.CHECK_LIVE_FB_DESC' | translate }}</p>
           </div>
-          <span class="tool-status active">Hoạt động</span>
+          <span class="tool-status active">{{ 'COMMON.ACTIVE' | translate }}</span>
         </a>
 
         <!-- Check Live Mail -->
@@ -57,10 +54,10 @@
             <i class="bi bi-envelope-fill"></i>
           </div>
           <div class="tool-info">
-            <h4>Check Live Mail</h4>
-            <p>Kiểm tra live, die</p>
+            <h4>{{ 'TOOLS.CHECK_LIVE_MAIL' | translate }}</h4>
+            <p>{{ 'TOOLS.CHECK_LIVE_MAIL_DESC' | translate }}</p>
           </div>
-          <span class="tool-status active">Hoạt động</span>
+          <span class="tool-status active">{{ 'COMMON.ACTIVE' | translate }}</span>
         </a>
 
         <!-- Get 2FA -->
@@ -69,10 +66,10 @@
             <i class="bi bi-shield-lock-fill"></i>
           </div>
           <div class="tool-info">
-            <h4>Get 2FA</h4>
-            <p>Lấy mã xác thực 2 bước</p>
+            <h4>{{ 'TOOLS.GET_2FA' | translate }}</h4>
+            <p>{{ 'TOOLS.GET_2FA_DESC' | translate }}</p>
           </div>
-          <span class="tool-status active">Hoạt động</span>
+          <span class="tool-status active">{{ 'COMMON.ACTIVE' | translate }}</span>
         </a>
 
         <!-- Get OAuth2 -->
@@ -81,10 +78,10 @@
             <i class="bi bi-key-fill"></i>
           </div>
           <div class="tool-info">
-            <h4>Renew Refresh Token</h4>
-            <p>Renew refresh token</p>
+            <h4>{{ 'TOOLS.GET_OAUTH2' | translate }}</h4>
+            <p>{{ 'TOOLS.GET_OAUTH2_DESC' | translate }}</p>
           </div>
-          <span class="tool-status active">Hoạt động</span>
+          <span class="tool-status active">{{ 'COMMON.ACTIVE' | translate }}</span>
         </a>
 
         <!-- Read Mail -->
@@ -93,10 +90,10 @@
             <i class="bi bi-inbox-fill"></i>
           </div>
           <div class="tool-info">
-            <h4>Đọc Hòm Thư</h4>
-            <p>Đọc danh sách thư</p>
+            <h4>{{ 'TOOLS.READ_MAIL' | translate }}</h4>
+            <p>{{ 'TOOLS.READ_MAIL_DESC' | translate }}</p>
           </div>
-          <span class="tool-status active">Hoạt động</span>
+          <span class="tool-status active">{{ 'COMMON.ACTIVE' | translate }}</span>
         </a>
       </div>
     </div>
@@ -126,18 +123,18 @@
         <div class="product-list">
 
           <div class="product-header">
-            <div class="col-name"><i class="bi bi-envelope me-2"></i>Sản phẩm</div>
-            <div class="col-live"><i class="bi bi-hourglass-split me-2"></i>LiveTime</div>
-            <div class="col-country"><i class="bi bi-globe me-2"></i>Quốc gia</div>
-            <div class="col-price text-start"><i class="bi bi-tag me-2"></i>Giá</div>
-            <div class="col-quantity text-start"><i class="bi bi-cart me-2"></i>Số lượng</div>
+            <div class="col-name"><i class="bi bi-envelope me-2"></i>{{ 'HOME.PRODUCT' | translate }}</div>
+            <div class="col-live"><i class="bi bi-hourglass-split me-2"></i>{{ 'HOME.LIVETIME' | translate }}</div>
+            <div class="col-country"><i class="bi bi-globe me-2"></i>{{ 'HOME.COUNTRY' | translate }}</div>
+            <div class="col-price text-start"><i class="bi bi-tag me-2"></i>{{ 'HOME.PRICE' | translate }}</div>
+            <div class="col-quantity text-start"><i class="bi bi-cart me-2"></i>{{ 'HOME.QUANTITY' | translate }}</div>
             <div class="col-action"></div>
           </div>
 
           @for (product of category.products; track product.id) {
           <div class="product-item">
 
-            <div class="info-col" data-label="Sản phẩm">
+            <div class="info-col" [attr.data-label]="'HOME.PRODUCT' | translate">
               <div class="product-info-wrapper">
                 @if (product.imageUrl) {
                 <img [src]="product.imageUrl" alt="{{ product.name }}" class="product-image">
@@ -153,32 +150,32 @@
               </div>
             </div>
 
-            <div class="live-col" data-label="LiveTime">
+            <div class="live-col" [attr.data-label]="'HOME.LIVETIME' | translate">
               <span class="live-chip">{{ product.liveTime || '—' }}</span>
             </div>
 
-            <div class="country-col" data-label="Quốc gia">
+            <div class="country-col" [attr.data-label]="'HOME.COUNTRY' | translate">
               <span class="country-chip">
                 <i class="bi bi-flag me-1"></i>{{ product.country || '—' }}
               </span>
             </div>
 
-            <div class="price-col text-start" data-label="Giá">
+            <div class="price-col text-start" [attr.data-label]="'HOME.PRICE' | translate">
               <div class="price">{{ product.price | number }} VNĐ</div>
             </div>
 
-            <div class="quantity-col text-start" data-label="Số lượng">
+            <div class="quantity-col text-start" [attr.data-label]="'HOME.QUANTITY' | translate">
               <div class="quantity-box">{{ product.quantity | number }}</div>
             </div>
 
-            <div class="action-col" data-label="Thao tác">
+            <div class="action-col" [attr.data-label]="'COMMON.ACTION' | translate">
               @if (product.quantity > 0) {
               <button class="buy-btn" (click)="prepareOrder(product)">
-                <i class="bi bi-plus me-1"></i> Mua
+                <i class="bi bi-plus me-1"></i> {{ 'COMMON.BUY' | translate }}
               </button>
               } @else {
               <button class="buy-btn sold-out" disabled>
-                <i class="bi bi-x-circle me-1"></i> Hết hàng
+                <i class="bi bi-x-circle me-1"></i> {{ 'COMMON.OUT_OF_STOCK' | translate }}
               </button>
               }
             </div>
@@ -209,7 +206,7 @@
 
       <div class="modal-header">
         <h5 class="modal-title" id="orderModalLabel">
-          <i class="bi bi-cart me-2"></i>Xác nhận đơn hàng
+          <i class="bi bi-cart me-2"></i>{{ 'ORDER.CONFIRM_ORDER' | translate }}
         </h5>
         <button type="button" class="btn-close" (click)="closeOrderModal()" aria-label="Close"></button>
       </div>
@@ -217,39 +214,40 @@
       <div class="modal-body" *ngIf="selectedProduct">
         <div class="alert alert-info mb-4">
           <div class="fw-bold">{{ selectedProduct.name }}</div>
-          <div class="small">Đơn giá: {{ selectedProduct.price | number }} VNĐ</div>
+          <div class="small">{{ 'ORDER.UNIT_PRICE' | translate }}: {{ selectedProduct.price | number }} VNĐ</div>
         </div>
 
         <form [formGroup]="orderForm" (ngSubmit)="onSubmitOrder()">
           <div class="mb-3">
-            <label for="quantity" class="form-label">Số lượng mua:</label>
+            <label for="quantity" class="form-label">{{ 'ORDER.QUANTITY' | translate }}:</label>
             <input type="number" id="quantity" class="form-control" formControlName="quantity" min="1" max="1000"
               [class.is-invalid]="orderForm.get('quantity')?.invalid && orderForm.get('quantity')?.touched">
 
             <div class="invalid-feedback d-block"
               *ngIf="orderForm.get('quantity')?.errors?.['required'] && orderForm.get('quantity')?.touched">
-              Vui lòng nhập số lượng.
+              {{ 'VALIDATION.REQUIRED' | translate }}
             </div>
             <div class="invalid-feedback d-block" *ngIf="orderForm.get('quantity')?.errors?.['min']">
-              Số lượng tối thiểu là 1.
+              {{ 'VALIDATION.MIN_VALUE' | translate }}
             </div>
           </div>
 
           <div class="bg-light p-3 rounded d-flex justify-content-between align-items-center">
-            <span class="fw-bold text-dark">Thành tiền:</span>
+            <span class="fw-bold text-dark">{{ 'ORDER.TOTAL_PAYMENT' | translate }}:</span>
             <span class="fw-bold text-primary fs-5">{{ totalPrice | number }} VNĐ</span>
           </div>
         </form>
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="closeOrderModal()">Hủy bỏ</button>
+        <button type="button" class="btn btn-secondary" (click)="closeOrderModal()">{{ 'COMMON.CANCEL' | translate
+          }}</button>
         <button type="button" class="btn btn-primary" [disabled]="orderForm.invalid || orderLoading"
           (click)="onSubmitOrder()">
           <span *ngIf="orderLoading" class="spinner-border spinner-border-sm me-2" role="status"
             aria-hidden="true"></span>
           <i class="bi bi-check me-2" *ngIf="!orderLoading"></i>
-          {{ orderLoading ? 'Đang xử lý...' : 'Xác nhận mua' }}
+          {{ orderLoading ? ('COMMON.PROCESSING' | translate) : ('ORDER.CONFIRM_BUY' | translate) }}
         </button>
       </div>
 

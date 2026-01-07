@@ -1,41 +1,23 @@
 ﻿<div class="support-page py-4">
-    <h2 class="mb-3 support-title">Hỗ Trợ</h2>
+    <h2 class="mb-3 support-title">{{ 'SUPPORT.TITLE' | translate }}</h2>
 
     <p class="support-intro">
-        Gặp vấn đề về Dịch vụ? Vui lòng liên hệ admin để được xử lý nhanh nhất có thể!
+        {{ 'SUPPORT.DESCRIPTION' | translate }}
     </p>
 
     <!-- Liên hệ qua Telegram -->
-    <h3 class="section-title">Liên hệ qua Telegram</h3>
+    <h3 class="section-title">{{ 'SUPPORT.CONTACT_US' | translate }}</h3>
 
     <ul class="contact-list">
         <li>
             <a [href]="telegramGroupUrl" target="_blank" rel="noopener noreferrer">
-                <i class="bi bi-telegram me-2"></i>Group Chat - Tham gia nhóm chat hỗ trợ
+                <i class="bi bi-telegram me-2"></i>{{ 'FOOTER.GROUP_CHAT' | translate }}
             </a>
         </li>
         <li>
             <a [href]="telegramChannelUrl" target="_blank" rel="noopener noreferrer">
-                <i class="bi bi-telegram me-2"></i>Liên hệ Admin
+                <i class="bi bi-telegram me-2"></i>{{ 'FOOTER.CONTACT_ADMIN' | translate }}
             </a>
-        </li>
-    </ul>
-
-    <!-- Câu hỏi thường gặp -->
-    <h3 class="section-title">Câu hỏi thường gặp</h3>
-
-    <ul class="faq-list">
-        <li>
-            <strong>Thời gian phản hồi?</strong>
-            <p>Chúng tôi sẽ phản hồi trong vòng 5-30 phút trong giờ làm việc.</p>
-        </li>
-        <li>
-            <strong>Bảo mật thông tin?</strong>
-            <p>Mọi thông tin của bạn đều được bảo mật tuyệt đối.</p>
-        </li>
-        <li>
-            <strong>Chính sách hoàn tiền?</strong>
-            <p>Liên hệ admin để được hỗ trợ xử lý các vấn đề về hoàn tiền.</p>
         </li>
     </ul>
 </div>

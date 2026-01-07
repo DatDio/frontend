@@ -1,115 +1,93 @@
 <div class="auth-container">
   <div class="auth-card">
     <div class="text-center mb-4">
-      <h2 class="auth-card__title">Tạo tài khoản</h2>
-      <p class="text-muted">Đăng ký để bắt đầu</p>
+      <h2 class="auth-card__title">{{ 'AUTH.CREATE_ACCOUNT' | translate }}</h2>
+      <p class="text-muted">{{ 'AUTH.REGISTER_SUBTITLE' | translate }}</p>
     </div>
 
     @if (errorMessage) {
-      <div class="alert alert-danger" role="alert">
-        {{ errorMessage }}
-      </div>
+    <div class="alert alert-danger" role="alert">
+      {{ errorMessage }}
+    </div>
     }
 
     <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
       <div class="mb-3">
-        <label for="email" class="form-label">Email</label>
-        <input
-          type="email"
-          class="form-control"
-          id="email"
-          formControlName="email"
-          placeholder="Nhập email của bạn"
-          [class.is-invalid]="email?.invalid && email?.touched"
-        >
+        <label for="email" class="form-label">{{ 'AUTH.EMAIL' | translate }}</label>
+        <input type="email" class="form-control" id="email" formControlName="email"
+          [placeholder]="'AUTH.EMAIL_PLACEHOLDER' | translate" [class.is-invalid]="email?.invalid && email?.touched">
         @if (email?.invalid && email?.touched) {
-          <div class="invalid-feedback">
-            @if (email?.errors?.['required']) {
-              <span>Email là bắt buộc</span>
-            }
-            @if (email?.errors?.['email']) {
-              <span>Vui lòng nhập email hợp lệ</span>
-            }
-          </div>
+        <div class="invalid-feedback">
+          @if (email?.errors?.['required']) {
+          <span>{{ 'VALIDATION.REQUIRED' | translate }}</span>
+          }
+          @if (email?.errors?.['email']) {
+          <span>{{ 'VALIDATION.EMAIL_INVALID' | translate }}</span>
+          }
+        </div>
         }
       </div>
 
       <div class="mb-3">
-        <label for="fullName" class="form-label">Tên người dùng</label>
-        <input
-          type="text"
-          class="form-control"
-          id="fullName"
-          formControlName="fullName"
-          placeholder="Chọn tên người dùng"
-          [class.is-invalid]="fullName?.invalid && fullName?.touched"
-        >
+        <label for="fullName" class="form-label">{{ 'COMMON.NAME' | translate }}</label>
+        <input type="text" class="form-control" id="fullName" formControlName="fullName"
+          [placeholder]="'COMMON.NAME' | translate" [class.is-invalid]="fullName?.invalid && fullName?.touched">
         @if (fullName?.invalid && fullName?.touched) {
-          <div class="invalid-feedback">
-            @if (fullName?.errors?.['required']) {
-              <span>Tên người dùng là bắt buộc</span>
-            }
-            @if (fullName?.errors?.['minlength']) {
-              <span>Tên người dùng phải có ít nhất 3 ký tự</span>
-            }
-          </div>
+        <div class="invalid-feedback">
+          @if (fullName?.errors?.['required']) {
+          <span>{{ 'VALIDATION.REQUIRED' | translate }}</span>
+          }
+          @if (fullName?.errors?.['minlength']) {
+          <span>{{ 'VALIDATION.MIN_LENGTH' | translate:{ min: 3 } }}</span>
+          }
+        </div>
         }
       </div>
 
       <div class="mb-3">
-        <label for="password" class="form-label">Mật khẩu</label>
-        <input
-          type="password"
-          class="form-control"
-          id="password"
-          formControlName="password"
-          placeholder="Nhập mật khẩu của bạn"
-          [class.is-invalid]="password?.invalid && password?.touched"
-        >
+        <label for="password" class="form-label">{{ 'AUTH.PASSWORD' | translate }}</label>
+        <input type="password" class="form-control" id="password" formControlName="password"
+          [placeholder]="'AUTH.PASSWORD_PLACEHOLDER' | translate"
+          [class.is-invalid]="password?.invalid && password?.touched">
         @if (password?.invalid && password?.touched) {
-          <div class="invalid-feedback">
-            @if (password?.errors?.['required']) {
-              <span>Mật khẩu không được để trống</span>
-            }
-            @if (password?.errors?.['minlength']) {
-              <span>Mật khẩu phải có ít nhất 6 ký tự</span>
-            }
-          </div>
+        <div class="invalid-feedback">
+          @if (password?.errors?.['required']) {
+          <span>{{ 'VALIDATION.REQUIRED' | translate }}</span>
+          }
+          @if (password?.errors?.['minlength']) {
+          <span>{{ 'AUTH.PASSWORD_MIN_LENGTH' | translate }}</span>
+          }
+        </div>
         }
       </div>
 
       <div class="mb-3">
-        <label for="confirmPassword" class="form-label">Xác nhận mật khẩu</label>
-        <input
-          type="password"
-          class="form-control"
-          id="confirmPassword"
-          formControlName="confirmPassword"
-          placeholder="Xác nhận mật khẩu của bạn"
-          [class.is-invalid]="(confirmPassword?.invalid && confirmPassword?.touched) || registerForm.errors?.['passwordMismatch']"
-        >
+        <label for="confirmPassword" class="form-label">{{ 'AUTH.CONFIRM_PASSWORD' | translate }}</label>
+        <input type="password" class="form-control" id="confirmPassword" formControlName="confirmPassword"
+          [placeholder]="'AUTH.CONFIRM_PASSWORD_PLACEHOLDER' | translate"
+          [class.is-invalid]="(confirmPassword?.invalid && confirmPassword?.touched) || registerForm.errors?.['passwordMismatch']">
         @if (registerForm.errors?.['passwordMismatch'] && confirmPassword?.touched) {
-          <div class="invalid-feedback d-block">
-            <span>Mật khẩu không khớp</span>
-          </div>
+        <div class="invalid-feedback d-block">
+          <span>{{ 'AUTH.PASSWORD_MISMATCH' | translate }}</span>
+        </div>
         }
       </div>
 
       <div class="d-grid gap-2 mb-3">
         <button type="submit" class="btn btn-primary" [disabled]="loading">
           @if (loading) {
-            <span class="spinner-border spinner-border-sm me-2"></span>
-            Đang tạo tài khoản...
+          <span class="spinner-border spinner-border-sm me-2"></span>
+          {{ 'COMMON.PROCESSING' | translate }}
           } @else {
-            Đăng ký
+          {{ 'AUTH.REGISTER' | translate }}
           }
         </button>
       </div>
 
       <div class="text-center">
         <p class="mb-0">
-          Bạn đã có tài khoản?
-          <a routerLink="/auth/login" class="text-decoration-none">Đăng nhập</a>
+          {{ 'AUTH.ALREADY_HAVE_ACCOUNT' | translate }}
+          <a routerLink="/auth/login" class="text-decoration-none">{{ 'AUTH.LOGIN' | translate }}</a>
         </p>
       </div>
     </form>

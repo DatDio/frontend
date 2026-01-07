@@ -1,6 +1,7 @@
 ﻿import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { NotificationService } from '../../../core/services/notification.service';
 import { SeoService } from '../../../core/services/seo.service';
 import { HotmailApi } from '../../../Utils/apis/hotmail/hotmail.api';
@@ -29,7 +30,7 @@ interface ReadMailResult {
 @Component({
     selector: 'app-read-mail',
     standalone: true,
-    imports: [CommonModule, ReactiveFormsModule],
+    imports: [CommonModule, ReactiveFormsModule, TranslateModule],
     templateUrl: './read-mail.component.html',
     styleUrls: ['./read-mail.component.scss']
 })

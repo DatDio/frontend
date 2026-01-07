@@ -1,8 +1,8 @@
 <div class="tool-page">
     <div class="container">
         <div class="page-header">
-            <h1><i class="bi bi-facebook me-2"></i> Check Live Facebook</h1>
-            <p>Kiểm tra trạng thái hoạt động của tài khoản Facebook bằng UID</p>
+            <h1><i class="bi bi-facebook me-2"></i> {{ 'TOOLS.CHECK_LIVE_FB_TITLE' | translate }}</h1>
+            <p>{{ 'TOOLS.CHECK_LIVE_FB_SUBTITLE' | translate }}</p>
         </div>
 
         <div class="tool-card">
@@ -10,13 +10,13 @@
                 <!-- UID Input -->
                 <div class="form-row">
                     <label class="form-label">
-                        UID Facebook <span class="item-count">[{{ uidCount }}]</span>
+                        {{ 'TOOLS.UID_FACEBOOK_LABEL' | translate }} <span class="item-count">[{{ uidCount }}]</span>
                     </label>
                     <textarea formControlName="uidData" class="data-textarea" rows="8"
-                        placeholder="Nhập UID, mỗi dòng một UID&#10;100000123456789&#10;100000987654321"></textarea>
+                        [placeholder]="'TOOLS.UID_PLACEHOLDER' | translate"></textarea>
                     <div class="textarea-hint">
                         <i class="bi bi-info-circle me-1"></i>
-                        Mỗi dòng một UID Facebook
+                        {{ 'TOOLS.UID_HINT' | translate }}
                     </div>
                 </div>
 
@@ -24,7 +24,7 @@
                 <div class="form-row options-row">
                     <label class="checkbox-label">
                         <input type="checkbox" [(ngModel)]="removeDuplicate" [ngModelOptions]="{standalone: true}">
-                        <span>Loại bỏ UID trùng lặp</span>
+                        <span>{{ 'TOOLS.REMOVE_DUPLICATE_UID' | translate }}</span>
                     </label>
                 </div>
 
@@ -33,14 +33,14 @@
                     <button type="submit" class="submit-btn" [disabled]="checkForm.invalid || isLoading">
                         @if (isLoading) {
                         <span class="spinner-border spinner-border-sm me-2"></span>
-                        Đang kiểm tra...
+                        {{ 'TOOLS.CHECKING' | translate }}
                         } @else {
-                        <i class="bi bi-search me-2"></i> Check Live
+                        <i class="bi bi-search me-2"></i> {{ 'TOOLS.START_CHECK' | translate }}
                         }
                     </button>
                     @if (isLoading) {
                     <button type="button" class="stop-btn" (click)="stopCheck()">
-                        <i class="bi bi-stop-fill me-1"></i> Dừng
+                        <i class="bi bi-stop-fill me-1"></i> {{ 'TOOLS.STOP' | translate }}
                     </button>
                     }
                 </div>
@@ -50,7 +50,7 @@
             @if (showResults && totalCount > 0) {
             <div class="progress-section">
                 <div class="progress-info">
-                    <span>Tiến trình: {{ processedCount }}/{{ totalCount }}</span>
+                    <span>{{ 'TOOLS.PROGRESS' | translate }}: {{ processedCount }}/{{ totalCount }}</span>
                     <span>{{ progressPercent }}%</span>
                 </div>
                 <div class="progress-bar-wrapper">
@@ -63,19 +63,20 @@
             @if (showResults) {
             <div class="results-section">
                 <div class="results-header">
-                    <h4><i class="bi bi-list-ul me-2"></i> Kết quả</h4>
+                    <h4><i class="bi bi-list-ul me-2"></i> {{ 'TOOLS.RESULTS' | translate }}</h4>
                     <div class="results-actions">
                         <button type="button" class="copy-success-btn" (click)="copyAllLive()">
-                            <i class="bi bi-clipboard me-1"></i> Copy Live ({{ liveCount }})
+                            <i class="bi bi-clipboard me-1"></i> {{ 'TOOLS.COPY_LIVE' | translate }} ({{ liveCount }})
                         </button>
                         <button type="button" class="copy-error-btn" (click)="copyAllDie()">
-                            <i class="bi bi-clipboard me-1"></i> Copy Die ({{ dieCount }})
+                            <i class="bi bi-clipboard me-1"></i> {{ 'TOOLS.COPY_DIE' | translate }} ({{ dieCount }})
                         </button>
                         <button type="button" class="copy-unknown-btn" (click)="copyAllUnknown()">
-                            <i class="bi bi-clipboard me-1"></i> Copy Unknown ({{ unknownCount }})
+                            <i class="bi bi-clipboard me-1"></i> {{ 'TOOLS.COPY_UNKNOWN' | translate }} ({{ unknownCount
+                            }})
                         </button>
                         <button type="button" class="clear-btn" (click)="clearResults()">
-                            <i class="bi bi-x me-1"></i> Xóa
+                            <i class="bi bi-x me-1"></i> {{ 'TOOLS.DELETE' | translate }}
                         </button>
                     </div>
                 </div>
@@ -85,7 +86,8 @@
                     <!-- Live Column -->
                     <div class="result-column live-column">
                         <div class="column-header success">
-                            <i class="bi bi-check-circle-fill me-1"></i> Live ({{ liveCount }})
+                            <i class="bi bi-check-circle-fill me-1"></i> {{ 'TOOLS.LIVE' | translate }} ({{ liveCount
+                            }})
                         </div>
                         <div class="column-content">
                             @for (result of liveResults; track result.uid) {
@@ -94,7 +96,7 @@
                             </div>
                             }
                             @if (liveResults.length === 0) {
-                            <div class="empty-message">Chưa có kết quả</div>
+                            <div class="empty-message">{{ 'TOOLS.EMPTY_RESULT' | translate }}</div>
                             }
                         </div>
                     </div>
@@ -102,7 +104,7 @@
                     <!-- Die Column -->
                     <div class="result-column die-column">
                         <div class="column-header error">
-                            <i class="bi bi-x-circle-fill me-1"></i> Die ({{ dieCount }})
+                            <i class="bi bi-x-circle-fill me-1"></i> {{ 'TOOLS.DIE' | translate }} ({{ dieCount }})
                         </div>
                         <div class="column-content">
                             @for (result of dieResults; track result.uid) {
@@ -111,7 +113,7 @@
                             </div>
                             }
                             @if (dieResults.length === 0) {
-                            <div class="empty-message">Chưa có kết quả</div>
+                            <div class="empty-message">{{ 'TOOLS.EMPTY_RESULT' | translate }}</div>
                             }
                         </div>
                     </div>
@@ -119,7 +121,8 @@
                     <!-- Unknown Column -->
                     <div class="result-column unknown-column">
                         <div class="column-header warning">
-                            <i class="bi bi-question-circle-fill me-1"></i> Unknown ({{ unknownCount }})
+                            <i class="bi bi-question-circle-fill me-1"></i> {{ 'TOOLS.UNKNOWN' | translate }} ({{
+                            unknownCount }})
                         </div>
                         <div class="column-content">
                             @for (result of unknownResults; track result.uid) {
@@ -128,7 +131,7 @@
                             </div>
                             }
                             @if (unknownResults.length === 0) {
-                            <div class="empty-message">Chưa có kết quả</div>
+                            <div class="empty-message">{{ 'TOOLS.EMPTY_RESULT' | translate }}</div>
                             }
                         </div>
                     </div>

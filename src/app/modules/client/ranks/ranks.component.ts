@@ -1,5 +1,6 @@
 ﻿import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { RankService } from '../../../core/services/rank.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
@@ -9,7 +10,7 @@ import { Rank, UserRankInfo } from '../../../core/models/rank.model';
 @Component({
     selector: 'app-ranks',
     standalone: true,
-    imports: [CommonModule],
+    imports: [CommonModule, TranslateModule],
     templateUrl: './ranks.component.html',
     styleUrls: ['./ranks.component.scss']
 })

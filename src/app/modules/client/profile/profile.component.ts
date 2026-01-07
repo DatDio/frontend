@@ -3,6 +3,7 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { finalize } from 'rxjs/operators';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { User } from '../../../core/models/user.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
@@ -20,7 +21,7 @@ declare var bootstrap: any;
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ActiveStatusBadgeComponent, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, ActiveStatusBadgeComponent, RouterModule, TranslateModule],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })
@@ -32,6 +33,7 @@ export class ProfileComponent implements OnInit {
   private readonly formBuilder = inject(FormBuilder);
   private readonly apiKeyService = inject(ApiKeyService);
   private readonly confirmService = inject(ConfirmService);
+  private readonly translateService = inject(TranslateService);
 
   profileForm!: FormGroup;
   changePasswordForm!: FormGroup;
@@ -155,10 +157,10 @@ export class ProfileComponent implements OnInit {
 
   async onDeleteApiKey(id: number): Promise<void> {
     const confirmed = await this.confirmService.confirm({
-      title: 'Xác nhận xóa',
-      message: 'Bạn có chắc chắn muốn xóa API Key này không?',
-      confirmText: 'Xóa',
-      cancelText: 'Hủy'
+      title: this.translateService.instant('CONFIRM.DELETE_TITLE'),
+      message: this.translateService.instant('CONFIRM.DELETE_API_KEY_MESSAGE'),
+      confirmText: this.translateService.instant('COMMON.DELETE'),
+      cancelText: this.translateService.instant('COMMON.CANCEL')
     });
 
     if (!confirmed) return;

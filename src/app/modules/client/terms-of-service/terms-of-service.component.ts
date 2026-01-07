@@ -1,11 +1,12 @@
 ﻿import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { SeoService } from '../../../core/services/seo.service';
 
 @Component({
   selector: 'app-terms-of-service',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslateModule],
   templateUrl: './terms-of-service.component.html',
   styleUrls: ['./terms-of-service.component.scss']
 })
