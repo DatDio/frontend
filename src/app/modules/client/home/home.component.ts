@@ -75,7 +75,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private initOrderForm(): void {
     this.orderForm = this.formBuilder.group({
-      quantity: [1, [Validators.required, Validators.min(1), Validators.max(1000)]]
+      quantity: [1, [Validators.required, Validators.min(1)]]
     });
   }
 
