@@ -220,7 +220,7 @@
         <form [formGroup]="orderForm" (ngSubmit)="onSubmitOrder()">
           <div class="mb-3">
             <label for="quantity" class="form-label">{{ 'ORDER.QUANTITY' | translate }}:</label>
-            <input type="number" id="quantity" class="form-control" formControlName="quantity" min="1" max="1000"
+            <input type="number" id="quantity" class="form-control" formControlName="quantity" min="1"
               [class.is-invalid]="orderForm.get('quantity')?.invalid && orderForm.get('quantity')?.touched">
 
             <div class="invalid-feedback d-block"
