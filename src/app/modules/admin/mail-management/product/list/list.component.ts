@@ -218,7 +218,7 @@ export class MailManagementListComponent implements OnInit {
   async onDeleteClick(id: number): Promise<void> {
     const confirmed = await this.confirmService.confirm({
       title: 'Xác nhận xóa',
-      message: 'Bạn có chắc muốn xóa sản phẩm này?',
+      message: 'Bạn có chắc muốn xóa sản phẩm này và toàn bộ mail của sản phẩm này?',
       confirmText: 'Xóa',
       cancelText: 'Hủy'
     });
