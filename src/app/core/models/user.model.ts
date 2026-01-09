@@ -23,6 +23,8 @@ export interface User {
   totalSpent?: number;
 
   rank?: UserRankInfo;
+  isCollaborator?: boolean;
+  bonusPercent?: number;
 }
 
 export interface CreateUserRequest {
@@ -43,6 +45,8 @@ export interface UpdateUserRequest {
   address?: string;
   roles?: string[];
   status: number;
+  isCollaborator?: boolean;
+  bonusPercent?: number;
 }
 
 export interface UserFilter extends PageFilter {
@@ -50,6 +54,7 @@ export interface UserFilter extends PageFilter {
   username?: string;
   role?: string;
   status?: string;
+  isCollaborator?: boolean;
 }
 
 export interface LoginRequest {

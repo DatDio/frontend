@@ -1,0 +1,111 @@
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white text-center">
+                    <h4 class="mb-0">
+                        {{ 'COLLABORATOR.TITLE' | translate }}
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Loading -->
+                    <div *ngIf="loading" class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">{{ 'COLLABORATOR.LOADING' | translate }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div *ngIf="!loading">
+                        <!-- Already Collaborator -->
+                        <div *ngIf="isCollaborator" class="text-center py-4">
+                            <div class="mb-4">
+                                <i class="bi bi-patch-check-fill text-success" style="font-size: 4rem;"></i>
+                            </div>
+                            <h4 class="text-success mb-3">{{ 'COLLABORATOR.ALREADY_COLLABORATOR' | translate }}</h4>
+                            <div class="alert alert-success d-inline-block">
+                                <i class="bi bi-gift me-2"></i>
+                                <strong>{{ 'COLLABORATOR.YOUR_BENEFIT' | translate }}:</strong> {{
+                                'COLLABORATOR.BONUS_ON_DEPOSIT' | translate: { percent: bonusPercent } }}
+                            </div>
+                            <p class="text-muted mt-3">
+                                {{ 'COLLABORATOR.AUTO_APPLY_NOTE' | translate }}
+                            </p>
+                        </div>
+
+                        <!-- Not Collaborator -->
+                        <div *ngIf="!isCollaborator">
+                            <div class="text-center mb-4">
+                                <i class="bi bi-stars text-warning" style="font-size: 3rem;"></i>
+                                <h5 class="mt-3">{{ 'COLLABORATOR.BECOME_COLLABORATOR' | translate }}</h5>
+                            </div>
+
+                            <!-- Benefits -->
+                            <div class="row mb-4">
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-start">
+                                        <i class="bi bi-percent text-primary fs-4 me-3"></i>
+                                        <div>
+                                            <h6 class="mb-1">{{ 'COLLABORATOR.SPECIAL_DISCOUNT' | translate }}</h6>
+                                            <p class="text-muted mb-0 small">{{ 'COLLABORATOR.SPECIAL_DISCOUNT_DESC' |
+                                                translate }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-start">
+                                        <i class="bi bi-lightning-charge text-warning fs-4 me-3"></i>
+                                        <div>
+                                            <h6 class="mb-1">{{ 'COLLABORATOR.PRIORITY_SUPPORT' | translate }}</h6>
+                                            <p class="text-muted mb-0 small">{{ 'COLLABORATOR.PRIORITY_SUPPORT_DESC' |
+                                                translate }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-start">
+                                        <i class="bi bi-infinity text-info fs-4 me-3"></i>
+                                        <div>
+                                            <h6 class="mb-1">{{ 'COLLABORATOR.FOREVER_APPLY' | translate }}</h6>
+                                            <p class="text-muted mb-0 small">{{ 'COLLABORATOR.FOREVER_APPLY_DESC' |
+                                                translate }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <div class="d-flex align-items-start">
+                                        <i class="bi bi-shield-check text-success fs-4 me-3"></i>
+                                        <div>
+                                            <h6 class="mb-1">{{ 'COLLABORATOR.AUTO_APPLY' | translate }}</h6>
+                                            <p class="text-muted mb-0 small">{{ 'COLLABORATOR.AUTO_APPLY_DESC' |
+                                                translate }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <!-- Contact -->
+                            <div class="text-center">
+                                <h5 class="mb-3">{{ 'COLLABORATOR.CONTACT_ADMIN' | translate }}</h5>
+                                <p class="text-muted mb-4">
+                                    {{ 'COLLABORATOR.CONTACT_TELEGRAM' | translate }}
+                                </p>
+                                <a *ngIf="telegramChannel" [href]="telegramUrl" target="_blank"
+                                    class="btn btn-lg btn-primary">
+                                    <i class="bi bi-telegram me-2"></i>
+                                    {{ 'COLLABORATOR.CONTACT_VIA_TELEGRAM' | translate }}
+                                </a>
+                                <div *ngIf="!telegramChannel" class="text-muted">
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    {{ 'COLLABORATOR.UPDATING_CONTACT' | translate }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

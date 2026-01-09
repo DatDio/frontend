@@ -48,7 +48,9 @@ export class UsersUpdateComponent implements OnInit {
       phone: [''],
       address: [''],
       roles: ['USER', Validators.required],
-      status: [1]
+      status: [1],
+      isCollaborator: [false],
+      bonusPercent: [0, [Validators.min(0), Validators.max(100)]]
     });
   }
 
@@ -66,7 +68,9 @@ export class UsersUpdateComponent implements OnInit {
             phone: user.phone || '',
             address: user.address || '',
             roles: user.roles && user.roles.length > 0 ? user.roles[0] : 'USER',
-            status: user.status ?? 1
+            status: user.status ?? 1,
+            isCollaborator: user.isCollaborator ?? false,
+            bonusPercent: user.bonusPercent ?? 0
           });
         } else {
           this.#notificationService.error(response.message || 'Không thể tải thông tin người dùng');
@@ -97,7 +101,9 @@ export class UsersUpdateComponent implements OnInit {
       phone: formValue.phone || undefined,
       address: formValue.address || undefined,
       roles: [formValue.roles],
-      status: Number(formValue.status)
+      status: Number(formValue.status),
+      isCollaborator: formValue.isCollaborator,
+      bonusPercent: formValue.isCollaborator ? Number(formValue.bonusPercent) : 0
     };
 
     this.#userService.update(request).subscribe({
@@ -144,4 +150,13 @@ export class UsersUpdateComponent implements OnInit {
   get status() {
     return this.form.get('status');
   }
+
+  get isCollaborator() {
+    return this.form.get('isCollaborator');
+  }
+
+  get bonusPercent() {
+    return this.form.get('bonusPercent');
+  }
 }
+

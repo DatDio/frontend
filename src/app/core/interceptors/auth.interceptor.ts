@@ -31,16 +31,18 @@ const getCurrentLanguage = (platformId: Object): string => {
 };
 
 /**
- * Add language query parameter to API requests.
- * This allows the backend to return localized error messages.
+ * Add Accept-Language header to API requests.
+ * This allows the backend to return localized messages.
+ * Note: Users can also use ?lang= query param for API integration (e.g., tools, scripts).
  */
-const addLanguageParam = (request: HttpRequest<any>, lang: string): HttpRequest<any> => {
-  // Only add lang param to API requests (not static assets)
+const addLanguageHeader = (request: HttpRequest<any>, lang: string): HttpRequest<any> => {
+  // Only add header to API requests (not static assets)
   if (request.url.includes('/api/')) {
-    // Check if URL already has query params
-    const separator = request.url.includes('?') ? '&' : '?';
-    const urlWithLang = `${request.url}${separator}lang=${lang}`;
-    return request.clone({ url: urlWithLang });
+    return request.clone({
+      setHeaders: {
+        'Accept-Language': lang
+      }
+    });
   }
   return request;
 };
@@ -84,7 +86,7 @@ const handle401Error = (request: HttpRequest<any>, next: any, authService: AuthS
 /**
  * Auth interceptor that:
  * 1. Adds JWT token to Authorization header
- * 2. Adds language query parameter to API requests
+ * 2. Adds Accept-Language header to API requests
  * 3. Handles 401 errors with token refresh
  */
 export const authInterceptor: HttpInterceptorFn = (request, next): Observable<HttpEvent<any>> => {
@@ -99,8 +101,8 @@ export const authInterceptor: HttpInterceptorFn = (request, next): Observable<Ht
     request = addToken(request, token);
   }
 
-  // Add language parameter for API requests
-  request = addLanguageParam(request, currentLang);
+  // Add Accept-Language header for API requests
+  request = addLanguageHeader(request, currentLang);
 
   return next(request).pipe(
     catchError((error: HttpErrorResponse) => {
@@ -111,3 +113,4 @@ export const authInterceptor: HttpInterceptorFn = (request, next): Observable<Ht
     })
   );
 };
+

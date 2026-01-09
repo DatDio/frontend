@@ -97,7 +97,8 @@
         "LIGHT_THEME": "Light Mode",
         "DARK_THEME": "Dark Mode",
         "CREATED_DATE": "Created Date",
-        "UNKNOWN": "Unknown"
+        "UNKNOWN": "Unknown",
+        "COLLABORATOR": "Collaborator"
     },
     "PAGINATION": {
         "RECORDS_PER_PAGE": "Records per page",
@@ -492,7 +493,7 @@
         "NEXT_RANK": "Next rank",
         "PROGRESS": "Progress",
         "BENEFITS": "Benefits",
-        "DISCOUNT": "Discount",
+        "BONUS": "Bonus",
         "MIN_SPENT": "Minimum spent",
         "NO_RANKS": "No rank information available"
     },
@@ -626,5 +627,26 @@
     "CONFIRM": {
         "DELETE_TITLE": "Confirm Delete",
         "DELETE_API_KEY_MESSAGE": "Are you sure you want to delete this API Key?"
+    },
+    "COLLABORATOR": {
+        "TITLE": "Collaborator Program",
+        "LOADING": "Loading...",
+        "ALREADY_COLLABORATOR": "You are already a Collaborator!",
+        "YOUR_BENEFIT": "Your benefits",
+        "BONUS_ON_DEPOSIT": "+{{percent}}% bonus when depositing",
+        "AUTO_APPLY_NOTE": "Bonus will be automatically added when you deposit.",
+        "BECOME_COLLABORATOR": "Become a Collaborator to get benefits!",
+        "SPECIAL_DISCOUNT": "Deposit bonus",
+        "SPECIAL_DISCOUNT_DESC": "Get extra % when depositing",
+        "PRIORITY_SUPPORT": "Priority support",
+        "PRIORITY_SUPPORT_DESC": "Fast support from Admin",
+        "FOREVER_APPLY": "Forever applicable",
+        "FOREVER_APPLY_DESC": "Unlimited benefits",
+        "AUTO_APPLY": "Auto apply",
+        "AUTO_APPLY_DESC": "No code required",
+        "CONTACT_ADMIN": "Contact Admin to register",
+        "CONTACT_TELEGRAM": "Please contact via Telegram for Collaborator registration support",
+        "CONTACT_VIA_TELEGRAM": "Contact via Telegram",
+        "UPDATING_CONTACT": "Contact information is being updated"
     }
 }

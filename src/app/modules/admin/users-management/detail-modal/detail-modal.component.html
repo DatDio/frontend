@@ -173,6 +173,53 @@
                 </p>
               </div>
             </div>
+
+            <!-- Collaborator Section -->
+            <div class="col-12">
+              <div class="detail-item">
+                <label class="detail-label">Cộng tác viên</label>
+                <div class="card bg-light mt-2">
+                  <div class="card-body py-3">
+                    <div class="row align-items-center">
+                      <div class="col-md-4">
+                        <div class="form-check form-switch">
+                          <input class="form-check-input" type="checkbox" id="isCollaboratorDetail"
+                            [(ngModel)]="isCollaborator" (change)="onCollaboratorChange()">
+                          <label class="form-check-label fw-semibold" for="isCollaboratorDetail">
+                            <i class="bi bi-person-badge me-1"></i> Là cộng tác viên
+                          </label>
+                        </div>
+                      </div>
+                      <div class="col-md-4" *ngIf="isCollaborator">
+                        <label for="bonusPercentDetail" class="form-label mb-1">% Bonus nạp tiền</label>
+                        <div class="input-group">
+                          <input type="number" class="form-control" id="bonusPercentDetail" [(ngModel)]="bonusPercent"
+                            min="0" max="100">
+                          <span class="input-group-text">%</span>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <button class="btn btn-primary btn-sm" (click)="saveCollaborator()"
+                          [disabled]="savingCollaborator">
+                          <span *ngIf="!savingCollaborator">
+                            <i class="bi bi-save me-1"></i> Lưu CTV
+                          </span>
+                          <span *ngIf="savingCollaborator">
+                            <span class="spinner-border spinner-border-sm me-1"></span> Đang lưu...
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                    <div class="mt-2" *ngIf="isCollaborator && bonusPercent > 0">
+                      <small class="text-success">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Người dùng được cộng thêm {{ bonusPercent }}% khi nạp tiền
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         }

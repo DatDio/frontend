@@ -151,8 +151,14 @@
           </div>
           <div class="bonus-badge">
             <span class="bonus-percent">+{{ userRankInfo.bonusPercent }}%</span>
-            <span class="bonus-label">{{ 'TRANSACTION.BONUS' | translate }}</span>
+            <span class="bonus-label">Rank</span>
           </div>
+          @if (isCollaborator && ctvBonusPercent > 0) {
+          <div class="bonus-badge ctv-badge">
+            <span class="bonus-percent">+{{ ctvBonusPercent }}%</span>
+            <span class="bonus-label">CTV</span>
+          </div>
+          }
         </div>
 
         <!-- Progress to next rank -->
@@ -197,15 +203,27 @@
         </div>
 
         <!-- Bonus Preview -->
-        @if (userRankInfo && userRankInfo.bonusPercent > 0) {
+        @if (getTotalBonusPercent() > 0) {
         <div class="bonus-preview">
           <div class="bonus-row">
             <span>{{ 'TRANSACTION.DEPOSIT_AMOUNT' | translate }}:</span>
             <span>{{ depositAmount | number:'1.0-0' }} VNĐ</span>
           </div>
+          @if (userRankInfo && userRankInfo.bonusPercent > 0) {
+          <div class="bonus-row">
+            <span><i class="bi bi-trophy me-1"></i>Bonus Rank ({{ userRankInfo.bonusPercent }}%):</span>
+            <span class="bonus-value">+{{ (depositAmount * userRankInfo.bonusPercent / 100) | number:'1.0-0' }}
+              VNĐ</span>
+          </div>
+          }
+          @if (isCollaborator && ctvBonusPercent > 0) {
+          <div class="bonus-row">
+            <span><i class="bi bi-person-badge me-1"></i>Bonus CTV ({{ ctvBonusPercent }}%):</span>
+            <span class="bonus-value">+{{ (depositAmount * ctvBonusPercent / 100) | number:'1.0-0' }} VNĐ</span>
+          </div>
+          }
           <div class="bonus-row highlight">
-            <span><i class="bi bi-gift-fill me-1"></i>{{ 'TRANSACTION.BONUS' | translate }} ({{
-              userRankInfo.bonusPercent }}%):</span>
+            <span><i class="bi bi-gift-fill me-1"></i>Tổng bonus ({{ getTotalBonusPercent() }}%):</span>
             <span class="bonus-value">+{{ calculateBonus() | number:'1.0-0' }} VNĐ</span>
           </div>
           <div class="bonus-row total">

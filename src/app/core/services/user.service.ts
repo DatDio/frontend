@@ -130,6 +130,9 @@ export class UserService {
     if (filter.username) params = params.set('username', filter.username);
     if (filter.role) params = params.set('role', filter.role);
     if (filter.status) params = params.set('status', filter.status);
+    if (filter.isCollaborator !== undefined && filter.isCollaborator !== null) {
+      params = params.set('isCollaborator', filter.isCollaborator.toString());
+    }
 
     params = params
       .set('page', (filter.page ?? 0).toString())

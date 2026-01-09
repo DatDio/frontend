@@ -64,5 +64,10 @@ export const clientRoutes: Routes = [
   {
     path: 'read-mail',
     loadComponent: () => import('../../modules/client/read-mail/read-mail.component').then(m => m.ReadMailComponent)
+  },
+  {
+    path: 'collaborator',
+    canActivate: [authGuard],
+    loadComponent: () => import('../../modules/client/collaborator/collaborator.component').then(m => m.CollaboratorComponent)
   }
 ];

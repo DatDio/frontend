@@ -15,6 +15,7 @@ import { ActiveStatusBadgeComponent } from '../../../../shared/components/active
 interface UserSearchFilter {
   email?: string;
   status?: string;
+  collaboratorType?: string;
   pagination?: any;
 }
 
@@ -65,6 +66,7 @@ export class UsersListComponent implements OnInit {
     return this.#fb.group({
       email: new FormControl(''),
       status: new FormControl(''),
+      collaboratorType: new FormControl(''),
       searchPage: new FormControl('')
     });
   }
@@ -137,6 +139,12 @@ export class UsersListComponent implements OnInit {
     }
     if (this.dataFormSearch.status) {
       params.status = this.dataFormSearch.status;
+    }
+    // Handle collaborator filter
+    if (this.dataFormSearch.collaboratorType === 'collaborator') {
+      params.isCollaborator = true;
+    } else if (this.dataFormSearch.collaboratorType === 'normal') {
+      params.isCollaborator = false;
     }
 
     this.#userService.list(params).subscribe({

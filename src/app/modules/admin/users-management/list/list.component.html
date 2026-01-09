@@ -9,22 +9,30 @@
   <div class="card mb-3">
     <div class="card-body">
       <form [formGroup]="formSearch" class="row g-3">
-        <div class="col-md-4">
+        <div class="col-md-3">
           <label for="emailInput" class="form-label">Email</label>
           <input id="emailInput" type="email" class="form-control" placeholder="Tìm kiếm theo email..."
             formControlName="email">
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
           <label for="statusSelect" class="form-label">Trạng thái</label>
           <app-active-status-select id="statusSelect" formControlName="status">
           </app-active-status-select>
         </div>
-        <div class="col-md-4 d-flex align-items-end gap-2">
+        <div class="col-md-3">
+          <label for="collaboratorType" class="form-label">Loại tài khoản</label>
+          <select id="collaboratorType" class="form-select" formControlName="collaboratorType">
+            <option value="">Tất cả</option>
+            <option value="collaborator">Cộng tác viên</option>
+            <option value="normal">User thường</option>
+          </select>
+        </div>
+        <div class="col-md-3 d-flex align-items-end gap-2">
           <button type="button" class="btn btn-primary w-50" (click)="handleSearch()">
-            <i class="bi bi-search"></i> Tìm kiếm
+            <i class="bi bi-search"></i> Tìm
           </button>
           <button type="button" class="btn btn-secondary w-50" (click)="clearForm()">
-            <i class="bi bi-arrow-clockwise"></i> Xoá bộ lọc
+            <i class="bi bi-arrow-clockwise"></i> Xóa lọc
           </button>
         </div>
       </form>

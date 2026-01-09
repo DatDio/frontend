@@ -37,6 +37,9 @@ export interface UserRankInfo {
     nextRankMinDeposit?: number;
     nextRankName?: string;
     periodDays: number;
+    // CTV info (realtime from API)
+    isCollaborator?: boolean;
+    ctvBonusPercent?: number;
 }
 
 export interface RankFilter {

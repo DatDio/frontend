@@ -75,6 +75,8 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
 
   // ========== RANK INFO ==========
   userRankInfo: UserRankInfo | null = null;
+  ctvBonusPercent: number = 0;
+  isCollaborator: boolean = false;
 
   // ========== NOTE MODAL ==========
   showNoteModal = false;
@@ -105,12 +107,15 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
     this.depositSuccessSub?.unsubscribe();
   }
 
-  // Load user rank info
+  // Load user rank info (includes CTV info from API - realtime)
   private loadRankInfo(): void {
     this.rankService.getMyRank().subscribe({
       next: (res) => {
         if (res.success) {
           this.userRankInfo = res.data;
+          // CTV info from API (realtime, not from localStorage)
+          this.isCollaborator = res.data.isCollaborator ?? false;
+          this.ctvBonusPercent = res.data.ctvBonusPercent ?? 0;
         }
       },
       error: (err) => {
@@ -118,10 +123,17 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Calculate bonus amount based on deposit
+  // Calculate bonus amount based on deposit (Rank bonus + CTV bonus)
   calculateBonus(): number {
-    if (!this.userRankInfo || !this.userRankInfo.bonusPercent) return 0;
-    return Math.floor((this.depositAmount * this.userRankInfo.bonusPercent) / 100);
+    const rankBonus = this.userRankInfo?.bonusPercent ?? 0;
+    const totalBonusPercent = rankBonus + this.ctvBonusPercent;
+    if (totalBonusPercent <= 0) return 0;
+    return Math.floor((this.depositAmount * totalBonusPercent) / 100);
+  }
+
+  // Get total bonus percent (Rank + CTV)
+  getTotalBonusPercent(): number {
+    return (this.userRankInfo?.bonusPercent ?? 0) + this.ctvBonusPercent;
   }
 
   // Calculate total amount (deposit + bonus)

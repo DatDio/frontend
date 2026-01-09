@@ -97,7 +97,8 @@
     "LIGHT_THEME": "Giao diện sáng",
     "DARK_THEME": "Giao diện tối",
     "CREATED_DATE": "Ngày tạo",
-    "UNKNOWN": "Không xác định"
+    "UNKNOWN": "Không xác định",
+    "COLLABORATOR": "Cộng tác viên"
   },
   "PAGINATION": {
     "RECORDS_PER_PAGE": "Bản ghi / trang",
@@ -492,7 +493,7 @@
     "NEXT_RANK": "Hạng tiếp theo",
     "PROGRESS": "Tiến độ",
     "BENEFITS": "Quyền lợi",
-    "DISCOUNT": "Chiết khấu",
+    "BONUS": "Bonus",
     "MIN_SPENT": "Chi tiêu tối thiểu",
     "NO_RANKS": "Chưa có thông tin hạng"
   },
@@ -626,5 +627,26 @@
   "CONFIRM": {
     "DELETE_TITLE": "Xác nhận xóa",
     "DELETE_API_KEY_MESSAGE": "Bạn có chắc chắn muốn xóa API Key này không?"
+  },
+  "COLLABORATOR": {
+    "TITLE": "Chương Trình Cộng Tác Viên",
+    "LOADING": "Đang tải...",
+    "ALREADY_COLLABORATOR": "Bạn đã là Cộng Tác Viên!",
+    "YOUR_BENEFIT": "Ưu đãi của bạn",
+    "BONUS_ON_DEPOSIT": "Được cộng thêm {{percent}}% khi nạp tiền",
+    "AUTO_APPLY_NOTE": "Bonus sẽ được cộng tự động khi bạn nạp tiền.",
+    "BECOME_COLLABORATOR": "Trở thành Cộng Tác Viên để nhận ưu đãi!",
+    "SPECIAL_DISCOUNT": "Bonus nạp tiền",
+    "SPECIAL_DISCOUNT_DESC": "Được cộng thêm % khi nạp tiền",
+    "PRIORITY_SUPPORT": "Ưu tiên hỗ trợ",
+    "PRIORITY_SUPPORT_DESC": "Hỗ trợ nhanh chóng từ Admin",
+    "FOREVER_APPLY": "Áp dụng mãi mãi",
+    "FOREVER_APPLY_DESC": "Ưu đãi không giới hạn thời gian",
+    "AUTO_APPLY": "Tự động áp dụng",
+    "AUTO_APPLY_DESC": "Không cần nhập mã",
+    "CONTACT_ADMIN": "Liên hệ Admin để đăng ký",
+    "CONTACT_TELEGRAM": "Vui lòng liên hệ qua Telegram để được hỗ trợ đăng ký Cộng Tác Viên",
+    "CONTACT_VIA_TELEGRAM": "Liên hệ qua Telegram",
+    "UPDATING_CONTACT": "Thông tin liên hệ đang được cập nhật"
   }
 }
