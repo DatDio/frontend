@@ -146,7 +146,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           if (response.success) {
-            this.notificationService.success('Đặt hàng thành công!');
+            this.notificationService.success(response.message || 'Đặt hàng thành công!');
             this.closeOrderModal();
             this.walletService.refreshBalance();
             this.router.navigate(['/orders']);

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 
 export enum NOTI_TYPE_ENUM {
   SUCCESS = 'success',
@@ -23,6 +24,8 @@ export class NotificationService {
   private notificationSubject = new BehaviorSubject<ToastNotification | null>(null);
   public notification$ = this.notificationSubject.asObservable();
 
+  constructor(private translate: TranslateService) { }
+
   show(notification: ToastNotification): void {
     this.notificationSubject.next(notification);
 
@@ -35,7 +38,7 @@ export class NotificationService {
 
   success(content: string, duration: number = 3000): void {
     this.show({
-      title: 'Thành công',
+      title: this.translate.instant('COMMON.SUCCESS'),
       content,
       status: NOTI_TYPE_ENUM.SUCCESS,
       isShowBtn: false,
@@ -45,7 +48,7 @@ export class NotificationService {
 
   error(content: string, duration: number = 4000): void {
     this.show({
-      title: 'Lỗi',
+      title: this.translate.instant('COMMON.ERROR'),
       content,
       status: NOTI_TYPE_ENUM.ERROR,
       isShowBtn: false,
@@ -55,7 +58,7 @@ export class NotificationService {
 
   warning(content: string, duration: number = 3500): void {
     this.show({
-      title: 'Cảnh báo',
+      title: this.translate.instant('COMMON.WARNING'),
       content,
       status: NOTI_TYPE_ENUM.WARNING,
       isShowBtn: false,
@@ -65,7 +68,7 @@ export class NotificationService {
 
   info(content: string, duration: number = 3000): void {
     this.show({
-      title: 'Thông tin',
+      title: this.translate.instant('COMMON.INFO'),
       content,
       status: NOTI_TYPE_ENUM.INFO,
       isShowBtn: false,

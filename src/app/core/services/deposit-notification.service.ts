@@ -4,6 +4,7 @@ import { WebSocketService } from './websocket.service';
 import { NotificationService } from './notification.service';
 import { TransactionService } from './wallet.service';
 import { AuthService } from './auth.service';
+import { TranslateService } from '@ngx-translate/core';
 
 // WebSocket message interface for deposit notifications
 export interface DepositSuccessMessage {
@@ -28,6 +29,7 @@ export class DepositNotificationService {
     private readonly notificationService = inject(NotificationService);
     private readonly transactionService = inject(TransactionService);
     private readonly authService = inject(AuthService);
+    private readonly translate = inject(TranslateService);
 
     private depositWsUnsub?: () => void;
     private currentTransactionCode?: number;
@@ -83,7 +85,7 @@ export class DepositNotificationService {
         console.info('[DepositNotification] Deposit success received:', payload);
 
         // Show success notification with bonus info
-        let message = `🎉 Nạp tiền thành công! +${payload.amount.toLocaleString()} VNĐ`;
+        let message = this.translate.instant('MESSAGE.DEPOSIT_SUCCESS_AMOUNT', { amount: payload.amount.toLocaleString() });
         if (payload.bonusAmount > 0) {
             message += ` (Bonus: +${payload.bonusAmount.toLocaleString()} VNĐ)`;
         }
