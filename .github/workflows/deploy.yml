@@ -1,58 +1,87 @@
 name: Frontend CI/CD
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# PHẦN 1: TRIGGER - Khi nào workflow chạy?
+# ═══════════════════════════════════════════════════════════════════════════════
 on:
   push:
-    branches: [main, master]
+    branches: [main]          # Chạy khi push vào branch main
   pull_request:
-    branches: [main, master]
+    branches: [main]          # Chạy khi tạo PR vào main (chỉ build, ko deploy)
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# PHẦN 2: JOBS - Các công việc cần thực hiện
+# ═══════════════════════════════════════════════════════════════════════════════
 jobs:
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 1: BUILD - Chạy trên GitHub Runner (máy ảo Ubuntu của GitHub)
+  # ─────────────────────────────────────────────────────────────────────────────
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest    # Sử dụng máy ảo Ubuntu mới nhất của GitHub (miễn phí)
 
     steps:
+      # Bước 1: Clone code từ repo về máy ảo GitHub
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Bước 2: Cài đặt Node.js 20
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: '20'           # Version Node.js
+          cache: 'npm'                 # Cache npm dependencies để lần sau build nhanh hơn
 
+      # Bước 3: Cài đặt dependencies từ package-lock.json
       - name: Install dependencies
-        run: npm ci
+        run: npm ci                    # npm ci nhanh hơn npm install, dùng cho CI/CD
 
+      # Bước 4: Build Angular app cho production
       - name: Build Angular app
         run: npm run build -- --configuration=production
 
+  # ─────────────────────────────────────────────────────────────────────────────
+  # JOB 2: DEPLOY - SSH vào VPS và deploy
+  # ─────────────────────────────────────────────────────────────────────────────
   deploy:
     runs-on: ubuntu-latest
-    needs: build
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    needs: build                       # ⚠️ Phải đợi job "build" hoàn thành trước
+    
+    # Điều kiện: Chỉ deploy khi PUSH vào main (không deploy khi tạo PR)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
+      # SSH vào VPS và chạy các lệnh deploy
       - name: Deploy Frontend to VPS
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.0.3   # Action SSH phổ biến nhất
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
+          # Thông tin kết nối VPS (lấy từ GitHub Secrets)
+          host: ${{ secrets.VPS_HOST }}         # IP hoặc domain VPS
+          username: ${{ secrets.VPS_USERNAME }} # Username SSH (vd: ubuntu, root)
+          key: ${{ secrets.VPS_SSH_KEY }}       # Private key SSH
+          port: ${{ secrets.VPS_PORT }}         # Port SSH (thường là 22)
+          
+          # Script chạy trên VPS
           script: |
-            cd ${{ secrets.PROJECT_PATH }}
+            set -e  # Dừng ngay nếu có lỗi
             
-            # Pull latest frontend code
-            cd frontend
-            git pull origin main
-            cd ..
+            echo "📁 Navigating to project..."
+            cd ${{ secrets.PROJECT_PATH }}      # Vào /opt/mailshop
             
-            # Rebuild only frontend container
-            docker-compose stop frontend
-            docker-compose build --no-cache frontend
-            docker-compose up -d frontend
+            echo "📥 Pulling latest frontend code..."
+            cd frontend                         # Vào folder frontend
+            git fetch --all                     # Fetch tất cả changes từ remote
+            git reset --hard origin/main        # Reset về commit mới nhất của origin/main
+            cd ..                               # Quay lại /opt/mailshop
             
-            # Clean up
-            docker image prune -f
+            echo "🔄 Rebuilding frontend container..."
+            docker-compose stop frontend                  # Dừng container cũ
+            docker-compose build --no-cache frontend      # Build lại image (không dùng cache)
+            docker-compose up -d frontend                 # Chạy container mới ở background
+            
+            echo "🧹 Cleaning up old images..."
+            docker image prune -f               # Xóa images cũ không dùng
+            
+            echo "📊 Container status:"
+            docker-compose ps frontend          # Hiển thị trạng thái container
             
             echo "✅ Frontend deployed successfully!"
