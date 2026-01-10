@@ -74,14 +74,14 @@ jobs:
             cd ..                               # Quay lại /opt/mailshop
             
             echo "🔄 Rebuilding frontend container..."
-            docker-compose stop frontend                  # Dừng container cũ
-            docker-compose build --no-cache frontend      # Build lại image (không dùng cache)
-            docker-compose up -d frontend                 # Chạy container mới ở background
+            docker compose stop frontend                  # Dừng container cũ
+            docker compose build --no-cache frontend      # Build lại image (không dùng cache)
+            docker compose up -d frontend                 # Chạy container mới ở background
             
             echo "🧹 Cleaning up old images..."
             docker image prune -f               # Xóa images cũ không dùng
             
             echo "📊 Container status:"
-            docker-compose ps frontend          # Hiển thị trạng thái container
+            docker compose ps frontend          # Hiển thị trạng thái container
             
             echo "✅ Frontend deployed successfully!"
