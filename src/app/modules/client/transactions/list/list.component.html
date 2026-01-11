@@ -73,6 +73,66 @@
   </div>
   }
 
+  <!-- Crypto Payment Modal -->
+  @if (showCryptoModal) {
+  <div class="qr-modal-overlay" (click)="closeCryptoModal()">
+    <div class="qr-modal-content crypto-modal" (click)="$event.stopPropagation()">
+      <div class="qr-modal-header crypto-header">
+        <h3><i class="bi bi-currency-bitcoin me-2"></i>{{ 'TRANSACTION.CRYPTO_TITLE' | translate }}</h3>
+        <button class="qr-close-btn" (click)="closeCryptoModal()">
+          <i class="bi bi-x-lg"></i>
+        </button>
+      </div>
+
+      <div class="qr-modal-body">
+        <div class="crypto-info">
+          <div class="crypto-icon-large">
+            <i class="bi bi-currency-bitcoin"></i>
+          </div>
+          <h4>{{ 'TRANSACTION.PAYMENT_CREATED' | translate }}</h4>
+          <p class="crypto-trans-id">{{ 'TRANSACTION.TRANS_ID' | translate }}: <strong>{{ cryptoTransId }}</strong></p>
+        </div>
+
+        <div class="bank-info crypto-payment-info">
+          <div class="bank-info-row">
+            <span class="label">{{ 'TRANSACTION.USDT_AMOUNT_LABEL' | translate }}:</span>
+            <span class="value crypto-value">{{ cryptoAmount }} USDT</span>
+          </div>
+          <div class="bank-info-row">
+            <span class="label">{{ 'TRANSACTION.EQUIVALENT_VND' | translate }}:</span>
+            <span class="value amount">{{ estimatedVnd | number:'1.0-0' }} VNĐ</span>
+          </div>
+        </div>
+
+        <div class="crypto-action-section">
+          <button class="deposit-btn crypto-btn" (click)="openCryptoPayment()">
+            <i class="bi bi-box-arrow-up-right me-2"></i>
+            {{ 'TRANSACTION.OPEN_PAYMENT' | translate }}
+          </button>
+        </div>
+
+        <div class="qr-note crypto-note">
+          <i class="bi bi-info-circle me-1"></i>
+          <span>{{ 'TRANSACTION.CRYPTO_CONFIRM_NOTE' | translate }}</span>
+        </div>
+
+        <!-- Waiting State -->
+        <div class="qr-waiting-state">
+          <div class="waiting-spinner">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            <span>{{ 'TRANSACTION.WAITING' | translate }}</span>
+          </div>
+          <p class="waiting-note">{{ 'TRANSACTION.AUTO_UPDATE' | translate }}</p>
+        </div>
+
+        <button class="btn btn-secondary mt-3" (click)="closeCryptoModal()">
+          <i class="bi bi-x-lg me-2"></i>{{ 'COMMON.CLOSE' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
   <!-- Note Modal -->
   @if (showNoteModal && selectedTransaction) {
   <div class="note-modal-overlay" (click)="closeNoteModal()">
@@ -179,7 +239,20 @@
       </div>
       }
 
-      <!-- Deposit Form -->
+      <!-- Deposit Method Tabs -->
+      <div class="deposit-method-tabs">
+        <button class="method-tab" [class.active]="depositMethod === 'vietqr'" (click)="depositMethod = 'vietqr'">
+          <i class="bi bi-qr-code me-2"></i>
+          {{ 'TRANSACTION.METHOD_VIETQR' | translate }}
+        </button>
+        <button class="method-tab" [class.active]="depositMethod === 'crypto'" (click)="depositMethod = 'crypto'">
+          <i class="bi bi-currency-bitcoin me-2"></i>
+          {{ 'TRANSACTION.METHOD_CRYPTO' | translate }}
+        </button>
+      </div>
+
+      <!-- VietQR Deposit Form -->
+      @if (depositMethod === 'vietqr') {
       <div class="deposit-form">
         <label class="input-label">{{ 'TRANSACTION.DEPOSIT_AMOUNT' | translate }}</label>
         <div class="amount-input-wrapper">
@@ -243,6 +316,79 @@
           {{ 'TRANSACTION.SECURITY_NOTE' | translate }}
         </p>
       </div>
+      }
+
+      <!-- Crypto (USDT) Deposit Form -->
+      @if (depositMethod === 'crypto') {
+      <div class="deposit-form crypto-form">
+        <label class="input-label">{{ 'TRANSACTION.USDT_AMOUNT' | translate }}</label>
+        <div class="amount-input-wrapper">
+          <input type="text" class="amount-input" [value]="cryptoAmountDisplay" (input)="onCryptoAmountChange($event)"
+            [placeholder]="'TRANSACTION.USDT_PLACEHOLDER' | translate">
+          <span class="currency-tag crypto-tag">USDT</span>
+        </div>
+
+        <!-- Quick USDT Amount Buttons -->
+        <div class="quick-amounts">
+          <button type="button" class="quick-amount-btn"
+            (click)="cryptoAmount = 5; cryptoAmountDisplay = '5'; estimatedVnd = calculateEstimatedVnd()">5
+            USDT</button>
+          <button type="button" class="quick-amount-btn"
+            (click)="cryptoAmount = 10; cryptoAmountDisplay = '10'; estimatedVnd = calculateEstimatedVnd()">10
+            USDT</button>
+          <button type="button" class="quick-amount-btn"
+            (click)="cryptoAmount = 20; cryptoAmountDisplay = '20'; estimatedVnd = calculateEstimatedVnd()">20
+            USDT</button>
+          <button type="button" class="quick-amount-btn"
+            (click)="cryptoAmount = 50; cryptoAmountDisplay = '50'; estimatedVnd = calculateEstimatedVnd()">50
+            USDT</button>
+          <button type="button" class="quick-amount-btn"
+            (click)="cryptoAmount = 100; cryptoAmountDisplay = '100'; estimatedVnd = calculateEstimatedVnd()">100
+            USDT</button>
+        </div>
+
+        <!-- Exchange Rate & VND Preview -->
+        @if (cryptoAmount > 0) {
+        <div class="crypto-preview">
+          <div class="exchange-rate-info">
+            <i class="bi bi-arrow-left-right me-1"></i>
+            {{ 'TRANSACTION.EXCHANGE_RATE' | translate }}: 1 USDT = {{ usdVndRate | number:'1.0-0' }} VNĐ
+          </div>
+          <div class="bonus-preview">
+            <div class="bonus-row">
+              <span>{{ 'TRANSACTION.USDT_PAYMENT' | translate }}:</span>
+              <span class="crypto-value">{{ cryptoAmount }} USDT</span>
+            </div>
+            <div class="bonus-row highlight">
+              <span><i class="bi bi-cash-stack me-1"></i>{{ 'TRANSACTION.EQUIVALENT_VND' | translate }}:</span>
+              <span class="vnd-value">{{ estimatedVnd | number:'1.0-0' }} VNĐ</span>
+            </div>
+            @if (getTotalBonusPercent() > 0) {
+            <div class="bonus-row">
+              <span><i class="bi bi-gift me-1"></i>{{ 'TRANSACTION.TOTAL_BONUS_PERCENT' | translate }} ({{
+                getTotalBonusPercent() }}%):</span>
+              <span class="bonus-value">+{{ calculateCryptoBonus() | number:'1.0-0' }} VNĐ</span>
+            </div>
+            <div class="bonus-row total">
+              <span>{{ 'TRANSACTION.TOTAL_RECEIVED_CRYPTO' | translate }}:</span>
+              <span class="total-value">{{ calculateCryptoTotal() | number:'1.0-0' }} VNĐ</span>
+            </div>
+            }
+          </div>
+        </div>
+        }
+
+        <button class="deposit-btn crypto-btn" (click)="createDepositCrypto()">
+          <i class="bi bi-currency-bitcoin me-2"></i>
+          {{ 'TRANSACTION.PAY_USDT' | translate }}
+        </button>
+
+        <p class="deposit-note">
+          <i class="bi bi-info-circle me-1"></i>
+          {{ 'TRANSACTION.CRYPTO_NOTE' | translate }}
+        </p>
+      </div>
+      }
     </div>
   </div>
 

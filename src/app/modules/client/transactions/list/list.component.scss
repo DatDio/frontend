@@ -1006,3 +1006,181 @@ h1 {
     border-radius: $radius-lg;
   }
 }
+
+// =============================================
+// DEPOSIT METHOD TABS
+// =============================================
+
+.deposit-method-tabs {
+  display: flex;
+  gap: $spacing-2;
+  padding: $spacing-4 $spacing-6;
+  background: var(--bg-table-header);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.method-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-3 $spacing-4;
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: $radius-xl;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  i {
+    font-size: $font-size-lg;
+  }
+
+  &:hover {
+    border-color: $primary;
+    color: $primary;
+    background: rgba($primary, 0.05);
+  }
+
+  &.active {
+    background: $gradient-primary;
+    border-color: $primary;
+    color: $white;
+    box-shadow: $shadow-primary;
+
+    i {
+      color: $white;
+    }
+  }
+}
+
+// =============================================
+// CRYPTO FORM STYLES
+// =============================================
+
+.crypto-form {
+  .crypto-tag {
+    background: linear-gradient(135deg, #f7931a, #f59e0b) !important;
+  }
+}
+
+.crypto-preview {
+  margin-bottom: $spacing-5;
+
+  .exchange-rate-info {
+    text-align: center;
+    padding: $spacing-2 $spacing-3;
+    background: rgba($info, 0.1);
+    border: 1px solid rgba($info, 0.2);
+    border-radius: $radius-lg;
+    font-size: $font-size-xs;
+    color: $info;
+    margin-bottom: $spacing-3;
+  }
+}
+
+.crypto-value {
+  font-weight: $font-weight-bold;
+  color: #f7931a !important;
+}
+
+.vnd-value {
+  font-weight: $font-weight-bold;
+  color: $primary !important;
+  font-size: $font-size-base;
+}
+
+.crypto-btn {
+  background: linear-gradient(135deg, #f7931a, #f59e0b) !important;
+  box-shadow: 0 4px 14px rgba(247, 147, 26, 0.4) !important;
+
+  &:hover {
+    box-shadow: 0 8px 25px rgba(247, 147, 26, 0.5) !important;
+  }
+}
+
+// =============================================
+// CRYPTO MODAL
+// =============================================
+
+.crypto-modal {
+  max-width: 500px;
+}
+
+.crypto-header {
+  background: linear-gradient(135deg, #f7931a, #f59e0b) !important;
+}
+
+.crypto-info {
+  text-align: center;
+  padding: $spacing-5;
+
+  .crypto-icon-large {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #f7931a, #f59e0b);
+    border-radius: $radius-full;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto $spacing-4;
+
+    i {
+      font-size: 40px;
+      color: $white;
+    }
+  }
+
+  h4 {
+    color: var(--text-heading);
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    margin: 0 0 $spacing-2;
+  }
+
+  .crypto-trans-id {
+    color: var(--text-secondary);
+    font-size: $font-size-sm;
+    margin: 0;
+
+    strong {
+      color: $primary;
+      font-family: monospace;
+    }
+  }
+}
+
+.crypto-payment-info {
+  margin-top: $spacing-4;
+}
+
+.crypto-action-section {
+  margin: $spacing-4 0;
+}
+
+.crypto-note {
+  background: rgba(#f7931a, 0.1);
+  border-color: rgba(#f7931a, 0.3);
+
+  i {
+    color: #f7931a;
+  }
+}
+
+// =============================================
+// RESPONSIVE FOR CRYPTO
+// =============================================
+
+@media (max-width: $breakpoint-md) {
+  .deposit-method-tabs {
+    padding: $spacing-3 $spacing-4;
+    flex-direction: column;
+  }
+
+  .method-tab {
+    font-size: $font-size-xs;
+    padding: $spacing-2 $spacing-3;
+  }
+}

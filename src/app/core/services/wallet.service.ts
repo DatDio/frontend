@@ -71,6 +71,19 @@ export class TransactionService {
       .pipe(finalize(() => this.loaderService.hide()));
   }
 
+  // ================== CREATE DEPOSIT FPAYMENT (CRYPTO) ==================
+  createDepositFPayment(amountVnd: number): Observable<ApiResponse<any>> {
+    this.loaderService.show();
+
+    return this.httpClient
+      .post<ApiResponse<any>>(
+        WalletApi.DEPOSIT_FPAYMENT,
+        null,
+        { params: { amountVnd: amountVnd.toString() } }
+      )
+      .pipe(finalize(() => this.loaderService.hide()));
+  }
+
   // ================== SEARCH TRANSACTIONS ==================
   list(filter?: TransactionFilter): Observable<ApiResponse<PaginatedResponse<TransactionResponse>>> {
     const params = this.createTransactionFilter(filter);

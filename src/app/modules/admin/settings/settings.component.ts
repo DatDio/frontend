@@ -38,6 +38,13 @@ export class SettingsComponent implements OnInit {
     cassoSaving = false;
     showSecureToken = false;
 
+    // FPayment (Crypto) settings
+    fpaymentMerchantId = '';
+    fpaymentApiKey = '';
+    fpaymentUsdVndRate = 25000;
+    fpaymentSaving = false;
+    showFpaymentApiKey = false;
+
     // Social settings
     telegramGroupUrl = '';
     telegramChannelUrl = '';
@@ -97,6 +104,16 @@ export class SettingsComponent implements OnInit {
 
         const accountName = this.settings.find(s => s.settingKey === 'casso.account_name');
         if (accountName) this.cassoAccountName = accountName.settingValue || '';
+
+        // FPayment (Crypto) settings
+        const fpaymentMerchantId = this.settings.find(s => s.settingKey === 'fpayment.merchant_id');
+        if (fpaymentMerchantId) this.fpaymentMerchantId = fpaymentMerchantId.settingValue || '';
+
+        const fpaymentApiKey = this.settings.find(s => s.settingKey === 'fpayment.api_key');
+        if (fpaymentApiKey) this.fpaymentApiKey = fpaymentApiKey.settingValue || '';
+
+        const fpaymentUsdVndRate = this.settings.find(s => s.settingKey === 'fpayment.usd_vnd_rate');
+        if (fpaymentUsdVndRate) this.fpaymentUsdVndRate = parseInt(fpaymentUsdVndRate.settingValue) || 25000;
 
         // Social settings
         const telegramGroup = this.settings.find(s => s.settingKey === 'social.telegram_group');
@@ -246,6 +263,37 @@ export class SettingsComponent implements OnInit {
             })
             .finally(() => {
                 this.cassoSaving = false;
+            });
+    }
+
+    saveFPaymentSettings(): void {
+        this.fpaymentSaving = true;
+
+        const saveMerchantId = () => this.#settingService.update('fpayment.merchant_id', {
+            settingValue: this.fpaymentMerchantId,
+            description: 'FPayment Merchant ID'
+        }).toPromise();
+
+        const saveApiKey = () => this.#settingService.update('fpayment.api_key', {
+            settingValue: this.fpaymentApiKey,
+            description: 'FPayment API Key'
+        }).toPromise();
+
+        const saveUsdVndRate = () => this.#settingService.update('fpayment.usd_vnd_rate', {
+            settingValue: String(this.fpaymentUsdVndRate),
+            description: 'Tỷ giá USD/VND (1 USDT = ? VND)'
+        }).toPromise();
+
+        Promise.all([saveMerchantId(), saveApiKey(), saveUsdVndRate()])
+            .then(() => {
+                this.#notificationService.success('Lưu cấu hình FPayment thành công');
+                this.loadSettings();
+            })
+            .catch((error) => {
+                this.#notificationService.error('Lỗi khi lưu cấu hình FPayment');
+            })
+            .finally(() => {
+                this.fpaymentSaving = false;
             });
     }
 

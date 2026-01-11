@@ -149,6 +149,57 @@
                     </div>
                 </div>
 
+                <!-- FPayment (Crypto) Settings Section -->
+                <div class="settings-section mt-4">
+                    <h6 class="section-title">
+                        <i class="bi bi-currency-bitcoin me-2"></i>
+                        Cấu hình Thanh toán Crypto (FPayment)
+                        <span class="badge bg-info ms-2">USDT</span>
+                    </h6>
+                    <p class="text-muted small mb-3">
+                        Nhập thông tin FPayment để nhận tiền qua USDT. Tỷ giá USD/VND dùng để quy đổi số tiền VND sang
+                        USDT.
+                    </p>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Merchant ID</label>
+                            <input type="text" class="form-control" [(ngModel)]="fpaymentMerchantId"
+                                placeholder="Nhập FPayment Merchant ID...">
+                            <small class="text-muted">Lấy từ trang quản lý FPayment</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">API Key</label>
+                            <div class="input-group">
+                                <input [type]="showFpaymentApiKey ? 'text' : 'password'" class="form-control"
+                                    [(ngModel)]="fpaymentApiKey" placeholder="Nhập FPayment API Key...">
+                                <button class="btn btn-outline-secondary" type="button"
+                                    (click)="showFpaymentApiKey = !showFpaymentApiKey" title="Hiện/Ẩn API Key">
+                                    <i class="bi" [ngClass]="showFpaymentApiKey ? 'bi-eye-slash' : 'bi-eye'"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted">Lấy từ trang quản lý FPayment</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Tỷ giá USD/VND</label>
+                            <div class="input-group">
+                                <span class="input-group-text">1 USDT =</span>
+                                <input type="number" class="form-control" [(ngModel)]="fpaymentUsdVndRate" min="1000"
+                                    max="100000" placeholder="25000">
+                                <span class="input-group-text">VND</span>
+                            </div>
+                            <small class="text-muted">Ví dụ: 25000 nghĩa là 1 USDT = 25,000 VND</small>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button class="btn btn-primary" (click)="saveFPaymentSettings()" [disabled]="fpaymentSaving">
+                            <i class="bi bi-check-lg me-1" *ngIf="!fpaymentSaving"></i>
+                            <span class="spinner-border spinner-border-sm me-1" *ngIf="fpaymentSaving"></span>
+                            {{ fpaymentSaving ? 'Đang lưu...' : 'Lưu cấu hình FPayment' }}
+                        </button>
+                    </div>
+                </div>
+
                 <!-- Scheduler Settings Section -->
                 <div class="settings-section mt-4">
                     <h6 class="section-title">

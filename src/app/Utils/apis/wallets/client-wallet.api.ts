@@ -11,6 +11,9 @@ export class WalletApi {
     public static readonly DEPOSIT_CASSO =
         WalletApi.BASE + '/casso/deposit';
 
+    public static readonly DEPOSIT_FPAYMENT =
+        WalletApi.BASE + '/fpayment/deposit';
+
     public static readonly TRANSACTOIN_SEARCH =
         WalletApi.BASE + '/transactions/search';
     public static GET_TRANSACTION = (transactionCode: string) =>

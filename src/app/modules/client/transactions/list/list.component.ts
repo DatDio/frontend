@@ -13,6 +13,7 @@ import { convertToISO } from '../../../../Utils/functions/date-time-utils';
 import { RankService } from '../../../../core/services/rank.service';
 import { UserRankInfo } from '../../../../core/models/rank.model';
 import { DepositNotificationService } from '../../../../core/services/deposit-notification.service';
+import { SystemSettingService } from '../../../../core/services/system-setting.service';
 import { Subscription } from 'rxjs';
 
 declare global {
@@ -45,6 +46,7 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
   private readonly seoService = inject(SeoService);
   private readonly depositNotificationService = inject(DepositNotificationService);
   private readonly translate = inject(TranslateService);
+  private readonly systemSettingService = inject(SystemSettingService);
 
   transactions: TransactionResponse[] = [];
   orderCode: number = 0;
@@ -61,8 +63,15 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
   formSearch!: FormGroup;
 
   // ========== DEPOSIT ==========
+  depositMethod: 'vietqr' | 'crypto' = 'vietqr';
   depositAmount: number = 10000;
   depositAmountDisplay: string = '10,000';
+
+  // ========== CRYPTO DEPOSIT ==========
+  cryptoAmount: number = 0;
+  cryptoAmountDisplay: string = '';
+  usdVndRate: number = 25000; // Tỷ giá mặc định 1 USDT = 25,000 VND
+  estimatedVnd: number = 0;
 
   // ========== WEB2M QR MODAL ==========
   showQrModal = false;
@@ -72,6 +81,11 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
   accountNumber = '';
   accountName = '';
   currentTransactionCode = 0;
+
+  // ========== CRYPTO MODAL ==========
+  showCryptoModal = false;
+  cryptoPaymentUrl = '';
+  cryptoTransId = '';
 
   // ========== RANK INFO ==========
   userRankInfo: UserRankInfo | null = null;
@@ -94,11 +108,13 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
     this.initForm();
     this.loadTransactions();
     this.loadRankInfo();
+    this.loadUsdVndRate();
     this.depositAmountDisplay = this.formatNumber(this.depositAmount);
 
     // Subscribe to deposit success events to close modal and reload data
     this.depositSuccessSub = this.depositNotificationService.depositSuccess$.subscribe(() => {
       this.showQrModal = false;
+      this.showCryptoModal = false;
       this.loadTransactions();
     });
   }
@@ -121,6 +137,59 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
       error: (err) => {
       }
     });
+  }
+
+  // Load USD/VND exchange rate from public settings
+  private loadUsdVndRate(): void {
+    this.systemSettingService.getPublicSettings().subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          const rate = res.data['fpayment.usd_vnd_rate'];
+          if (rate) {
+            this.usdVndRate = parseInt(rate, 10) || 25000;
+          }
+        }
+      },
+      error: () => {
+        // Keep default rate
+      }
+    });
+  }
+
+  // Handle crypto (USDT) amount input change
+  onCryptoAmountChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    // Allow decimal input for USDT
+    const rawValue = input.value.replace(/[^0-9.]/g, '');
+
+    if (rawValue) {
+      this.cryptoAmount = parseFloat(rawValue);
+      this.cryptoAmountDisplay = rawValue;
+      this.estimatedVnd = this.calculateEstimatedVnd();
+    } else {
+      this.cryptoAmount = 0;
+      this.cryptoAmountDisplay = '';
+      this.estimatedVnd = 0;
+    }
+  }
+
+  // Calculate estimated VND from USDT amount
+  calculateEstimatedVnd(): number {
+    if (!this.cryptoAmount || this.cryptoAmount <= 0) return 0;
+    return Math.floor(this.cryptoAmount * this.usdVndRate);
+  }
+
+  // Calculate bonus for crypto deposit (based on VND equivalent)
+  calculateCryptoBonus(): number {
+    const rankBonus = this.userRankInfo?.bonusPercent ?? 0;
+    const totalBonusPercent = rankBonus + this.ctvBonusPercent;
+    if (totalBonusPercent <= 0) return 0;
+    return Math.floor((this.estimatedVnd * totalBonusPercent) / 100);
+  }
+
+  // Calculate total for crypto deposit
+  calculateCryptoTotal(): number {
+    return this.estimatedVnd + this.calculateCryptoBonus();
   }
 
   // Calculate bonus amount based on deposit (Rank bonus + CTV bonus)
@@ -208,7 +277,57 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
     });
   }
 
+  // ================== CREATE DEPOSIT CRYPTO (FPAYMENT) ==================
+  createDepositCrypto(): void {
+    if (!this.cryptoAmount || this.cryptoAmount <= 0) {
+      this.notificationService.error(this.translate.instant('TRANSACTION.ENTER_USDT_ERROR'));
+      return;
+    }
 
+    // Convert USDT to VND for API call
+    const amountVnd = this.calculateEstimatedVnd();
+    if (amountVnd < 10000) {
+      this.notificationService.error(this.translate.instant('TRANSACTION.MIN_VND_ERROR'));
+      return;
+    }
+
+    this.transactionService.createDepositFPayment(amountVnd).subscribe({
+      next: (res: any) => {
+        if (res.success && res.data?.urlPayment) {
+          // Start listening for deposit notification
+          this.currentTransactionCode = res.data.transactionCode;
+          this.depositNotificationService.startListening(this.currentTransactionCode);
+
+          // Open FPayment page directly in new tab
+          window.open(res.data.urlPayment, '_blank');
+
+          // Show notification
+          this.notificationService.success(this.translate.instant('TRANSACTION.PAYMENT_CREATED'));
+        } else {
+          this.notificationService.error(this.translate.instant('TRANSACTION.CRYPTO_CREATE_ERROR'));
+        }
+      },
+      error: (error: any) => {
+        this.notificationService.error(
+          error.error?.message || this.translate.instant('TRANSACTION.CRYPTO_ERROR')
+        );
+      }
+    });
+  }
+
+  // Open crypto payment page in new tab
+  openCryptoPayment(): void {
+    if (this.cryptoPaymentUrl) {
+      window.open(this.cryptoPaymentUrl, '_blank');
+    }
+  }
+
+  // ================== CRYPTO MODAL ACTIONS ==================
+  closeCryptoModal(): void {
+    this.showCryptoModal = false;
+    this.loadTransactions();
+    this.transactionService.refreshBalance();
+  }
 
   // ================== QR MODAL ACTIONS ==================
   closeQrModal(): void {
