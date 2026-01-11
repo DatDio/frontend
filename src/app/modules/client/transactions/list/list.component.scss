@@ -1062,7 +1062,7 @@ h1 {
 
 .crypto-form {
   .crypto-tag {
-    background: linear-gradient(135deg, #f7931a, #f59e0b) !important;
+    background: $gradient-primary !important;
   }
 }
 
@@ -1072,18 +1072,18 @@ h1 {
   .exchange-rate-info {
     text-align: center;
     padding: $spacing-2 $spacing-3;
-    background: rgba($info, 0.1);
-    border: 1px solid rgba($info, 0.2);
+    background: rgba($primary, 0.1);
+    border: 1px solid rgba($primary, 0.2);
     border-radius: $radius-lg;
     font-size: $font-size-xs;
-    color: $info;
+    color: $primary;
     margin-bottom: $spacing-3;
   }
 }
 
 .crypto-value {
   font-weight: $font-weight-bold;
-  color: #f7931a !important;
+  color: $primary !important;
 }
 
 .vnd-value {
@@ -1093,11 +1093,11 @@ h1 {
 }
 
 .crypto-btn {
-  background: linear-gradient(135deg, #f7931a, #f59e0b) !important;
-  box-shadow: 0 4px 14px rgba(247, 147, 26, 0.4) !important;
+  background: $gradient-primary !important;
+  box-shadow: $shadow-primary !important;
 
   &:hover {
-    box-shadow: 0 8px 25px rgba(247, 147, 26, 0.5) !important;
+    box-shadow: $shadow-lg, 0 8px 25px rgba($primary, 0.4) !important;
   }
 }
 
@@ -1110,7 +1110,7 @@ h1 {
 }
 
 .crypto-header {
-  background: linear-gradient(135deg, #f7931a, #f59e0b) !important;
+  background: $gradient-primary !important;
 }
 
 .crypto-info {
@@ -1120,7 +1120,7 @@ h1 {
   .crypto-icon-large {
     width: 80px;
     height: 80px;
-    background: linear-gradient(135deg, #f7931a, #f59e0b);
+    background: $gradient-primary;
     border-radius: $radius-full;
     display: flex;
     align-items: center;
@@ -1161,11 +1161,11 @@ h1 {
 }
 
 .crypto-note {
-  background: rgba(#f7931a, 0.1);
-  border-color: rgba(#f7931a, 0.3);
+  background: rgba($primary, 0.1);
+  border-color: rgba($primary, 0.3);
 
   i {
-    color: #f7931a;
+    color: $primary;
   }
 }
 

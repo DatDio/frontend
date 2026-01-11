@@ -38,7 +38,7 @@
           </div>
           <div class="bank-info-row">
             <span class="label">{{ 'TRANSACTION.AMOUNT' | translate }}:</span>
-            <span class="value amount">{{ depositAmount | number:'1.0-0' }} VNĐ</span>
+            <span class="value amount">{{ depositAmount | vndUsd }}</span>
           </div>
           <div class="bank-info-row content-row">
             <span class="label">{{ 'TRANSACTION.CONTENT' | translate }}:</span>
@@ -100,7 +100,7 @@
           </div>
           <div class="bank-info-row">
             <span class="label">{{ 'TRANSACTION.EQUIVALENT_VND' | translate }}:</span>
-            <span class="value amount">{{ estimatedVnd | number:'1.0-0' }} VNĐ</span>
+            <span class="value amount">{{ estimatedVnd | vndUsd }}</span>
           </div>
         </div>
 
@@ -488,7 +488,7 @@
               </td>
 
               <td class="fw-bold">
-                {{ transaction.amount | number:'1.0-0' }} VNĐ
+                {{ transaction.amount | vndUsd }}
               </td>
 
               <td>

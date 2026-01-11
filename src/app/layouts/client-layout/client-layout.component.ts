@@ -8,11 +8,12 @@ import { ThemeService } from '../../core/services/theme.service';
 import { SystemSettingService } from '../../core/services/system-setting.service';
 import { LanguageService } from '../../core/services/language.service';
 import { LanguageSwitcherComponent } from '../../shared/components/language-switcher/language-switcher.component';
+import { VndUsdPipe } from '../../shared/pipes/vnd-usd.pipe';
 
 @Component({
   selector: 'app-client-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslateModule, LanguageSwitcherComponent],
+  imports: [CommonModule, RouterModule, TranslateModule, LanguageSwitcherComponent, VndUsdPipe],
   templateUrl: './client-layout.component.html',
   styleUrls: ['./client-layout.component.scss']
 })

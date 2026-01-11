@@ -497,7 +497,8 @@
         "BENEFITS": "Benefits",
         "BONUS": "Bonus",
         "MIN_SPENT": "Minimum spent",
-        "NO_RANKS": "No rank information available"
+        "NO_RANKS": "No rank information available",
+        "PERIOD_INFO": "Rank is calculated based on total deposits in the last {{days}} days"
     },
     "SUPPORT": {
         "TITLE": "Support",
@@ -644,8 +645,12 @@
         "CRYPTO_CONFIRM_NOTE": "Click the button above to go to FPayment and complete USDT payment. Balance will be added automatically after successful payment.",
         "MIN_VND_ERROR": "Minimum VND amount is 10,000 VND",
         "ENTER_USDT_ERROR": "Please enter USDT amount to deposit",
+        "MIN_USDT_ERROR": "Minimum USDT amount is 1 USDT",
         "CRYPTO_CREATE_ERROR": "Cannot create crypto payment invoice",
-        "CRYPTO_ERROR": "An error occurred while creating crypto payment"
+        "CRYPTO_ERROR": "An error occurred while creating crypto payment",
+        "PAYMENT_CREATED": "Payment invoice created, please complete payment on FPayment page",
+        "DEPOSIT_SUCCESS": "Deposit successful! Balance has been updated",
+        "DEPOSIT_EXPIRED": "Payment invoice has expired"
     },
     "CONFIRM": {
         "DELETE_TITLE": "Confirm Delete",

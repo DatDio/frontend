@@ -20,13 +20,14 @@ import { OrderCreate } from '../../../core/models/order.model';
 import { ProductQuantityMessage } from '../../../core/models/product-quantity-message.model';
 import { TransactionService } from '../../../core/services/wallet.service';
 import { environment } from '../../../../environments/environment';
+import { VndUsdPipe } from '../../../shared/pipes/vnd-usd.pipe';
 
 declare var bootstrap: any;
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, PaginationComponent, ReactiveFormsModule, TranslateModule],
+  imports: [CommonModule, RouterModule, PaginationComponent, ReactiveFormsModule, TranslateModule, VndUsdPipe],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })

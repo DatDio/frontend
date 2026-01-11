@@ -6,11 +6,12 @@ import { AuthService } from '../../../core/services/auth.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { SeoService } from '../../../core/services/seo.service';
 import { Rank, UserRankInfo } from '../../../core/models/rank.model';
+import { VndUsdPipe } from '../../../shared/pipes/vnd-usd.pipe';
 
 @Component({
     selector: 'app-ranks',
     standalone: true,
-    imports: [CommonModule, TranslateModule],
+    imports: [CommonModule, TranslateModule, VndUsdPipe],
     templateUrl: './ranks.component.html',
     styleUrls: ['./ranks.component.scss']
 })

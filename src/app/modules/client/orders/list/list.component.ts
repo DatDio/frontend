@@ -9,6 +9,7 @@ import { NotificationService } from '../../../../core/services/notification.serv
 import { SeoService } from '../../../../core/services/seo.service';
 import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
 import { PaginationService } from '../../../../shared/services/pagination.service';
+import { VndUsdPipe } from '../../../../shared/pipes/vnd-usd.pipe';
 
 interface OrderSearchFilter extends OrderFilter {
   pagination?: PaginationConfig;
@@ -17,7 +18,7 @@ interface OrderSearchFilter extends OrderFilter {
 @Component({
   selector: 'app-client-order-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, PaginationComponent, TranslateModule],
+  imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, PaginationComponent, TranslateModule, VndUsdPipe],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss'
 })

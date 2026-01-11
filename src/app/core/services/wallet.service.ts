@@ -72,16 +72,23 @@ export class TransactionService {
   }
 
   // ================== CREATE DEPOSIT FPAYMENT (CRYPTO) ==================
-  createDepositFPayment(amountVnd: number): Observable<ApiResponse<any>> {
+  createDepositFPayment(amountUsdt: number): Observable<ApiResponse<any>> {
     this.loaderService.show();
 
     return this.httpClient
       .post<ApiResponse<any>>(
         WalletApi.DEPOSIT_FPAYMENT,
         null,
-        { params: { amountVnd: amountVnd.toString() } }
+        { params: { amountUsdt: amountUsdt.toString() } }
       )
       .pipe(finalize(() => this.loaderService.hide()));
+  }
+
+  // ================== CHECK FPAYMENT STATUS (POLLING) ==================
+  checkFPaymentStatus(transactionCode: number): Observable<ApiResponse<string>> {
+    return this.httpClient.get<ApiResponse<string>>(
+      `${WalletApi.DEPOSIT_FPAYMENT}/check-status/${transactionCode}`
+    );
   }
 
   // ================== SEARCH TRANSACTIONS ==================

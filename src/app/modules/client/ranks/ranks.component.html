@@ -15,12 +15,16 @@
                 </div>
                 <div class="rank-info-card">
                     <div class="rank-label">{{ 'PROFILE.TOTAL_DEPOSITED' | translate }}</div>
-                    <div class="rank-value">{{ formatCurrency(myRankInfo.currentDeposit) }} vnđ</div>
+                    <div class="rank-value">{{ myRankInfo.currentDeposit | vndUsd }}</div>
                 </div>
                 <div class="rank-info-card">
                     <div class="rank-label">{{ 'RANK.BONUS' | translate }}</div>
                     <div class="rank-value bonus">{{ myRankInfo.bonusPercent }} %</div>
                 </div>
+            </div>
+            <div class="rank-period-info">
+                <i class="bi bi-info-circle"></i>
+                {{ 'RANK.PERIOD_INFO' | translate: { days: myRankInfo.periodDays } }}
             </div>
             }
         </div>
@@ -68,7 +72,7 @@
 
                         <div class="deposit-section">
                             <span class="deposit-label">{{ 'RANK.MIN_SPENT' | translate }}</span>
-                            <span class="deposit-value">{{ formatCurrency(rank.minDeposit) }} vnd</span>
+                            <span class="deposit-value">{{ rank.minDeposit | vndUsd }}</span>
                         </div>
                     </div>
 

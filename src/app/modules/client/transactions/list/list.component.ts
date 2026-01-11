@@ -13,7 +13,8 @@ import { convertToISO } from '../../../../Utils/functions/date-time-utils';
 import { RankService } from '../../../../core/services/rank.service';
 import { UserRankInfo } from '../../../../core/models/rank.model';
 import { DepositNotificationService } from '../../../../core/services/deposit-notification.service';
-import { SystemSettingService } from '../../../../core/services/system-setting.service';
+import { VndUsdPipe } from '../../../../shared/pipes/vnd-usd.pipe';
+import { CurrencyService } from '../../../../core/services/currency.service';
 import { Subscription } from 'rxjs';
 
 declare global {
@@ -31,7 +32,8 @@ declare global {
     FormsModule,
     ReactiveFormsModule,
     PaginationComponent,
-    TranslateModule
+    TranslateModule,
+    VndUsdPipe
   ],
   templateUrl: './list.component.html',
   styleUrls: ['./list.component.scss']
@@ -46,7 +48,7 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
   private readonly seoService = inject(SeoService);
   private readonly depositNotificationService = inject(DepositNotificationService);
   private readonly translate = inject(TranslateService);
-  private readonly systemSettingService = inject(SystemSettingService);
+  private readonly currencyService = inject(CurrencyService);
 
   transactions: TransactionResponse[] = [];
   orderCode: number = 0;
@@ -68,10 +70,10 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
   depositAmountDisplay: string = '10,000';
 
   // ========== CRYPTO DEPOSIT ==========
-  cryptoAmount: number = 0;
-  cryptoAmountDisplay: string = '';
-  usdVndRate: number = 25000; // Tỷ giá mặc định 1 USDT = 25,000 VND
-  estimatedVnd: number = 0;
+  cryptoAmount: number = 1;
+  cryptoAmountDisplay: string = '1';
+  usdVndRate: number = 26000; // Tỷ giá mặc định 1 USDT = 26,000 VND
+  estimatedVnd: number = 26000; // Default: 1 USDT * 26000
 
   // ========== WEB2M QR MODAL ==========
   showQrModal = false;
@@ -110,6 +112,8 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
     this.loadRankInfo();
     this.loadUsdVndRate();
     this.depositAmountDisplay = this.formatNumber(this.depositAmount);
+    // Initialize estimatedVnd for default crypto amount
+    this.estimatedVnd = this.calculateEstimatedVnd();
 
     // Subscribe to deposit success events to close modal and reload data
     this.depositSuccessSub = this.depositNotificationService.depositSuccess$.subscribe(() => {
@@ -139,28 +143,35 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Load USD/VND exchange rate from public settings
+  // Load USD/VND exchange rate from CurrencyService
   private loadUsdVndRate(): void {
-    this.systemSettingService.getPublicSettings().subscribe({
-      next: (res) => {
-        if (res.success && res.data) {
-          const rate = res.data['fpayment.usd_vnd_rate'];
-          if (rate) {
-            this.usdVndRate = parseInt(rate, 10) || 25000;
-          }
-        }
-      },
-      error: () => {
-        // Keep default rate
-      }
+    // Get current rate immediately
+    this.usdVndRate = this.currencyService.getRate();
+    this.estimatedVnd = this.calculateEstimatedVnd();
+
+    // Subscribe to rate changes
+    this.currencyService.usdVndRate$.subscribe(rate => {
+      this.usdVndRate = rate;
+      this.estimatedVnd = this.calculateEstimatedVnd();
     });
   }
 
   // Handle crypto (USDT) amount input change
   onCryptoAmountChange(event: Event): void {
     const input = event.target as HTMLInputElement;
-    // Allow decimal input for USDT
-    const rawValue = input.value.replace(/[^0-9.]/g, '');
+    // Allow decimal input for USDT, max 2 decimal places
+    let rawValue = input.value.replace(/[^0-9.]/g, '');
+
+    // Handle multiple dots - keep only first one
+    const dotIndex = rawValue.indexOf('.');
+    if (dotIndex !== -1) {
+      rawValue = rawValue.slice(0, dotIndex + 1) + rawValue.slice(dotIndex + 1).replace(/\./g, '');
+    }
+
+    // Limit to 2 decimal places
+    if (dotIndex !== -1 && rawValue.length > dotIndex + 3) {
+      rawValue = rawValue.slice(0, dotIndex + 3);
+    }
 
     if (rawValue) {
       this.cryptoAmount = parseFloat(rawValue);
@@ -171,6 +182,9 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
       this.cryptoAmountDisplay = '';
       this.estimatedVnd = 0;
     }
+
+    // Update input value with formatted display
+    input.value = this.cryptoAmountDisplay;
   }
 
   // Calculate estimated VND from USDT amount
@@ -279,35 +293,43 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
 
   // ================== CREATE DEPOSIT CRYPTO (FPAYMENT) ==================
   createDepositCrypto(): void {
-    if (!this.cryptoAmount || this.cryptoAmount <= 0) {
-      this.notificationService.error(this.translate.instant('TRANSACTION.ENTER_USDT_ERROR'));
+    // Validate minimum USDT amount (1 USDT)
+    if (!this.cryptoAmount || this.cryptoAmount < 1) {
+      this.notificationService.error(this.translate.instant('TRANSACTION.MIN_USDT_ERROR'));
       return;
     }
 
-    // Convert USDT to VND for API call
-    const amountVnd = this.calculateEstimatedVnd();
-    if (amountVnd < 10000) {
-      this.notificationService.error(this.translate.instant('TRANSACTION.MIN_VND_ERROR'));
-      return;
-    }
+    // Open blank window BEFORE async call to avoid popup blocker
+    const paymentWindow = window.open('about:blank', '_blank');
 
-    this.transactionService.createDepositFPayment(amountVnd).subscribe({
+    // Send USDT amount directly to backend
+    this.transactionService.createDepositFPayment(this.cryptoAmount).subscribe({
       next: (res: any) => {
         if (res.success && res.data?.urlPayment) {
           // Start listening for deposit notification
           this.currentTransactionCode = res.data.transactionCode;
           this.depositNotificationService.startListening(this.currentTransactionCode);
 
-          // Open FPayment page directly in new tab
-          window.open(res.data.urlPayment, '_blank');
+          // Navigate the pre-opened window to payment URL
+          if (paymentWindow) {
+            paymentWindow.location.href = res.data.urlPayment;
+          } else {
+            // Fallback: navigate current tab if popup was blocked
+            window.location.href = res.data.urlPayment;
+          }
 
           // Show notification
           this.notificationService.success(this.translate.instant('TRANSACTION.PAYMENT_CREATED'));
+          // Backend will poll FPayment status and notify via WebSocket when completed
         } else {
+          // Close the blank window if request failed
+          paymentWindow?.close();
           this.notificationService.error(this.translate.instant('TRANSACTION.CRYPTO_CREATE_ERROR'));
         }
       },
       error: (error: any) => {
+        // Close the blank window on error
+        paymentWindow?.close();
         this.notificationService.error(
           error.error?.message || this.translate.instant('TRANSACTION.CRYPTO_ERROR')
         );

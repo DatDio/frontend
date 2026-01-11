@@ -14,6 +14,7 @@ import { ActiveStatusBadgeComponent } from '../../../shared/components/active-st
 // IMPORT DỊCH VỤ VÀ MODELS API KEY
 import { ApiKeyResponse } from '../../../core/models/api-key.model';
 import { ApiKeyService } from '../../../core/services/apikey.service';
+import { VndUsdPipe } from '../../../shared/pipes/vnd-usd.pipe';
 
 // Khai báo biến global Bootstrap
 declare var bootstrap: any;
@@ -21,7 +22,7 @@ declare var bootstrap: any;
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ActiveStatusBadgeComponent, RouterModule, TranslateModule],
+  imports: [CommonModule, ReactiveFormsModule, ActiveStatusBadgeComponent, RouterModule, TranslateModule, VndUsdPipe],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.scss']
 })

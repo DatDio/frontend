@@ -87,7 +87,7 @@
               </div>
               <div class="stat-info">
                 <span class="stat-label">{{ 'PROFILE.CURRENT_BALANCE' | translate }}</span>
-                <span class="stat-value text-primary">{{ (currentUser?.balance || 0) | number }} VNĐ</span>
+                <span class="stat-value text-primary">{{ (currentUser?.balance || 0) | vndUsd }}</span>
               </div>
             </div>
             <div class="stat-item">
@@ -96,7 +96,7 @@
               </div>
               <div class="stat-info">
                 <span class="stat-label">{{ 'PROFILE.TOTAL_DEPOSITED' | translate }}</span>
-                <span class="stat-value text-success">{{ (currentUser?.totalDeposit || 0) | number }} VNĐ</span>
+                <span class="stat-value text-success">{{ (currentUser?.totalDeposit || 0) | vndUsd }}</span>
               </div>
             </div>
             <div class="stat-item">
@@ -105,7 +105,7 @@
               </div>
               <div class="stat-info">
                 <span class="stat-label">{{ 'PROFILE.TOTAL_SPENT' | translate }}</span>
-                <span class="stat-value text-danger">{{ (currentUser?.totalSpent || 0) | number }} VNĐ</span>
+                <span class="stat-value text-danger">{{ (currentUser?.totalSpent || 0) | vndUsd }}</span>
               </div>
             </div>
           </div>

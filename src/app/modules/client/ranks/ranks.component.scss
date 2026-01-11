@@ -71,6 +71,24 @@
     }
 }
 
+// Period Info
+.rank-period-info {
+    margin-top: $spacing-4;
+    padding: $spacing-3 $spacing-4;
+    background: rgba($info, 0.1);
+    border: 1px solid rgba($info, 0.3);
+    border-radius: $radius-md;
+    color: $gray-300;
+    font-size: $font-size-sm;
+    display: inline-flex;
+    align-items: center;
+    gap: $spacing-2;
+
+    i {
+        color: $info;
+    }
+}
+
 // =============================================
 // RANKS CONTENT
 // =============================================

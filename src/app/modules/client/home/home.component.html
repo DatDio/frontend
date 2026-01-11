@@ -161,7 +161,7 @@
             </div>
 
             <div class="price-col text-start" [attr.data-label]="'HOME.PRICE' | translate">
-              <div class="price">{{ product.price | number }} VNĐ</div>
+              <div class="price">{{ product.price | vndUsd }}</div>
             </div>
 
             <div class="quantity-col text-start" [attr.data-label]="'HOME.QUANTITY' | translate">
@@ -214,7 +214,7 @@
       <div class="modal-body" *ngIf="selectedProduct">
         <div class="alert alert-info mb-4">
           <div class="fw-bold">{{ selectedProduct.name }}</div>
-          <div class="small">{{ 'ORDER.UNIT_PRICE' | translate }}: {{ selectedProduct.price | number }} VNĐ</div>
+          <div class="small">{{ 'ORDER.UNIT_PRICE' | translate }}: {{ selectedProduct.price | vndUsd }}</div>
         </div>
 
         <form [formGroup]="orderForm" (ngSubmit)="onSubmitOrder()">
@@ -234,7 +234,7 @@
 
           <div class="bg-light p-3 rounded d-flex justify-content-between align-items-center">
             <span class="fw-bold text-dark">{{ 'ORDER.TOTAL_PAYMENT' | translate }}:</span>
-            <span class="fw-bold text-primary fs-5">{{ totalPrice | number }} VNĐ</span>
+            <span class="fw-bold text-primary fs-5">{{ totalPrice | vndUsd }}</span>
           </div>
         </form>
       </div>

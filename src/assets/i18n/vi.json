@@ -497,7 +497,8 @@
     "BENEFITS": "Quyền lợi",
     "BONUS": "Bonus",
     "MIN_SPENT": "Chi tiêu tối thiểu",
-    "NO_RANKS": "Chưa có thông tin hạng"
+    "NO_RANKS": "Chưa có thông tin hạng",
+    "PERIOD_INFO": "Hạng được tính trên tổng tiền nạp trong {{days}} ngày gần nhất"
   },
   "SUPPORT": {
     "TITLE": "Hỗ trợ",
@@ -644,8 +645,12 @@
     "CRYPTO_CONFIRM_NOTE": "Nhấn nút trên để chuyển đến trang FPayment và hoàn tất thanh toán bằng USDT. Số dư sẽ được cộng tự động sau khi thanh toán thành công.",
     "MIN_VND_ERROR": "Số tiền VND tối thiểu là 10,000 VND",
     "ENTER_USDT_ERROR": "Vui lòng nhập số USDT muốn nạp",
+    "MIN_USDT_ERROR": "Số USDT tối thiểu là 1 USDT",
     "CRYPTO_CREATE_ERROR": "Không thể tạo hóa đơn thanh toán crypto",
-    "CRYPTO_ERROR": "Đã xảy ra lỗi khi tạo thanh toán crypto"
+    "CRYPTO_ERROR": "Đã xảy ra lỗi khi tạo thanh toán crypto",
+    "PAYMENT_CREATED": "Đã tạo hóa đơn thanh toán, vui lòng hoàn tất thanh toán trên trang FPayment",
+    "DEPOSIT_SUCCESS": "Nạp tiền thành công! Số dư đã được cập nhật",
+    "DEPOSIT_EXPIRED": "Hóa đơn thanh toán đã hết hạn"
   },
   "CONFIRM": {
     "DELETE_TITLE": "Xác nhận xóa",
