@@ -496,7 +496,7 @@
     "PROGRESS": "Tiến độ",
     "BENEFITS": "Quyền lợi",
     "BONUS": "Bonus",
-    "MIN_SPENT": "Chi tiêu tối thiểu",
+    "MIN_SPENT": "Tổng nạp tối thiểu",
     "NO_RANKS": "Chưa có thông tin hạng",
     "PERIOD_INFO": "Hạng được tính trên tổng tiền nạp trong {{days}} ngày gần nhất"
   },

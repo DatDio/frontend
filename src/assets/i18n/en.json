@@ -496,7 +496,7 @@
         "PROGRESS": "Progress",
         "BENEFITS": "Benefits",
         "BONUS": "Bonus",
-        "MIN_SPENT": "Minimum spent",
+        "MIN_SPENT": "Minimum deposit",
         "NO_RANKS": "No rank information available",
         "PERIOD_INFO": "Rank is calculated based on total deposits in the last {{days}} days"
     },

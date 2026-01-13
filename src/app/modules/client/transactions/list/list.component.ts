@@ -309,7 +309,7 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
           // Start listening for deposit notification
           this.currentTransactionCode = res.data.transactionCode;
           this.depositNotificationService.startListening(this.currentTransactionCode);
-
+          this.loadTransactions();
           // Navigate the pre-opened window to payment URL
           if (paymentWindow) {
             paymentWindow.location.href = res.data.urlPayment;

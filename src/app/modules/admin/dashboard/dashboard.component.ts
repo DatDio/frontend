@@ -51,7 +51,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    this.loadChartData();
+    // Chart will be loaded after overview stats complete
+    // to ensure canvas element is in DOM (not hidden by @if loading)
   }
 
   ngOnDestroy(): void {
@@ -68,10 +69,14 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           this.stats = response.data;
         }
         this.loading = false;
+        // Load chart after overview completes - canvas is now in DOM
+        setTimeout(() => this.loadChartData(), 100);
       },
       error: (error) => {
         console.error('Error loading overview stats:', error);
         this.loading = false;
+        // Still try to load chart
+        setTimeout(() => this.loadChartData(), 100);
       }
     });
   }
@@ -84,7 +89,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       next: (response) => {
         if (response.success && response.data) {
           this.chartData = response.data;
-          this.renderChart();
+          // Use setTimeout to ensure DOM is updated after chartLoading changes
+          setTimeout(() => this.renderChart(), 50);
         }
         this.chartLoading = false;
       },
