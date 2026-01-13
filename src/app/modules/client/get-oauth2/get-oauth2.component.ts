@@ -4,13 +4,13 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } 
 import { TranslateModule } from '@ngx-translate/core';
 import { NotificationService } from '../../../core/services/notification.service';
 import { SeoService } from '../../../core/services/seo.service';
-import { GetOAuth2Response, CheckStatus } from '../../../core/models/hotmail.model';
-import { HotmailApi } from '../../../Utils/apis/hotmail/hotmail.api';
+import { MicrosoftGraphService, OAuth2Result } from '../../../core/services/microsoft-graph.service';
+import { CheckStatus } from '../../../core/models/hotmail.model';
 
-interface OAuth2Result {
+interface OAuth2ResultItem {
     email: string;
     password: string;
-    refreshToken: string;  // New refresh token after renewal
+    refreshToken: string;
     clientId: string;
     accessToken?: string;
     fullData?: string;
@@ -29,23 +29,27 @@ export class GetOAuth2Component implements OnInit, OnDestroy {
     private readonly formBuilder = inject(FormBuilder);
     private readonly notificationService = inject(NotificationService);
     private readonly seoService = inject(SeoService);
+    private readonly graphService = inject(MicrosoftGraphService);
 
     getForm!: FormGroup;
     isLoading = false;
     showResults = false;
     removeDuplicate = true;
+    isStopped = false;
 
-    private eventSource: EventSource | null = null;
-
-    successResults: OAuth2Result[] = [];
-    errorResults: OAuth2Result[] = [];
-    unknownResults: OAuth2Result[] = [];
+    successResults: OAuth2ResultItem[] = [];
+    errorResults: OAuth2ResultItem[] = [];
+    unknownResults: OAuth2ResultItem[] = [];
     totalCount = 0;
     processedCount = 0;
 
     // Copy state tracking
     copiedType: string | null = null;
     private copyTimeout: any;
+
+    // Concurrency control
+    private readonly MAX_CONCURRENT = 10;
+    private readonly DEFAULT_CLIENT_ID = '9e5f94bc-e8a4-4e73-b8be-63364c29d753';
 
     ngOnInit(): void {
         this.seoService.setPageMeta(
@@ -59,16 +63,8 @@ export class GetOAuth2Component implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.closeEventSource();
         if (this.copyTimeout) {
             clearTimeout(this.copyTimeout);
-        }
-    }
-
-    private closeEventSource(): void {
-        if (this.eventSource) {
-            this.eventSource.close();
-            this.eventSource = null;
         }
     }
 
@@ -84,88 +80,126 @@ export class GetOAuth2Component implements OnInit, OnDestroy {
         return this.totalCount > 0 ? Math.round((this.processedCount / this.totalCount) * 100) : 0;
     }
 
-    onGet(): void {
+    async onGet(): Promise<void> {
         if (this.getForm.invalid) {
             this.notificationService.warning('Vui lòng nhập danh sách email');
             return;
         }
 
+        // Reset state
         this.successResults = [];
         this.errorResults = [];
         this.unknownResults = [];
         this.processedCount = 0;
         this.isLoading = true;
         this.showResults = true;
-        this.closeEventSource();
+        this.isStopped = false;
 
         let emailData = this.getForm.get('emailData')?.value.trim();
         if (this.removeDuplicate) {
             const lines = emailData.split('\n').filter((line: string) => line.trim().length > 0);
             emailData = [...new Set(lines)].join('\n');
         }
-        this.totalCount = emailData.split('\n').filter((line: string) => line.trim().length > 0).length;
 
-        fetch(HotmailApi.GET_OAUTH2_START, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ emailData })
-        })
-            .then(res => res.json())
-            .then(result => {
-                if (result.success && result.data?.sessionId) {
-                    this.connectToStream(result.data.sessionId);
-                } else {
-                    throw new Error(result.message || 'Failed to create session');
+        const emailLines = emailData.split('\n')
+            .map((line: string) => line.trim())
+            .filter((line: string) => line.length > 0);
+
+        this.totalCount = emailLines.length;
+
+        // Process emails with concurrency control
+        await this.processEmailsConcurrently(emailLines);
+
+        this.isLoading = false;
+        this.notificationService.success(
+            `Hoàn thành: ${this.successCount} thành công, ${this.errorCount} thất bại, ${this.unknownCount} unknown`
+        );
+    }
+
+    private async processEmailsConcurrently(emailLines: string[]): Promise<void> {
+        const queue = [...emailLines];
+        let activeCount = 0;
+        const maxConcurrent = this.MAX_CONCURRENT;
+
+        const processNext = async (): Promise<void> => {
+            while (queue.length > 0 && !this.isStopped) {
+                if (activeCount >= maxConcurrent) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    continue;
                 }
-            })
-            .catch(error => {
-                this.isLoading = false;
-                this.notificationService.error('Lỗi: ' + error.message);
+
+                const line = queue.shift();
+                if (!line) break;
+
+                activeCount++;
+                this.processSingleEmail(line).finally(() => {
+                    activeCount--;
+                });
+            }
+        };
+
+        const workers = [];
+        for (let i = 0; i < maxConcurrent; i++) {
+            workers.push(processNext());
+        }
+
+        await Promise.all(workers);
+
+        while (activeCount > 0) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+    }
+
+    private async processSingleEmail(line: string): Promise<void> {
+        const parts = line.split('|');
+
+        if (parts.length < 3) {
+            this.handleResult({
+                email: parts[0] || line,
+                password: parts[1] || '',
+                refreshToken: '',
+                clientId: '',
+                status: 'FAILED',
+                error: 'Invalid format: requires email|password|refresh_token|client_id'
             });
+            return;
+        }
+
+        const email = parts[0].trim();
+        const password = parts[1].trim();
+        const refreshToken = parts[2].trim();
+        const clientId = parts.length > 3 && parts[3].trim() ? parts[3].trim() : this.DEFAULT_CLIENT_ID;
+
+        try {
+            const result = await this.graphService.getOAuth2(
+                email, password, refreshToken, clientId
+            ).toPromise();
+
+            if (result) {
+                this.handleResult(result);
+            }
+        } catch (error: any) {
+            this.handleResult({
+                email,
+                password,
+                refreshToken,
+                clientId,
+                status: 'UNKNOWN',
+                error: error.message
+            });
+        }
     }
 
-    private connectToStream(sessionId: string): void {
-        const url = `${HotmailApi.GET_OAUTH2_STREAM}?sessionId=${sessionId}`;
-        this.eventSource = new EventSource(url);
-
-        this.eventSource.onmessage = (event) => {
-            try {
-                const result: GetOAuth2Response = JSON.parse(event.data);
-                this.handleResult(result);
-            } catch (e) { }
-        };
-
-        this.eventSource.addEventListener('result', (event: any) => {
-            try {
-                const result: GetOAuth2Response = JSON.parse(event.data);
-                this.handleResult(result);
-            } catch (e) { }
-        });
-
-        this.eventSource.addEventListener('done', () => {
-            this.closeEventSource();
-            this.isLoading = false;
-            this.notificationService.success(
-                `Hoàn thành: ${this.successCount} thành công, ${this.errorCount} thất bại, ${this.unknownCount} unknown`
-            );
-        });
-
-        this.eventSource.onerror = () => {
-            this.closeEventSource();
-            this.isLoading = false;
-        };
-    }
-
-    private handleResult(result: GetOAuth2Response): void {
+    private handleResult(result: OAuth2Result): void {
         this.processedCount++;
-        const oauth2Result: OAuth2Result = {
+        const oauth2Result: OAuth2ResultItem = {
             email: result.email,
             password: result.password || '',
             refreshToken: result.refreshToken || '',
             clientId: result.clientId || '',
             accessToken: result.accessToken,
             fullData: result.fullData || '',
-            status: result.status || (result.success ? 'SUCCESS' : 'FAILED'),
+            status: result.status,
             error: result.error
         };
 
@@ -239,7 +273,7 @@ export class GetOAuth2Component implements OnInit, OnDestroy {
     }
 
     stopGet(): void {
-        this.closeEventSource();
+        this.isStopped = true;
         this.isLoading = false;
         this.notificationService.info('Đã dừng lấy token');
     }

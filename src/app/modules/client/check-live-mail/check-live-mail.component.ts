@@ -4,8 +4,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule, Validators } 
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../core/services/notification.service';
 import { SeoService } from '../../../core/services/seo.service';
-import { CheckLiveMailResponse, CheckStatus } from '../../../core/models/hotmail.model';
-import { HotmailApi } from '../../../Utils/apis/hotmail/hotmail.api';
+import { MicrosoftGraphService, CheckLiveResult } from '../../../core/services/microsoft-graph.service';
+import { CheckStatus } from '../../../core/models/hotmail.model';
 
 interface MailCheckResult {
     email: string;
@@ -28,13 +28,13 @@ export class CheckLiveMailComponent implements OnInit, OnDestroy {
     private readonly notificationService = inject(NotificationService);
     private readonly seoService = inject(SeoService);
     private readonly translate = inject(TranslateService);
+    private readonly graphService = inject(MicrosoftGraphService);
 
     checkForm!: FormGroup;
     isLoading = false;
     showResults = false;
     removeDuplicate = true;
-
-    private eventSource: EventSource | null = null;
+    isStopped = false;
 
     liveResults: MailCheckResult[] = [];
     dieResults: MailCheckResult[] = [];
@@ -45,6 +45,10 @@ export class CheckLiveMailComponent implements OnInit, OnDestroy {
     // Copy state tracking
     copiedType: string | null = null;
     private copyTimeout: any;
+
+    // Concurrency control
+    private readonly MAX_CONCURRENT = 10;
+    private readonly DEFAULT_CLIENT_ID = '9e5f94bc-e8a4-4e73-b8be-63364c29d753';
 
     ngOnInit(): void {
         this.seoService.setPageMeta(
@@ -58,16 +62,8 @@ export class CheckLiveMailComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        this.closeEventSource();
         if (this.copyTimeout) {
             clearTimeout(this.copyTimeout);
-        }
-    }
-
-    private closeEventSource(): void {
-        if (this.eventSource) {
-            this.eventSource.close();
-            this.eventSource = null;
         }
     }
 
@@ -83,90 +79,128 @@ export class CheckLiveMailComponent implements OnInit, OnDestroy {
         return this.totalCount > 0 ? Math.round((this.processedCount / this.totalCount) * 100) : 0;
     }
 
-    onCheck(): void {
+    async onCheck(): Promise<void> {
         if (this.checkForm.invalid) {
             this.notificationService.warning(this.translate.instant('MESSAGE.NO_EMAIL_INPUT'));
             return;
         }
 
+        // Reset state
         this.liveResults = [];
         this.dieResults = [];
         this.unknownResults = [];
         this.processedCount = 0;
         this.isLoading = true;
         this.showResults = true;
-        this.closeEventSource();
+        this.isStopped = false;
 
         let emailData = this.checkForm.get('emailData')?.value.trim();
         if (this.removeDuplicate) {
             const lines = emailData.split('\n').filter((line: string) => line.trim().length > 0);
             emailData = [...new Set(lines)].join('\n');
         }
-        this.totalCount = emailData.split('\n').filter((line: string) => line.trim().length > 0).length;
 
-        fetch(HotmailApi.CHECK_LIVE_MAIL_START, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ emailData })
-        })
-            .then(res => res.json())
-            .then(result => {
-                if (result.success && result.data?.sessionId) {
-                    this.connectToStream(result.data.sessionId);
-                } else {
-                    throw new Error(result.message || 'Failed to create session');
-                }
+        const emailLines = emailData.split('\n')
+            .map((line: string) => line.trim())
+            .filter((line: string) => line.length > 0);
+
+        this.totalCount = emailLines.length;
+
+        // Process emails with concurrency control
+        await this.processEmailsConcurrently(emailLines);
+
+        this.isLoading = false;
+        this.notificationService.success(
+            this.translate.instant('MESSAGE.CHECK_COMPLETED', {
+                live: this.liveCount,
+                die: this.dieCount,
+                unknown: this.unknownCount
             })
-            .catch(error => {
-                this.isLoading = false;
-                this.notificationService.error(this.translate.instant('COMMON.ERROR') + ': ' + error.message);
+        );
+    }
+
+    private async processEmailsConcurrently(emailLines: string[]): Promise<void> {
+        const queue = [...emailLines];
+        let activeCount = 0;
+        const maxConcurrent = this.MAX_CONCURRENT;
+
+        const processNext = async (): Promise<void> => {
+            while (queue.length > 0 && !this.isStopped) {
+                if (activeCount >= maxConcurrent) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    continue;
+                }
+
+                const line = queue.shift();
+                if (!line) break;
+
+                activeCount++;
+                this.processSingleEmail(line).finally(() => {
+                    activeCount--;
+                });
+            }
+        };
+
+        const workers = [];
+        for (let i = 0; i < maxConcurrent; i++) {
+            workers.push(processNext());
+        }
+
+        await Promise.all(workers);
+
+        while (activeCount > 0) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+    }
+
+    private async processSingleEmail(line: string): Promise<void> {
+        const parts = line.split('|');
+
+        if (parts.length < 3) {
+            this.handleResult({
+                email: parts[0] || line,
+                password: parts[1] || '',
+                isLive: false,
+                error: 'Invalid format: requires email|password|refresh_token|client_id',
+                status: 'FAILED'
             });
+            return;
+        }
+
+        const email = parts[0].trim();
+        const password = parts[1].trim();
+        const refreshToken = parts[2].trim();
+        const clientId = parts.length > 3 && parts[3].trim() ? parts[3].trim() : this.DEFAULT_CLIENT_ID;
+
+        try {
+            const result = await this.graphService.checkLive(
+                email, password, refreshToken, clientId
+            ).toPromise();
+
+            if (result) {
+                this.handleResult(result);
+            }
+        } catch (error: any) {
+            this.handleResult({
+                email,
+                password,
+                refreshToken,
+                clientId,
+                isLive: false,
+                error: error.message,
+                status: 'UNKNOWN'
+            });
+        }
     }
 
-    private connectToStream(sessionId: string): void {
-        const url = `${HotmailApi.CHECK_LIVE_MAIL_STREAM}?sessionId=${sessionId}`;
-        this.eventSource = new EventSource(url);
-
-        this.eventSource.onmessage = (event) => {
-            try {
-                const result: CheckLiveMailResponse = JSON.parse(event.data);
-                this.handleResult(result);
-            } catch (e) { }
-        };
-
-        this.eventSource.addEventListener('result', (event: any) => {
-            try {
-                const result: CheckLiveMailResponse = JSON.parse(event.data);
-                this.handleResult(result);
-            } catch (e) { }
-        });
-
-        this.eventSource.addEventListener('done', () => {
-            this.closeEventSource();
-            this.isLoading = false;
-            this.notificationService.success(
-                this.translate.instant('MESSAGE.CHECK_COMPLETED', {
-                    live: this.liveCount,
-                    die: this.dieCount,
-                    unknown: this.unknownCount
-                })
-            );
-        });
-
-        this.eventSource.onerror = () => {
-            this.closeEventSource();
-            this.isLoading = false;
-        };
-    }
-
-    private handleResult(result: CheckLiveMailResponse): void {
+    private handleResult(result: CheckLiveResult): void {
         this.processedCount++;
         const mailResult: MailCheckResult = {
             email: result.email,
             password: result.password || '',
             refreshToken: result.refreshToken,
             clientId: result.clientId,
-            status: result.status || (result.isLive ? 'SUCCESS' : 'FAILED'),
+            status: result.status,
             error: result.error
         };
 
@@ -226,7 +260,7 @@ export class CheckLiveMailComponent implements OnInit, OnDestroy {
     }
 
     stopCheck(): void {
-        this.closeEventSource();
+        this.isStopped = true;
         this.isLoading = false;
         this.notificationService.info(this.translate.instant('MESSAGE.CHECK_STOPPED'));
     }

@@ -4,8 +4,8 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NotificationService } from '../../../core/services/notification.service';
 import { SeoService } from '../../../core/services/seo.service';
-import { HotmailGetCodeResponse, EMAIL_TYPES, GET_TYPES, EmailType, CheckStatus } from '../../../core/models/hotmail.model';
-import { HotmailApi } from '../../../Utils/apis/hotmail/hotmail.api';
+import { MicrosoftGraphService, EmailCodeResult } from '../../../core/services/microsoft-graph.service';
+import { EMAIL_TYPES, GET_TYPES, EmailType, CheckStatus } from '../../../core/models/hotmail.model';
 
 interface CodeResult {
   email: string;
@@ -31,18 +31,18 @@ export class GetCodeMailComponent implements OnInit, OnDestroy {
   private readonly notificationService = inject(NotificationService);
   private readonly seoService = inject(SeoService);
   private readonly translateService = inject(TranslateService);
+  private readonly graphService = inject(MicrosoftGraphService);
 
   getCodeForm!: FormGroup;
   emailTypes = EMAIL_TYPES;
   getTypes = GET_TYPES;
   isLoading = false;
   showResults = false;
+  isStopped = false;
 
   // Copy state tracking
   copiedCode: string | null = null;
   private copyTimeout: any;
-
-  private eventSource: EventSource | null = null;
 
   selectedGetTypes: Set<string> = new Set(['Oauth2']);
   selectedEmailTypes: Set<string> = new Set(['Auto']);
@@ -52,6 +52,10 @@ export class GetCodeMailComponent implements OnInit, OnDestroy {
   unknownResults: CodeResult[] = [];
   totalCount = 0;
   processedCount = 0;
+
+  // Concurrency control
+  private readonly MAX_CONCURRENT = 10;
+  private readonly DEFAULT_CLIENT_ID = '9e5f94bc-e8a4-4e73-b8be-63364c29d753';
 
   ngOnInit(): void {
     this.seoService.setPageMeta(
@@ -65,16 +69,8 @@ export class GetCodeMailComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.closeEventSource();
     if (this.copyTimeout) {
       clearTimeout(this.copyTimeout);
-    }
-  }
-
-  private closeEventSource(): void {
-    if (this.eventSource) {
-      this.eventSource.close();
-      this.eventSource = null;
     }
   }
 
@@ -133,82 +129,128 @@ export class GetCodeMailComponent implements OnInit, OnDestroy {
     return [...this.successResults, ...this.failedResults, ...this.unknownResults];
   }
 
-  onGetCode(): void {
+  /**
+   * Main entry point - process emails using frontend Graph API
+   */
+  async onGetCode(): Promise<void> {
     if (this.getCodeForm.invalid || this.selectedGetTypes.size === 0 || this.selectedEmailTypes.size === 0) {
       this.notificationService.warning(this.translateService.instant('TOOLS.FILL_INFO'));
       return;
     }
 
+    // Reset state
     this.successResults = [];
     this.failedResults = [];
     this.unknownResults = [];
     this.processedCount = 0;
     this.isLoading = true;
     this.showResults = true;
-    this.closeEventSource();
+    this.isStopped = false;
 
     const emailData = this.getCodeForm.get('emailData')?.value.trim();
-    this.totalCount = emailData.split('\n').filter((line: string) => line.trim().length > 0).length;
+    const emailLines = emailData.split('\n')
+      .map((line: string) => line.trim())
+      .filter((line: string) => line.length > 0);
 
-    const request = {
-      getTypes: Array.from(this.selectedGetTypes),
-      emailTypes: Array.from(this.selectedEmailTypes),
-      emailData
-    };
+    this.totalCount = emailLines.length;
+    const emailTypes = Array.from(this.selectedEmailTypes);
 
-    fetch(HotmailApi.GET_CODE_START, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(request)
-    })
-      .then(res => res.json())
-      .then(result => {
-        if (result.success && result.data?.sessionId) {
-          this.connectToStream(result.data.sessionId);
-        } else {
-          throw new Error(result.message || 'Failed to create session');
+    // Process emails with concurrency control
+    await this.processEmailsConcurrently(emailLines, emailTypes);
+
+    this.isLoading = false;
+    this.notificationService.success(
+      `${this.translateService.instant('TOOLS.COMPLETED')}: ${this.successCount} success, ${this.failedCount} failed, ${this.unknownCount} unknown`
+    );
+  }
+
+  /**
+   * Process emails with concurrency limit using Promise-based queue
+   */
+  private async processEmailsConcurrently(emailLines: string[], emailTypes: string[]): Promise<void> {
+    const queue = [...emailLines];
+    let activeCount = 0;
+    const maxConcurrent = this.MAX_CONCURRENT;
+
+    const processNext = async (): Promise<void> => {
+      while (queue.length > 0 && !this.isStopped) {
+        if (activeCount >= maxConcurrent) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+          continue;
         }
-      })
-      .catch(error => {
-        this.isLoading = false;
-        this.notificationService.error(this.translateService.instant('TOOLS.ERROR') + ': ' + error.message);
+
+        const line = queue.shift();
+        if (!line) break;
+
+        activeCount++;
+        this.processSingleEmail(line, emailTypes).finally(() => {
+          activeCount--;
+        });
+      }
+    };
+
+    // Start concurrent processing
+    const workers = [];
+    for (let i = 0; i < maxConcurrent; i++) {
+      workers.push(processNext());
+    }
+
+    // Wait for all workers to complete
+    await Promise.all(workers);
+
+    // Wait for remaining active tasks
+    while (activeCount > 0) {
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+  }
+
+  /**
+   * Process a single email line
+   */
+  private async processSingleEmail(line: string, emailTypes: string[]): Promise<void> {
+    const parts = line.split('|');
+
+    if (parts.length < 3) {
+      this.handleResult({
+        email: parts[0] || line,
+        password: parts[1] || '',
+        status: 'FAILED',
+        content: 'Invalid format: requires email|password|refresh_token|client_id'
       });
+      return;
+    }
+
+    const email = parts[0].trim();
+    const password = parts[1].trim();
+    const refreshToken = parts[2].trim();
+    const clientId = parts.length > 3 && parts[3].trim() ? parts[3].trim() : this.DEFAULT_CLIENT_ID;
+
+    try {
+      const result = await this.graphService.getCode(
+        email, password, refreshToken, clientId, emailTypes
+      ).toPromise();
+
+      if (result) {
+        this.handleResult(result);
+      }
+    } catch (error: any) {
+      this.handleResult({
+        email,
+        password,
+        refreshToken,
+        clientId,
+        status: 'UNKNOWN',
+        content: `Error: ${error.message}`
+      });
+    }
   }
 
-  private connectToStream(sessionId: string): void {
-    const url = `${HotmailApi.GET_CODE_STREAM}?sessionId=${sessionId}`;
-    this.eventSource = new EventSource(url);
-
-    this.eventSource.onmessage = (event) => {
-      try {
-        const result: HotmailGetCodeResponse = JSON.parse(event.data);
-        this.handleResult(result);
-      } catch (e) { }
-    };
-
-    this.eventSource.addEventListener('result', (event: any) => {
-      try {
-        const result: HotmailGetCodeResponse = JSON.parse(event.data);
-        this.handleResult(result);
-      } catch (e) { }
-    });
-
-    this.eventSource.addEventListener('done', () => {
-      this.closeEventSource();
-      this.isLoading = false;
-      this.notificationService.success(
-        `${this.translateService.instant('TOOLS.COMPLETED')}: ${this.successCount} success, ${this.failedCount} failed, ${this.unknownCount} unknown`
-      );
-    });
-
-    this.eventSource.onerror = () => {
-      this.closeEventSource();
-      this.isLoading = false;
-    };
-  }
-
-  private handleResult(result: HotmailGetCodeResponse): void {
+  /**
+   * Handle result from Graph API processing
+   */
+  private handleResult(result: EmailCodeResult): void {
     this.processedCount++;
+
     const codeResult: CodeResult = {
       email: result.email,
       password: result.password,
@@ -217,12 +259,12 @@ export class GetCodeMailComponent implements OnInit, OnDestroy {
       code: result.code,
       content: result.content,
       date: result.date,
-      status: result.checkStatus || (result.status ? 'SUCCESS' : 'FAILED')
+      status: result.status
     };
 
-    if (codeResult.status === 'SUCCESS') {
+    if (result.status === 'SUCCESS') {
       this.successResults = [...this.successResults, codeResult];
-    } else if (codeResult.status === 'FAILED') {
+    } else if (result.status === 'FAILED') {
       this.failedResults = [...this.failedResults, codeResult];
     } else {
       this.unknownResults = [...this.unknownResults, codeResult];
@@ -270,66 +312,43 @@ export class GetCodeMailComponent implements OnInit, OnDestroy {
   }
 
   stopGetCode(): void {
-    this.closeEventSource();
+    this.isStopped = true;
     this.isLoading = false;
     this.notificationService.info(this.translateService.instant('TOOLS.STOPPED'));
   }
 
-  retryRow(item: CodeResult): void {
+  /**
+   * Retry a single failed email
+   */
+  async retryRow(item: CodeResult): Promise<void> {
+    if (!item.refreshToken) {
+      this.notificationService.error('Missing refresh token for retry');
+      return;
+    }
+
     item.retrying = true;
-    const emailData = `${item.email}|${item.password || ''}|${item.refreshToken || ''}|${item.clientId || ''}`;
+    const emailTypes = Array.from(this.selectedEmailTypes);
 
-    const request = {
-      getTypes: Array.from(this.selectedGetTypes),
-      emailTypes: Array.from(this.selectedEmailTypes),
-      emailData
-    };
+    try {
+      const result = await this.graphService.getCode(
+        item.email,
+        item.password || '',
+        item.refreshToken,
+        item.clientId || this.DEFAULT_CLIENT_ID,
+        emailTypes
+      ).toPromise();
 
-    fetch(HotmailApi.GET_CODE_START, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(request)
-    })
-      .then(res => res.json())
-      .then(result => {
-        if (result.success && result.data?.sessionId) {
-          this.retryStream(result.data.sessionId, item);
-        } else {
-          item.retrying = false;
-          this.notificationService.error('Retry failed');
-        }
-      })
-      .catch(() => {
-        item.retrying = false;
-        this.notificationService.error('Retry failed');
-      });
+      if (result) {
+        this.updateRetryResult(item, result);
+      }
+    } catch (error: any) {
+      item.retrying = false;
+      this.notificationService.error('Retry failed: ' + error.message);
+    }
   }
 
-  private retryStream(sessionId: string, originalItem: CodeResult): void {
-    const eventSource = new EventSource(`${HotmailApi.GET_CODE_STREAM}?sessionId=${sessionId}`);
-
-    eventSource.addEventListener('result', (event: any) => {
-      try {
-        const result: HotmailGetCodeResponse = JSON.parse(event.data);
-        this.updateRetryResult(originalItem, result);
-      } catch (e) { }
-    });
-
-    eventSource.addEventListener('done', () => {
-      eventSource.close();
-      originalItem.retrying = false;
-    });
-
-    eventSource.onerror = () => {
-      eventSource.close();
-      originalItem.retrying = false;
-    };
-  }
-
-  private updateRetryResult(originalItem: CodeResult, result: HotmailGetCodeResponse): void {
-    const newStatus = result.checkStatus || (result.status ? 'SUCCESS' : 'FAILED');
-
-    // Remove from old array
+  private updateRetryResult(originalItem: CodeResult, result: EmailCodeResult): void {
+    // Remove from old arrays
     this.successResults = this.successResults.filter(r => r !== originalItem);
     this.failedResults = this.failedResults.filter(r => r !== originalItem);
     this.unknownResults = this.unknownResults.filter(r => r !== originalItem);
@@ -343,15 +362,15 @@ export class GetCodeMailComponent implements OnInit, OnDestroy {
       code: result.code,
       content: result.content,
       date: result.date,
-      status: newStatus,
+      status: result.status,
       retrying: false
     };
 
-    // Add to new array
-    if (newStatus === 'SUCCESS') {
+    // Add to appropriate array
+    if (result.status === 'SUCCESS') {
       this.successResults = [...this.successResults, updatedResult];
       this.notificationService.success(`${result.email}: ${this.translateService.instant('COMMON.SUCCESS')}!`);
-    } else if (newStatus === 'FAILED') {
+    } else if (result.status === 'FAILED') {
       this.failedResults = [...this.failedResults, updatedResult];
     } else {
       this.unknownResults = [...this.unknownResults, updatedResult];
