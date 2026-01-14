@@ -94,7 +94,7 @@ export class AuthService {
         finalize(() => this.loaderService.hide())
       );
   }
-// ===== CHANGE PASSWORD =====
+  // ===== CHANGE PASSWORD =====
   changePassword(data: { currentPassword: string; newPassword: string }): Observable<ApiResponse<void>> {
     this.loaderService.show();
 
@@ -223,6 +223,7 @@ export class AuthService {
     }
 
     const token = localStorage.getItem('accessToken');
+    const refreshToken = localStorage.getItem('refreshToken');
     const userJson = localStorage.getItem('currentUser');
 
     if (token) {
@@ -230,17 +231,79 @@ export class AuthService {
         const user = userJson ? (JSON.parse(userJson) as User) : null;
         this.currentUserSubject.next(user);
         this.isAuthenticatedSubject.next(true);
+        // Mark auth as ready
+        this.authReadySubject.next(true);
       } catch {
         localStorage.removeItem('currentUser');
         this.currentUserSubject.next(null);
         this.isAuthenticatedSubject.next(false);
+        this.authReadySubject.next(true);
       }
+    } else if (refreshToken) {
+      // No accessToken but refreshToken exists - try to refresh
+      this.tryRefreshOnStartup(userJson);
     } else {
       this.currentUserSubject.next(null);
       this.isAuthenticatedSubject.next(false);
+      // Mark auth as ready - only happens in browser after localStorage check
+      this.authReadySubject.next(true);
+    }
+  }
+
+  /**
+   * Try to refresh token on startup when accessToken is missing but refreshToken exists
+   */
+  private tryRefreshOnStartup(userJson: string | null): void {
+    const refreshToken = localStorage.getItem('refreshToken');
+
+    if (!refreshToken) {
+      this.currentUserSubject.next(null);
+      this.isAuthenticatedSubject.next(false);
+      this.authReadySubject.next(true);
+      return;
     }
 
-    // Mark auth as ready - only happens in browser after localStorage check
-    this.authReadySubject.next(true);
+    this.httpClient
+      .post<ApiResponse<{ accessToken: string }>>(AuthApi.REFRESH, { refreshToken })
+      .subscribe({
+        next: (response) => {
+          if (response.success && response.data) {
+            // Successfully refreshed - restore session
+            localStorage.setItem('accessToken', response.data.accessToken);
+
+            try {
+              const user = userJson ? (JSON.parse(userJson) as User) : null;
+              this.currentUserSubject.next(user);
+              this.isAuthenticatedSubject.next(true);
+            } catch {
+              // User data corrupted, but we have valid tokens
+              this.currentUserSubject.next(null);
+              this.isAuthenticatedSubject.next(true);
+            }
+          } else {
+            // Refresh failed - clear everything
+            this.clearAuthData();
+          }
+          this.authReadySubject.next(true);
+        },
+        error: () => {
+          // Refresh failed - clear everything
+          this.clearAuthData();
+          this.authReadySubject.next(true);
+        }
+      });
+  }
+
+  /**
+   * Clear all auth data from storage
+   */
+  private clearAuthData(): void {
+    if (this.isBrowser) {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('currentUser');
+    }
+    this.currentUserSubject.next(null);
+    this.isAuthenticatedSubject.next(false);
   }
 }
