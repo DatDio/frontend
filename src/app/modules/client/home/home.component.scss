@@ -661,3 +661,208 @@
   border-top: 1px solid var(--border-color);
   background: var(--bg-card);
 }
+
+// =============================================
+// SUCCESS MODAL
+// =============================================
+
+.success-modal {
+  .modal-header {
+    background: linear-gradient(135deg, $success 0%, darken($success, 10%) 100%);
+  }
+
+  .order-info-section {
+    background: var(--bg-secondary);
+    border-radius: $radius-lg;
+    padding: $spacing-4;
+    margin-bottom: $spacing-5;
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: $spacing-3 0;
+      border-bottom: 1px solid var(--border-color);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      &.full {
+        width: 100%;
+      }
+
+      &.half {
+        flex: 1;
+        border-bottom: none;
+        padding: $spacing-2 $spacing-3;
+
+        &:first-child {
+          border-right: 1px solid var(--border-color);
+        }
+      }
+
+      .label {
+        font-size: $font-size-xs;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .value {
+        font-size: $font-size-base;
+        font-weight: $font-weight-bold;
+        color: var(--text-heading);
+        word-break: break-all;
+
+        &.primary {
+          color: $primary;
+        }
+
+        &.success {
+          color: $success;
+        }
+      }
+    }
+
+    .info-row-group {
+      display: flex;
+      padding-top: $spacing-3;
+    }
+  }
+
+  .account-data-section {
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: $spacing-2;
+      font-weight: $font-weight-semibold;
+      color: var(--text-heading);
+      margin-bottom: $spacing-3;
+
+      i {
+        color: $primary;
+      }
+    }
+
+    .account-textarea {
+      width: 100%;
+      min-height: 200px;
+      padding: $spacing-3;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-input);
+      border-radius: $radius-lg;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: $font-size-sm;
+      color: var(--text-primary);
+      resize: vertical;
+      white-space: nowrap;
+      overflow-x: auto;
+
+      &:focus {
+        outline: none;
+        border-color: $primary;
+      }
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: $spacing-3;
+    justify-content: center;
+    margin-top: $spacing-5;
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-2;
+      padding: $spacing-3 $spacing-5;
+      border-radius: $radius-lg;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      cursor: pointer;
+      transition: all $transition-base;
+      border: none;
+
+      i {
+        font-size: $font-size-base;
+      }
+
+      &.btn-copy {
+        background: $gradient-primary;
+        color: $white;
+        box-shadow: $shadow-primary;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: $shadow-md, $shadow-primary;
+        }
+
+        &.copied {
+          background: $success;
+          box-shadow: 0 4px 15px rgba($success, 0.4);
+        }
+      }
+
+      &.btn-download {
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        border: 1px solid var(--border-color);
+
+        &:hover {
+          background: var(--bg-table-row-hover);
+          border-color: $primary;
+          color: $primary;
+        }
+      }
+    }
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: $spacing-3;
+
+    .btn-orders {
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-2;
+      padding: $spacing-3 $spacing-5;
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: $radius-lg;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-medium;
+      cursor: pointer;
+      transition: all $transition-base;
+
+      &:hover {
+        background: var(--bg-secondary);
+        color: $primary;
+        border-color: $primary;
+      }
+    }
+
+    .btn-close-modal {
+      display: inline-flex;
+      align-items: center;
+      gap: $spacing-2;
+      padding: $spacing-3 $spacing-6;
+      background: $gradient-primary;
+      color: $white;
+      border: none;
+      border-radius: $radius-lg;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      cursor: pointer;
+      transition: all $transition-base;
+      box-shadow: $shadow-primary;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: $shadow-md, $shadow-primary;
+      }
+    }
+  }
+}

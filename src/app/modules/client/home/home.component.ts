@@ -3,7 +3,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { finalize } from 'rxjs/operators';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { SeoService } from '../../../core/services/seo.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -16,7 +16,7 @@ import { WebSocketService } from '../../../core/services/websocket.service';
 
 import { Category } from '../../../core/models/category.model';
 import { Product } from '../../../core/models/product.model';
-import { OrderCreate } from '../../../core/models/order.model';
+import { Order, OrderCreate } from '../../../core/models/order.model';
 import { ProductQuantityMessage } from '../../../core/models/product-quantity-message.model';
 import { TransactionService } from '../../../core/services/wallet.service';
 import { environment } from '../../../../environments/environment';
@@ -44,6 +44,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   private readonly walletService = inject(TransactionService);
   private readonly router = inject(Router);
   private readonly webSocketService = inject(WebSocketService);
+  private readonly translate = inject(TranslateService);
 
   categories: Category[] = [];
   paginationConfig: PaginationConfig = {
@@ -59,6 +60,12 @@ export class HomeComponent implements OnInit, OnDestroy {
   private modalInstance: any;
   private productQuantityUnsub?: () => void;
   private latestQuantities = new Map<number, number>();
+
+  // Order success popup
+  successOrder: Order | null = null;
+  copiedSuccess = false;
+  private successModalInstance: any;
+  private copyTimeout: any;
 
   constructor() {
     // loadCategories() is called in ngOnInit() for SSR support
@@ -95,7 +102,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.applyBufferedQuantities();
         }
       },
-      error: () => this.notificationService.error('Không thể tải danh sách sản phẩm')
+      error: () => this.notificationService.error(this.translate.instant('MESSAGE.LOAD_PRODUCTS_ERROR'))
     });
   }
 
@@ -114,7 +121,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   prepareOrder(product: Product): void {
     if (!this.authService.isAuthenticated()) {
-      this.notificationService.warning('Vui lòng đăng nhập để mua hàng');
+      this.notificationService.warning(this.translate.instant('MESSAGE.LOGIN_REQUIRED'));
       return;
     }
 
@@ -142,21 +149,21 @@ export class HomeComponent implements OnInit, OnDestroy {
       quantity: quantity
     };
 
-    this.orderService.buy(orderRequest)
+    this.orderService.buyWeb(orderRequest)
       .pipe(finalize(() => this.orderLoading = false))
       .subscribe({
         next: (response) => {
-          if (response.success) {
-            this.notificationService.success(response.message || 'Đặt hàng thành công!');
+          if (response.success && response.data) {
             this.closeOrderModal();
             this.walletService.refreshBalance();
-            this.router.navigate(['/orders']);
+            this.successOrder = response.data;
+            this.openSuccessModal();
           } else {
-            this.notificationService.error(response.message || 'Đặt hàng thất bại');
+            this.notificationService.error(response.message || this.translate.instant('ORDER.ORDER_FAILED'));
           }
         },
         error: (error) => {
-          this.notificationService.error(error.error?.message || 'Đã xảy ra lỗi hệ thống');
+          this.notificationService.error(error.error?.message || this.translate.instant('MESSAGE.ERROR'));
         }
       });
   }
@@ -184,6 +191,73 @@ export class HomeComponent implements OnInit, OnDestroy {
     if (!this.selectedProduct) return 0;
     const quantity = this.orderForm.get('quantity')?.value || 0;
     return this.selectedProduct.price * quantity;
+  }
+
+  // --- SUCCESS MODAL METHODS ---
+
+  openSuccessModal(): void {
+    const modalElement = document.getElementById('successModal');
+    if (modalElement) {
+      this.successModalInstance = new bootstrap.Modal(modalElement, {
+        backdrop: 'static',
+        keyboard: false
+      });
+      this.successModalInstance.show();
+    }
+  }
+
+  closeSuccessModal(): void {
+    if (this.successModalInstance) {
+      this.successModalInstance.hide();
+    }
+
+    const backdrops = document.getElementsByClassName('modal-backdrop');
+    while (backdrops.length > 0) {
+      backdrops[0].parentNode?.removeChild(backdrops[0]);
+    }
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+
+    setTimeout(() => {
+      this.successOrder = null;
+      this.copiedSuccess = false;
+    }, 200);
+  }
+
+  copyAccountData(): void {
+    if (!this.successOrder?.accountData?.length) return;
+
+    const content = this.successOrder.accountData.join('\n');
+    navigator.clipboard.writeText(content).then(() => {
+      if (this.copyTimeout) clearTimeout(this.copyTimeout);
+      this.copiedSuccess = true;
+      this.notificationService.success(this.translate.instant('MESSAGE.ACCOUNTS_COPIED'));
+      this.copyTimeout = setTimeout(() => {
+        this.copiedSuccess = false;
+      }, 2000);
+    }).catch(() => {
+      this.notificationService.error(this.translate.instant('MESSAGE.COPY_FAILED'));
+    });
+  }
+
+  downloadTxt(): void {
+    if (!this.successOrder?.accountData?.length) return;
+
+    const content = this.successOrder.accountData.join('\n');
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${this.successOrder.orderNumber}.txt`;
+    link.click();
+    window.URL.revokeObjectURL(url);
+    this.notificationService.success(this.translate.instant('MESSAGE.DOWNLOAD_SUCCESS'));
+  }
+
+  goToOrders(): void {
+    this.closeSuccessModal();
+    this.router.navigate(['/orders']);
   }
 
   private subscribeToQuantityUpdates(): void {

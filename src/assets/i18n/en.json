@@ -215,7 +215,9 @@
         "TOTAL_PAYMENT": "Total payment",
         "MY_ORDERS": "My orders",
         "ENTER_ORDER_ID": "Enter order ID",
-        "TOTAL_ORDERS": "Total orders"
+        "TOTAL_ORDERS": "Total orders",
+        "SUCCESS_TITLE": "Order Successful!",
+        "VIEW_ALL_ORDERS": "View all orders"
     },
     "WALLET": {
         "TITLE": "Wallet",
@@ -317,8 +319,8 @@
         "CHECK_LIVE_MAIL": "Check live mail",
         "CHECK_LIVE_MAIL_DESC": "Check if email is still active",
         "CHECK_LIVE_MAIL_SUBTITLE": "Check status of Hotmail/Outlook email accounts",
-        "GET_OAUTH2": "Get OAuth2",
-        "GET_OAUTH2_DESC": "Get OAuth2 token",
+        "GET_OAUTH2": "Renew OAuth2",
+        "GET_OAUTH2_DESC": "Renew OAuth2 token",
         "RENEW_REFRESH_TOKEN": "Renew Refresh Token",
         "RENEW_REFRESH_TOKEN_SUBTITLE": "Renew Refresh Token for Hotmail/Outlook email",
         "RENEWING": "Renewing...",
@@ -385,7 +387,8 @@
         "STOPPED_READING": "Stopped reading mail",
         "COMPLETED": "Completed",
         "FILL_INFO": "Please fill in all information",
-        "ERROR": "Error"
+        "ERROR": "Error",
+        "VIEW_ALL": "View all tools"
     },
     "FOOTER": {
         "ABOUT": "Providing quality email marketing at competitive prices",
@@ -432,6 +435,8 @@
         "CONFIRM_ACTION": "Are you sure you want to proceed?",
         "NO_RESULTS": "No results found",
         "LOADING_DATA": "Loading data...",
+        "LOAD_PRODUCTS_ERROR": "Failed to load products",
+        "LOGIN_REQUIRED": "Please login to purchase",
         "OPERATION_FAILED": "Operation failed",
         "PAGE_RANGE_ERROR": "Page must be between 1 and {{max}}",
         "NO_ACCOUNT_TO_COPY": "No accounts to copy",

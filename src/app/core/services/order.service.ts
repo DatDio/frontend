@@ -63,6 +63,20 @@ export class OrderService {
   }
 
   /**
+   * Buy for Web/Frontend - returns full order info for popup display
+   */
+  buyWeb(request: OrderCreate): Observable<ApiResponse<Order>> {
+    const params = new HttpParams()
+      .set('productId', request.productId.toString())
+      .set('quantity', request.quantity.toString());
+
+    return this.httpClient.get<ApiResponse<Order>>(
+      OrderApi.BUY_WEB,
+      { params }
+    );
+  }
+
+  /**
    * Get order by ID
    */
   getById(id: number | string): Observable<ApiResponse<Order>> {

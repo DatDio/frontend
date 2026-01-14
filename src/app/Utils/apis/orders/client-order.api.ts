@@ -5,8 +5,9 @@ export class OrderApi {
 
     public static readonly SEARCH = OrderApi.BASE + '/my-orders';
     public static readonly BUY = OrderApi.BASE + '/buy';
+    public static readonly BUY_WEB = OrderApi.BASE + '/buy-web';
     public static readonly GET_ORDER_BY_USER = OrderApi.BASE + `/my-orders`;
 
     public static readonly GET_BY_ID = (id: number | string) =>
-    OrderApi.BASE + `/${id}`;
+        OrderApi.BASE + `/${id}`;
 }

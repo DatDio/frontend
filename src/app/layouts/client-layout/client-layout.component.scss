@@ -190,6 +190,9 @@
   background: $gradient-dark;
   padding: $spacing-4 0;
   box-shadow: $shadow-md;
+  position: sticky;
+  top: 60px; // Height of navbar
+  z-index: calc(#{$z-sticky} - 1); // Below navbar
 }
 
 .hero-menu {

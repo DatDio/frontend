@@ -215,7 +215,9 @@
     "TOTAL_PAYMENT": "Thành tiền",
     "MY_ORDERS": "Đơn hàng của tôi",
     "ENTER_ORDER_ID": "Nhập mã đơn hàng",
-    "TOTAL_ORDERS": "Tổng đơn hàng"
+    "TOTAL_ORDERS": "Tổng đơn hàng",
+    "SUCCESS_TITLE": "Mua hàng thành công!",
+    "VIEW_ALL_ORDERS": "Xem tất cả đơn hàng"
   },
   "WALLET": {
     "TITLE": "Ví tiền",
@@ -317,8 +319,8 @@
     "CHECK_LIVE_MAIL": "Check live mail",
     "CHECK_LIVE_MAIL_DESC": "Kiểm tra mail còn hoạt động",
     "CHECK_LIVE_MAIL_SUBTITLE": "Kiểm tra trạng thái hoạt động của tài khoản email Hotmail/Outlook",
-    "GET_OAUTH2": "Lấy OAuth2",
-    "GET_OAUTH2_DESC": "Lấy token OAuth2",
+    "GET_OAUTH2": "Renew refresh token",
+    "GET_OAUTH2_DESC": "Renew refresh token",
     "RENEW_REFRESH_TOKEN": "Renew Refresh Token",
     "RENEW_REFRESH_TOKEN_SUBTITLE": "Làm mới Refresh Token cho email Hotmail/Outlook",
     "RENEWING": "Đang renew...",
@@ -385,7 +387,8 @@
     "STOPPED_READING": "Đã dừng đọc mail",
     "COMPLETED": "Hoàn thành",
     "FILL_INFO": "Vui lòng nhập đầy đủ thông tin",
-    "ERROR": "Lỗi"
+    "ERROR": "Lỗi",
+    "VIEW_ALL": "Xem tất cả công cụ"
   },
   "FOOTER": {
     "ABOUT": "Cung cấp email marketing chất lượng giá cạnh tranh",
@@ -432,6 +435,8 @@
     "CONFIRM_ACTION": "Bạn có chắc chắn muốn thực hiện?",
     "NO_RESULTS": "Không tìm thấy kết quả",
     "LOADING_DATA": "Đang tải dữ liệu...",
+    "LOAD_PRODUCTS_ERROR": "Không thể tải danh sách sản phẩm",
+    "LOGIN_REQUIRED": "Vui lòng đăng nhập để mua hàng",
     "OPERATION_FAILED": "Thao tác thất bại",
     "PAGE_RANGE_ERROR": "Trang phải từ 1 đến {{max}}",
     "NO_ACCOUNT_TO_COPY": "Không có tài khoản để sao chép",

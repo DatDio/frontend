@@ -254,3 +254,74 @@
     </div>
   </div>
 </div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content success-modal">
+
+      <div class="modal-header">
+        <h5 class="modal-title" id="successModalLabel">
+          <i class="bi bi-check-circle-fill me-2"></i>{{ 'ORDER.SUCCESS_TITLE' | translate }}
+        </h5>
+        <button type="button" class="btn-close btn-close-white" (click)="closeSuccessModal()"
+          aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body" *ngIf="successOrder">
+        <!-- Order Info -->
+        <div class="order-info-section">
+          <div class="info-row">
+            <div class="label">{{ 'ORDER.ORDER_ID' | translate }}</div>
+            <div class="value primary">{{ successOrder.orderNumber }}</div>
+          </div>
+          <div class="info-row">
+            <div class="label">{{ 'HOME.PRODUCT' | translate }}</div>
+            <div class="value">{{ successOrder.productName }}</div>
+          </div>
+          <div class="info-row">
+            <div class="label">{{ 'HOME.QUANTITY' | translate }}</div>
+            <div class="value">{{ successOrder.accountData?.length || 0 }}</div>
+          </div>
+          <div class="info-row">
+            <div class="label">{{ 'ORDER.TOTAL_PAYMENT' | translate }}</div>
+            <div class="value success">{{ successOrder.totalAmount | vndUsd }}</div>
+          </div>
+        </div>
+
+        <!-- Account Data Section -->
+        <div class="account-data-section">
+          <div class="section-label">
+            <i class="bi bi-list-ul"></i>
+            {{ 'ORDER.ACCOUNT_DATA' | translate }}
+          </div>
+          <textarea class="account-textarea" readonly [value]="successOrder.accountData?.join('\n') || ''"></textarea>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <button type="button" class="btn-action btn-copy" [class.copied]="copiedSuccess" (click)="copyAccountData()">
+            <i class="bi" [class.bi-clipboard]="!copiedSuccess" [class.bi-check-circle-fill]="copiedSuccess"></i>
+            {{ copiedSuccess ? ('COMMON.COPIED' | translate) : ('ORDER.COPY_ALL' | translate) }}
+          </button>
+          <button type="button" class="btn-action btn-download" (click)="downloadTxt()">
+            <i class="bi bi-download"></i>
+            {{ 'ORDER.DOWNLOAD_TXT' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-orders" (click)="goToOrders()">
+          <i class="bi bi-list-ul"></i>
+          {{ 'ORDER.VIEW_ALL_ORDERS' | translate }}
+        </button>
+        <button type="button" class="btn-close-modal" (click)="closeSuccessModal()">
+          <i class="bi bi-check-lg"></i>
+          {{ 'COMMON.CLOSE' | translate }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>

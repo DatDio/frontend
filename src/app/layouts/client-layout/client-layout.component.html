@@ -31,6 +31,31 @@
         <li class="nav-item">
           <app-language-switcher></app-language-switcher>
         </li>
+        <!-- Tools Dropdown -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-tools me-1"></i>{{ 'COMMON.TOOLS' | translate }}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" routerLink="/get-code-mail"><i class="bi bi-code-slash me-2"></i>{{
+                'TOOLS.GET_CODE_MAIL' | translate }}</a></li>
+            <li><a class="dropdown-item" routerLink="/check-live-facebook"><i class="bi bi-facebook me-2"></i>{{
+                'TOOLS.CHECK_LIVE_FB' | translate }}</a></li>
+            <li><a class="dropdown-item" routerLink="/check-live-mail"><i class="bi bi-envelope-fill me-2"></i>{{
+                'TOOLS.CHECK_LIVE_MAIL' | translate }}</a></li>
+            <li><a class="dropdown-item" routerLink="/get-2fa"><i class="bi bi-shield-lock-fill me-2"></i>{{
+                'TOOLS.GET_2FA' | translate }}</a></li>
+            <li><a class="dropdown-item" routerLink="/get-oauth2"><i class="bi bi-key-fill me-2"></i>{{
+                'TOOLS.GET_OAUTH2' | translate }}</a></li>
+            <li><a class="dropdown-item" routerLink="/read-mail"><i class="bi bi-inbox-fill me-2"></i>{{
+                'TOOLS.READ_MAIL' | translate }}</a></li>
+            <li>
+              <hr class="dropdown-divider">
+            </li>
+            <li><a class="dropdown-item" routerLink="/tools"><i class="bi bi-grid-fill me-2"></i>{{ 'TOOLS.VIEW_ALL' |
+                translate }}</a></li>
+          </ul>
+        </li>
         <!-- Theme Toggle -->
         <li class="nav-item">
           <button class="theme-toggle-btn" (click)="toggleTheme()" [title]="'COMMON.SWITCH_THEME' | translate">
