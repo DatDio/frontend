@@ -1,0 +1,157 @@
+<div class="security-container">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0">
+                <i class="bi bi-shield-lock me-2"></i>
+                Bảo mật hệ thống
+            </h5>
+        </div>
+        <div class="card-body">
+            <!-- Loading -->
+            <div *ngIf="loading" class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Đang tải...</span>
+                </div>
+                <p class="mt-2 text-muted">Đang tải cài đặt...</p>
+            </div>
+
+            <!-- Settings Content -->
+            <div *ngIf="!loading">
+                <!-- Spam Protection Settings Section -->
+                <div class="settings-section">
+                    <h6 class="section-title">
+                        <i class="bi bi-shield-exclamation me-2"></i>
+                        Bảo vệ chống Spam mua hàng
+                        <span class="badge bg-warning ms-2">Anti-Spam</span>
+                    </h6>
+                    <p class="text-muted small mb-3">
+                        Tự động khóa tạm thời người dùng liên tục mua hàng khi không đủ số dư.
+                        Ngăn chặn các cuộc tấn công spam từ API.
+                    </p>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <label class="setting-label">Số lần thất bại tối đa</label>
+                                    <p class="setting-description text-muted mb-0">
+                                        Số lần mua thất bại do thiếu tiền trước khi bị khóa.
+                                    </p>
+                                </div>
+                                <div class="setting-control mt-2">
+                                    <div class="input-group" style="width: 150px;">
+                                        <input type="number" class="form-control" [(ngModel)]="spamMaxAttempts" min="1"
+                                            max="100" placeholder="5">
+                                        <span class="input-group-text">lần</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <label class="setting-label">Thời gian khóa</label>
+                                    <p class="setting-description text-muted mb-0">
+                                        Thời gian user bị khóa khi vượt ngưỡng.
+                                    </p>
+                                </div>
+                                <div class="setting-control mt-2">
+                                    <div class="input-group" style="width: 150px;">
+                                        <input type="number" class="form-control" [(ngModel)]="spamBlockMinutes" min="1"
+                                            max="1440" placeholder="30">
+                                        <span class="input-group-text">phút</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <label class="setting-label">Cửa sổ thời gian</label>
+                                    <p class="setting-description text-muted mb-0">
+                                        Khoảng thời gian đếm số lần thất bại.
+                                    </p>
+                                </div>
+                                <div class="setting-control mt-2">
+                                    <div class="input-group" style="width: 150px;">
+                                        <input type="number" class="form-control" [(ngModel)]="spamWindowMinutes"
+                                            min="1" max="60" placeholder="10">
+                                        <span class="input-group-text">phút</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button class="btn btn-primary" (click)="saveSpamSettings()" [disabled]="spamSaving">
+                            <i class="bi bi-check-lg me-1" *ngIf="!spamSaving"></i>
+                            <span class="spinner-border spinner-border-sm me-1" *ngIf="spamSaving"></span>
+                            {{ spamSaving ? 'Đang lưu...' : 'Lưu cấu hình chống Spam' }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Blocked Users Section -->
+                <div class="settings-section mt-4">
+                    <h6 class="section-title">
+                        <i class="bi bi-person-x me-2"></i>
+                        Người dùng đang bị khóa
+                        <span class="badge bg-danger ms-2">{{ blockedUsers.length }}</span>
+                        <button class="btn btn-outline-secondary btn-sm ms-3" (click)="loadBlockedUsers()"
+                            [disabled]="loadingBlockedUsers">
+                            <i class="bi bi-arrow-clockwise" *ngIf="!loadingBlockedUsers"></i>
+                            <span class="spinner-border spinner-border-sm" *ngIf="loadingBlockedUsers"></span>
+                        </button>
+                    </h6>
+
+                    <div *ngIf="loadingBlockedUsers" class="text-center py-4">
+                        <div class="spinner-border text-primary spinner-border-sm" role="status"></div>
+                        <span class="ms-2">Đang tải...</span>
+                    </div>
+
+                    <div *ngIf="!loadingBlockedUsers && blockedUsers.length === 0" class="text-center py-4 text-muted">
+                        <i class="bi bi-check-circle fs-1 text-success"></i>
+                        <p class="mt-2 mb-0">Không có người dùng nào đang bị khóa</p>
+                    </div>
+
+                    <div *ngIf="!loadingBlockedUsers && blockedUsers.length > 0" class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Email</th>
+                                    <th>Hết khóa lúc</th>
+                                    <th>Còn lại</th>
+                                    <th>Lý do</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let user of blockedUsers">
+                                    <td>{{ user.userId }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.blockedUntil }}</td>
+                                    <td>
+                                        <span class="badge bg-warning">
+                                            {{ formatSeconds(user.blockedSecondsRemaining) }}
+                                        </span>
+                                    </td>
+                                    <td><span class="badge bg-secondary">{{ user.reason }}</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-success" (click)="unblockUser(user.userId)"
+                                            [disabled]="unblockingUserId === user.userId" title="Mở khóa">
+                                            <i class="bi bi-unlock" *ngIf="unblockingUserId !== user.userId"></i>
+                                            <span class="spinner-border spinner-border-sm"
+                                                *ngIf="unblockingUserId === user.userId"></span>
+                                            <span class="ms-1">Mở khóa</span>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

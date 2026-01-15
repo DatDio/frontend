@@ -62,6 +62,10 @@ export const adminRoutes: Routes = [
     loadComponent: () => import('../../modules/admin/settings/settings.component').then(m => m.SettingsComponent)
   },
   {
+    path: 'security',
+    loadComponent: () => import('../../modules/admin/security/security.component').then(m => m.SecurityComponent)
+  },
+  {
     path: 'api-doc',
     loadComponent: () => import('../../modules/admin/api-doc/api-doc.component').then(m => m.ApiDocComponent)
   }

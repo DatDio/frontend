@@ -31,6 +31,13 @@
         <li class="nav-item">
           <app-language-switcher></app-language-switcher>
         </li>
+        <!-- Theme Toggle -->
+        <li class="nav-item">
+          <button class="theme-toggle-btn" (click)="toggleTheme()" [title]="'COMMON.SWITCH_THEME' | translate">
+            <i class="bi" [class.bi-sun-fill]="(theme$ | async) === 'dark'"
+              [class.bi-moon-fill]="(theme$ | async) === 'light'"></i>
+          </button>
+        </li>
         <!-- Tools Dropdown -->
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -55,13 +62,6 @@
             <li><a class="dropdown-item" routerLink="/tools"><i class="bi bi-grid-fill me-2"></i>{{ 'TOOLS.VIEW_ALL' |
                 translate }}</a></li>
           </ul>
-        </li>
-        <!-- Theme Toggle -->
-        <li class="nav-item">
-          <button class="theme-toggle-btn" (click)="toggleTheme()" [title]="'COMMON.SWITCH_THEME' | translate">
-            <i class="bi" [class.bi-sun-fill]="(theme$ | async) === 'dark'"
-              [class.bi-moon-fill]="(theme$ | async) === 'light'"></i>
-          </button>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="https://docs.emailsieure.com/" target="_blank" rel="noopener noreferrer">

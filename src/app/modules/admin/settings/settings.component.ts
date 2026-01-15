@@ -68,7 +68,7 @@ export class SettingsComponent implements OnInit {
                 }
                 this.loading = false;
             },
-            error: (error) => {
+            error: () => {
                 this.#notificationService.error('Không thể tải cài đặt');
                 this.loading = false;
             }
@@ -157,7 +157,7 @@ export class SettingsComponent implements OnInit {
                     this.#notificationService.error(response.message || 'Có lỗi xảy ra');
                 }
             },
-            error: (error) => {
+            error: (error: { error?: { message?: string } }) => {
                 this.#notificationService.error(error.error?.message || 'Có lỗi xảy ra');
             }
         });
@@ -176,7 +176,7 @@ export class SettingsComponent implements OnInit {
                     this.#notificationService.error(response.message || 'Có lỗi xảy ra');
                 }
             },
-            error: (error) => {
+            error: (error: { error?: { message?: string } }) => {
                 this.#notificationService.error(error.error?.message || 'Có lỗi xảy ra');
             }
         });
@@ -201,7 +201,6 @@ export class SettingsComponent implements OnInit {
     savePayOSSettings(): void {
         this.payosSaving = true;
 
-        // Save all 3 settings in sequence
         const saveClientId = () => this.#settingService.update('payos.client_id', {
             settingValue: this.payosClientId,
             description: 'PayOS Client ID'
@@ -222,7 +221,7 @@ export class SettingsComponent implements OnInit {
                 this.#notificationService.success('Lưu cấu hình PayOS thành công');
                 this.loadSettings();
             })
-            .catch((error) => {
+            .catch(() => {
                 this.#notificationService.error('Lỗi khi lưu cấu hình PayOS');
             })
             .finally(() => {
@@ -258,7 +257,7 @@ export class SettingsComponent implements OnInit {
                 this.#notificationService.success('Lưu cấu hình Casso thành công');
                 this.loadSettings();
             })
-            .catch((error) => {
+            .catch(() => {
                 this.#notificationService.error('Lỗi khi lưu cấu hình Casso');
             })
             .finally(() => {
@@ -289,7 +288,7 @@ export class SettingsComponent implements OnInit {
                 this.#notificationService.success('Lưu cấu hình FPayment thành công');
                 this.loadSettings();
             })
-            .catch((error) => {
+            .catch(() => {
                 this.#notificationService.error('Lỗi khi lưu cấu hình FPayment');
             })
             .finally(() => {
@@ -315,7 +314,7 @@ export class SettingsComponent implements OnInit {
                 this.#notificationService.success('Lưu cấu hình liên kết thành công');
                 this.loadSettings();
             })
-            .catch((error) => {
+            .catch(() => {
                 this.#notificationService.error('Lỗi khi lưu cấu hình liên kết');
             })
             .finally(() => {
@@ -337,7 +336,7 @@ export class SettingsComponent implements OnInit {
                     this.#notificationService.error(response.message || 'Có lỗi xảy ra');
                 }
             },
-            error: (error) => {
+            error: (error: { error?: { message?: string } }) => {
                 this.#notificationService.error(error.error?.message || 'Có lỗi xảy ra');
             }
         });
@@ -356,10 +355,9 @@ export class SettingsComponent implements OnInit {
                     this.#notificationService.error(response.message || 'Có lỗi xảy ra');
                 }
             },
-            error: (error) => {
+            error: (error: { error?: { message?: string } }) => {
                 this.#notificationService.error(error.error?.message || 'Có lỗi xảy ra');
             }
         });
     }
 }
-
