@@ -39,7 +39,7 @@
 // =============================================
 
 .read-mail-card {
-    max-width: 900px;
+    max-width: $container-max-width;
     margin: 0 auto;
     background: var(--bg-card);
     border-radius: $radius-xl;
@@ -114,6 +114,9 @@
             box-shadow: 0 0 0 3px rgba($primary, 0.15);
             background: var(--bg-input);
         }
+
+        white-space: pre; // Prevent line wrapping
+        overflow-x: auto; // Enable horizontal scrolling
 
         &::placeholder {
             color: var(--text-muted);

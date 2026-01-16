@@ -4,21 +4,38 @@
 // CLIENT LAYOUT - NAVBAR
 // =============================================
 
+// =============================================
+// HEADER STICKY WRAPPER
+// =============================================
+
+.client-header-sticky {
+  position: sticky;
+  top: 0;
+  z-index: $z-sticky;
+  width: 100%;
+}
+
 .client-navbar {
   background: var(--bg-navbar);
   border-bottom: 1px solid var(--border-color);
   box-shadow: var(--shadow-card);
   padding: $spacing-3 0;
-  position: sticky;
-  top: 0;
-  z-index: $z-sticky;
   transition: background-color 0.3s ease, border-color 0.3s ease;
 
   .navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
     font-size: $font-size-2xl;
     font-weight: $font-weight-bold;
     color: $primary;
     letter-spacing: -0.5px;
+
+    img {
+      height: 40px;
+      width: auto;
+      object-fit: contain;
+    }
 
     &:hover {
       color: $primary-dark;
@@ -190,9 +207,6 @@
   background: $gradient-dark;
   padding: $spacing-4 0;
   box-shadow: $shadow-md;
-  position: sticky;
-  top: 60px; // Height of navbar
-  z-index: calc(#{$z-sticky} - 1); // Below navbar
 }
 
 .hero-menu {
@@ -246,15 +260,26 @@
 }
 
 // =============================================
+// LAYOUT WRAPPER (STICKY FOOTER)
+// =============================================
+
+.layout-wrapper {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+// =============================================
 // MAIN CONTENT
 // =============================================
 
 .client-main {
-  min-height: calc(100vh - 300px);
-  padding: $spacing-8 0;
+  flex: 1; // Grow to push footer down
+  padding: $spacing-1 0;
   background: var(--bg-secondary);
   padding-top: 0px;
   transition: background-color 0.3s ease;
+  width: 100%; // Ensure it takes full width of container
 }
 
 // =============================================
@@ -419,7 +444,7 @@
 .nav-placeholder {
   width: 120px;
   height: 36px;
-  background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-card) 50%, var(--border-color) 75%);
+  background: linear-gradient(90deg, var(--border-color) 30%, var(--bg-card) 50%, var(--border-color) 70%);
   background-size: 200% 100%;
   border-radius: $radius-lg;
   animation: shimmer 1.5s infinite;
@@ -437,7 +462,7 @@
   .skeleton-header {
     width: 40%;
     height: 32px;
-    background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-secondary) 50%, var(--border-color) 75%);
+    background: linear-gradient(90deg, var(--border-color) 30%, var(--bg-secondary) 50%, var(--border-color) 70%);
     background-size: 200% 100%;
     border-radius: $radius-lg;
     margin-bottom: $spacing-6;
@@ -448,7 +473,7 @@
     .skeleton-line {
       width: 100%;
       height: 16px;
-      background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-secondary) 50%, var(--border-color) 75%);
+      background: linear-gradient(90deg, var(--border-color) 30%, var(--bg-secondary) 50%, var(--border-color) 70%);
       background-size: 200% 100%;
       border-radius: $radius-md;
       margin-bottom: $spacing-3;

@@ -217,7 +217,8 @@
         "ENTER_ORDER_ID": "Enter order ID",
         "TOTAL_ORDERS": "Total orders",
         "SUCCESS_TITLE": "Order Successful!",
-        "VIEW_ALL_ORDERS": "View all orders"
+        "VIEW_ALL_ORDERS": "View all orders",
+        "AUTO_DELETE_NOTE": "All order data will be automatically deleted after 24 hours, please download your order immediately after purchase"
     },
     "WALLET": {
         "TITLE": "Wallet",
@@ -391,14 +392,14 @@
         "VIEW_ALL": "View all tools"
     },
     "FOOTER": {
-        "ABOUT": "Providing quality email marketing at competitive prices",
+        "ABOUT": "Provide high-quality email marketing at competitive prices.<br>Always prioritize the store’s credibility and reputation.<br>Protect customer information.<br>Ensure secure payments.",
         "QUICK_LINKS": "Quick links",
         "TERMS_OF_SERVICE": "Terms of service",
         "PRIVACY_POLICY": "Privacy policy",
         "CONTACT": "Contact",
         "GROUP_CHAT": "Group Chat - Join support group",
         "CONTACT_ADMIN": "Contact Admin",
-        "COPYRIGHT": "© 2025 EmailSieuRe"
+        "COPYRIGHT": "©2025 EmailSieuRe"
     },
     "LANGUAGE": {
         "TITLE": "Language",
@@ -562,9 +563,11 @@
         "SECTION_9_CONTENT": "For any questions about these Terms of Service, please contact us via Telegram."
     },
     "HOME": {
-        "HERO_TITLE": "EmailSieuRe provides high quality cheap email accounts for marketing and advertising",
+        "HERO_TITLE": "Provides high quality cheap email accounts for marketing and advertising",
         "HERO_TEXT_1": "Strictly forbidden to use email accounts for illegal purposes",
-        "HERO_TEXT_2": "We are not responsible for any misuse of resources.",
+        "HERO_TEXT_2": "We are not responsible for any misuse of resources",
+        "HERO_TEXT_3": "Each email account is sold to only one person, guaranteeing no duplication",
+        "HERO_TEXT_4": "All order data will be automatically deleted after 24 hours, please download your order immediately after purchase",
         "HERO_SUBTITLE": "Cheapest price in the market",
         "PRODUCT": "Product",
         "LIVETIME": "LiveTime",
@@ -643,7 +646,6 @@
         "PAY_USDT": "Pay with USDT",
         "CRYPTO_NOTE": "You will be redirected to FPayment to complete the USDT payment",
         "CRYPTO_TITLE": "USDT Payment",
-        "PAYMENT_CREATED": "Payment invoice created!",
         "TRANS_ID": "Transaction ID",
         "USDT_AMOUNT_LABEL": "USDT Amount",
         "OPEN_PAYMENT": "Open FPayment page",
@@ -677,6 +679,8 @@
         "FOREVER_APPLY_DESC": "Unlimited benefits",
         "AUTO_APPLY": "Auto apply",
         "AUTO_APPLY_DESC": "No code required",
+        "CONDITION": "Applicable conditions",
+        "CONDITION_DESC": "Must have an active e-commerce website, minimum top-up: 50 USD",
         "CONTACT_ADMIN": "Contact Admin to register",
         "CONTACT_TELEGRAM": "Please contact via Telegram for Collaborator registration support",
         "CONTACT_VIA_TELEGRAM": "Contact via Telegram",

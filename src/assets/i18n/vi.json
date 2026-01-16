@@ -217,7 +217,8 @@
     "ENTER_ORDER_ID": "Nhập mã đơn hàng",
     "TOTAL_ORDERS": "Tổng đơn hàng",
     "SUCCESS_TITLE": "Mua hàng thành công!",
-    "VIEW_ALL_ORDERS": "Xem tất cả đơn hàng"
+    "VIEW_ALL_ORDERS": "Xem tất cả đơn hàng",
+    "AUTO_DELETE_NOTE": "Tất cả dữ liệu đơn hàng sẽ được tự động xóa sau 24h, vui lòng tải về đơn hàng ngay sau khi mua"
   },
   "WALLET": {
     "TITLE": "Ví tiền",
@@ -391,14 +392,14 @@
     "VIEW_ALL": "Xem tất cả công cụ"
   },
   "FOOTER": {
-    "ABOUT": "Cung cấp email marketing chất lượng giá cạnh tranh",
+    "ABOUT": "Cung cấp email marketing chất lượng giá cạnh tranh.<br>Luôn đặt sự uy tín của cửa hàng lên đầu.<br>Bảo mật thông tin khách hàng.<br>Bảo mật thanh toán.",
     "QUICK_LINKS": "Liên kết nhanh",
     "TERMS_OF_SERVICE": "Điều khoản sử dụng",
     "PRIVACY_POLICY": "Chính sách bảo mật",
     "CONTACT": "Liên hệ",
     "GROUP_CHAT": "Group Chat - Tham gia nhóm chat hỗ trợ",
     "CONTACT_ADMIN": "Liên hệ Admin",
-    "COPYRIGHT": "© 2025 EmailSieuRe"
+    "COPYRIGHT": "©2025 EmailSieuRe"
   },
   "LANGUAGE": {
     "TITLE": "Ngôn ngữ",
@@ -562,9 +563,11 @@
     "SECTION_9_CONTENT": "Đối với bất kỳ câu hỏi nào về các Điều khoản Dịch vụ này, vui lòng liên hệ với chúng tôi qua Telegram."
   },
   "HOME": {
-    "HERO_TITLE": "EmailSieuRe chuyên cung cấp các tài khoản email chất lượng cao giá rẻ cho mục đích marketing và quảng cáo",
+    "HERO_TITLE": "Chuyên cung cấp các tài khoản email chất lượng cao giá rẻ cho mục đích marketing và quảng cáo",
     "HERO_TEXT_1": "Nghiêm cấm sử dụng tài khoản email với mục đích trái pháp luật",
-    "HERO_TEXT_2": "Chúng tôi không chịu trách nhiệm cho bất kì hành vi nào sử dụng tài nguyên sai mục đích.",
+    "HERO_TEXT_2": "Chúng tôi không chịu trách nhiệm cho bất kì hành vi nào sử dụng tài nguyên sai mục đích",
+    "HERO_TEXT_3": "Mỗi tài khoản Email được bán duy nhất cho 1 người, cam kết không trùng lặp",
+    "HERO_TEXT_4": "Tất cả dữ liệu đơn hàng sẽ được tự động xóa sau 24h, vui lòng tải về đơn hàng ngay sau khi mua",
     "HERO_SUBTITLE": "Giá rẻ nhất thị trường",
     "PRODUCT": "Sản phẩm",
     "LIVETIME": "LiveTime",
@@ -643,7 +646,6 @@
     "PAY_USDT": "Thanh toán bằng USDT",
     "CRYPTO_NOTE": "Bạn sẽ được chuyển đến trang FPayment để hoàn tất thanh toán bằng USDT",
     "CRYPTO_TITLE": "Thanh toán USDT",
-    "PAYMENT_CREATED": "Đơn thanh toán đã được tạo!",
     "TRANS_ID": "Mã giao dịch",
     "USDT_AMOUNT_LABEL": "Số USDT",
     "OPEN_PAYMENT": "Mở trang thanh toán FPayment",
@@ -677,6 +679,8 @@
     "FOREVER_APPLY_DESC": "Ưu đãi không giới hạn thời gian",
     "AUTO_APPLY": "Tự động áp dụng",
     "AUTO_APPLY_DESC": "Không cần nhập mã",
+    "CONDITION": "Điều kiện áp dụng",
+    "CONDITION_DESC": "Phải có website bán hàng đang hoạt động, nạp tối thiểu 1.000.000 VND",
     "CONTACT_ADMIN": "Liên hệ Admin để đăng ký",
     "CONTACT_TELEGRAM": "Vui lòng liên hệ qua Telegram để được hỗ trợ đăng ký Cộng Tác Viên",
     "CONTACT_VIA_TELEGRAM": "Liên hệ qua Telegram",

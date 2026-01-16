@@ -16,7 +16,7 @@
 
 .hero-content {
   background: var(--bg-hero);
-  padding: $spacing-16 0;
+  padding: $spacing-1 0;
   color: $white;
   position: relative;
   overflow: hidden;
@@ -52,7 +52,7 @@
     position: relative;
     z-index: 1;
     flex: 1;
-    max-width: 600px;
+    max-width: 800px;
     padding: 0 $spacing-6;
   }
 
@@ -66,7 +66,7 @@
 
   p {
     font-size: $font-size-lg;
-    margin-bottom: $spacing-8;
+    margin-bottom: $spacing-4;
     color: $gray-300;
     max-width: 700px;
     margin-left: auto;
@@ -130,14 +130,14 @@
 // =============================================
 
 .tools-section {
-  padding: $spacing-12 0;
+  padding: $spacing-4 0;
   background: var(--bg-card);
   border-bottom: 1px solid var(--border-color);
   transition: background-color 0.3s ease;
 
   .section-header {
     text-align: center;
-    margin-bottom: $spacing-10;
+    margin-bottom: $spacing-4;
 
     h2 {
       font-size: $font-size-3xl;
@@ -164,7 +164,7 @@
   gap: $spacing-4;
 
   @media (min-width: $breakpoint-lg) {
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
   }
 }
 

@@ -5,6 +5,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { RankService } from '../../../core/services/rank.service';
 import { SystemSettingService } from '../../../core/services/system-setting.service';
 import { ApiResponse } from '../../../core/models/common.model';
+import { SeoService } from '../../../core/services/seo.service';
 
 @Component({
     selector: 'app-collaborator',
@@ -14,6 +15,7 @@ import { ApiResponse } from '../../../core/models/common.model';
     styleUrls: ['./collaborator.component.scss']
 })
 export class CollaboratorComponent implements OnInit {
+    private readonly seoService = inject(SeoService);
     readonly #rankService = inject(RankService);
     readonly #settingsService = inject(SystemSettingService);
 
@@ -23,6 +25,8 @@ export class CollaboratorComponent implements OnInit {
     loading = true;
 
     ngOnInit(): void {
+        this.seoService.setTitle('Cộng Tác Viên - EmailSieuRe');
+        this.seoService.setMetaDescription('Tham gia chương trình Cộng Tác Viên và nhận ưu đãi');
         this.loadUserInfo();
         this.loadTelegramChannel();
     }
