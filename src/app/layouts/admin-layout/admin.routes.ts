@@ -68,5 +68,9 @@ export const adminRoutes: Routes = [
   {
     path: 'api-doc',
     loadComponent: () => import('../../modules/admin/api-doc/api-doc.component').then(m => m.ApiDocComponent)
+  },
+  {
+    path: 'reg-management',
+    loadComponent: () => import('../../modules/admin/reg-management/list/list.component').then(m => m.RegListComponent)
   }
 ];

@@ -69,5 +69,10 @@ export const clientRoutes: Routes = [
     path: 'collaborator',
     canActivate: [authGuard],
     loadComponent: () => import('../../modules/client/collaborator/collaborator.component').then(m => m.CollaboratorComponent)
+  },
+  {
+    path: 'reg-tool',
+    canActivate: [authGuard],
+    loadComponent: () => import('../../modules/client/reg-tool/reg-tool.component').then(m => m.RegToolComponent)
   }
 ];

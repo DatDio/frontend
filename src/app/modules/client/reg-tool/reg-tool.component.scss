@@ -1,0 +1,106 @@
+@import '../client-styles.scss';
+
+.reg-tool-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.input-section {
+    .form-label {
+        font-weight: 500;
+    }
+
+    textarea {
+        font-family: monospace;
+        min-height: 200px;
+    }
+
+    .input-stats {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+    }
+}
+
+.progress-section {
+    .progress {
+        height: 24px;
+        border-radius: 12px;
+    }
+
+    .progress-bar {
+        transition: width 0.3s ease;
+    }
+}
+
+.results-section {
+    .result-table {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .result-row {
+        &.success {
+            background-color: rgba(40, 167, 69, 0.05);
+        }
+
+        &.failed {
+            background-color: rgba(220, 53, 69, 0.05);
+        }
+    }
+
+    code {
+        font-size: 0.85em;
+        word-break: break-all;
+    }
+}
+
+.history-section {
+    .request-card {
+        border-left: 4px solid var(--bs-secondary);
+
+        &.pending {
+            border-left-color: #ffc107;
+        }
+
+        &.processing {
+            border-left-color: #17a2b8;
+        }
+
+        &.completed {
+            border-left-color: #28a745;
+        }
+
+        &.cancelled {
+            border-left-color: #dc3545;
+        }
+
+        &.expired {
+            border-left-color: #6c757d;
+        }
+    }
+}
+
+.badge-success {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.badge-danger {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.badge-warning {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.badge-info {
+    background-color: #17a2b8;
+    color: #fff;
+}
+
+.badge-secondary {
+    background-color: #6c757d;
+    color: #fff;
+}
