@@ -47,10 +47,10 @@ export function app(): express.Express {
     next();
   });
 
-  // Serve robots.txt with correct content-type
+  // Let Cloudflare manage robots.txt - return empty response
   server.get('/robots.txt', (req, res) => {
     res.type('text/plain');
-    res.sendFile(join(browserDistFolder, 'robots.txt'));
+    res.status(200).send('');
   });
 
   server.get('*.*', express.static(browserDistFolder, {
