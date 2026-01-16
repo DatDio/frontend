@@ -132,11 +132,22 @@ p {
 
 a {
   color: $primary;
-  text-decoration: none;
-  transition: color $transition-fast;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  transition: color $transition-fast, text-decoration-color $transition-fast;
 
   &:hover {
     color: $primary-dark;
+    text-decoration-color: $primary-dark;
+  }
+
+  // Remove underline for buttons styled as links and nav links
+  &.btn,
+  &.nav-link,
+  &.navbar-brand,
+  &.dropdown-item {
+    text-decoration: none;
   }
 }
 
