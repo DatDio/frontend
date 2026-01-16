@@ -16,8 +16,47 @@ export function app(): express.Express {
   server.set('view engine', 'html');
   server.set('views', browserDistFolder);
 
+  // Security Headers Middleware
+  server.use((req, res, next) => {
+    // HSTS - Force HTTPS
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+
+    // Prevent MIME type sniffing
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+
+    // Prevent clickjacking
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+
+    // XSS Protection
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+
+    // Referrer Policy
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+    // Content Security Policy (permissive for now, can be tightened)
+    res.setHeader('Content-Security-Policy',
+      "default-src 'self'; " +
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdn.payos.vn https://challenges.cloudflare.com https://static.cloudflareinsights.com; " +
+      "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; " +
+      "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net; " +
+      "img-src 'self' data: https:; " +
+      "connect-src 'self' https://emailsieure.com wss://emailsieure.com https://api.payos.vn; " +
+      "frame-src 'self' https://challenges.cloudflare.com https://pay.payos.vn;"
+    );
+
+    next();
+  });
+
+  // Serve robots.txt with correct content-type
+  server.get('/robots.txt', (req, res) => {
+    res.type('text/plain');
+    res.sendFile(join(browserDistFolder, 'robots.txt'));
+  });
+
   server.get('*.*', express.static(browserDistFolder, {
-    maxAge: '1y'
+    maxAge: '1y',
+    etag: true,
+    lastModified: true
   }));
 
   server.get('*', (req, res, next) => {
@@ -48,3 +87,4 @@ function run(): void {
 }
 
 run();
+
