@@ -28,7 +28,7 @@ export class ToolsComponent implements OnInit {
             id: 'get-code',
             name: 'Get Code',
             description: 'Lấy mã xác thực OTP từ email Hotmail/Outlook một cách nhanh chóng và tự động',
-            icon: 'assets/images/icon-getCode.png',
+            icon: 'bi bi-code-slash',
             route: '/get-code-mail',
             status: 'active',
             gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'

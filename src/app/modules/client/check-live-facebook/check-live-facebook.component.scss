@@ -43,7 +43,7 @@
 // =============================================
 
 .tool-card {
-    max-width: 900px;
+    max-width: $container-max-width;
     margin: 0 auto;
     background: var(--bg-card);
     border-radius: $radius-xl;
@@ -95,6 +95,9 @@
             border-color: $primary;
             box-shadow: 0 0 0 3px rgba($primary, 0.15);
         }
+
+        white-space: pre; // Prevent wrapping
+        overflow-x: auto; // Add horizontal scrollbar
 
         &::placeholder {
             color: var(--text-muted);
