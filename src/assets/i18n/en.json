@@ -319,7 +319,7 @@
         "CHECK_LIVE_MAIL": "Check live mail",
         "CHECK_LIVE_MAIL_DESC": "Check if email is still active",
         "CHECK_LIVE_MAIL_SUBTITLE": "Check status of Hotmail/Outlook email accounts",
-        "GET_OAUTH2": "Renew OAuth2",
+        "GET_OAUTH2": "Renew refresh token",
         "GET_OAUTH2_DESC": "Renew OAuth2 token",
         "RENEW_REFRESH_TOKEN": "Renew Refresh Token",
         "RENEW_REFRESH_TOKEN_SUBTITLE": "Renew Refresh Token for Hotmail/Outlook email",
