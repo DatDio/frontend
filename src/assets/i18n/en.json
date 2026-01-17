@@ -235,6 +235,8 @@
         "PURCHASE": "Purchase",
         "REFUND": "Refund",
         "ADMIN_ADJUST": "Admin Adjust",
+        "REG_PAYMENT": "Account Registration Payment",
+        "REG_REFUND": "Registration Failure Refund",
         "DEPOSIT_TITLE": "Deposit to wallet",
         "DEPOSIT_SUBTITLE": "Choose payment method",
         "MIN_DEPOSIT": "Minimum deposit",

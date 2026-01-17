@@ -11,6 +11,7 @@ export interface RegRequest {
     pricePerAccount: number;
     estimatedTotal: number;
     totalCharged: number;
+    inputList?: string[];  // Original input data
     createdAt: string;
     completedAt?: string;
     results?: RegResult[];

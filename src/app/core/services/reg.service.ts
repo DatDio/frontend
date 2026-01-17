@@ -57,6 +57,13 @@ export class RegService {
             .pipe(finalize(() => this.loaderService.hide()));
     }
 
+    /**
+     * Get user's current pending/processing request (if any)
+     */
+    getMyPending(): Observable<ApiResponse<RegRequest | null>> {
+        return this.httpClient.get<ApiResponse<RegRequest | null>>(RegApi.MY_PENDING);
+    }
+
     // ==================== ADMIN ENDPOINTS ====================
 
     /**
@@ -66,7 +73,6 @@ export class RegService {
         let params = new HttpParams()
             .set('page', (filter.page ?? 0).toString())
             .set('limit', (filter.limit ?? 20).toString())
-            .set('sort', filter.sort ?? 'createdAt:desc');
 
         if (filter.userId) params = params.set('userId', filter.userId.toString());
         if (filter.userEmail) params = params.set('userEmail', filter.userEmail);
@@ -74,7 +80,7 @@ export class RegService {
         if (filter.status) params = params.set('status', filter.status);
         if (filter.createdFrom) params = params.set('createdFrom', filter.createdFrom);
         if (filter.createdTo) params = params.set('createdTo', filter.createdTo);
-
+        if (filter.sort) params = params.set('sort', filter.sort);
         return this.httpClient.get<ApiResponse<PaginatedResponse<RegRequest>>>(AdminRegApi.SEARCH, { params });
     }
 

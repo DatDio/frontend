@@ -5,6 +5,7 @@ export class RegApi {
 
     public static readonly CREATE = RegApi.BASE;
     public static readonly LIST = RegApi.BASE;
+    public static readonly MY_PENDING = RegApi.BASE + '/my-pending';
     public static readonly GET_BY_ID = (id: number | string) => RegApi.BASE + `/${id}`;
     public static readonly CANCEL = (id: number | string) => RegApi.BASE + `/${id}`;
 }

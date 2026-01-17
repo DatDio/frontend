@@ -76,7 +76,6 @@ export class RegListComponent implements OnInit {
         const filter: RegRequestFilter = {
             page: this.paginationConfig.currentPage,
             limit: this.paginationConfig.pageSize,
-            sort: 'createdAt:desc',
             requestNumber: this.formSearch.get('requestNumber')?.value || undefined,
             userEmail: this.formSearch.get('userEmail')?.value || undefined,
             status: this.formSearch.get('status')?.value || undefined,
@@ -96,7 +95,6 @@ export class RegListComponent implements OnInit {
                 }
             },
             error: (error: any) => {
-                console.error('Error loading reg requests:', error);
                 this.notificationService.error('Lỗi khi tải danh sách yêu cầu');
             }
         });
@@ -158,7 +156,7 @@ export class RegListComponent implements OnInit {
     }
 
     getStatusLabel(status: RegRequestStatus): string {
-        const statusMap: Record<RegRequestStatus, string> = {
+        const statusMap: Record<string, string> = {
             'PENDING': 'Chờ xử lý',
             'PROCESSING': 'Đang xử lý',
             'COMPLETED': 'Hoàn thành',
@@ -169,7 +167,7 @@ export class RegListComponent implements OnInit {
     }
 
     getStatusClass(status: RegRequestStatus): string {
-        const classMap: Record<RegRequestStatus, string> = {
+        const classMap: Record<string, string> = {
             'PENDING': 'badge-warning',
             'PROCESSING': 'badge-info',
             'COMPLETED': 'badge-success',

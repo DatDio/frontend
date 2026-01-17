@@ -235,6 +235,8 @@
     "PURCHASE": "Mua hàng",
     "REFUND": "Hoàn tiền",
     "ADMIN_ADJUST": "Admin điều chỉnh",
+    "REG_PAYMENT": "Thanh toán đăng ký tài khoản",
+    "REG_REFUND": "Hoàn tiền đăng ký thất bại",
     "DEPOSIT_TITLE": "Nạp tiền vào ví",
     "DEPOSIT_SUBTITLE": "Chọn phương thức thanh toán",
     "MIN_DEPOSIT": "Nạp tối thiểu",

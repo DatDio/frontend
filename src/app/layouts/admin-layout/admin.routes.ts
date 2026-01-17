@@ -71,6 +71,24 @@ export const adminRoutes: Routes = [
   },
   {
     path: 'reg-management',
-    loadComponent: () => import('../../modules/admin/reg-management/list/list.component').then(m => m.RegListComponent)
+    children: [
+      {
+        path: '',
+        redirectTo: 'list',
+        pathMatch: 'full'
+      },
+      {
+        path: 'list',
+        loadComponent: () => import('../../modules/admin/reg-management/list/list.component').then(m => m.RegListComponent)
+      },
+      {
+        path: 'tool-apikeys',
+        loadComponent: () => import('../../modules/admin/reg-management/tool-apikeys/list.component').then(m => m.ToolApiKeyListComponent)
+      },
+      {
+        path: 'settings',
+        loadComponent: () => import('../../modules/admin/reg-management/settings/settings.component').then(m => m.RegSettingsComponent)
+      }
+    ]
   }
 ];
