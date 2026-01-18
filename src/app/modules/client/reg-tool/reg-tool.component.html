@@ -1,86 +1,118 @@
-<div class="reg-tool-container p-4">
-    <h4 class="mb-4">
-        <i class="bi bi-person-plus-fill me-2"></i>
-        Công cụ Reg Account
-    </h4>
+<div class="tool-page">
+    <div class="container">
+        <div class="page-header">
+            <h1><i class="bi bi-person-plus-fill me-2"></i> {{ 'REG.TOOL_TITLE' | translate }}</h1>
+            <p>{{ 'REG.TITLE' | translate }}</p>
+        </div>
 
-    <!-- Tab Navigation -->
-    <ul class="nav nav-tabs mb-4">
-        <li class="nav-item">
-            <a class="nav-link" [ngClass]="{'active': activeTab === 'submit'}" (click)="activeTab = 'submit'"
-                style="cursor: pointer;">
-                <i class="bi bi-send me-1"></i> Tạo yêu cầu
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" [ngClass]="{'active': activeTab === 'history'}" (click)="activeTab = 'history'"
-                style="cursor: pointer;">
-                <i class="bi bi-clock-history me-1"></i> Lịch sử
-            </a>
-        </li>
-    </ul>
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs mb-4">
+            <li class="nav-item">
+                <a class="nav-link" [ngClass]="{'active': activeTab === 'submit'}" (click)="activeTab = 'submit'"
+                    style="cursor: pointer;">
+                    <i class="bi bi-send me-1"></i> {{ 'REG.CREATE_REQUEST' | translate }}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" [ngClass]="{'active': activeTab === 'history'}" (click)="activeTab = 'history'"
+                    style="cursor: pointer;">
+                    <i class="bi bi-clock-history me-1"></i> {{ 'REG.REQUEST_HISTORY' | translate }}
+                </a>
+            </li>
+        </ul>
 
-    <!-- Tab: Submit -->
-    @if (activeTab === 'submit') {
-    <div class="row">
-        <!-- Left: Input Form -->
-        <div class="col-lg-5 mb-4">
-            <div class="card input-section">
-                <div class="card-header">
-                    <h6 class="mb-0">Tạo yêu cầu mới</h6>
-                </div>
-                <div class="card-body">
-                    <form [formGroup]="form" (ngSubmit)="onSubmit()">
-                        <div class="mb-3">
-                            <label class="form-label">Loại yêu cầu</label>
+        <!-- Tab: Submit -->
+        @if (activeTab === 'submit') {
+        <div class="row">
+            <!-- Left: Input Form -->
+            <div class="col-lg-5 mb-4">
+                <div class="tool-card">
+                    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="tool-form">
+                        <div class="form-row">
+                            <label class="form-label">{{ 'REG.REQUEST_TYPE' | translate }}</label>
                             <select class="form-select" formControlName="requestType">
-                                <option value="USER_ONLY">Chỉ username (hệ thống tạo password)</option>
-                                <option value="USER_PASS">Username|Password (bạn cung cấp password)</option>
+                                <option value="USER_ONLY">{{ 'REG.TYPE_EMAIL_ONLY' | translate }}</option>
+                                <option value="USER_PASS">{{ 'REG.TYPE_EMAIL_PASS' | translate }}</option>
                             </select>
                         </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Danh sách (mỗi dòng 1 account)</label>
-                            <textarea class="form-control" formControlName="inputData" rows="8"
-                                [placeholder]="form.get('requestType')?.value === 'USER_ONLY' ? 'username1\nusername2\nusername3' : 'username1|password1\nusername2|password2'">
-              </textarea>
-                            <div class="input-stats mt-2">
-                                <div class="d-flex justify-content-between mb-1">
-                                    <span>Số lượng: <strong
-                                            [class.text-danger]="inputLines.length > maxAccountsPerRequest">{{
-                                            inputLines.length }}</strong> / {{ maxAccountsPerRequest }}</span>
-                                    <span>Đơn giá: <strong>{{ pricePerAccount | number }}đ</strong>/account</span>
-                                </div>
-                                <div class="d-flex justify-content-between">
-                                    <span>Dự kiến: <strong class="text-primary">{{ estimatedTotal | number
-                                            }}đ</strong></span>
-                                    @if (inputLines.length > maxAccountsPerRequest) {
-                                    <span class="text-danger"><i class="bi bi-exclamation-triangle me-1"></i>Vượt quá
-                                        giới hạn!</span>
-                                    }
-                                </div>
+                        @if (form.get('requestType')?.value === 'USER_PASS') {
+                        <div class="form-row">
+                            <label class="form-label">{{ 'REG.SHARED_PASSWORD' | translate }}</label>
+                            <input type="text" class="form-control" formControlName="sharedPassword"
+                                [placeholder]="'REG.SHARED_PASSWORD_PLACEHOLDER' | translate">
+                            <div class="textarea-hint">
+                                <i class="bi bi-info-circle me-1"></i>
+                                {{ 'REG.SHARED_PASSWORD_HINT' | translate }}
                             </div>
                         </div>
+                        }
 
-                        <button type="submit" class="btn btn-primary w-100"
-                            [disabled]="isSubmitting || inputLines.length === 0 || hasPendingRequest">
-                            @if (isSubmitting) {
-                            <span class="spinner-border spinner-border-sm me-2"></span>
+                        <div class="form-row">
+                            <label class="form-label">
+                                {{ 'REG.INPUT_LIST' | translate }} <span class="item-count">[{{ inputLines.length
+                                    }}]</span>
+                            </label>
+                            <textarea class="data-textarea" formControlName="inputData" rows="8"
+                                [placeholder]="'REG.INPUT_PLACEHOLDER_EMAIL' | translate">
+                            </textarea>
+                            <div class="textarea-hint">
+                                <i class="bi bi-info-circle me-1"></i>
+                                {{ 'REG.QUANTITY' | translate }}: <strong
+                                    [class.text-danger]="inputLines.length > maxAccountsPerRequest">{{
+                                    inputLines.length }}</strong> / {{ maxAccountsPerRequest }}
+                                &nbsp;|&nbsp;
+                                {{ 'REG.ESTIMATED' | translate }}: <strong class="text-primary">{{ estimatedTotal |
+                                    number }}đ</strong>
+                                ({{ pricePerAccount | number }}đ/acc)
+                                @if (duplicateCount > 0) {
+                                &nbsp;|&nbsp;
+                                <span class="text-warning">
+                                    <i class="bi bi-exclamation-circle me-1"></i>
+                                    {{ 'REG.DUPLICATES_FOUND' | translate:{count: duplicateCount} }}
+                                </span>
+                                }
+                            </div>
+                            @if (inputLines.length > maxAccountsPerRequest) {
+                            <div class="alert alert-danger mt-2 mb-0 py-2">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                {{ 'VALIDATION.MAX_VALUE' | translate:{max: maxAccountsPerRequest} }}
+                            </div>
                             }
-                            <i class="bi bi-send me-2"></i>
-                            Gửi yêu cầu
-                        </button>
+                        </div>
+
+                        <div class="action-buttons">
+                            @if (duplicateCount > 0) {
+                            <button type="button" class="filter-btn" (click)="filterDuplicates()">
+                                <i class="bi bi-funnel me-1"></i>
+                                {{ 'REG.FILTER_DUPLICATES' | translate }}
+                            </button>
+                            }
+                            <button type="submit" class="submit-btn"
+                                [disabled]="isSubmitting || inputLines.length === 0 || hasPendingRequest || inputLines.length > maxAccountsPerRequest">
+                                @if (isSubmitting) {
+                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                {{ 'COMMON.PROCESSING' | translate }}
+                                } @else {
+                                <i class="bi bi-send me-2"></i>
+                                {{ 'REG.SUBMIT_REQUEST' | translate }}
+                                }
+                            </button>
+                        </div>
 
                         @if (hasPendingRequest && currentRequest) {
                         <div
                             class="alert alert-warning mt-3 mb-0 py-2 d-flex justify-content-between align-items-center">
                             <div>
                                 <i class="bi bi-exclamation-triangle me-1"></i>
-                                Yêu cầu <strong>{{ currentRequest.requestNumber }}</strong> đang chờ xử lý.
+                                {{ 'REG.REQUEST_NUMBER' | translate }}: <strong>{{ currentRequest.requestNumber
+                                    }}</strong>
+                                - {{ getRequestStatusLabel(currentRequest.status) }}
                             </div>
                             @if (currentRequest.status === 'PENDING') {
-                            <button class="btn btn-sm btn-outline-danger" (click)="cancelCurrentRequest()">
-                                <i class="bi bi-x-circle me-1"></i> Huỷ
+                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                (click)="cancelCurrentRequest()">
+                                <i class="bi bi-x-circle me-1"></i> {{ 'COMMON.CANCEL' | translate }}
                             </button>
                             }
                         </div>
@@ -88,118 +120,132 @@
                     </form>
                 </div>
             </div>
-        </div>
 
-        <!-- Right: Current Request Results -->
-        <div class="col-lg-7">
-            @if (currentRequest) {
-            <div class="card results-section">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h6 class="mb-0">{{ currentRequest.requestNumber }}</h6>
-                    <div>
-                        <span class="badge me-2" [ngClass]="{
-                'badge-warning': currentRequest.status === 'PENDING',
-                'badge-info': currentRequest.status === 'PROCESSING',
-                'badge-success': currentRequest.status === 'COMPLETED',
-                'badge-danger': currentRequest.status === 'CANCELLED'
-              }">{{ getRequestStatusLabel(currentRequest.status) }}</span>
-                        <button class="btn btn-sm btn-success" (click)="copySuccessResults()">
-                            <i class="bi bi-clipboard"></i> Copy
-                        </button>
+            <!-- Right: Current Request Results -->
+            <div class="col-lg-7">
+                @if (currentRequest) {
+                <div class="tool-card">
+                    <div class="results-header">
+                        <h4><i class="bi bi-list-check me-2"></i> {{ currentRequest.requestNumber }}</h4>
+                        <div class="results-actions">
+                            <span class="badge me-2" [ngClass]="{
+                                'bg-warning text-dark': currentRequest.status === 'PENDING',
+                                'bg-info': currentRequest.status === 'PROCESSING',
+                                'bg-success': currentRequest.status === 'COMPLETED',
+                                'bg-danger': currentRequest.status === 'CANCELLED'
+                            }">{{ getRequestStatusLabel(currentRequest.status) }}</span>
+                            <button type="button" class="copy-success-btn" (click)="copySuccessResults()">
+                                <i class="bi bi-clipboard me-1"></i> {{ 'REG.COPY_SUCCESS' | translate }}
+                            </button>
+                            <button type="button" class="copy-error-btn" (click)="copyFailedResults()">
+                                <i class="bi bi-clipboard me-1"></i> {{ 'REG.COPY_FAILED' | translate }}
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <div class="card-body">
-                    <!-- Progress -->
-                    <div class="progress-section mb-3">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span>Tiến độ: {{ currentRequest.successCount + currentRequest.failedCount }}/{{
-                                currentRequest.quantity }}</span>
+
+                    <!-- Progress Bar -->
+                    <div class="progress-section">
+                        <div class="progress-info">
+                            <span>{{ 'REG.PROGRESS' | translate }}: {{ currentRequest.successCount +
+                                currentRequest.failedCount }}/{{ currentRequest.quantity }}</span>
                             <span>
                                 <span class="text-success">{{ currentRequest.successCount }} ✓</span> |
                                 <span class="text-danger">{{ currentRequest.failedCount }} ✗</span>
                             </span>
                         </div>
-                        <div class="progress">
-                            <div class="progress-bar bg-success" [style.width.%]="progressPercent">
-                                {{ progressPercent }}%
-                            </div>
+                        <div class="progress-bar-wrapper">
+                            <div class="progress-bar" [style.width.%]="progressPercent"></div>
                         </div>
                         <div class="text-end mt-1">
-                            <small class="text-muted">Đã trừ: <strong>{{ currentRequest.totalCharged | number
-                                    }}đ</strong></small>
+                            <small class="text-muted">{{ 'REG.TOTAL_CHARGED' | translate }}: <strong>{{
+                                    currentRequest.totalCharged | number }}đ</strong></small>
                         </div>
                     </div>
 
-                    <!-- Results Table -->
-                    <div class="result-table">
-                        <table class="table table-sm table-bordered mb-0">
-                            <thead class="table-light sticky-top">
-                                <tr>
-                                    <th width="30%">Input</th>
-                                    <th width="15%">Status</th>
-                                    <th>Result / Error</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @for (result of results; track result.id) {
-                                <tr [ngClass]="getResultStatusClass(result.status)">
-                                    <td><code>{{ result.inputLine }}</code></td>
-                                    <td>
-                                        <span [ngClass]="getStatusClass(result.status)">
-                                            @if (result.status === 'SUCCESS') { ✓ }
-                                            @else if (result.status === 'FAILED') { ✗ }
-                                            @else { ⏳ }
-                                        </span>
-                                    </td>
-                                    <td>
-                                        @if (result.status === 'SUCCESS' && result.accountData) {
+                    <!-- Results Section -->
+                    <div class="results-section">
+                        <div class="results-grid">
+                            <!-- Success Column -->
+                            <div class="result-column">
+                                <div class="column-header success">
+                                    <i class="bi bi-check-circle-fill me-1"></i> {{ 'REG.RESULT_SUCCESS' | translate }}
+                                    ({{ currentRequest.successCount }})
+                                </div>
+                                <div class="column-content">
+                                    @for (result of results; track result.id) {
+                                    @if (result.status === 'SUCCESS' && result.accountData) {
+                                    <div class="result-item success">
                                         <code>{{ result.accountData }}</code>
-                                        } @else if (result.errorMessage) {
-                                        <span class="text-danger">{{ result.errorMessage }}</span>
+                                    </div>
+                                    }
+                                    }
+                                    @if (currentRequest.successCount === 0) {
+                                    <div class="empty-message">{{ 'TOOLS.EMPTY_RESULT' | translate }}</div>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Failed Column -->
+                            <div class="result-column">
+                                <div class="column-header error">
+                                    <i class="bi bi-x-circle-fill me-1"></i> {{ 'REG.RESULT_FAILED' | translate }} ({{
+                                    currentRequest.failedCount }})
+                                </div>
+                                <div class="column-content">
+                                    @for (result of results; track result.id) {
+                                    @if (result.status === 'FAILED') {
+                                    <div class="result-item error">
+                                        <span class="result-input">{{ result.inputLine }}</span>
+                                        @if (result.errorMessage) {
+                                        <small class="result-error">{{ result.errorMessage }}</small>
                                         }
-                                    </td>
-                                </tr>
-                                }
-                                @if (results.length === 0) {
-                                <tr>
-                                    <td colspan="3" class="text-center text-muted py-3">
-                                        @if (currentRequest.status === 'PENDING') {
-                                        Đang chờ tool xử lý...
-                                        } @else if (currentRequest.status === 'PROCESSING') {
-                                        Đang xử lý, kết quả sẽ hiển thị real-time...
-                                        } @else {
-                                        Không có kết quả
-                                        }
-                                    </td>
-                                </tr>
-                                }
-                            </tbody>
-                        </table>
+                                    </div>
+                                    }
+                                    }
+                                    @if (currentRequest.failedCount === 0) {
+                                    <div class="empty-message">{{ 'TOOLS.EMPTY_RESULT' | translate }}</div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (results.length === 0) {
+                        <div class="text-center text-muted py-4">
+                            @if (currentRequest.status === 'PENDING') {
+                            <i class="bi bi-hourglass-split display-4 d-block mb-2"></i>
+                            {{ 'REG.WAITING_TOOL' | translate }}
+                            } @else if (currentRequest.status === 'PROCESSING') {
+                            <div class="spinner-border text-primary mb-2"></div>
+                            <div>{{ 'REG.PROCESSING_REALTIME' | translate }}</div>
+                            } @else {
+                            {{ 'REG.NO_RESULTS' | translate }}
+                            }
+                        </div>
+                        }
                     </div>
                 </div>
-            </div>
-            } @else {
-            <div class="card">
-                <div class="card-body text-center py-5 text-muted">
+                } @else {
+                <div class="tool-card text-center py-5 text-muted">
                     <i class="bi bi-inbox display-4 mb-3 d-block"></i>
-                    <p>Tạo yêu cầu mới để bắt đầu</p>
+                    <p>{{ 'REG.SELECT_REQUEST' | translate }}</p>
+                </div>
+                }
+            </div>
+        </div>
+        }
+
+        <!-- Tab: History -->
+        @if (activeTab === 'history') {
+        <div class="tool-card">
+            <div class="results-header">
+                <h4><i class="bi bi-clock-history me-2"></i> {{ 'REG.REQUEST_HISTORY' | translate }}</h4>
+                <div class="results-actions">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="loadMyRequests()">
+                        <i class="bi bi-arrow-clockwise me-1"></i> {{ 'COMMON.REFRESH' | translate }}
+                    </button>
                 </div>
             </div>
-            }
-        </div>
-    </div>
-    }
 
-    <!-- Tab: History -->
-    @if (activeTab === 'history') {
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h6 class="mb-0">Lịch sử yêu cầu</h6>
-            <button class="btn btn-sm btn-outline-secondary" (click)="loadMyRequests()">
-                <i class="bi bi-arrow-clockwise"></i> Tải lại
-            </button>
-        </div>
-        <div class="card-body p-0">
             @if (loadingHistory) {
             <div class="text-center py-5">
                 <div class="spinner-border text-primary"></div>
@@ -207,27 +253,28 @@
             } @else if (myRequests.length === 0) {
             <div class="text-center text-muted py-5">
                 <i class="bi bi-inbox display-4 d-block mb-2"></i>
-                Chưa có yêu cầu nào
+                {{ 'REG.NO_REQUESTS' | translate }}
             </div>
             } @else {
             <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-light">
+                <table class="table table-hover mb-0 history-table">
+                    <thead>
                         <tr>
-                            <th>Mã yêu cầu</th>
-                            <th>Loại</th>
-                            <th>Số lượng</th>
-                            <th>Kết quả</th>
-                            <th>Trạng thái</th>
-                            <th>Ngày tạo</th>
-                            <th></th>
+                            <th>{{ 'REG.REQUEST_NUMBER' | translate }}</th>
+                            <th>{{ 'REG.REQUEST_TYPE' | translate }}</th>
+                            <th>{{ 'REG.QUANTITY' | translate }}</th>
+                            <th>{{ 'COMMON.RESULT' | translate }}</th>
+                            <th>{{ 'REG.STATUS' | translate }}</th>
+                            <th>{{ 'COMMON.CREATED_DATE' | translate }}</th>
+                            <th>{{ 'COMMON.ACTION' | translate }}</th>
                         </tr>
                     </thead>
                     <tbody>
                         @for (req of myRequests; track req.id) {
                         <tr>
                             <td><code>{{ req.requestNumber }}</code></td>
-                            <td>{{ req.requestType === 'USER_ONLY' ? 'Username' : 'User|Pass' }}</td>
+                            <td>{{ req.requestType === 'USER_ONLY' ? ('REG.TYPE_USER_ONLY' | translate) :
+                                ('REG.TYPE_USER_PASS' | translate) }}</td>
                             <td>{{ req.quantity }}</td>
                             <td>
                                 <span class="text-success">{{ req.successCount }}</span> /
@@ -235,20 +282,22 @@
                             </td>
                             <td>
                                 <span class="badge" [ngClass]="{
-                                    'badge-warning': req.status === 'PENDING',
-                                    'badge-info': req.status === 'PROCESSING',
-                                    'badge-success': req.status === 'COMPLETED',
-                                    'badge-danger': req.status === 'CANCELLED',
-                                    'badge-secondary': req.status === 'EXPIRED'
+                                    'bg-warning text-dark': req.status === 'PENDING',
+                                    'bg-info': req.status === 'PROCESSING',
+                                    'bg-success': req.status === 'COMPLETED',
+                                    'bg-danger': req.status === 'CANCELLED',
+                                    'bg-secondary': req.status === 'EXPIRED'
                                 }">{{ getRequestStatusLabel(req.status) }}</span>
                             </td>
                             <td>{{ req.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
                             <td>
-                                <button class="btn btn-sm btn-outline-primary" (click)="viewRequestDetail(req)">
+                                <button class="btn btn-sm btn-outline-primary" (click)="viewRequestDetail(req)"
+                                    title="{{ 'COMMON.VIEW' | translate }}">
                                     <i class="bi bi-eye"></i>
                                 </button>
                                 @if (req.status === 'PENDING') {
-                                <button class="btn btn-sm btn-outline-danger ms-1" (click)="cancelRequest(req)">
+                                <button class="btn btn-sm btn-outline-danger ms-1" (click)="cancelRequest(req)"
+                                    title="{{ 'COMMON.CANCEL' | translate }}">
                                     <i class="bi bi-x-circle"></i>
                                 </button>
                                 }
@@ -260,119 +309,127 @@
             </div>
 
             <!-- Pagination -->
-            @if (paginationConfig.totalPages > 1) {
-            <div class="d-flex justify-content-between align-items-center p-3 border-top">
-                <small class="text-muted">
-                    Hiển thị {{ (paginationConfig.currentPage - 1) * paginationConfig.pageSize + 1 }} -
-                    {{ Math.min(paginationConfig.currentPage * paginationConfig.pageSize, paginationConfig.totalItems)
-                    }}
-                    / {{ paginationConfig.totalItems }} yêu cầu
-                </small>
-                <nav>
-                    <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item" [ngClass]="{'disabled': paginationConfig.currentPage === 1}">
-                            <a class="page-link" (click)="goToPage(paginationConfig.currentPage - 1)">Trước</a>
-                        </li>
-                        @for (page of getPageNumbers(); track page) {
-                        <li class="page-item" [ngClass]="{'active': page === paginationConfig.currentPage}">
-                            <a class="page-link" (click)="goToPage(page)">{{ page }}</a>
-                        </li>
-                        }
-                        <li class="page-item"
-                            [ngClass]="{'disabled': paginationConfig.currentPage === paginationConfig.totalPages}">
-                            <a class="page-link" (click)="goToPage(paginationConfig.currentPage + 1)">Sau</a>
-                        </li>
-                    </ul>
-                </nav>
+            @if (paginationConfig.totalPages > 0) {
+            <div class="card-footer">
+                <app-pagination [config]="paginationConfig" (pageChange)="handlePageChange($event)"
+                    (pageSizeChange)="handlePageSizeChange($event)">
+                </app-pagination>
             </div>
             }
             }
         </div>
-    </div>
 
-    <!-- Request Detail Modal -->
-    @if (selectedRequest) {
-    <div class="modal fade show d-block" style="background: rgba(0,0,0,0.5)">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ selectedRequest.requestNumber }}</h5>
-                    <button type="button" class="btn-close" (click)="selectedRequest = null"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Progress -->
-                    <div class="progress-section mb-3">
-                        <div class="d-flex justify-content-between mb-1">
-                            <span>Kết quả: {{ selectedRequest.successCount + selectedRequest.failedCount }}/{{
-                                selectedRequest.quantity }}</span>
-                            <span>
-                                <span class="text-success">{{ selectedRequest.successCount }} ✓</span> |
-                                <span class="text-danger">{{ selectedRequest.failedCount }} ✗</span>
-                            </span>
-                        </div>
-                        <div class="progress">
-                            <div class="progress-bar bg-success"
-                                [style.width.%]="(selectedRequest.successCount / selectedRequest.quantity) * 100">
+        <!-- Request Detail Modal -->
+        @if (selectedRequest) {
+        <div class="modal fade show d-block" style="background: rgba(0,0,0,0.7)">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+                <div class="modal-content detail-modal">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="bi bi-file-text me-2"></i>
+                            {{ selectedRequest.requestNumber }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white"
+                            (click)="selectedRequest = null"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Progress Section -->
+                        <div class="progress-section mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-semibold">{{ 'COMMON.RESULT' | translate }}: {{
+                                    selectedRequest.successCount +
+                                    selectedRequest.failedCount }}/{{ selectedRequest.quantity }}</span>
+                                <div>
+                                    <span class="badge bg-success me-1">{{ selectedRequest.successCount }} ✓</span>
+                                    <span class="badge bg-danger">{{ selectedRequest.failedCount }} ✗</span>
+                                </div>
+                            </div>
+                            <div class="progress-bar-wrapper">
+                                <div class="progress-bar"
+                                    [style.width.%]="(selectedRequest.successCount / selectedRequest.quantity) * 100">
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div>
+                                    <span class="text-muted me-3">{{ 'REG.TOTAL_CHARGED' | translate }}: <strong
+                                            class="text-primary">{{
+                                            selectedRequest.totalCharged | number }}đ</strong></span>
+                                    <span class="text-muted">{{ 'REG.REQUEST_TYPE' | translate }}: <strong>{{
+                                            selectedRequest.requestType === 'USER_ONLY' ? ('REG.TYPE_USER_ONLY' |
+                                            translate) : ('REG.TYPE_USER_PASS' | translate) }}</strong></span>
+                                </div>
+                                <span class="badge" [ngClass]="{
+                                    'bg-warning text-dark': selectedRequest.status === 'PENDING',
+                                    'bg-info': selectedRequest.status === 'PROCESSING',
+                                    'bg-success': selectedRequest.status === 'COMPLETED',
+                                    'bg-danger': selectedRequest.status === 'CANCELLED'
+                                }">{{ getRequestStatusLabel(selectedRequest.status) }}</span>
                             </div>
                         </div>
-                        <div class="d-flex justify-content-between mt-2">
-                            <small class="text-muted">Đã trừ: {{ selectedRequest.totalCharged | number }}đ</small>
-                            <span class="badge" [ngClass]="{
-                                'badge-warning': selectedRequest.status === 'PENDING',
-                                'badge-info': selectedRequest.status === 'PROCESSING',
-                                'badge-success': selectedRequest.status === 'COMPLETED',
-                                'badge-danger': selectedRequest.status === 'CANCELLED'
-                            }">{{ getRequestStatusLabel(selectedRequest.status) }}</span>
-                        </div>
-                    </div>
 
-                    <!-- Results Table -->
-                    @if (selectedRequest.results && selectedRequest.results.length > 0) {
-                    <table class="table table-sm table-bordered">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Input</th>
-                                <th>Status</th>
-                                <th>Result</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (result of selectedRequest.results; track result.id) {
-                            <tr>
-                                <td><code>{{ result.inputLine }}</code></td>
-                                <td>
-                                    @if (result.status === 'SUCCESS') {
-                                    <span class="text-success">✓</span>
-                                    } @else if (result.status === 'FAILED') {
-                                    <span class="text-danger">✗</span>
-                                    } @else {
-                                    <span class="text-warning">⏳</span>
+                        <!-- Results Table -->
+                        @if (selectedRequest.results && selectedRequest.results.length > 0) {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40%">{{ 'REG.ADMIN_INPUT' | translate }}</th>
+                                        <th style="width: 80px" class="text-center">{{ 'REG.STATUS' | translate }}</th>
+                                        <th>{{ 'REG.ADMIN_RESULT' | translate }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (result of selectedRequest.results; track result.id) {
+                                    <tr
+                                        [ngClass]="{'success-row': result.status === 'SUCCESS', 'error-row': result.status === 'FAILED'}">
+                                        <td><code>{{ result.inputLine }}</code></td>
+                                        <td class="text-center">
+                                            @if (result.status === 'SUCCESS') {
+                                            <span class="status-badge success"><i
+                                                    class="bi bi-check-circle-fill"></i></span>
+                                            } @else if (result.status === 'FAILED') {
+                                            <span class="status-badge error"><i class="bi bi-x-circle-fill"></i></span>
+                                            } @else {
+                                            <span class="status-badge pending"><i
+                                                    class="bi bi-hourglass-split"></i></span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (result.status === 'SUCCESS' && result.accountData) {
+                                            <code class="result-code">{{ result.accountData }}</code>
+                                            } @else if (result.errorMessage) {
+                                            <span class="text-danger">{{ result.errorMessage }}</span>
+                                            } @else {
+                                            <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                    </tr>
                                     }
-                                </td>
-                                <td>
-                                    @if (result.status === 'SUCCESS' && result.accountData) {
-                                    <code>{{ result.accountData }}</code>
-                                    } @else if (result.errorMessage) {
-                                    <span class="text-danger">{{ result.errorMessage }}</span>
-                                    }
-                                </td>
-                            </tr>
-                            }
-                        </tbody>
-                    </table>
-                    } @else {
-                    <div class="text-center text-muted py-4">Không có kết quả</div>
-                    }
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-success" (click)="copyResultsFromRequest(selectedRequest)">
-                        <i class="bi bi-clipboard me-1"></i> Copy kết quả thành công
-                    </button>
-                    <button type="button" class="btn btn-secondary" (click)="selectedRequest = null">Đóng</button>
+                                </tbody>
+                            </table>
+                        </div>
+                        } @else {
+                        <div class="empty-state py-5">
+                            <i class="bi bi-inbox display-4 d-block mb-3"></i>
+                            <p class="mb-0">{{ 'REG.NO_RESULTS' | translate }}</p>
+                        </div>
+                        }
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-success" (click)="copyResultsFromRequest(selectedRequest)">
+                            <i class="bi bi-clipboard me-1"></i> {{ 'REG.COPY_SUCCESS' | translate }}
+                        </button>
+                        <button class="btn btn-danger" (click)="copyFailedFromRequest(selectedRequest)">
+                            <i class="bi bi-clipboard me-1"></i> {{ 'REG.COPY_FAILED' | translate }}
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" (click)="selectedRequest = null">
+                            <i class="bi bi-x me-1"></i> {{ 'COMMON.CLOSE' | translate }}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
+        }
+        }
     </div>
-    }
-    }
 </div>

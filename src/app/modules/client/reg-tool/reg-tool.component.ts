@@ -1,18 +1,21 @@
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { RegService } from '../../../core/services/reg.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { RegRequest, RegRequestCreate, RegRequestType, RegRequestStatus, RegResult, RegResultStatus } from '../../../core/models/reg-request.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { WebSocketService } from '../../../core/services/websocket.service';
 import { SystemSettingService } from '../../../core/services/system-setting.service';
+import { ConfirmService } from '../../../shared/services/confirm.service';
+import { TransactionService } from '../../../core/services/wallet.service';
+import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
     selector: 'app-reg-tool',
     standalone: true,
-    imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule],
+    imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule, PaginationComponent],
     templateUrl: './reg-tool.component.html',
     styleUrl: './reg-tool.component.scss'
 })
@@ -23,6 +26,9 @@ export class RegToolComponent implements OnInit, OnDestroy {
     private readonly authService = inject(AuthService);
     private readonly wsService = inject(WebSocketService);
     private readonly settingService = inject(SystemSettingService);
+    private readonly translateService = inject(TranslateService);
+    private readonly confirmService = inject(ConfirmService);
+    private readonly transactionService = inject(TransactionService);
 
     // Tab state
     activeTab: 'submit' | 'history' = 'submit';
@@ -41,9 +47,9 @@ export class RegToolComponent implements OnInit, OnDestroy {
 
     // Pagination
     paginationConfig = {
-        currentPage: 1,
+        currentPage: 0,
         pageSize: 10,
-        totalItems: 0,
+        totalElements: 0,
         totalPages: 0
     };
 
@@ -87,7 +93,8 @@ export class RegToolComponent implements OnInit, OnDestroy {
     private initForm(): void {
         this.form = this.fb.group({
             requestType: ['USER_ONLY', Validators.required],
-            inputData: ['', [Validators.required, Validators.minLength(1)]]
+            inputData: ['', [Validators.required, Validators.minLength(1)]],
+            sharedPassword: ['']
         });
     }
 
@@ -98,6 +105,36 @@ export class RegToolComponent implements OnInit, OnDestroy {
 
     get estimatedTotal(): number {
         return this.inputLines.length * this.pricePerAccount;
+    }
+
+    get duplicateCount(): number {
+        const seen = new Set<string>();
+        let count = 0;
+        for (const line of this.inputLines) {
+            const key = line.trim().toLowerCase();
+            if (seen.has(key)) {
+                count++;
+            } else {
+                seen.add(key);
+            }
+        }
+        return count;
+    }
+
+    filterDuplicates(): void {
+        const seen = new Set<string>();
+        const uniqueLines: string[] = [];
+        for (const line of this.inputLines) {
+            const key = line.trim().toLowerCase();
+            if (!seen.has(key)) {
+                seen.add(key);
+                uniqueLines.push(line.trim());
+            }
+        }
+        this.form.patchValue({ inputData: uniqueLines.join('\n') });
+        this.notificationService.success(
+            this.translateService.instant('REG.DUPLICATES_FILTERED', { count: this.duplicateCount })
+        );
     }
 
     private checkPendingRequest(): void {
@@ -129,25 +166,40 @@ export class RegToolComponent implements OnInit, OnDestroy {
 
     onSubmit(): void {
         if (this.form.invalid || this.inputLines.length === 0) {
-            this.notificationService.error('Vui lòng nhập danh sách username');
+            this.notificationService.error(this.translateService.instant('REG.ENTER_INPUT'));
             return;
         }
 
         if (this.hasPendingRequest) {
-            this.notificationService.error('Bạn đang có yêu cầu đang xử lý. Vui lòng chờ hoàn thành.');
+            this.notificationService.error(this.translateService.instant('REG.CANCEL_PENDING_ONLY'));
             return;
         }
 
         if (this.inputLines.length > this.maxAccountsPerRequest) {
-            this.notificationService.error(`Số lượng tối đa là ${this.maxAccountsPerRequest} account mỗi lần gửi`);
+            this.notificationService.error(this.translateService.instant('VALIDATION.MAX_VALUE', { max: this.maxAccountsPerRequest }));
+            return;
+        }
+
+        const requestType = this.form.get('requestType')?.value;
+        const sharedPassword = this.form.get('sharedPassword')?.value?.trim() || '';
+
+        // Validate sharedPassword for EMAIL_PASS type
+        if (requestType === 'USER_PASS' && !sharedPassword) {
+            this.notificationService.error(this.translateService.instant('REG.ENTER_PASSWORD'));
             return;
         }
 
         this.isSubmitting = true;
 
+        // Build input list: for EMAIL_PASS, combine email with sharedPassword
+        let inputList = this.inputLines;
+        if (requestType === 'USER_PASS' && sharedPassword) {
+            inputList = this.inputLines.map(email => `${email.trim()}|${sharedPassword}`);
+        }
+
         const request: RegRequestCreate = {
             requestType: this.form.get('requestType')?.value as RegRequestType,
-            inputList: this.inputLines
+            inputList: inputList
         };
 
         this.regService.create(request).subscribe({
@@ -156,15 +208,17 @@ export class RegToolComponent implements OnInit, OnDestroy {
                     this.currentRequest = response.data;
                     this.results = [];
                     // Giữ nguyên input để user xem lại
-                    this.notificationService.success('Đã tạo yêu cầu thành công');
+                    this.notificationService.success(this.translateService.instant('REG.REQUEST_CREATED'));
                     this.subscribeToWebSocket(response.data.id);
                     this.hasPendingRequest = true;
                     this.loadMyRequests();
+                    // Refresh balance after creating request
+                    this.transactionService.refreshBalance();
                 }
             },
             error: (error) => {
                 console.error('Error creating request:', error);
-                this.notificationService.error(error?.error?.message || 'Lỗi khi tạo yêu cầu');
+                this.notificationService.error(error?.error?.message || this.translateService.instant('REG.CREATE_ERROR'));
                 this.isSubmitting = false;
             },
             complete: () => {
@@ -195,6 +249,23 @@ export class RegToolComponent implements OnInit, OnDestroy {
     }
 
     private onResultReceived(data: any): void {
+        // Check if this is a request status update (completion notification)
+        if (data.requestStatus && this.currentRequest) {
+            this.currentRequest.status = data.requestStatus;
+            this.currentRequest.successCount = data.successCount;
+            this.currentRequest.failedCount = data.failedCount;
+            this.currentRequest.totalCharged = data.totalCharged;
+
+            if (data.requestStatus === 'COMPLETED' || data.requestStatus === 'CANCELLED') {
+                this.hasPendingRequest = false;
+                this.loadMyRequests();
+                // Refresh balance when request is completed or cancelled (refund)
+                this.transactionService.refreshBalance();
+            }
+            return;
+        }
+
+        // Handle individual result update
         const result: RegResult = {
             id: Date.now(),
             inputLine: data.inputLine,
@@ -210,25 +281,17 @@ export class RegToolComponent implements OnInit, OnDestroy {
             this.currentRequest.successCount = data.successCount;
             this.currentRequest.failedCount = data.failedCount;
             this.currentRequest.totalCharged = data.totalCharged;
-
-            // If completed, update pending status
-            if (data.status === 'COMPLETED') {
-                this.currentRequest.status = 'COMPLETED';
-                this.hasPendingRequest = false;
-                this.loadMyRequests();
-            }
         }
     }
 
     loadMyRequests(): void {
         this.loadingHistory = true;
-        const page = this.paginationConfig.currentPage - 1;
 
-        this.regService.getMyRequests(page, this.paginationConfig.pageSize).subscribe({
+        this.regService.getMyRequests(this.paginationConfig.currentPage, this.paginationConfig.pageSize).subscribe({
             next: (response) => {
                 if (response.success && response.data) {
                     this.myRequests = response.data.content || [];
-                    this.paginationConfig.totalItems = response.data.totalElements || 0;
+                    this.paginationConfig.totalElements = response.data.totalElements || 0;
                     this.paginationConfig.totalPages = response.data.totalPages || 0;
                 }
                 this.loadingHistory = false;
@@ -258,17 +321,32 @@ export class RegToolComponent implements OnInit, OnDestroy {
         });
     }
 
-    cancelRequest(request: RegRequest): void {
+    async cancelRequest(request: RegRequest): Promise<void> {
         if (request.status !== 'PENDING') {
-            this.notificationService.error('Chỉ có thể hủy yêu cầu đang chờ');
+            this.notificationService.error(this.translateService.instant('REG.CANCEL_PENDING_ONLY'));
+            return;
+        }
+
+        // Confirm before canceling with styled modal
+        const confirmed = await this.confirmService.confirm({
+            title: this.translateService.instant('REG.CANCEL_REQUEST'),
+            message: this.translateService.instant('REG.CANCEL_CONFIRM'),
+            confirmText: this.translateService.instant('COMMON.CONFIRM'),
+            cancelText: this.translateService.instant('COMMON.CANCEL'),
+            confirmButtonClass: 'btn-danger'
+        });
+
+        if (!confirmed) {
             return;
         }
 
         this.regService.cancel(request.id).subscribe({
             next: () => {
-                this.notificationService.success('Đã hủy yêu cầu');
+                this.notificationService.success(this.translateService.instant('REG.REQUEST_CANCELLED'));
                 this.hasPendingRequest = false;
                 this.loadMyRequests();
+                // Refresh balance after cancel (refund)
+                this.transactionService.refreshBalance();
                 if (this.currentRequest?.id === request.id) {
                     this.currentRequest = null;
                     this.results = [];
@@ -277,7 +355,7 @@ export class RegToolComponent implements OnInit, OnDestroy {
                     this.selectedRequest = null;
                 }
             },
-            error: () => this.notificationService.error('Lỗi khi hủy yêu cầu')
+            error: () => this.notificationService.error(this.translateService.instant('REG.CREATE_ERROR'))
         });
     }
 
@@ -294,9 +372,9 @@ export class RegToolComponent implements OnInit, OnDestroy {
 
         if (successData) {
             navigator.clipboard.writeText(successData);
-            this.notificationService.success('Đã copy kết quả thành công');
+            this.notificationService.success(this.translateService.instant('REG.COPIED_SUCCESS'));
         } else {
-            this.notificationService.warning('Không có kết quả thành công để copy');
+            this.notificationService.warning(this.translateService.instant('REG.NO_SUCCESS_TO_COPY'));
         }
     }
 
@@ -310,31 +388,52 @@ export class RegToolComponent implements OnInit, OnDestroy {
 
         if (successData) {
             navigator.clipboard.writeText(successData);
-            this.notificationService.success('Đã copy kết quả thành công');
+            this.notificationService.success(this.translateService.instant('REG.COPIED_SUCCESS'));
         } else {
-            this.notificationService.warning('Không có kết quả thành công để copy');
+            this.notificationService.warning(this.translateService.instant('REG.NO_SUCCESS_TO_COPY'));
+        }
+    }
+
+    copyFailedResults(): void {
+        const failedData = this.results
+            .filter(r => r.status === 'FAILED')
+            .map(r => r.inputLine)
+            .join('\n');
+
+        if (failedData) {
+            navigator.clipboard.writeText(failedData);
+            this.notificationService.success(this.translateService.instant('REG.COPIED_FAILED'));
+        } else {
+            this.notificationService.warning(this.translateService.instant('REG.NO_FAILED_TO_COPY'));
+        }
+    }
+
+    copyFailedFromRequest(request: RegRequest): void {
+        if (!request.results) return;
+
+        const failedData = request.results
+            .filter(r => r.status === 'FAILED')
+            .map(r => r.inputLine)
+            .join('\n');
+
+        if (failedData) {
+            navigator.clipboard.writeText(failedData);
+            this.notificationService.success(this.translateService.instant('REG.COPIED_FAILED'));
+        } else {
+            this.notificationService.warning(this.translateService.instant('REG.NO_FAILED_TO_COPY'));
         }
     }
 
     // Pagination
-    goToPage(page: number): void {
-        if (page < 1 || page > this.paginationConfig.totalPages) return;
+    handlePageChange(page: number): void {
         this.paginationConfig.currentPage = page;
         this.loadMyRequests();
     }
 
-    getPageNumbers(): number[] {
-        const pages: number[] = [];
-        const total = this.paginationConfig.totalPages;
-        const current = this.paginationConfig.currentPage;
-
-        let start = Math.max(1, current - 2);
-        let end = Math.min(total, current + 2);
-
-        for (let i = start; i <= end; i++) {
-            pages.push(i);
-        }
-        return pages;
+    handlePageSizeChange(size: number): void {
+        this.paginationConfig.pageSize = size;
+        this.paginationConfig.currentPage = 0;
+        this.loadMyRequests();
     }
 
     // Status helpers
@@ -361,11 +460,11 @@ export class RegToolComponent implements OnInit, OnDestroy {
 
     getRequestStatusLabel(status: RegRequestStatus): string {
         const statusMap: Record<string, string> = {
-            'PENDING': 'Chờ xử lý',
-            'PROCESSING': 'Đang xử lý',
-            'COMPLETED': 'Hoàn thành',
-            'CANCELLED': 'Đã hủy',
-            'EXPIRED': 'Hết hạn'
+            'PENDING': this.translateService.instant('REG.STATUS_PENDING'),
+            'PROCESSING': this.translateService.instant('REG.STATUS_PROCESSING'),
+            'COMPLETED': this.translateService.instant('REG.STATUS_COMPLETED'),
+            'CANCELLED': this.translateService.instant('REG.STATUS_CANCELLED'),
+            'EXPIRED': this.translateService.instant('REG.STATUS_EXPIRED')
         };
         return statusMap[status] || status;
     }

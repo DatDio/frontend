@@ -487,8 +487,8 @@
                 </span>
               </td>
 
-              <td class="fw-bold">
-                {{ transaction.amount | vndUsd }}
+              <td class="fw-bold" [ngClass]="getAmountClass(transaction.type)">
+                {{ getAmountPrefix(transaction.type) }}{{ transaction.amount | vndUsd }}
               </td>
 
               <td>
