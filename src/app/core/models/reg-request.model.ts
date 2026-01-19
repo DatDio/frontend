@@ -29,6 +29,7 @@ export interface RegResult {
 export interface RegRequestCreate {
     requestType: RegRequestType;
     inputList: string[];
+    sharedPassword?: string;  // Password chung cho USER_PASS
 }
 
 export interface RegRequestFilter {

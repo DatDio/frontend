@@ -242,8 +242,12 @@ export class TransactionListComponent implements OnInit {
       '2': 'Hoàn tiền',
       '3': 'Admin điều chỉnh',
       'DEPOSIT': 'Nạp tiền',
+      'PURCHASE': 'Mua tài khoản',
       'REFUND': 'Hoàn tiền',
-      'ADMIN_ADJUST': 'Admin điều chỉnh'
+      'ADMIN_ADJUST': 'Admin điều chỉnh',
+      'REG_PAYMENT': 'Thanh toán đăng ký',
+      'REG_REFUND': 'Hoàn tiền đăng ký thất bại',
+      'REG_CANCEL_REFUND': 'Hoàn tiền hủy đăng ký'
     };
     return typeMap[type?.toString()] || type?.toString() || '';
   }
@@ -254,10 +258,32 @@ export class TransactionListComponent implements OnInit {
       '2': 'bg-info',
       '3': 'bg-primary',
       'DEPOSIT': 'bg-success',
+      'PURCHASE': 'bg-warning',
       'REFUND': 'bg-info',
-      'ADMIN_ADJUST': 'bg-primary'
+      'ADMIN_ADJUST': 'bg-primary',
+      'REG_PAYMENT': 'bg-warning',
+      'REG_REFUND': 'bg-info',
+      'REG_CANCEL_REFUND': 'bg-info'
     };
     return classMap[type?.toString()] || 'bg-secondary';
+  }
+
+  getAmountClass(type: string | number): string {
+    const debitTypes = ['PURCHASE', 'REG_PAYMENT', '1'];
+    const creditTypes = ['DEPOSIT', 'REFUND', 'REG_REFUND', 'REG_CANCEL_REFUND', 'ADMIN_ADJUST', '0', '2', '3'];
+    const typeStr = type?.toString();
+    if (debitTypes.includes(typeStr)) return 'text-danger';
+    if (creditTypes.includes(typeStr)) return 'text-success';
+    return '';
+  }
+
+  getAmountPrefix(type: string | number): string {
+    const debitTypes = ['PURCHASE', 'REG_PAYMENT', '1'];
+    const creditTypes = ['DEPOSIT', 'REFUND', 'REG_REFUND', 'REG_CANCEL_REFUND', '0', '2'];
+    const typeStr = type?.toString();
+    if (debitTypes.includes(typeStr)) return '-';
+    if (creditTypes.includes(typeStr)) return '+';
+    return '';
   }
 
   getStatusLabel(status: string | number): string {

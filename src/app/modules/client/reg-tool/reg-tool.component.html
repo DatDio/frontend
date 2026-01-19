@@ -246,6 +246,11 @@
                 </div>
             </div>
 
+            <div class="alert alert-warning mb-3">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                {{ 'REG.AUTO_DELETE_NOTE' | translate:{ days: resultRetentionDays } }}
+            </div>
+
             @if (loadingHistory) {
             <div class="text-center py-5">
                 <div class="spinner-border text-primary"></div>

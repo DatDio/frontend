@@ -307,9 +307,12 @@
 
             code {
                 font-size: $font-size-xs;
-                word-break: break-all;
+                white-space: nowrap;
+                overflow-x: auto;
+                display: block;
                 font-family: 'Consolas', 'Monaco', monospace;
                 color: var(--text-primary);
+                padding-bottom: $spacing-1; // Space for scrollbar
             }
 
             .result-input {
@@ -648,7 +651,10 @@
         border-radius: $radius-sm;
         font-family: 'Consolas', 'Monaco', monospace;
         font-size: $font-size-xs;
-        word-break: break-all;
+        white-space: nowrap;
+        overflow-x: auto;
+        display: block;
+        max-width: 100%;
     }
 
     .empty-state {

@@ -59,6 +59,7 @@ export class RegToolComponent implements OnInit, OnDestroy {
     // Settings from backend
     pricePerAccount = 500;  // Default, will be fetched
     maxAccountsPerRequest = 100;  // Default, will be fetched
+    resultRetentionDays = 7;  // Default, will be fetched
 
     // Math for template
     Math = Math;
@@ -85,6 +86,8 @@ export class RegToolComponent implements OnInit, OnDestroy {
                     const maxAccounts = response.data['reg.max_accounts_per_request'];
                     if (price) this.pricePerAccount = parseInt(price, 10);
                     if (maxAccounts) this.maxAccountsPerRequest = parseInt(maxAccounts, 10);
+                    const retentionDays = response.data['reg.result_retention_days'];
+                    if (retentionDays) this.resultRetentionDays = parseInt(retentionDays, 10);
                 }
             }
         });
@@ -191,15 +194,11 @@ export class RegToolComponent implements OnInit, OnDestroy {
 
         this.isSubmitting = true;
 
-        // Build input list: for EMAIL_PASS, combine email with sharedPassword
-        let inputList = this.inputLines;
-        if (requestType === 'USER_PASS' && sharedPassword) {
-            inputList = this.inputLines.map(email => `${email.trim()}|${sharedPassword}`);
-        }
-
+        // Build request - inputList is pure email/username list, password sent separately
         const request: RegRequestCreate = {
-            requestType: this.form.get('requestType')?.value as RegRequestType,
-            inputList: inputList
+            requestType: requestType as RegRequestType,
+            inputList: this.inputLines.map(line => line.trim()),
+            ...(requestType === 'USER_PASS' && sharedPassword ? { sharedPassword } : {})
         };
 
         this.regService.create(request).subscribe({

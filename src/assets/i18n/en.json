@@ -392,7 +392,9 @@
         "COMPLETED": "Completed",
         "FILL_INFO": "Please fill in all information",
         "ERROR": "Error",
-        "VIEW_ALL": "View all tools"
+        "VIEW_ALL": "View all tools",
+        "REG_TOOL": "Account Registration",
+        "REG_TOOL_DESC": "Automatic account registration tool"
     },
     "FOOTER": {
         "ABOUT": "Provide high-quality email marketing at competitive prices.<br>Always prioritize the store’s credibility and reputation.<br>Protect customer information.<br>Ensure secure payments.",
@@ -703,9 +705,9 @@
         "SHARED_PASSWORD_HINT": "All emails will use this same password",
         "ENTER_PASSWORD": "Please enter a shared password",
         "INPUT_LIST": "Email list (one email per line)",
-        "INPUT_PLACEHOLDER_USER": "email1@domain.com\nemail2@domain.com\nemail3@domain.com",
-        "INPUT_PLACEHOLDER_PASS": "email1@domain.com\nemail2@domain.com",
-        "INPUT_PLACEHOLDER_EMAIL": "email1@domain.com\nemail2@domain.com\nemail3@domain.com",
+        "INPUT_PLACEHOLDER_USER": "email1@hotmail.com\nemail2@hotmail.com\nemail3@hotmail.com",
+        "INPUT_PLACEHOLDER_PASS": "email1@hotmail.com\nemail2@hotmail.com",
+        "INPUT_PLACEHOLDER_EMAIL": "email1@hotmail.com\nemail2@hotmail.com\nemail3@hotmail.com",
         "QUANTITY": "Quantity",
         "ESTIMATED": "Estimated",
         "SUBMIT_REQUEST": "Submit request",
@@ -756,6 +758,7 @@
         "CANCEL_CONFIRM": "Are you sure you want to cancel this request? The charged amount will be refunded.",
         "COPY_FAILED": "Copy Failed",
         "COPIED_FAILED": "Failed results copied to clipboard",
-        "NO_FAILED_TO_COPY": "No failed results to copy"
+        "NO_FAILED_TO_COPY": "No failed results to copy",
+        "AUTO_DELETE_NOTE": "All request data will be automatically deleted after {{days}} days, please download results immediately after completion"
     }
 }

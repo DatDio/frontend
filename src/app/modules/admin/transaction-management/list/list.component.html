@@ -147,7 +147,9 @@
                 {{ getTypeLabel(transaction.type) }}
               </span>
             </td>
-            <td class="text-end">{{ transaction.amount | number: '1.0-0' }}</td>
+            <td class="text-end fw-bold" [ngClass]="getAmountClass(transaction.type)">
+              {{ getAmountPrefix(transaction.type) }}{{ transaction.amount | number: '1.0-0' }}
+            </td>
             <td class="small">
               <span class="badge bg-light text-dark">{{ transaction.balanceBefore | number: '1.0-0' }}</span>
               <i class="bi bi-arrow-right text-muted mx-1"></i>

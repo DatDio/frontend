@@ -392,7 +392,9 @@
     "COMPLETED": "Hoàn thành",
     "FILL_INFO": "Vui lòng nhập đầy đủ thông tin",
     "ERROR": "Lỗi",
-    "VIEW_ALL": "Xem tất cả công cụ"
+    "VIEW_ALL": "Xem tất cả công cụ",
+    "REG_TOOL": "Đăng ký tài khoản",
+    "REG_TOOL_DESC": "Công cụ đăng ký tài khoản tự động"
   },
   "FOOTER": {
     "ABOUT": "Cung cấp email marketing chất lượng giá cạnh tranh.<br>Luôn đặt sự uy tín của cửa hàng lên đầu.<br>Bảo mật thông tin khách hàng.<br>Bảo mật thanh toán.",
@@ -694,18 +696,18 @@
     "TOOL_TITLE": "Công cụ Reg Account",
     "CREATE_REQUEST": "Tạo yêu cầu mới",
     "REQUEST_TYPE": "Loại yêu cầu",
-    "TYPE_USER_ONLY": "Chỉ email (hệ thống tạo password)",
+    "TYPE_USER_ONLY": "Chỉ email (Random password)",
     "TYPE_USER_PASS": "Email + Password (bạn cung cấp password)",
-    "TYPE_EMAIL_ONLY": "Chỉ email (hệ thống tạo password)",
-    "TYPE_EMAIL_PASS": "Email + Password chung",
+    "TYPE_EMAIL_ONLY": "Chỉ email (Random password)",
+    "TYPE_EMAIL_PASS": "Email + Password",
     "SHARED_PASSWORD": "Password chung cho tất cả email",
     "SHARED_PASSWORD_PLACEHOLDER": "Nhập password chung",
     "SHARED_PASSWORD_HINT": "Tất cả email sẽ sử dụng cùng password này",
     "ENTER_PASSWORD": "Vui lòng nhập password chung",
     "INPUT_LIST": "Danh sách email (mỗi dòng 1 email)",
-    "INPUT_PLACEHOLDER_USER": "email1@domain.com\nemail2@domain.com\nemail3@domain.com",
-    "INPUT_PLACEHOLDER_PASS": "email1@domain.com\nemail2@domain.com",
-    "INPUT_PLACEHOLDER_EMAIL": "email1@domain.com\nemail2@domain.com\nemail3@domain.com",
+    "INPUT_PLACEHOLDER_USER": "email1@hotmail.com\nemail2@hotmail.com\nemail3@hotmail.com",
+    "INPUT_PLACEHOLDER_PASS": "email1@hotmail.com\nemail2@hotmail.com",
+    "INPUT_PLACEHOLDER_EMAIL": "email1@hotmail.com\nemail2@hotmail.com\nemail3@hotmail.com",
     "QUANTITY": "Số lượng",
     "ESTIMATED": "Dự kiến",
     "SUBMIT_REQUEST": "Gửi yêu cầu",
@@ -756,6 +758,7 @@
     "CANCEL_CONFIRM": "Bạn có chắc muốn hủy yêu cầu này? Số tiền đã trừ sẽ được hoàn lại.",
     "COPY_FAILED": "Copy Failed",
     "COPIED_FAILED": "Đã copy danh sách thất bại",
-    "NO_FAILED_TO_COPY": "Không có kết quả thất bại để copy"
+    "NO_FAILED_TO_COPY": "Không có kết quả thất bại để copy",
+    "AUTO_DELETE_NOTE": "Tất cả dữ liệu yêu cầu sẽ được tự động xóa sau {{days}} ngày, vui lòng tải về kết quả ngay sau khi hoàn thành"
   }
 }

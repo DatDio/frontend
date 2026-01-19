@@ -164,7 +164,7 @@
   gap: $spacing-4;
 
   @media (min-width: $breakpoint-lg) {
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
