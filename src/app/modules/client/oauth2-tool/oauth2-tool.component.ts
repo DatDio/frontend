@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -29,6 +29,7 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
     private readonly translateService = inject(TranslateService);
     private readonly confirmService = inject(ConfirmService);
     private readonly transactionService = inject(TransactionService);
+    private readonly ngZone = inject(NgZone);
 
     // Tab state
     activeTab: 'submit' | 'history' = 'submit';
@@ -64,6 +65,10 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
     // Math for template
     Math = Math;
 
+    // Timer for elapsed time
+    elapsedTime = '00:00:00';
+    private timerInterval: any = null;
+
     // WebSocket unsubscribe function
     private wsUnsubscribe: (() => void) | null = null;
 
@@ -76,6 +81,7 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.unsubscribeWebSocket();
+        this.stopTimer();
     }
 
     private loadSettings(): void {
@@ -157,6 +163,11 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
                     if (pending.status === 'PROCESSING') {
                         this.subscribeToWebSocket(pending.id);
                     }
+
+                    // Start timer if request is PENDING or PROCESSING
+                    if (pending.status === 'PENDING' || pending.status === 'PROCESSING') {
+                        this.startTimer();
+                    }
                 } else {
                     this.hasPendingRequest = false;
                 }
@@ -196,6 +207,8 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
                     this.hasPendingRequest = true;
                     this.loadMyRequests();
                     this.transactionService.refreshBalance();
+                    // Start timer for new request
+                    this.startTimer();
                 }
             },
             error: (error) => {
@@ -230,6 +243,63 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
         }
     }
 
+    // ==================== TIMER METHODS ====================
+
+    /**
+     * Start elapsed time timer based on pickedAt or createdAt timestamp
+     * Runs outside Angular Zone to prevent hydration stability issues
+     */
+    private startTimer(): void {
+        this.stopTimer();
+        this.updateElapsedTime();
+        this.ngZone.runOutsideAngular(() => {
+            this.timerInterval = setInterval(() => {
+                this.ngZone.run(() => this.updateElapsedTime());
+            }, 1000);
+        });
+    }
+
+    /**
+     * Stop the timer
+     */
+    private stopTimer(): void {
+        if (this.timerInterval) {
+            clearInterval(this.timerInterval);
+            this.timerInterval = null;
+        }
+    }
+
+    /**
+     * Calculate and update elapsed time from start timestamp
+     * Uses pickedAt if available (PROCESSING), otherwise createdAt (PENDING)
+     */
+    private updateElapsedTime(): void {
+        if (!this.currentRequest) {
+            this.elapsedTime = '00:00:00';
+            return;
+        }
+
+        const startTime = this.currentRequest.pickedAt || this.currentRequest.createdAt;
+        if (!startTime) {
+            this.elapsedTime = '00:00:00';
+            return;
+        }
+
+        const start = new Date(startTime).getTime();
+        const now = Date.now();
+        const diff = Math.max(0, Math.floor((now - start) / 1000));
+
+        const hours = Math.floor(diff / 3600);
+        const minutes = Math.floor((diff % 3600) / 60);
+        const seconds = diff % 60;
+
+        this.elapsedTime = [
+            hours.toString().padStart(2, '0'),
+            minutes.toString().padStart(2, '0'),
+            seconds.toString().padStart(2, '0')
+        ].join(':');
+    }
+
     private onResultReceived(data: any): void {
         // Check if this is a request status update (completion notification)
         if (data.requestStatus && this.currentRequest) {
@@ -242,6 +312,8 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
                 this.hasPendingRequest = false;
                 this.loadMyRequests();
                 this.transactionService.refreshBalance();
+                // Stop timer when request is done
+                this.stopTimer();
             }
             return;
         }

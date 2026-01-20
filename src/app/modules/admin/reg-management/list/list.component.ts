@@ -192,6 +192,21 @@ export class RegListComponent implements OnInit {
         }
     }
 
+    copyFailedResults(request: RegRequest): void {
+        if (!request.results?.length) return;
+        const failedResults = request.results
+            .filter(r => r.status === 'FAILED')
+            .map(r => r.inputLine)
+            .join('\n');
+
+        if (failedResults) {
+            navigator.clipboard.writeText(failedResults);
+            this.notificationService.success('Đã copy danh sách thất bại');
+        } else {
+            this.notificationService.warning('Không có kết quả thất bại để copy');
+        }
+    }
+
     async onForceComplete(request: RegRequest): Promise<void> {
         const confirmed = await this.confirmService.confirm({
             title: 'Xác nhận Force Complete',

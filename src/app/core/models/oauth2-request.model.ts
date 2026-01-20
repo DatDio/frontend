@@ -12,6 +12,7 @@ export interface OAuth2Request {
     totalCharged: number;
     inputList?: string[];  // Original input data
     createdAt: string;
+    pickedAt?: string;      // Thời điểm bắt đầu xử lý (cho timer)
     completedAt?: string;
     results?: OAuth2Result[];
 }

@@ -136,7 +136,11 @@
                         <div class="progress-bar-wrapper">
                             <div class="progress-bar" [style.width.%]="progressPercent"></div>
                         </div>
-                        <div class="text-end mt-1">
+                        <div class="d-flex justify-content-between align-items-center mt-1">
+                            <small class="text-muted">
+                                <i class="bi bi-stopwatch me-1"></i>
+                                {{ 'OAUTH2.ELAPSED_TIME' | translate }}: <strong>{{ elapsedTime }}</strong>
+                            </small>
                             <small class="text-muted">{{ 'OAUTH2.TOTAL_CHARGED' | translate }}: <strong>{{
                                     currentRequest.totalCharged | number }}đ</strong></small>
                         </div>

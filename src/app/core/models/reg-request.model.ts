@@ -13,6 +13,7 @@ export interface RegRequest {
     totalCharged: number;
     inputList?: string[];  // Original input data
     createdAt: string;
+    pickedAt?: string;      // Thời điểm bắt đầu xử lý (cho timer)
     completedAt?: string;
     results?: RegResult[];
 }
