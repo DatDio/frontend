@@ -1,0 +1,417 @@
+<div class="tool-page">
+    <div class="container">
+        <div class="page-header">
+            <h1><i class="bi bi-key-fill me-2"></i> {{ 'OAUTH2.TOOL_TITLE' | translate }}</h1>
+            <p>{{ 'OAUTH2.TITLE' | translate }}</p>
+        </div>
+
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs mb-4">
+            <li class="nav-item">
+                <a class="nav-link" [ngClass]="{'active': activeTab === 'submit'}" (click)="activeTab = 'submit'"
+                    style="cursor: pointer;">
+                    <i class="bi bi-send me-1"></i> {{ 'OAUTH2.CREATE_REQUEST' | translate }}
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" [ngClass]="{'active': activeTab === 'history'}" (click)="activeTab = 'history'"
+                    style="cursor: pointer;">
+                    <i class="bi bi-clock-history me-1"></i> {{ 'OAUTH2.REQUEST_HISTORY' | translate }}
+                </a>
+            </li>
+        </ul>
+
+        <!-- Tab: Submit -->
+        @if (activeTab === 'submit') {
+        <div class="row">
+            <!-- Left: Input Form -->
+            <div class="col-lg-5 mb-4">
+                <div class="tool-card">
+                    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="tool-form">
+                        <div class="form-row">
+                            <label class="form-label">
+                                {{ 'OAUTH2.INPUT_LIST' | translate }} <span class="item-count">[{{ inputLines.length
+                                    }}]</span>
+                            </label>
+                            <textarea class="data-textarea" formControlName="inputData" rows="10"
+                                [placeholder]="'OAUTH2.INPUT_PLACEHOLDER' | translate">
+                            </textarea>
+                            <div class="textarea-hint">
+                                <i class="bi bi-info-circle me-1"></i>
+                                {{ 'OAUTH2.QUANTITY' | translate }}: <strong
+                                    [class.text-danger]="inputLines.length > maxAccountsPerRequest">{{
+                                    inputLines.length }}</strong> / {{ maxAccountsPerRequest }}
+                                &nbsp;|&nbsp;
+                                {{ 'OAUTH2.ESTIMATED' | translate }}: <strong class="text-primary">{{ estimatedTotal |
+                                    number }}đ</strong>
+                                ({{ pricePerAccount | number }}đ/acc)
+                                @if (duplicateCount > 0) {
+                                &nbsp;|&nbsp;
+                                <span class="text-warning">
+                                    <i class="bi bi-exclamation-circle me-1"></i>
+                                    {{ 'OAUTH2.DUPLICATES_FOUND' | translate:{count: duplicateCount} }}
+                                </span>
+                                }
+                            </div>
+                            @if (inputLines.length > maxAccountsPerRequest) {
+                            <div class="alert alert-danger mt-2 mb-0 py-2">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                {{ 'VALIDATION.MAX_VALUE' | translate:{max: maxAccountsPerRequest} }}
+                            </div>
+                            }
+                        </div>
+
+                        <div class="action-buttons">
+                            @if (duplicateCount > 0) {
+                            <button type="button" class="filter-btn" (click)="filterDuplicates()">
+                                <i class="bi bi-funnel me-1"></i>
+                                {{ 'OAUTH2.FILTER_DUPLICATES' | translate }}
+                            </button>
+                            }
+                            <button type="submit" class="submit-btn"
+                                [disabled]="isSubmitting || inputLines.length === 0 || hasPendingRequest || inputLines.length > maxAccountsPerRequest">
+                                @if (isSubmitting) {
+                                <span class="spinner-border spinner-border-sm me-2"></span>
+                                {{ 'COMMON.PROCESSING' | translate }}
+                                } @else {
+                                <i class="bi bi-send me-2"></i>
+                                {{ 'OAUTH2.SUBMIT_REQUEST' | translate }}
+                                }
+                            </button>
+                        </div>
+
+                        @if (hasPendingRequest && currentRequest) {
+                        <div
+                            class="alert alert-warning mt-3 mb-0 py-2 d-flex justify-content-between align-items-center">
+                            <div>
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                {{ 'OAUTH2.REQUEST_NUMBER' | translate }}: <strong>{{ currentRequest.requestNumber
+                                    }}</strong>
+                                - {{ getRequestStatusLabel(currentRequest.status) }}
+                            </div>
+                            @if (currentRequest.status === 'PENDING') {
+                            <button type="button" class="btn btn-sm btn-outline-danger"
+                                (click)="cancelCurrentRequest()">
+                                <i class="bi bi-x-circle me-1"></i> {{ 'COMMON.CANCEL' | translate }}
+                            </button>
+                            }
+                        </div>
+                        }
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right: Current Request Results -->
+            <div class="col-lg-7">
+                @if (currentRequest) {
+                <div class="tool-card">
+                    <div class="results-header">
+                        <h4><i class="bi bi-list-check me-2"></i> {{ currentRequest.requestNumber }}</h4>
+                        <div class="results-actions">
+                            <span class="badge me-2" [ngClass]="{
+                                'bg-warning text-dark': currentRequest.status === 'PENDING',
+                                'bg-info': currentRequest.status === 'PROCESSING',
+                                'bg-success': currentRequest.status === 'COMPLETED',
+                                'bg-danger': currentRequest.status === 'CANCELLED'
+                            }">{{ getRequestStatusLabel(currentRequest.status) }}</span>
+                            <button type="button" class="copy-success-btn" (click)="copySuccessResults()">
+                                <i class="bi bi-clipboard me-1"></i> {{ 'OAUTH2.COPY_SUCCESS' | translate }}
+                            </button>
+                            <button type="button" class="copy-error-btn" (click)="copyFailedResults()">
+                                <i class="bi bi-clipboard me-1"></i> {{ 'OAUTH2.COPY_FAILED' | translate }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="progress-section">
+                        <div class="progress-info">
+                            <span>{{ 'OAUTH2.PROGRESS' | translate }}: {{ currentRequest.successCount +
+                                currentRequest.failedCount }}/{{ currentRequest.quantity }}</span>
+                            <span>
+                                <span class="text-success">{{ currentRequest.successCount }} ✓</span> |
+                                <span class="text-danger">{{ currentRequest.failedCount }} ✗</span>
+                            </span>
+                        </div>
+                        <div class="progress-bar-wrapper">
+                            <div class="progress-bar" [style.width.%]="progressPercent"></div>
+                        </div>
+                        <div class="text-end mt-1">
+                            <small class="text-muted">{{ 'OAUTH2.TOTAL_CHARGED' | translate }}: <strong>{{
+                                    currentRequest.totalCharged | number }}đ</strong></small>
+                        </div>
+                    </div>
+
+                    <!-- Results Section -->
+                    <div class="results-section">
+                        <div class="results-grid">
+                            <!-- Success Column -->
+                            <div class="result-column">
+                                <div class="column-header success">
+                                    <i class="bi bi-check-circle-fill me-1"></i> {{ 'OAUTH2.RESULT_SUCCESS' | translate
+                                    }}
+                                    ({{ currentRequest.successCount }})
+                                </div>
+                                <div class="column-content">
+                                    @for (result of results; track result.id) {
+                                    @if (result.status === 'SUCCESS' && result.accountData) {
+                                    <div class="result-item success">
+                                        <code>{{ result.accountData }}</code>
+                                    </div>
+                                    }
+                                    }
+                                    @if (currentRequest.successCount === 0) {
+                                    <div class="empty-message">{{ 'TOOLS.EMPTY_RESULT' | translate }}</div>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Failed Column -->
+                            <div class="result-column">
+                                <div class="column-header error">
+                                    <i class="bi bi-x-circle-fill me-1"></i> {{ 'OAUTH2.RESULT_FAILED' | translate }}
+                                    ({{
+                                    currentRequest.failedCount }})
+                                </div>
+                                <div class="column-content">
+                                    @for (result of results; track result.id) {
+                                    @if (result.status === 'FAILED') {
+                                    <div class="result-item error">
+                                        <span class="result-input">{{ result.inputLine }}</span>
+                                        @if (result.errorMessage) {
+                                        <small class="result-error">{{ result.errorMessage }}</small>
+                                        }
+                                    </div>
+                                    }
+                                    }
+                                    @if (currentRequest.failedCount === 0) {
+                                    <div class="empty-message">{{ 'TOOLS.EMPTY_RESULT' | translate }}</div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (results.length === 0) {
+                        <div class="text-center text-muted py-4">
+                            @if (currentRequest.status === 'PENDING') {
+                            <i class="bi bi-hourglass-split display-4 d-block mb-2"></i>
+                            {{ 'OAUTH2.WAITING_TOOL' | translate }}
+                            } @else if (currentRequest.status === 'PROCESSING') {
+                            <div class="spinner-border text-primary mb-2"></div>
+                            <div>{{ 'OAUTH2.PROCESSING_REALTIME' | translate }}</div>
+                            } @else {
+                            {{ 'OAUTH2.NO_RESULTS' | translate }}
+                            }
+                        </div>
+                        }
+                    </div>
+                </div>
+                } @else {
+                <div class="tool-card text-center py-5 text-muted">
+                    <i class="bi bi-inbox display-4 mb-3 d-block"></i>
+                    <p>{{ 'OAUTH2.SELECT_REQUEST' | translate }}</p>
+                </div>
+                }
+            </div>
+        </div>
+        }
+
+        <!-- Tab: History -->
+        @if (activeTab === 'history') {
+        <div class="tool-card">
+            <div class="results-header">
+                <h4><i class="bi bi-clock-history me-2"></i> {{ 'OAUTH2.REQUEST_HISTORY' | translate }}</h4>
+                <div class="results-actions">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="loadMyRequests()">
+                        <i class="bi bi-arrow-clockwise me-1"></i> {{ 'COMMON.REFRESH' | translate }}
+                    </button>
+                </div>
+            </div>
+
+            <div class="alert alert-warning mb-3">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                {{ 'OAUTH2.AUTO_DELETE_NOTE' | translate:{ days: resultRetentionDays } }}
+            </div>
+
+            @if (loadingHistory) {
+            <div class="text-center py-5">
+                <div class="spinner-border text-primary"></div>
+            </div>
+            } @else if (myRequests.length === 0) {
+            <div class="text-center text-muted py-5">
+                <i class="bi bi-inbox display-4 d-block mb-2"></i>
+                {{ 'OAUTH2.NO_REQUESTS' | translate }}
+            </div>
+            } @else {
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 history-table">
+                    <thead>
+                        <tr>
+                            <th>{{ 'OAUTH2.REQUEST_NUMBER' | translate }}</th>
+                            <th>{{ 'OAUTH2.QUANTITY' | translate }}</th>
+                            <th>{{ 'COMMON.RESULT' | translate }}</th>
+                            <th>{{ 'OAUTH2.STATUS' | translate }}</th>
+                            <th>{{ 'COMMON.CREATED_DATE' | translate }}</th>
+                            <th>{{ 'COMMON.ACTION' | translate }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (req of myRequests; track req.id) {
+                        <tr>
+                            <td><code>{{ req.requestNumber }}</code></td>
+                            <td>{{ req.quantity }}</td>
+                            <td>
+                                <span class="text-success">{{ req.successCount }}</span> /
+                                <span class="text-danger">{{ req.failedCount }}</span>
+                            </td>
+                            <td>
+                                <span class="badge" [ngClass]="{
+                                    'bg-warning text-dark': req.status === 'PENDING',
+                                    'bg-info': req.status === 'PROCESSING',
+                                    'bg-success': req.status === 'COMPLETED',
+                                    'bg-danger': req.status === 'CANCELLED',
+                                    'bg-secondary': req.status === 'EXPIRED'
+                                }">{{ getRequestStatusLabel(req.status) }}</span>
+                            </td>
+                            <td>{{ req.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary" (click)="viewRequestDetail(req)"
+                                    title="{{ 'COMMON.VIEW' | translate }}">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                @if (req.status === 'PENDING') {
+                                <button class="btn btn-sm btn-outline-danger ms-1" (click)="cancelRequest(req)"
+                                    title="{{ 'COMMON.CANCEL' | translate }}">
+                                    <i class="bi bi-x-circle"></i>
+                                </button>
+                                }
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            @if (paginationConfig.totalPages > 0) {
+            <div class="card-footer">
+                <app-pagination [config]="paginationConfig" (pageChange)="handlePageChange($event)"
+                    (pageSizeChange)="handlePageSizeChange($event)">
+                </app-pagination>
+            </div>
+            }
+            }
+        </div>
+
+        <!-- Request Detail Modal -->
+        @if (selectedRequest) {
+        <div class="modal fade show d-block" style="background: rgba(0,0,0,0.7)">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
+                <div class="modal-content detail-modal">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="bi bi-file-text me-2"></i>
+                            {{ selectedRequest.requestNumber }}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white"
+                            (click)="selectedRequest = null"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Progress Section -->
+                        <div class="progress-section mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="fw-semibold">{{ 'COMMON.RESULT' | translate }}: {{
+                                    selectedRequest.successCount +
+                                    selectedRequest.failedCount }}/{{ selectedRequest.quantity }}</span>
+                                <div>
+                                    <span class="badge bg-success me-1">{{ selectedRequest.successCount }} ✓</span>
+                                    <span class="badge bg-danger">{{ selectedRequest.failedCount }} ✗</span>
+                                </div>
+                            </div>
+                            <div class="progress-bar-wrapper">
+                                <div class="progress-bar"
+                                    [style.width.%]="(selectedRequest.successCount / selectedRequest.quantity) * 100">
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <div>
+                                    <span class="text-muted me-3">{{ 'OAUTH2.TOTAL_CHARGED' | translate }}: <strong
+                                            class="text-primary">{{
+                                            selectedRequest.totalCharged | number }}đ</strong></span>
+                                </div>
+                                <span class="badge" [ngClass]="{
+                                    'bg-warning text-dark': selectedRequest.status === 'PENDING',
+                                    'bg-info': selectedRequest.status === 'PROCESSING',
+                                    'bg-success': selectedRequest.status === 'COMPLETED',
+                                    'bg-danger': selectedRequest.status === 'CANCELLED'
+                                }">{{ getRequestStatusLabel(selectedRequest.status) }}</span>
+                            </div>
+                        </div>
+
+                        <!-- Results Table -->
+                        @if (selectedRequest.results && selectedRequest.results.length > 0) {
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 40%">{{ 'OAUTH2.ADMIN_INPUT' | translate }}</th>
+                                        <th style="width: 80px" class="text-center">{{ 'OAUTH2.STATUS' | translate }}
+                                        </th>
+                                        <th>{{ 'OAUTH2.ADMIN_RESULT' | translate }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (result of selectedRequest.results; track result.id) {
+                                    <tr
+                                        [ngClass]="{'success-row': result.status === 'SUCCESS', 'error-row': result.status === 'FAILED'}">
+                                        <td><code>{{ result.inputLine }}</code></td>
+                                        <td class="text-center">
+                                            @if (result.status === 'SUCCESS') {
+                                            <span class="status-badge success"><i
+                                                    class="bi bi-check-circle-fill"></i></span>
+                                            } @else if (result.status === 'FAILED') {
+                                            <span class="status-badge error"><i class="bi bi-x-circle-fill"></i></span>
+                                            } @else {
+                                            <span class="status-badge pending"><i
+                                                    class="bi bi-hourglass-split"></i></span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (result.status === 'SUCCESS' && result.accountData) {
+                                            <code class="result-code">{{ result.accountData }}</code>
+                                            } @else if (result.errorMessage) {
+                                            <span class="text-danger">{{ result.errorMessage }}</span>
+                                            } @else {
+                                            <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        } @else {
+                        <div class="empty-state py-5">
+                            <i class="bi bi-inbox display-4 d-block mb-3"></i>
+                            <p class="mb-0">{{ 'OAUTH2.NO_RESULTS' | translate }}</p>
+                        </div>
+                        }
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-success" (click)="copyResultsFromRequest(selectedRequest)">
+                            <i class="bi bi-clipboard me-1"></i> {{ 'OAUTH2.COPY_SUCCESS' | translate }}
+                        </button>
+                        <button class="btn btn-danger" (click)="copyFailedFromRequest(selectedRequest)">
+                            <i class="bi bi-clipboard me-1"></i> {{ 'OAUTH2.COPY_FAILED' | translate }}
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" (click)="selectedRequest = null">
+                            <i class="bi bi-x me-1"></i> {{ 'COMMON.CLOSE' | translate }}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        }
+        }
+    </div>
+</div>
