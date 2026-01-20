@@ -15,4 +15,5 @@ export class AdminOAuth2Api {
 
     public static readonly SEARCH = AdminOAuth2Api.BASE + '/search';
     public static readonly GET_BY_ID = (id: number | string) => AdminOAuth2Api.BASE + `/${id}`;
+    public static readonly FORCE_COMPLETE = (id: number | string) => AdminOAuth2Api.BASE + `/${id}/force-complete`;
 }

@@ -191,4 +191,26 @@ export class RegListComponent implements OnInit {
             this.notificationService.warning('Không có kết quả thành công để copy');
         }
     }
+
+    async onForceComplete(request: RegRequest): Promise<void> {
+        const confirmed = await this.confirmService.confirm({
+            title: 'Xác nhận Force Complete',
+            message: `Force complete yêu cầu ${request.requestNumber}? Các account chưa xử lý sẽ được đánh dấu là FAILED và hoàn tiền cho user.`,
+            confirmText: 'Force Complete',
+            cancelText: 'Hủy'
+        });
+
+        if (confirmed) {
+            this.regService.adminForceComplete(request.id).subscribe({
+                next: () => {
+                    this.notificationService.success('Đã force complete yêu cầu và hoàn tiền thành công');
+                    this.loadRequests();
+                    if (this.showDetailModal) {
+                        this.onCloseModal();
+                    }
+                },
+                error: (err: any) => this.notificationService.error(err?.error?.message || 'Lỗi khi force complete')
+            });
+        }
+    }
 }

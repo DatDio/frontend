@@ -5,6 +5,7 @@ import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule }
 import { OAuth2Request, OAuth2RequestFilter, OAuth2RequestStatus } from '../../../../core/models/oauth2-request.model';
 import { OAuth2Service } from '../../../../core/services/oauth2.service';
 import { NotificationService } from '../../../../core/services/notification.service';
+import { ConfirmService } from '../../../../shared/services/confirm.service';
 import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
 import { PaginationService } from '../../../../shared/services/pagination.service';
 
@@ -18,6 +19,7 @@ import { PaginationService } from '../../../../shared/services/pagination.servic
 export class OAuth2ListComponent implements OnInit {
     private readonly oauth2Service = inject(OAuth2Service);
     private readonly notificationService = inject(NotificationService);
+    private readonly confirmService = inject(ConfirmService);
     private readonly fb = inject(FormBuilder);
     private readonly paginationService = inject(PaginationService);
 
@@ -164,6 +166,28 @@ export class OAuth2ListComponent implements OnInit {
             this.notificationService.success('Đã copy danh sách thất bại');
         } else {
             this.notificationService.warning('Không có kết quả thất bại để copy');
+        }
+    }
+
+    async onForceComplete(request: OAuth2Request): Promise<void> {
+        const confirmed = await this.confirmService.confirm({
+            title: 'Xác nhận Force Complete',
+            message: `Force complete yêu cầu ${request.requestNumber}? Các account chưa xử lý sẽ được đánh dấu là FAILED và hoàn tiền cho user.`,
+            confirmText: 'Force Complete',
+            cancelText: 'Hủy'
+        });
+
+        if (confirmed) {
+            this.oauth2Service.adminForceComplete(request.id).subscribe({
+                next: () => {
+                    this.notificationService.success('Đã force complete yêu cầu và hoàn tiền thành công');
+                    this.loadRequests();
+                    if (this.showDetailModal) {
+                        this.onCloseModal();
+                    }
+                },
+                error: (err: any) => this.notificationService.error(err?.error?.message || 'Lỗi khi force complete')
+            });
         }
     }
 }

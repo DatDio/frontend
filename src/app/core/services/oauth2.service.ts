@@ -93,4 +93,14 @@ export class OAuth2Service {
             .get<ApiResponse<OAuth2Request>>(AdminOAuth2Api.GET_BY_ID(id))
             .pipe(finalize(() => this.loaderService.hide()));
     }
+
+    /**
+     * Admin: Force complete request
+     */
+    adminForceComplete(id: number | string): Observable<ApiResponse<void>> {
+        this.loaderService.show();
+        return this.httpClient
+            .post<ApiResponse<void>>(AdminOAuth2Api.FORCE_COMPLETE(id), {})
+            .pipe(finalize(() => this.loaderService.hide()));
+    }
 }

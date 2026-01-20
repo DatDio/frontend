@@ -17,4 +17,5 @@ export class AdminRegApi {
     public static readonly GET_BY_ID = (id: number | string) => AdminRegApi.BASE + `/${id}`;
     public static readonly CLEANUP = AdminRegApi.BASE + '/cleanup';
     public static readonly RESET_STUCK = AdminRegApi.BASE + '/reset-stuck';
+    public static readonly FORCE_COMPLETE = (id: number | string) => AdminRegApi.BASE + `/${id}/force-complete`;
 }

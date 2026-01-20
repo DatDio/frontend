@@ -1,14 +1,6 @@
 <div class="container-fluid">
     <div class="page-header d-flex justify-content-between align-items-center mb-3">
         <h4 class="mb-0">Quản lý Registration Tool</h4>
-        <!-- <div class="btn-group">
-            <button class="btn btn-warning btn-sm" (click)="onResetStuck()">
-                <i class="bi bi-arrow-repeat"></i> Reset Stuck
-            </button>
-            <button class="btn btn-danger btn-sm" (click)="onCleanup()">
-                <i class="bi bi-trash"></i> Cleanup
-            </button>
-        </div> -->
     </div>
 
     <!-- Tab Navigation -->
@@ -52,7 +44,6 @@
                             <option value="PROCESSING">Đang xử lý</option>
                             <option value="COMPLETED">Hoàn thành</option>
                             <option value="CANCELLED">Đã hủy</option>
-                            <!-- <option value="EXPIRED">Hết hạn</option> -->
                         </select>
                     </div>
                     <div class="col-md-3 d-flex align-items-end gap-2">
@@ -75,6 +66,7 @@
                 <table class="table table-hover mb-0">
                     <thead class="table-light">
                         <tr>
+                            <th style="width: 50px;">STT</th>
                             <th>Mã yêu cầu</th>
                             <th>User</th>
                             <th>Loại</th>
@@ -90,11 +82,13 @@
                     <tbody>
                         @if (requests.length === 0) {
                         <tr>
-                            <td colspan="10" class="text-center py-4 text-muted">Không có dữ liệu</td>
+                            <td colspan="11" class="text-center py-4 text-muted">Không có dữ liệu</td>
                         </tr>
                         }
-                        @for (request of requests; track request.id) {
+                        @for (request of requests; track request.id; let i = $index) {
                         <tr>
+                            <td class="text-muted">{{ paginationConfig.currentPage * paginationConfig.pageSize + i + 1
+                                }}</td>
                             <td class="fw-medium">{{ request.requestNumber }}</td>
                             <td>{{ request.userEmail }}</td>
                             <td>
@@ -113,9 +107,16 @@
                             </td>
                             <td>{{ request.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
                             <td>
-                                <button class="btn btn-sm btn-outline-primary" (click)="onViewDetail(request)">
+                                <button class="btn btn-sm btn-outline-primary me-1" (click)="onViewDetail(request)"
+                                    title="Xem chi tiết">
                                     <i class="bi bi-eye"></i>
                                 </button>
+                                @if (request.status === 'PENDING' || request.status === 'PROCESSING') {
+                                <button class="btn btn-sm btn-danger" (click)="onForceComplete(request)"
+                                    title="Force Complete">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                </button>
+                                }
                             </td>
                         </tr>
                         }

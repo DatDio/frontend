@@ -113,4 +113,14 @@ export class RegService {
             .post<ApiResponse<void>>(AdminRegApi.RESET_STUCK, {})
             .pipe(finalize(() => this.loaderService.hide()));
     }
+
+    /**
+     * Admin: Force complete request
+     */
+    adminForceComplete(id: number | string): Observable<ApiResponse<void>> {
+        this.loaderService.show();
+        return this.httpClient
+            .post<ApiResponse<void>>(AdminRegApi.FORCE_COMPLETE(id), {})
+            .pipe(finalize(() => this.loaderService.hide()));
+    }
 }
