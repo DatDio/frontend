@@ -1,10 +1,9 @@
-export interface RegRequest {
+export interface OAuth2Request {
     id: number;
     requestNumber: string;
     userId?: number;
     userEmail?: string;
-    status: RegRequestStatus;
-    requestType: RegRequestType;
+    status: OAuth2RequestStatus;
     quantity: number;
     successCount: number;
     failedCount: number;
@@ -15,29 +14,27 @@ export interface RegRequest {
     createdAt: string;
     pickedAt?: string;      // Thời điểm bắt đầu xử lý (cho timer)
     completedAt?: string;
-    results?: RegResult[];
+    results?: OAuth2Result[];
 }
 
-export interface RegResult {
+export interface OAuth2Result {
     id: number;
     inputLine: string;
-    accountData?: string;
-    status: RegResultStatus;
+    accountData?: string;  // email|pass|oauth2token|clientID
+    status: OAuth2ResultStatus;
     errorMessage?: string;
     processedAt?: string;
 }
 
-export interface RegRequestCreate {
-    requestType: RegRequestType;
-    inputList: string[];
-    sharedPassword?: string;  // Password chung cho USER_PASS
+export interface OAuth2RequestCreate {
+    inputList: string[];  // ["email1|pass1", "email2|pass2"]
 }
 
-export interface RegRequestFilter {
+export interface OAuth2RequestFilter {
     userId?: number;
     userEmail?: string;
     requestNumber?: string;
-    status?: RegRequestStatus;
+    status?: OAuth2RequestStatus;
     createdFrom?: string;
     createdTo?: string;
     page?: number;
@@ -45,6 +42,5 @@ export interface RegRequestFilter {
     sort?: string;
 }
 
-export type RegRequestStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED' | 'EXPIRED';
-export type RegRequestType = 'USER_ONLY' | 'USER_PASS';
-export type RegResultStatus = 'PENDING' | 'SUCCESS' | 'FAILED';
+export type OAuth2RequestStatus = 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'CANCELLED' | 'EXPIRED';
+export type OAuth2ResultStatus = 'PENDING' | 'SUCCESS' | 'FAILED';

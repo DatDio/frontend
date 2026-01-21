@@ -2,28 +2,28 @@ import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { RegRequest, RegRequestFilter, RegRequestStatus } from '../../../../core/models/reg-request.model';
-import { RegService } from '../../../../core/services/reg.service';
+import { OAuth2Request, OAuth2RequestFilter, OAuth2RequestStatus } from '../../../../core/models/oauth2-request.model';
+import { OAuth2Service } from '../../../../core/services/oauth2.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { ConfirmService } from '../../../../shared/services/confirm.service';
 import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
 import { PaginationService } from '../../../../shared/services/pagination.service';
 
 @Component({
-    selector: 'app-reg-list',
+    selector: 'app-oauth2-list',
     standalone: true,
     imports: [CommonModule, RouterModule, FormsModule, ReactiveFormsModule, PaginationComponent],
     templateUrl: './list.component.html',
     styleUrl: './list.component.scss'
 })
-export class RegListComponent implements OnInit {
-    private readonly regService = inject(RegService);
+export class OAuth2ListComponent implements OnInit {
+    private readonly oauth2Service = inject(OAuth2Service);
     private readonly notificationService = inject(NotificationService);
     private readonly confirmService = inject(ConfirmService);
     private readonly fb = inject(FormBuilder);
     private readonly paginationService = inject(PaginationService);
 
-    requests: RegRequest[] = [];
+    requests: OAuth2Request[] = [];
 
     paginationConfig: PaginationConfig = {
         currentPage: 0,
@@ -33,7 +33,7 @@ export class RegListComponent implements OnInit {
     };
 
     formSearch!: FormGroup;
-    selectedRequest: RegRequest | null = null;
+    selectedRequest: OAuth2Request | null = null;
     showDetailModal = false;
 
     ngOnInit(): void {
@@ -73,7 +73,7 @@ export class RegListComponent implements OnInit {
     }
 
     private loadRequests(): void {
-        const filter: RegRequestFilter = {
+        const filter: OAuth2RequestFilter = {
             page: this.paginationConfig.currentPage,
             limit: this.paginationConfig.pageSize,
             requestNumber: this.formSearch.get('requestNumber')?.value || undefined,
@@ -81,7 +81,7 @@ export class RegListComponent implements OnInit {
             status: this.formSearch.get('status')?.value || undefined,
         };
 
-        this.regService.adminSearch(filter).subscribe({
+        this.oauth2Service.adminSearch(filter).subscribe({
             next: (response: any) => {
                 if (response.success && response.data?.content) {
                     this.requests = response.data.content;
@@ -100,8 +100,8 @@ export class RegListComponent implements OnInit {
         });
     }
 
-    onViewDetail(request: RegRequest): void {
-        this.regService.adminGetById(request.id).subscribe({
+    onViewDetail(request: OAuth2Request): void {
+        this.oauth2Service.adminGetById(request.id).subscribe({
             next: (response: any) => {
                 if (response.success) {
                     this.selectedRequest = response.data;
@@ -117,45 +117,7 @@ export class RegListComponent implements OnInit {
         this.selectedRequest = null;
     }
 
-    async onCleanup(): Promise<void> {
-        const confirmed = await this.confirmService.confirm({
-            title: 'Xác nhận',
-            message: 'Dọn dẹp các yêu cầu đã hết hạn?',
-            confirmText: 'Dọn dẹp',
-            cancelText: 'Hủy'
-        });
-
-        if (confirmed) {
-            this.regService.adminCleanup().subscribe({
-                next: () => {
-                    this.notificationService.success('Đã dọn dẹp thành công');
-                    this.loadRequests();
-                },
-                error: () => this.notificationService.error('Lỗi khi dọn dẹp')
-            });
-        }
-    }
-
-    async onResetStuck(): Promise<void> {
-        const confirmed = await this.confirmService.confirm({
-            title: 'Xác nhận',
-            message: 'Reset các yêu cầu bị stuck (PROCESSING quá lâu)?',
-            confirmText: 'Reset',
-            cancelText: 'Hủy'
-        });
-
-        if (confirmed) {
-            this.regService.adminResetStuck().subscribe({
-                next: () => {
-                    this.notificationService.success('Đã reset thành công');
-                    this.loadRequests();
-                },
-                error: () => this.notificationService.error('Lỗi khi reset')
-            });
-        }
-    }
-
-    getStatusLabel(status: RegRequestStatus): string {
+    getStatusLabel(status: OAuth2RequestStatus): string {
         const statusMap: Record<string, string> = {
             'PENDING': 'Chờ xử lý',
             'PROCESSING': 'Đang xử lý',
@@ -166,7 +128,7 @@ export class RegListComponent implements OnInit {
         return statusMap[status] || status;
     }
 
-    getStatusClass(status: RegRequestStatus): string {
+    getStatusClass(status: OAuth2RequestStatus): string {
         const classMap: Record<string, string> = {
             'PENDING': 'badge-warning',
             'PROCESSING': 'badge-info',
@@ -177,7 +139,7 @@ export class RegListComponent implements OnInit {
         return classMap[status] || 'badge-secondary';
     }
 
-    copyResults(request: RegRequest): void {
+    copyResults(request: OAuth2Request): void {
         if (!request.results?.length) return;
         const successResults = request.results
             .filter(r => r.status === 'SUCCESS' && r.accountData)
@@ -192,7 +154,7 @@ export class RegListComponent implements OnInit {
         }
     }
 
-    copyFailedResults(request: RegRequest): void {
+    copyFailedResults(request: OAuth2Request): void {
         if (!request.results?.length) return;
         const failedResults = request.results
             .filter(r => r.status === 'FAILED')
@@ -207,7 +169,7 @@ export class RegListComponent implements OnInit {
         }
     }
 
-    async onForceComplete(request: RegRequest): Promise<void> {
+    async onForceComplete(request: OAuth2Request): Promise<void> {
         const confirmed = await this.confirmService.confirm({
             title: 'Xác nhận Force Complete',
             message: `Force complete yêu cầu ${request.requestNumber}? Các account chưa xử lý sẽ được đánh dấu là FAILED và hoàn tiền cho user.`,
@@ -216,7 +178,7 @@ export class RegListComponent implements OnInit {
         });
 
         if (confirmed) {
-            this.regService.adminForceComplete(request.id).subscribe({
+            this.oauth2Service.adminForceComplete(request.id).subscribe({
                 next: () => {
                     this.notificationService.success('Đã force complete yêu cầu và hoàn tiền thành công');
                     this.loadRequests();

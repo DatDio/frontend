@@ -74,5 +74,10 @@ export const clientRoutes: Routes = [
     path: 'reg-tool',
     canActivate: [authGuard],
     loadComponent: () => import('../../modules/client/reg-tool/reg-tool.component').then(m => m.RegToolComponent)
+  },
+  {
+    path: 'oauth2-tool',
+    canActivate: [authGuard],
+    loadComponent: () => import('../../modules/client/oauth2-tool/oauth2-tool.component').then(m => m.OAuth2ToolComponent)
   }
 ];

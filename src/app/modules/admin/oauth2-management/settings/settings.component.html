@@ -1,0 +1,82 @@
+<div class="container-fluid">
+    <div class="page-header d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Quản lý OAuth2 Tool</h4>
+    </div>
+
+    <!-- Tab Navigation -->
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/oauth2-management/list">
+                <i class="bi bi-list-ul me-1"></i> OAuth2 Requests
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/oauth2-management/tool-apikeys">
+                <i class="bi bi-key me-1"></i> Tool API Keys
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" routerLink="/admin/oauth2-management/settings">
+                <i class="bi bi-gear me-1"></i> Cài đặt
+            </a>
+        </li>
+    </ul>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Đang tải...</span>
+        </div>
+    </div>
+
+    <!-- Settings Content -->
+    <div *ngIf="!loading" class="card">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="bi bi-gear me-2"></i>Cài đặt OAuth2 Tool</h6>
+        </div>
+        <div class="card-body">
+            <div class="row g-4">
+                <!-- Price Per Account -->
+                <div class="col-md-6">
+                    <label class="form-label fw-medium">Giá mỗi account thành công</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" [(ngModel)]="pricePerAccount" min="0">
+                        <span class="input-group-text">VND</span>
+                    </div>
+                    <small class="text-muted">Số tiền trừ từ ví user khi get OAuth2 thành công 1 account</small>
+                </div>
+
+                <!-- Max Accounts Per Request -->
+                <div class="col-md-6">
+                    <label class="form-label fw-medium">Số account tối đa mỗi yêu cầu</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" [(ngModel)]="maxAccountsPerRequest" min="1"
+                            max="1000">
+                        <span class="input-group-text">account</span>
+                    </div>
+                    <small class="text-muted">Số lượng account tối đa trong 1 lần gửi yêu cầu</small>
+                </div>
+
+                <!-- Result Retention Days -->
+                <div class="col-md-6">
+                    <label class="form-label fw-medium">Thời gian lưu kết quả</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" [(ngModel)]="resultRetentionDays" min="1" max="365">
+                        <span class="input-group-text">ngày</span>
+                    </div>
+                    <small class="text-muted">Kết quả OAuth2 sẽ bị xóa sau số ngày này</small>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="d-flex justify-content-end">
+                <button class="btn btn-primary" (click)="saveAllSettings()" [disabled]="saving">
+                    <i class="bi bi-check-lg me-1" *ngIf="!saving"></i>
+                    <span class="spinner-border spinner-border-sm me-1" *ngIf="saving"></span>
+                    {{ saving ? 'Đang lưu...' : 'Lưu tất cả cài đặt' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

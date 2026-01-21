@@ -90,5 +90,27 @@ export const adminRoutes: Routes = [
         loadComponent: () => import('../../modules/admin/reg-management/settings/settings.component').then(m => m.RegSettingsComponent)
       }
     ]
+  },
+  {
+    path: 'oauth2-management',
+    children: [
+      {
+        path: '',
+        redirectTo: 'list',
+        pathMatch: 'full'
+      },
+      {
+        path: 'list',
+        loadComponent: () => import('../../modules/admin/oauth2-management/list/list.component').then(m => m.OAuth2ListComponent)
+      },
+      {
+        path: 'tool-apikeys',
+        loadComponent: () => import('../../modules/admin/oauth2-management/tool-apikeys/list.component').then(m => m.ToolApiKeyListComponent)
+      },
+      {
+        path: 'settings',
+        loadComponent: () => import('../../modules/admin/oauth2-management/settings/settings.component').then(m => m.OAuth2SettingsComponent)
+      }
+    ]
   }
 ];

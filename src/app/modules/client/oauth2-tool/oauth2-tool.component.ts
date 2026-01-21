@@ -2,9 +2,9 @@ import { Component, OnInit, OnDestroy, inject, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { RegService } from '../../../core/services/reg.service';
+import { OAuth2Service } from '../../../core/services/oauth2.service';
 import { NotificationService } from '../../../core/services/notification.service';
-import { RegRequest, RegRequestCreate, RegRequestType, RegRequestStatus, RegResult, RegResultStatus } from '../../../core/models/reg-request.model';
+import { OAuth2Request, OAuth2RequestCreate, OAuth2RequestStatus, OAuth2Result, OAuth2ResultStatus } from '../../../core/models/oauth2-request.model';
 import { AuthService } from '../../../core/services/auth.service';
 import { WebSocketService } from '../../../core/services/websocket.service';
 import { SystemSettingService } from '../../../core/services/system-setting.service';
@@ -13,14 +13,14 @@ import { TransactionService } from '../../../core/services/wallet.service';
 import { PaginationComponent } from '../../../shared/components/pagination/pagination.component';
 
 @Component({
-    selector: 'app-reg-tool',
+    selector: 'app-oauth2-tool',
     standalone: true,
     imports: [CommonModule, FormsModule, ReactiveFormsModule, TranslateModule, PaginationComponent],
-    templateUrl: './reg-tool.component.html',
-    styleUrl: './reg-tool.component.scss'
+    templateUrl: './oauth2-tool.component.html',
+    styleUrl: './oauth2-tool.component.scss'
 })
-export class RegToolComponent implements OnInit, OnDestroy {
-    private readonly regService = inject(RegService);
+export class OAuth2ToolComponent implements OnInit, OnDestroy {
+    private readonly oauth2Service = inject(OAuth2Service);
     private readonly notificationService = inject(NotificationService);
     private readonly fb = inject(FormBuilder);
     private readonly authService = inject(AuthService);
@@ -38,13 +38,13 @@ export class RegToolComponent implements OnInit, OnDestroy {
     isSubmitting = false;
 
     // Current request tracking (for submit tab)
-    currentRequest: RegRequest | null = null;
-    results: RegResult[] = [];
+    currentRequest: OAuth2Request | null = null;
+    results: OAuth2Result[] = [];
 
     // History tab
-    myRequests: RegRequest[] = [];
+    myRequests: OAuth2Request[] = [];
     loadingHistory = false;
-    selectedRequest: RegRequest | null = null;
+    selectedRequest: OAuth2Request | null = null;
 
     // Pagination
     paginationConfig = {
@@ -88,11 +88,11 @@ export class RegToolComponent implements OnInit, OnDestroy {
         this.settingService.getPublicSettings().subscribe({
             next: (response) => {
                 if (response.success && response.data) {
-                    const price = response.data['reg.price_per_account'];
-                    const maxAccounts = response.data['reg.max_accounts_per_request'];
+                    const price = response.data['oauth2.price_per_account'];
+                    const maxAccounts = response.data['oauth2.max_accounts_per_request'];
                     if (price) this.pricePerAccount = parseInt(price, 10);
                     if (maxAccounts) this.maxAccountsPerRequest = parseInt(maxAccounts, 10);
-                    const retentionDays = response.data['reg.result_retention_days'];
+                    const retentionDays = response.data['oauth2.result_retention_days'];
                     if (retentionDays) this.resultRetentionDays = parseInt(retentionDays, 10);
                 }
             }
@@ -101,9 +101,7 @@ export class RegToolComponent implements OnInit, OnDestroy {
 
     private initForm(): void {
         this.form = this.fb.group({
-            requestType: ['USER_ONLY', Validators.required],
-            inputData: ['', [Validators.required, Validators.minLength(1)]],
-            sharedPassword: ['']
+            inputData: ['', [Validators.required, Validators.minLength(1)]]
         });
     }
 
@@ -142,12 +140,12 @@ export class RegToolComponent implements OnInit, OnDestroy {
         }
         this.form.patchValue({ inputData: uniqueLines.join('\n') });
         this.notificationService.success(
-            this.translateService.instant('REG.DUPLICATES_FILTERED', { count: this.duplicateCount })
+            this.translateService.instant('OAUTH2.DUPLICATES_FILTERED', { count: this.duplicateCount })
         );
     }
 
     private checkPendingRequest(): void {
-        this.regService.getMyPending().subscribe({
+        this.oauth2Service.getMyPending().subscribe({
             next: (response) => {
                 if (response.success && response.data) {
                     const pending = response.data;
@@ -159,7 +157,6 @@ export class RegToolComponent implements OnInit, OnDestroy {
                     if (pending.inputList && pending.inputList.length > 0) {
                         const inputText = pending.inputList.join('\n');
                         this.form.get('inputData')?.setValue(inputText);
-                        this.form.get('requestType')?.setValue(pending.requestType);
                     }
 
                     // Subscribe to WebSocket for real-time updates
@@ -180,12 +177,12 @@ export class RegToolComponent implements OnInit, OnDestroy {
 
     onSubmit(): void {
         if (this.form.invalid || this.inputLines.length === 0) {
-            this.notificationService.error(this.translateService.instant('REG.ENTER_INPUT'));
+            this.notificationService.error(this.translateService.instant('OAUTH2.ENTER_INPUT'));
             return;
         }
 
         if (this.hasPendingRequest) {
-            this.notificationService.error(this.translateService.instant('REG.CANCEL_PENDING_ONLY'));
+            this.notificationService.error(this.translateService.instant('OAUTH2.CANCEL_PENDING_ONLY'));
             return;
         }
 
@@ -194,35 +191,21 @@ export class RegToolComponent implements OnInit, OnDestroy {
             return;
         }
 
-        const requestType = this.form.get('requestType')?.value;
-        const sharedPassword = this.form.get('sharedPassword')?.value?.trim() || '';
-
-        // Validate sharedPassword for EMAIL_PASS type
-        if (requestType === 'USER_PASS' && !sharedPassword) {
-            this.notificationService.error(this.translateService.instant('REG.ENTER_PASSWORD'));
-            return;
-        }
-
         this.isSubmitting = true;
 
-        // Build request - inputList is pure email/username list, password sent separately
-        const request: RegRequestCreate = {
-            requestType: requestType as RegRequestType,
-            inputList: this.inputLines.map(line => line.trim()),
-            ...(requestType === 'USER_PASS' && sharedPassword ? { sharedPassword } : {})
+        const request: OAuth2RequestCreate = {
+            inputList: this.inputLines.map(line => line.trim())
         };
 
-        this.regService.create(request).subscribe({
+        this.oauth2Service.create(request).subscribe({
             next: (response) => {
                 if (response.success) {
                     this.currentRequest = response.data;
                     this.results = [];
-                    // Giữ nguyên input để user xem lại
-                    this.notificationService.success(this.translateService.instant('REG.REQUEST_CREATED'));
+                    this.notificationService.success(this.translateService.instant('OAUTH2.REQUEST_CREATED'));
                     this.subscribeToWebSocket(response.data.id);
                     this.hasPendingRequest = true;
                     this.loadMyRequests();
-                    // Refresh balance after creating request
                     this.transactionService.refreshBalance();
                     // Start timer for new request
                     this.startTimer();
@@ -230,7 +213,7 @@ export class RegToolComponent implements OnInit, OnDestroy {
             },
             error: (error) => {
                 console.error('Error creating request:', error);
-                this.notificationService.error(error?.error?.message || this.translateService.instant('REG.CREATE_ERROR'));
+                this.notificationService.error(error?.error?.message || this.translateService.instant('OAUTH2.CREATE_ERROR'));
                 this.isSubmitting = false;
             },
             complete: () => {
@@ -245,7 +228,7 @@ export class RegToolComponent implements OnInit, OnDestroy {
         const userId = this.authService.getCurrentUser()?.id;
         if (!userId) return;
 
-        const topic = `/topic/reg/${userId}`;
+        const topic = `/topic/oauth2/${userId}`;
         this.wsUnsubscribe = this.wsService.subscribe<any>(topic, (data) => {
             if (data.requestId === requestId) {
                 this.onResultReceived(data);
@@ -296,7 +279,6 @@ export class RegToolComponent implements OnInit, OnDestroy {
             return;
         }
 
-        // Use pickedAt for PROCESSING, createdAt for PENDING
         const startTime = this.currentRequest.pickedAt || this.currentRequest.createdAt;
         if (!startTime) {
             this.elapsedTime = '00:00:00';
@@ -329,7 +311,6 @@ export class RegToolComponent implements OnInit, OnDestroy {
             if (data.requestStatus === 'COMPLETED' || data.requestStatus === 'CANCELLED') {
                 this.hasPendingRequest = false;
                 this.loadMyRequests();
-                // Refresh balance when request is completed or cancelled (refund)
                 this.transactionService.refreshBalance();
                 // Stop timer when request is done
                 this.stopTimer();
@@ -338,7 +319,7 @@ export class RegToolComponent implements OnInit, OnDestroy {
         }
 
         // Handle individual result update
-        const result: RegResult = {
+        const result: OAuth2Result = {
             id: Date.now(),
             inputLine: data.inputLine,
             accountData: data.accountData,
@@ -359,7 +340,7 @@ export class RegToolComponent implements OnInit, OnDestroy {
     loadMyRequests(): void {
         this.loadingHistory = true;
 
-        this.regService.getMyRequests(this.paginationConfig.currentPage, this.paginationConfig.pageSize).subscribe({
+        this.oauth2Service.getMyRequests(this.paginationConfig.currentPage, this.paginationConfig.pageSize).subscribe({
             next: (response) => {
                 if (response.success && response.data) {
                     this.myRequests = response.data.content || [];
@@ -374,8 +355,8 @@ export class RegToolComponent implements OnInit, OnDestroy {
         });
     }
 
-    viewRequestDetail(request: RegRequest): void {
-        this.regService.getById(request.id).subscribe({
+    viewRequestDetail(request: OAuth2Request): void {
+        this.oauth2Service.getById(request.id).subscribe({
             next: (response) => {
                 if (response.success) {
                     this.selectedRequest = response.data;
@@ -393,16 +374,15 @@ export class RegToolComponent implements OnInit, OnDestroy {
         });
     }
 
-    async cancelRequest(request: RegRequest): Promise<void> {
+    async cancelRequest(request: OAuth2Request): Promise<void> {
         if (request.status !== 'PENDING') {
-            this.notificationService.error(this.translateService.instant('REG.CANCEL_PENDING_ONLY'));
+            this.notificationService.error(this.translateService.instant('OAUTH2.CANCEL_PENDING_ONLY'));
             return;
         }
 
-        // Confirm before canceling with styled modal
         const confirmed = await this.confirmService.confirm({
-            title: this.translateService.instant('REG.CANCEL_REQUEST'),
-            message: this.translateService.instant('REG.CANCEL_CONFIRM'),
+            title: this.translateService.instant('OAUTH2.CANCEL_REQUEST'),
+            message: this.translateService.instant('OAUTH2.CANCEL_CONFIRM'),
             confirmText: this.translateService.instant('COMMON.CONFIRM'),
             cancelText: this.translateService.instant('COMMON.CANCEL'),
             confirmButtonClass: 'btn-danger'
@@ -412,12 +392,11 @@ export class RegToolComponent implements OnInit, OnDestroy {
             return;
         }
 
-        this.regService.cancel(request.id).subscribe({
+        this.oauth2Service.cancel(request.id).subscribe({
             next: () => {
-                this.notificationService.success(this.translateService.instant('REG.REQUEST_CANCELLED'));
+                this.notificationService.success(this.translateService.instant('OAUTH2.REQUEST_CANCELLED'));
                 this.hasPendingRequest = false;
                 this.loadMyRequests();
-                // Refresh balance after cancel (refund)
                 this.transactionService.refreshBalance();
                 if (this.currentRequest?.id === request.id) {
                     this.currentRequest = null;
@@ -427,7 +406,7 @@ export class RegToolComponent implements OnInit, OnDestroy {
                     this.selectedRequest = null;
                 }
             },
-            error: () => this.notificationService.error(this.translateService.instant('REG.CREATE_ERROR'))
+            error: () => this.notificationService.error(this.translateService.instant('OAUTH2.CREATE_ERROR'))
         });
     }
 
@@ -444,13 +423,13 @@ export class RegToolComponent implements OnInit, OnDestroy {
 
         if (successData) {
             navigator.clipboard.writeText(successData);
-            this.notificationService.success(this.translateService.instant('REG.COPIED_SUCCESS'));
+            this.notificationService.success(this.translateService.instant('OAUTH2.COPIED_SUCCESS'));
         } else {
-            this.notificationService.warning(this.translateService.instant('REG.NO_SUCCESS_TO_COPY'));
+            this.notificationService.warning(this.translateService.instant('OAUTH2.NO_SUCCESS_TO_COPY'));
         }
     }
 
-    copyResultsFromRequest(request: RegRequest): void {
+    copyResultsFromRequest(request: OAuth2Request): void {
         if (!request.results) return;
 
         const successData = request.results
@@ -460,9 +439,9 @@ export class RegToolComponent implements OnInit, OnDestroy {
 
         if (successData) {
             navigator.clipboard.writeText(successData);
-            this.notificationService.success(this.translateService.instant('REG.COPIED_SUCCESS'));
+            this.notificationService.success(this.translateService.instant('OAUTH2.COPIED_SUCCESS'));
         } else {
-            this.notificationService.warning(this.translateService.instant('REG.NO_SUCCESS_TO_COPY'));
+            this.notificationService.warning(this.translateService.instant('OAUTH2.NO_SUCCESS_TO_COPY'));
         }
     }
 
@@ -474,13 +453,13 @@ export class RegToolComponent implements OnInit, OnDestroy {
 
         if (failedData) {
             navigator.clipboard.writeText(failedData);
-            this.notificationService.success(this.translateService.instant('REG.COPIED_FAILED'));
+            this.notificationService.success(this.translateService.instant('OAUTH2.COPIED_FAILED'));
         } else {
-            this.notificationService.warning(this.translateService.instant('REG.NO_FAILED_TO_COPY'));
+            this.notificationService.warning(this.translateService.instant('OAUTH2.NO_FAILED_TO_COPY'));
         }
     }
 
-    copyFailedFromRequest(request: RegRequest): void {
+    copyFailedFromRequest(request: OAuth2Request): void {
         if (!request.results) return;
 
         const failedData = request.results
@@ -490,9 +469,9 @@ export class RegToolComponent implements OnInit, OnDestroy {
 
         if (failedData) {
             navigator.clipboard.writeText(failedData);
-            this.notificationService.success(this.translateService.instant('REG.COPIED_FAILED'));
+            this.notificationService.success(this.translateService.instant('OAUTH2.COPIED_FAILED'));
         } else {
-            this.notificationService.warning(this.translateService.instant('REG.NO_FAILED_TO_COPY'));
+            this.notificationService.warning(this.translateService.instant('OAUTH2.NO_FAILED_TO_COPY'));
         }
     }
 
@@ -509,7 +488,7 @@ export class RegToolComponent implements OnInit, OnDestroy {
     }
 
     // Status helpers
-    getStatusClass(status: RegResultStatus): string {
+    getStatusClass(status: OAuth2ResultStatus): string {
         return status === 'SUCCESS' ? 'text-success' : status === 'FAILED' ? 'text-danger' : 'text-warning';
     }
 
@@ -519,7 +498,7 @@ export class RegToolComponent implements OnInit, OnDestroy {
         return Math.round((processed / this.currentRequest.quantity) * 100);
     }
 
-    getRequestStatusClass(status: RegRequestStatus): string {
+    getRequestStatusClass(status: OAuth2RequestStatus): string {
         const statusMap: Record<string, string> = {
             'PENDING': 'pending',
             'PROCESSING': 'processing',
@@ -530,18 +509,18 @@ export class RegToolComponent implements OnInit, OnDestroy {
         return statusMap[status] || status.toLowerCase();
     }
 
-    getRequestStatusLabel(status: RegRequestStatus): string {
+    getRequestStatusLabel(status: OAuth2RequestStatus): string {
         const statusMap: Record<string, string> = {
-            'PENDING': this.translateService.instant('REG.STATUS_PENDING'),
-            'PROCESSING': this.translateService.instant('REG.STATUS_PROCESSING'),
-            'COMPLETED': this.translateService.instant('REG.STATUS_COMPLETED'),
-            'CANCELLED': this.translateService.instant('REG.STATUS_CANCELLED'),
-            'EXPIRED': this.translateService.instant('REG.STATUS_EXPIRED')
+            'PENDING': this.translateService.instant('OAUTH2.STATUS_PENDING'),
+            'PROCESSING': this.translateService.instant('OAUTH2.STATUS_PROCESSING'),
+            'COMPLETED': this.translateService.instant('OAUTH2.STATUS_COMPLETED'),
+            'CANCELLED': this.translateService.instant('OAUTH2.STATUS_CANCELLED'),
+            'EXPIRED': this.translateService.instant('OAUTH2.STATUS_EXPIRED')
         };
         return statusMap[status] || status;
     }
 
-    getResultStatusClass(status: RegResultStatus): string {
+    getResultStatusClass(status: OAuth2ResultStatus): string {
         const statusMap: Record<string, string> = {
             'PENDING': 'pending',
             'SUCCESS': 'success',

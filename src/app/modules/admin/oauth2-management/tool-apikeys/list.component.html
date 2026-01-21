@@ -1,0 +1,192 @@
+<div class="container-fluid">
+    <div class="page-header d-flex justify-content-between align-items-center mb-3">
+        <h4 class="mb-0">Quản lý OAuth2 Tool</h4>
+        <button class="btn btn-primary" (click)="onOpenCreateModal()">
+            <i class="bi bi-plus-lg"></i> Tạo Tool API Key
+        </button>
+    </div>
+
+    <!-- Tab Navigation -->
+    <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/oauth2-management/list">
+                <i class="bi bi-list-ul me-1"></i> OAuth2 Requests
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" routerLink="/admin/oauth2-management/tool-apikeys">
+                <i class="bi bi-key me-1"></i> Tool API Keys
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/oauth2-management/settings">
+                <i class="bi bi-gear me-1"></i> Cài đặt
+            </a>
+        </li>
+    </ul>
+
+    <div class="alert alert-info mb-4">
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>Tool API Key</strong> được sử dụng để xác thực Desktop Tool khi gọi các endpoint
+        <code>/oauth2-tool/*</code>.
+        Key có prefix <code>mtk_</code> và chỉ hiển thị một lần khi tạo.
+    </div>
+
+    <!-- Table -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Tên</th>
+                            <th>Prefix</th>
+                            <th>Trạng thái</th>
+                            <th>Mô tả</th>
+                            <th>Sử dụng lần cuối</th>
+                            <th>Ngày tạo</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (isLoading) {
+                        <tr>
+                            <td colspan="7" class="text-center py-4">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </td>
+                        </tr>
+                        } @else if (toolApiKeys.length === 0) {
+                        <tr>
+                            <td colspan="7" class="text-center py-4 text-muted">
+                                Chưa có Tool API Key nào. Click "Tạo Tool API Key" để bắt đầu.
+                            </td>
+                        </tr>
+                        }
+                        @for (key of toolApiKeys; track key.id) {
+                        <tr>
+                            <td class="fw-medium">{{ key.name }}</td>
+                            <td><code>{{ key.prefix }}...</code></td>
+                            <td>
+                                <span class="badge" [ngClass]="getStatusClass(key.status)">
+                                    {{ getStatusLabel(key.status) }}
+                                </span>
+                            </td>
+                            <td>{{ key.description || '-' }}</td>
+                            <td>
+                                @if (key.lastUsedAt) {
+                                <span>{{ key.lastUsedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                                <br>
+                                <small class="text-muted">IP: {{ key.lastUsedIp }}</small>
+                                } @else {
+                                <span class="text-muted">Chưa sử dụng</span>
+                                }
+                            </td>
+                            <td>{{ key.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    @if (key.status === 0) {
+                                    <button class="btn btn-outline-warning" (click)="onRevoke(key)" title="Vô hiệu hóa">
+                                        <i class="bi bi-pause-circle"></i>
+                                    </button>
+                                    } @else {
+                                    <button class="btn btn-outline-success" (click)="onActivate(key)"
+                                        title="Kích hoạt lại">
+                                        <i class="bi bi-play-circle"></i>
+                                    </button>
+                                    }
+                                    <button class="btn btn-outline-danger" (click)="onDelete(key)" title="Xóa">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Modal -->
+@if (showCreateModal) {
+<div class="modal-backdrop fade show"></div>
+<div class="modal fade show d-block" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tạo Tool API Key mới</h5>
+                <button type="button" class="btn-close" (click)="onCloseCreateModal()"></button>
+            </div>
+            <form [formGroup]="formCreate" (ngSubmit)="onCreate()">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Tên Tool <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" formControlName="name" placeholder="VD: Desktop Tool 1">
+                        @if (formCreate.get('name')?.invalid && formCreate.get('name')?.touched) {
+                        <div class="text-danger small mt-1">Tên không được để trống</div>
+                        }
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mô tả</label>
+                        <textarea class="form-control" formControlName="description" rows="3"
+                            placeholder="Mô tả thêm về tool này (không bắt buộc)"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="onCloseCreateModal()">Hủy</button>
+                    <button type="submit" class="btn btn-primary" [disabled]="formCreate.invalid">
+                        <i class="bi bi-plus-lg"></i> Tạo Key
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+}
+
+<!-- Generated Key Modal -->
+@if (showKeyModal && generatedKey) {
+<div class="modal-backdrop fade show"></div>
+<div class="modal fade show d-block" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="bi bi-check-circle me-2"></i>Tool API Key đã được tạo!</h5>
+                <button type="button" class="btn-close btn-close-white" (click)="onCloseKeyModal()"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Quan trọng:</strong> API Key chỉ hiển thị một lần. Hãy copy và lưu trữ an toàn!
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tên Tool:</label>
+                    <p class="mb-0">{{ generatedKey.metadata.name }}</p>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">API Key:</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control font-monospace" [value]="generatedKey.apiKey" readonly>
+                        <button class="btn btn-outline-primary" (click)="copyToClipboard(generatedKey.apiKey)">
+                            <i class="bi bi-clipboard"></i> Copy
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-3 bg-light rounded">
+                    <h6 class="mb-2">Cách sử dụng:</h6>
+                    <code>curl -H "X-API-KEY: {{ generatedKey.apiKey }}" https://your-api.com/api/v1/oauth2-tool/pending</code>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" (click)="onCloseKeyModal()">Đã lưu Key</button>
+            </div>
+        </div>
+    </div>
+</div>
+}

@@ -3,47 +3,47 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { LoaderService } from './loader.service';
-import { RegRequest, RegRequestCreate, RegRequestFilter } from '../models/reg-request.model';
+import { OAuth2Request, OAuth2RequestCreate, OAuth2RequestFilter } from '../models/oauth2-request.model';
 import { ApiResponse, PaginatedResponse } from '../models/common.model';
-import { RegApi, AdminRegApi } from '../../Utils/apis/reg/reg.api';
+import { OAuth2Api, AdminOAuth2Api } from '../../Utils/apis/oauth2/oauth2.api';
 
 @Injectable({
     providedIn: 'root'
 })
-export class RegService {
+export class OAuth2Service {
     private readonly httpClient = inject(HttpClient);
     private readonly loaderService = inject(LoaderService);
 
     // ==================== CLIENT ENDPOINTS ====================
 
     /**
-     * Create new registration request
+     * Create new OAuth2 request
      */
-    create(request: RegRequestCreate): Observable<ApiResponse<RegRequest>> {
+    create(request: OAuth2RequestCreate): Observable<ApiResponse<OAuth2Request>> {
         this.loaderService.show();
         return this.httpClient
-            .post<ApiResponse<RegRequest>>(RegApi.CREATE, request)
+            .post<ApiResponse<OAuth2Request>>(OAuth2Api.CREATE, request)
             .pipe(finalize(() => this.loaderService.hide()));
     }
 
     /**
-     * Get user's registration requests
+     * Get user's OAuth2 requests
      */
-    getMyRequests(page = 0, size = 10): Observable<ApiResponse<PaginatedResponse<RegRequest>>> {
+    getMyRequests(page = 0, size = 10): Observable<ApiResponse<PaginatedResponse<OAuth2Request>>> {
         const params = new HttpParams()
             .set('page', page.toString())
             .set('size', size.toString());
 
-        return this.httpClient.get<ApiResponse<PaginatedResponse<RegRequest>>>(RegApi.LIST, { params });
+        return this.httpClient.get<ApiResponse<PaginatedResponse<OAuth2Request>>>(OAuth2Api.LIST, { params });
     }
 
     /**
      * Get request by ID
      */
-    getById(id: number | string): Observable<ApiResponse<RegRequest>> {
+    getById(id: number | string): Observable<ApiResponse<OAuth2Request>> {
         this.loaderService.show();
         return this.httpClient
-            .get<ApiResponse<RegRequest>>(RegApi.GET_BY_ID(id))
+            .get<ApiResponse<OAuth2Request>>(OAuth2Api.GET_BY_ID(id))
             .pipe(finalize(() => this.loaderService.hide()));
     }
 
@@ -53,15 +53,15 @@ export class RegService {
     cancel(id: number | string): Observable<ApiResponse<void>> {
         this.loaderService.show();
         return this.httpClient
-            .delete<ApiResponse<void>>(RegApi.CANCEL(id))
+            .delete<ApiResponse<void>>(OAuth2Api.CANCEL(id))
             .pipe(finalize(() => this.loaderService.hide()));
     }
 
     /**
      * Get user's current pending/processing request (if any)
      */
-    getMyPending(): Observable<ApiResponse<RegRequest | null>> {
-        return this.httpClient.get<ApiResponse<RegRequest | null>>(RegApi.MY_PENDING);
+    getMyPending(): Observable<ApiResponse<OAuth2Request | null>> {
+        return this.httpClient.get<ApiResponse<OAuth2Request | null>>(OAuth2Api.MY_PENDING);
     }
 
     // ==================== ADMIN ENDPOINTS ====================
@@ -69,7 +69,7 @@ export class RegService {
     /**
      * Admin: Search all requests
      */
-    adminSearch(filter: RegRequestFilter): Observable<ApiResponse<PaginatedResponse<RegRequest>>> {
+    adminSearch(filter: OAuth2RequestFilter): Observable<ApiResponse<PaginatedResponse<OAuth2Request>>> {
         let params = new HttpParams()
             .set('page', (filter.page ?? 0).toString())
             .set('limit', (filter.limit ?? 20).toString())
@@ -81,36 +81,16 @@ export class RegService {
         if (filter.createdFrom) params = params.set('createdFrom', filter.createdFrom);
         if (filter.createdTo) params = params.set('createdTo', filter.createdTo);
         if (filter.sort) params = params.set('sort', filter.sort);
-        return this.httpClient.get<ApiResponse<PaginatedResponse<RegRequest>>>(AdminRegApi.SEARCH, { params });
+        return this.httpClient.get<ApiResponse<PaginatedResponse<OAuth2Request>>>(AdminOAuth2Api.SEARCH, { params });
     }
 
     /**
      * Admin: Get request by ID
      */
-    adminGetById(id: number | string): Observable<ApiResponse<RegRequest>> {
+    adminGetById(id: number | string): Observable<ApiResponse<OAuth2Request>> {
         this.loaderService.show();
         return this.httpClient
-            .get<ApiResponse<RegRequest>>(AdminRegApi.GET_BY_ID(id))
-            .pipe(finalize(() => this.loaderService.hide()));
-    }
-
-    /**
-     * Admin: Cleanup expired requests
-     */
-    adminCleanup(): Observable<ApiResponse<void>> {
-        this.loaderService.show();
-        return this.httpClient
-            .post<ApiResponse<void>>(AdminRegApi.CLEANUP, {})
-            .pipe(finalize(() => this.loaderService.hide()));
-    }
-
-    /**
-     * Admin: Reset stuck requests
-     */
-    adminResetStuck(): Observable<ApiResponse<void>> {
-        this.loaderService.show();
-        return this.httpClient
-            .post<ApiResponse<void>>(AdminRegApi.RESET_STUCK, {})
+            .get<ApiResponse<OAuth2Request>>(AdminOAuth2Api.GET_BY_ID(id))
             .pipe(finalize(() => this.loaderService.hide()));
     }
 
@@ -120,7 +100,7 @@ export class RegService {
     adminForceComplete(id: number | string): Observable<ApiResponse<void>> {
         this.loaderService.show();
         return this.httpClient
-            .post<ApiResponse<void>>(AdminRegApi.FORCE_COMPLETE(id), {})
+            .post<ApiResponse<void>>(AdminOAuth2Api.FORCE_COMPLETE(id), {})
             .pipe(finalize(() => this.loaderService.hide()));
     }
 }

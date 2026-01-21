@@ -1,22 +1,22 @@
 <div class="container-fluid">
     <div class="page-header d-flex justify-content-between align-items-center mb-3">
-        <h4 class="mb-0">Quản lý Registration Tool</h4>
+        <h4 class="mb-0">Quản lý OAuth2 Tool</h4>
     </div>
 
     <!-- Tab Navigation -->
     <ul class="nav nav-tabs mb-4">
         <li class="nav-item">
-            <a class="nav-link active" routerLink="/admin/reg-management/list">
-                <i class="bi bi-list-ul me-1"></i> Reg Requests
+            <a class="nav-link active" routerLink="/admin/oauth2-management/list">
+                <i class="bi bi-list-ul me-1"></i> OAuth2 Requests
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" routerLink="/admin/reg-management/tool-apikeys">
+            <a class="nav-link" routerLink="/admin/oauth2-management/tool-apikeys">
                 <i class="bi bi-key me-1"></i> Tool API Keys
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" routerLink="/admin/reg-management/settings">
+            <a class="nav-link" routerLink="/admin/oauth2-management/settings">
                 <i class="bi bi-gear me-1"></i> Cài đặt
             </a>
         </li>
@@ -29,7 +29,8 @@
                 <div class="row g-3">
                     <div class="col-md-3">
                         <label class="form-label">Mã yêu cầu</label>
-                        <input type="text" class="form-control" formControlName="requestNumber" placeholder="REG-...">
+                        <input type="text" class="form-control" formControlName="requestNumber"
+                            placeholder="OAUTH2-...">
                     </div>
                     <div class="col-md-3">
                         <label class="form-label">Email</label>
@@ -69,7 +70,6 @@
                             <th style="width: 50px;">STT</th>
                             <th>Mã yêu cầu</th>
                             <th>User</th>
-                            <th>Loại</th>
                             <th>Số lượng</th>
                             <th>Thành công</th>
                             <th>Thất bại</th>
@@ -82,7 +82,7 @@
                     <tbody>
                         @if (requests.length === 0) {
                         <tr>
-                            <td colspan="11" class="text-center py-4 text-muted">Không có dữ liệu</td>
+                            <td colspan="10" class="text-center py-4 text-muted">Không có dữ liệu</td>
                         </tr>
                         }
                         @for (request of requests; track request.id; let i = $index) {
@@ -91,11 +91,6 @@
                                 }}</td>
                             <td class="fw-medium">{{ request.requestNumber }}</td>
                             <td>{{ request.userEmail }}</td>
-                            <td>
-                                <span class="badge bg-secondary">
-                                    {{ request.requestType === 'USER_ONLY' ? 'User only' : 'User + Pass' }}
-                                </span>
-                            </td>
                             <td>{{ request.quantity }}</td>
                             <td class="text-success">{{ request.successCount }}</td>
                             <td class="text-danger">{{ request.failedCount }}</td>
@@ -148,8 +143,6 @@
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <p><strong>User:</strong> {{ selectedRequest.userEmail }}</p>
-                        <p><strong>Loại:</strong> {{ selectedRequest.requestType === 'USER_ONLY' ? 'Chỉ username' :
-                            'Username + Password' }}</p>
                         <p><strong>Số lượng:</strong> {{ selectedRequest.quantity }}</p>
                     </div>
                     <div class="col-md-6">
