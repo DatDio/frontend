@@ -5,7 +5,7 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-  workflow_dispatch:  # Allow manual trigger
+  workflow_dispatch:
 
 jobs:
   build:
@@ -32,7 +32,7 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
-      - name: Zero-Downtime Deploy Frontend
+      - name: Deploy Frontend
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -40,141 +40,95 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: 22
           debug: true
-          script_stop: true
-          command_timeout: 10m
+          command_timeout: 15m
           script: |
             set -e
             
-            echo "DEBUG: Starting script..."
-            echo "DEBUG: Current user: $(whoami)"
-            echo "DEBUG: Current directory: $(pwd)"
+            echo "=== Starting Frontend Deploy ==="
+            cd /opt/mailshop
             
-            PROJECT_PATH="/opt/mailshop"
+            # Check nginx to determine current slot
             NGINX_CONF="/etc/nginx/sites-enabled/mailshop"
-            
-            echo "DEBUG: Checking if $PROJECT_PATH exists..."
-            ls -la "$PROJECT_PATH" || echo "ERROR: Directory not found!"
-            
-            echo "=========================================="
-            echo "   Zero-Downtime Frontend Deployment"
-            echo "=========================================="
-            
-            cd "$PROJECT_PATH"
-            echo "DEBUG: Successfully cd to $PROJECT_PATH"
-            
-            # Determine current active slot from nginx config
-            echo "DEBUG: Checking nginx config..."
-            cat "$NGINX_CONF" | grep proxy_pass || echo "No proxy_pass found"
-            
-            if grep -q "127.0.0.1:4001" "$NGINX_CONF" 2>/dev/null; then
-              ACTIVE_SLOT="blue"
-              NEXT_SLOT="green"
+            if grep -q "4001" "$NGINX_CONF"; then
+              CURRENT_PORT=4001
               NEXT_PORT=4002
+              NEXT_NAME="frontend-green"
+              OLD_NAME="frontend-blue"
             else
-              ACTIVE_SLOT="green"
-              NEXT_SLOT="blue"
+              CURRENT_PORT=4002
               NEXT_PORT=4001
+              NEXT_NAME="frontend-blue"
+              OLD_NAME="frontend-green"
             fi
             
-            echo "Active slot: $ACTIVE_SLOT"
-            echo "Deploying to: $NEXT_SLOT (port $NEXT_PORT)"
+            echo "Current: $CURRENT_PORT, Next: $NEXT_PORT"
             
-            # Step 1: Pull latest code
-            echo "Step 1: Pulling latest frontend code..."
+            # Pull code
+            echo "=== Pulling code ==="
             cd frontend
-            echo "DEBUG: In frontend dir, running git fetch..."
             git fetch --all
-            echo "DEBUG: git fetch done, running git reset..."
             git reset --hard origin/main
-            echo "DEBUG: git reset done"
             cd ..
             
-            # Step 2: Stop old container for next slot (cleanup)
-            echo "🧹 Step 2: Cleaning up old $NEXT_SLOT container..."
-            docker stop frontend-$NEXT_SLOT 2>/dev/null || true
-            docker rm frontend-$NEXT_SLOT 2>/dev/null || true
+            # Build
+            echo "=== Building ==="
+            docker compose build frontend
             
-            # Step 3: Build new image
-            echo "🔨 Step 3: Building frontend image..."
-            docker compose -f docker-compose.yml build frontend
+            # Clean old next-slot container
+            echo "=== Cleanup ==="
+            docker stop $NEXT_NAME 2>/dev/null || true
+            docker rm $NEXT_NAME 2>/dev/null || true
             
-            # Step 4: Start new container on next slot port
-            echo "🚀 Step 4: Starting frontend-$NEXT_SLOT on port $NEXT_PORT..."
+            # Start new container
+            echo "=== Starting $NEXT_NAME on port $NEXT_PORT ==="
             docker run -d \
-              --name frontend-$NEXT_SLOT \
+              --name $NEXT_NAME \
               --network mailshop_mailshop-network \
               -p $NEXT_PORT:4000 \
               -e NODE_ENV=production \
               --restart always \
               mailshop-frontend:latest
             
-            # Step 5: Wait for health check
-            echo "💓 Step 5: Waiting for frontend health check..."
-            sleep 10  # Give container time to start
-            for i in {1..60}; do
-              if curl -sf "http://127.0.0.1:$NEXT_PORT" > /dev/null 2>&1; then
-                echo ""
-                echo "✅ Frontend is healthy on port $NEXT_PORT!"
+            # Wait for health
+            echo "=== Waiting for health check ==="
+            sleep 15
+            for i in 1 2 3 4 5 6 7 8 9 10; do
+              if curl -sf "http://127.0.0.1:$NEXT_PORT" > /dev/null; then
+                echo "Healthy!"
                 break
               fi
-              printf "."
-              sleep 2
+              echo "Waiting... $i"
+              sleep 5
             done
             
-            # Verify health check passed
-            if ! curl -sf "http://127.0.0.1:$NEXT_PORT" > /dev/null 2>&1; then
-              echo "❌ Health check failed! Debug info:"
-              echo "--- Container status ---"
-              docker ps -a | grep frontend
-              echo "--- Container logs ---"
-              docker logs frontend-$NEXT_SLOT --tail 50
-              echo "--- Curl verbose ---"
-              curl -v "http://127.0.0.1:$NEXT_PORT" || true
-              echo "Rolling back..."
-              docker stop frontend-$NEXT_SLOT 2>/dev/null || true
-              docker rm frontend-$NEXT_SLOT 2>/dev/null || true
+            # Verify
+            if ! curl -sf "http://127.0.0.1:$NEXT_PORT" > /dev/null; then
+              echo "FAILED! Logs:"
+              docker logs $NEXT_NAME --tail 30
+              docker stop $NEXT_NAME || true
+              docker rm $NEXT_NAME || true
               exit 1
             fi
             
-            # Step 6: Switch nginx to new slot
-            echo "🔄 Step 6: Switching Nginx to $NEXT_SLOT..."
+            # Switch nginx
+            echo "=== Switching nginx to $NEXT_PORT ==="
             sudo sed -i "s|proxy_pass http://127.0.0.1:400[0-2]|proxy_pass http://127.0.0.1:$NEXT_PORT|g" "$NGINX_CONF"
             sudo nginx -t && sudo nginx -s reload
             
-            # Step 7: Wait for connections to drain
-            echo "⏳ Step 7: Waiting for connections to drain (3s)..."
+            # Stop old
+            echo "=== Stopping old container ==="
             sleep 3
+            docker stop $OLD_NAME 2>/dev/null || true
+            docker rm $OLD_NAME 2>/dev/null || true
             
-            # Step 8: Stop old slot
-            echo "🛑 Step 8: Stopping old $ACTIVE_SLOT container..."
-            docker stop frontend-$ACTIVE_SLOT 2>/dev/null || true
-            docker rm frontend-$ACTIVE_SLOT 2>/dev/null || true
-            
-            # Cleanup old images
-            echo "🧹 Cleaning up old images..."
-            docker image prune -f
-            
-            echo ""
-            echo "=========================================="
-            echo "   ✅ Frontend Deployed Successfully!"
-            echo "   Active slot: $NEXT_SLOT (port $NEXT_PORT)"
-            echo "=========================================="
+            echo "=== DONE! Frontend on port $NEXT_PORT ==="
 
-      - name: Verify Deployment
+      - name: Verify
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          port: ${{ secrets.VPS_PORT }}
+          port: 22
           script: |
-            echo "💓 Verifying deployment..."
-            for i in {1..10}; do
-              if curl -sf https://emailsieure.com > /dev/null 2>&1; then
-                echo "✅ Frontend verified successfully!"
-                exit 0
-              fi
-              sleep 2
-            done
-            echo "❌ Verification failed!"
-            exit 1
+            curl -sf https://emailsieure.com > /dev/null && echo "OK!" || echo "FAILED"
