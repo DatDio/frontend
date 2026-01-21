@@ -94,7 +94,8 @@ jobs:
             
             # Step 5: Wait for health check
             echo "💓 Step 5: Waiting for frontend health check..."
-            for i in {1..30}; do
+            sleep 10  # Give container time to start
+            for i in {1..60}; do
               if curl -sf "http://127.0.0.1:$NEXT_PORT" > /dev/null 2>&1; then
                 echo ""
                 echo "✅ Frontend is healthy on port $NEXT_PORT!"
@@ -106,7 +107,14 @@ jobs:
             
             # Verify health check passed
             if ! curl -sf "http://127.0.0.1:$NEXT_PORT" > /dev/null 2>&1; then
-              echo "❌ Health check failed! Rolling back..."
+              echo "❌ Health check failed! Debug info:"
+              echo "--- Container status ---"
+              docker ps -a | grep frontend
+              echo "--- Container logs ---"
+              docker logs frontend-$NEXT_SLOT --tail 50
+              echo "--- Curl verbose ---"
+              curl -v "http://127.0.0.1:$NEXT_PORT" || true
+              echo "Rolling back..."
               docker stop frontend-$NEXT_SLOT 2>/dev/null || true
               docker rm frontend-$NEXT_SLOT 2>/dev/null || true
               exit 1
