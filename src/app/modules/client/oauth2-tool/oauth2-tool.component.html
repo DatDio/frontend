@@ -59,6 +59,12 @@
                                 {{ 'VALIDATION.MAX_VALUE' | translate:{max: maxAccountsPerRequest} }}
                             </div>
                             }
+                            @if (invalidFormatCount > 0) {
+                            <div class="alert alert-danger mt-2 mb-0 py-2">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                {{ 'OAUTH2.INVALID_FORMAT' | translate:{count: invalidFormatCount} }}
+                            </div>
+                            }
                         </div>
 
                         <div class="action-buttons">
@@ -69,7 +75,7 @@
                             </button>
                             }
                             <button type="submit" class="submit-btn"
-                                [disabled]="isSubmitting || inputLines.length === 0 || hasPendingRequest || inputLines.length > maxAccountsPerRequest">
+                                [disabled]="isSubmitting || inputLines.length === 0 || hasPendingRequest || inputLines.length > maxAccountsPerRequest || invalidFormatCount > 0">
                                 @if (isSubmitting) {
                                 <span class="spinner-border spinner-border-sm me-2"></span>
                                 {{ 'COMMON.PROCESSING' | translate }}

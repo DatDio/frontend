@@ -128,6 +128,29 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
         return count;
     }
 
+    /**
+     * Validate email|pass format
+     * Returns count of invalid lines
+     */
+    get invalidFormatCount(): number {
+        const emailPassRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\|.+$/;
+        let count = 0;
+        for (const line of this.inputLines) {
+            if (!emailPassRegex.test(line.trim())) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Get list of invalid format lines for display
+     */
+    get invalidLines(): string[] {
+        const emailPassRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\|.+$/;
+        return this.inputLines.filter(line => !emailPassRegex.test(line.trim()));
+    }
+
     filterDuplicates(): void {
         const seen = new Set<string>();
         const uniqueLines: string[] = [];
@@ -188,6 +211,14 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
 
         if (this.inputLines.length > this.maxAccountsPerRequest) {
             this.notificationService.error(this.translateService.instant('VALIDATION.MAX_VALUE', { max: this.maxAccountsPerRequest }));
+            return;
+        }
+
+        // Validate email|pass format
+        if (this.invalidFormatCount > 0) {
+            this.notificationService.error(
+                this.translateService.instant('OAUTH2.INVALID_FORMAT', { count: this.invalidFormatCount })
+            );
             return;
         }
 
