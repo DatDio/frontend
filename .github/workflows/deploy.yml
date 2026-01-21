@@ -40,17 +40,26 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
           script_stop: true
+          command_timeout: 10m
           script: |
             set -e
             
+            echo "DEBUG: Starting script..."
+            echo "DEBUG: Current user: $(whoami)"
+            echo "DEBUG: Current directory: $(pwd)"
+            
             PROJECT_PATH="/opt/mailshop"
             NGINX_CONF="/etc/nginx/sites-enabled/mailshop"
+            
+            echo "DEBUG: Checking if $PROJECT_PATH exists..."
+            ls -la "$PROJECT_PATH" || echo "ERROR: Directory not found!"
             
             echo "=========================================="
             echo "   Zero-Downtime Frontend Deployment"
             echo "=========================================="
             
             cd "$PROJECT_PATH"
+            echo "DEBUG: Successfully cd to $PROJECT_PATH"
             
             # Determine current active slot from nginx config
             if grep -q "127.0.0.1:4001" "$NGINX_CONF" 2>/dev/null; then
