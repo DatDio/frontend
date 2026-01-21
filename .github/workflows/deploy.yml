@@ -1,87 +1,156 @@
-name: Frontend CI/CD
+name: Frontend CI/CD (Zero-Downtime)
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# PHẦN 1: TRIGGER - Khi nào workflow chạy?
-# ═══════════════════════════════════════════════════════════════════════════════
 on:
   push:
-    branches: [main]          # Chạy khi push vào branch main
+    branches: [main]
   pull_request:
-    branches: [main]          # Chạy khi tạo PR vào main (chỉ build, ko deploy)
+    branches: [main]
+  workflow_dispatch:  # Allow manual trigger
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# PHẦN 2: JOBS - Các công việc cần thực hiện
-# ═══════════════════════════════════════════════════════════════════════════════
 jobs:
-  # ─────────────────────────────────────────────────────────────────────────────
-  # JOB 1: BUILD - Chạy trên GitHub Runner (máy ảo Ubuntu của GitHub)
-  # ─────────────────────────────────────────────────────────────────────────────
   build:
-    runs-on: ubuntu-latest    # Sử dụng máy ảo Ubuntu mới nhất của GitHub (miễn phí)
-
+    runs-on: ubuntu-latest
     steps:
-      # Bước 1: Clone code từ repo về máy ảo GitHub
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Bước 2: Cài đặt Node.js 20
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'           # Version Node.js
-          cache: 'npm'                 # Cache npm dependencies để lần sau build nhanh hơn
+          node-version: '20'
+          cache: 'npm'
 
-      # Bước 3: Cài đặt dependencies từ package-lock.json
       - name: Install dependencies
-        run: npm ci                    # npm ci nhanh hơn npm install, dùng cho CI/CD
+        run: npm ci
 
-      # Bước 4: Build Angular app cho production
       - name: Build Angular app
         run: npm run build -- --configuration=production
 
-  # ─────────────────────────────────────────────────────────────────────────────
-  # JOB 2: DEPLOY - SSH vào VPS và deploy
-  # ─────────────────────────────────────────────────────────────────────────────
   deploy:
     runs-on: ubuntu-latest
-    needs: build                       # ⚠️ Phải đợi job "build" hoàn thành trước
-    
-    # Điều kiện: Chỉ deploy khi PUSH vào main (không deploy khi tạo PR)
+    needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     steps:
-      # SSH vào VPS và chạy các lệnh deploy
-      - name: Deploy Frontend to VPS
-        uses: appleboy/ssh-action@v1.0.3   # Action SSH phổ biến nhất
+      - name: Zero-Downtime Deploy Frontend
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          # Thông tin kết nối VPS (lấy từ GitHub Secrets)
-          host: ${{ secrets.VPS_HOST }}         # IP hoặc domain VPS
-          username: ${{ secrets.VPS_USERNAME }} # Username SSH (vd: ubuntu, root)
-          key: ${{ secrets.VPS_SSH_KEY }}       # Private key SSH
-          port: ${{ secrets.VPS_PORT }}         # Port SSH (thường là 22)
-          
-          # Script chạy trên VPS
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script_stop: true
           script: |
-            set -e  # Dừng ngay nếu có lỗi
+            set -e
             
-            echo "📁 Navigating to project..."
-            cd ${{ secrets.PROJECT_PATH }}      # Vào /opt/mailshop
+            PROJECT_PATH="${{ secrets.PROJECT_PATH }}"
+            NGINX_CONF="/etc/nginx/sites-enabled/mailshop"
             
-            echo "📥 Pulling latest frontend code..."
-            cd frontend                         # Vào folder frontend
-            git fetch --all                     # Fetch tất cả changes từ remote
-            git reset --hard origin/main        # Reset về commit mới nhất của origin/main
-            cd ..                               # Quay lại /opt/mailshop
+            echo "=========================================="
+            echo "   Zero-Downtime Frontend Deployment"
+            echo "=========================================="
             
-            echo "🔄 Rebuilding frontend container..."
-            docker compose stop frontend                  # Dừng container cũ
-            docker compose build --no-cache frontend      # Build lại image (không dùng cache)
-            docker compose up -d frontend                 # Chạy container mới ở background
+            cd "$PROJECT_PATH"
             
+            # Determine current active slot from nginx config
+            if grep -q "127.0.0.1:4001" "$NGINX_CONF" 2>/dev/null; then
+              ACTIVE_SLOT="blue"
+              NEXT_SLOT="green"
+              NEXT_PORT=4002
+            else
+              ACTIVE_SLOT="green"
+              NEXT_SLOT="blue"
+              NEXT_PORT=4001
+            fi
+            
+            echo "📊 Active slot: $ACTIVE_SLOT"
+            echo "🚀 Deploying to: $NEXT_SLOT (port $NEXT_PORT)"
+            
+            # Step 1: Pull latest code
+            echo "📥 Step 1: Pulling latest frontend code..."
+            cd frontend
+            git fetch --all
+            git reset --hard origin/main
+            cd ..
+            
+            # Step 2: Stop old container for next slot (cleanup)
+            echo "🧹 Step 2: Cleaning up old $NEXT_SLOT container..."
+            docker stop frontend-$NEXT_SLOT 2>/dev/null || true
+            docker rm frontend-$NEXT_SLOT 2>/dev/null || true
+            
+            # Step 3: Build new image
+            echo "🔨 Step 3: Building frontend image..."
+            docker compose -f docker-compose.yml build frontend
+            
+            # Step 4: Start new container on next slot port
+            echo "🚀 Step 4: Starting frontend-$NEXT_SLOT on port $NEXT_PORT..."
+            docker run -d \
+              --name frontend-$NEXT_SLOT \
+              --network mailshop_mailshop-network \
+              -p $NEXT_PORT:4000 \
+              -e NODE_ENV=production \
+              --restart always \
+              mailshop-frontend:latest
+            
+            # Step 5: Wait for health check
+            echo "💓 Step 5: Waiting for frontend health check..."
+            for i in {1..30}; do
+              if curl -sf "http://127.0.0.1:$NEXT_PORT" > /dev/null 2>&1; then
+                echo ""
+                echo "✅ Frontend is healthy on port $NEXT_PORT!"
+                break
+              fi
+              printf "."
+              sleep 2
+            done
+            
+            # Verify health check passed
+            if ! curl -sf "http://127.0.0.1:$NEXT_PORT" > /dev/null 2>&1; then
+              echo "❌ Health check failed! Rolling back..."
+              docker stop frontend-$NEXT_SLOT 2>/dev/null || true
+              docker rm frontend-$NEXT_SLOT 2>/dev/null || true
+              exit 1
+            fi
+            
+            # Step 6: Switch nginx to new slot
+            echo "🔄 Step 6: Switching Nginx to $NEXT_SLOT..."
+            sudo sed -i "s|proxy_pass http://127.0.0.1:400[0-2]|proxy_pass http://127.0.0.1:$NEXT_PORT|g" "$NGINX_CONF"
+            sudo nginx -t && sudo nginx -s reload
+            
+            # Step 7: Wait for connections to drain
+            echo "⏳ Step 7: Waiting for connections to drain (3s)..."
+            sleep 3
+            
+            # Step 8: Stop old slot
+            echo "🛑 Step 8: Stopping old $ACTIVE_SLOT container..."
+            docker stop frontend-$ACTIVE_SLOT 2>/dev/null || true
+            docker rm frontend-$ACTIVE_SLOT 2>/dev/null || true
+            
+            # Cleanup old images
             echo "🧹 Cleaning up old images..."
-            docker image prune -f               # Xóa images cũ không dùng
+            docker image prune -f
             
-            echo "📊 Container status:"
-            docker compose ps frontend          # Hiển thị trạng thái container
-            
-            echo "✅ Frontend deployed successfully!"
+            echo ""
+            echo "=========================================="
+            echo "   ✅ Frontend Deployed Successfully!"
+            echo "   Active slot: $NEXT_SLOT (port $NEXT_PORT)"
+            echo "=========================================="
+
+      - name: Verify Deployment
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            echo "💓 Verifying deployment..."
+            for i in {1..10}; do
+              if curl -sf https://emailsieure.com > /dev/null 2>&1; then
+                echo "✅ Frontend verified successfully!"
+                exit 0
+              fi
+              sleep 2
+            done
+            echo "❌ Verification failed!"
+            exit 1
