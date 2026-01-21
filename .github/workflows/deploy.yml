@@ -43,7 +43,7 @@ jobs:
           script: |
             set -e
             
-            PROJECT_PATH="${{ secrets.PROJECT_PATH }}"
+            PROJECT_PATH="/opt/mailshop"
             NGINX_CONF="/etc/nginx/sites-enabled/mailshop"
             
             echo "=========================================="
