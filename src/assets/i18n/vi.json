@@ -765,7 +765,9 @@
     "COPY_FAILED": "Copy Failed",
     "COPIED_FAILED": "Đã copy danh sách thất bại",
     "NO_FAILED_TO_COPY": "Không có kết quả thất bại để copy",
-    "AUTO_DELETE_NOTE": "Tất cả dữ liệu yêu cầu sẽ được tự động xóa sau {{days}} ngày, vui lòng tải về kết quả ngay sau khi hoàn thành"
+    "AUTO_DELETE_NOTE": "Tất cả dữ liệu yêu cầu sẽ được tự động xóa sau {{days}} ngày, vui lòng tải về kết quả ngay sau khi hoàn thành",
+    "MAX_REQUESTS_REACHED": "Bạn đã đạt giới hạn {{max}} yêu cầu đang chờ xử lý",
+    "ACTIVE_REQUESTS": "Yêu cầu đang chạy"
   },
   "OAUTH2": {
     "TITLE": "Lấy OAuth2 Token",

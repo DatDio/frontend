@@ -69,6 +69,16 @@
                     <small class="text-muted">Số lượng account tối đa trong 1 lần gửi yêu cầu</small>
                 </div>
 
+                <!-- Max Pending Requests -->
+                <div class="col-md-6">
+                    <label class="form-label fw-medium">Số request tối đa mỗi user</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" [(ngModel)]="maxPendingRequests" min="1" max="50">
+                        <span class="input-group-text">request</span>
+                    </div>
+                    <small class="text-muted">Số lượng request PENDING/PROCESSING tối đa mỗi user</small>
+                </div>
+
                 <!-- Result Retention Days -->
                 <div class="col-md-6">
                     <label class="form-label fw-medium">Thời gian lưu kết quả</label>

@@ -24,6 +24,7 @@ export class RegSettingsComponent implements OnInit {
     resultRetentionDays = 7;
     requestTimeoutMinutes = 30;
     maxAccountsPerRequest = 100;
+    maxPendingRequests = 5;
 
     ngOnInit(): void {
         this.loadSettings();
@@ -49,6 +50,10 @@ export class RegSettingsComponent implements OnInit {
                             case 'reg.max_accounts_per_request':
                                 this.maxAccountsPerRequest = parseInt(setting.settingValue) || 100;
                                 break;
+
+                            case 'reg.max_pending_requests':
+                                this.maxPendingRequests = parseInt(setting.settingValue) || 5;
+                                break;
                         }
                     }
                 }
@@ -68,7 +73,8 @@ export class RegSettingsComponent implements OnInit {
             { key: 'reg.price_per_account', value: String(this.pricePerAccount), desc: 'Giá mỗi account reg thành công (VND)' },
             { key: 'reg.result_retention_days', value: String(this.resultRetentionDays), desc: 'Số ngày lưu kết quả reg' },
             { key: 'reg.request_timeout_minutes', value: String(this.requestTimeoutMinutes), desc: 'Thời gian timeout yêu cầu (phút)' },
-            { key: 'reg.max_accounts_per_request', value: String(this.maxAccountsPerRequest), desc: 'Số account tối đa mỗi yêu cầu' }
+            { key: 'reg.max_accounts_per_request', value: String(this.maxAccountsPerRequest), desc: 'Số account tối đa mỗi yêu cầu' },
+            { key: 'reg.max_pending_requests', value: String(this.maxPendingRequests), desc: 'Số request PENDING/PROCESSING tối đa mỗi user' }
         ];
 
         Promise.all(

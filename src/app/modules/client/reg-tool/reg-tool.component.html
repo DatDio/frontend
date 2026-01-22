@@ -89,7 +89,7 @@
                             </button>
                             }
                             <button type="submit" class="submit-btn"
-                                [disabled]="isSubmitting || inputLines.length === 0 || hasPendingRequest || inputLines.length > maxAccountsPerRequest">
+                                [disabled]="isSubmitting || inputLines.length === 0 || activeRequests.length >= maxPendingRequests || inputLines.length > maxAccountsPerRequest">
                                 @if (isSubmitting) {
                                 <span class="spinner-border spinner-border-sm me-2"></span>
                                 {{ 'COMMON.PROCESSING' | translate }}
@@ -100,57 +100,92 @@
                             </button>
                         </div>
 
-                        @if (hasPendingRequest && currentRequest) {
-                        <div
-                            class="alert alert-warning mt-3 mb-0 py-2 d-flex justify-content-between align-items-center">
-                            <div>
-                                <i class="bi bi-exclamation-triangle me-1"></i>
-                                {{ 'REG.REQUEST_NUMBER' | translate }}: <strong>{{ currentRequest.requestNumber
-                                    }}</strong>
-                                - {{ getRequestStatusLabel(currentRequest.status) }}
-                            </div>
-                            @if (currentRequest.status === 'PENDING') {
-                            <button type="button" class="btn btn-sm btn-outline-danger"
-                                (click)="cancelCurrentRequest()">
-                                <i class="bi bi-x-circle me-1"></i> {{ 'COMMON.CANCEL' | translate }}
-                            </button>
-                            }
+                        @if (activeRequests.length >= maxPendingRequests) {
+                        <div class="alert alert-warning mt-3 mb-0 py-2">
+                            <i class="bi bi-exclamation-triangle me-1"></i>
+                            {{ 'REG.MAX_REQUESTS_REACHED' | translate:{max: maxPendingRequests} }}
                         </div>
                         }
                     </form>
+
+                    <!-- Active Requests List (Below Form) -->
+                    @if (activeRequests.length > 0) {
+                    <div class="mt-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0"><i class="bi bi-clock me-2"></i> {{ 'REG.ACTIVE_REQUESTS' | translate }}
+                                ({{ activeRequests.length }}/{{ maxPendingRequests }})</h5>
+                        </div>
+                        <div class="row g-2">
+                            @for (req of activeRequests; track req.id) {
+                            <div class="col-12">
+                                <div class="request-card" [class.active]="selectedActiveRequest?.id === req.id"
+                                    (click)="selectActiveRequest(req)" style="cursor: pointer;">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <code class="small">{{ req.requestNumber }}</code>
+                                        <span class="badge" [ngClass]="{
+                                            'bg-warning text-dark': req.status === 'PENDING',
+                                            'bg-info': req.status === 'PROCESSING'
+                                        }">{{ getRequestStatusLabel(req.status) }}</span>
+                                    </div>
+                                    <div class="progress-bar-wrapper" style="height: 6px;">
+                                        <div class="progress-bar"
+                                            [style.width.%]="((req.successCount + req.failedCount) / req.quantity) * 100">
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-between align-items-center mt-1">
+                                        <small class="text-muted">
+                                            <span class="text-success">{{ req.successCount }}✓</span> |
+                                            <span class="text-danger">{{ req.failedCount }}✗</span>
+                                        </small>
+                                        <small class="text-muted">{{ req.successCount + req.failedCount }}/{{
+                                            req.quantity }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                    }
                 </div>
             </div>
 
-            <!-- Right: Current Request Results -->
+            <!-- Right: Selected Request Details -->
             <div class="col-lg-7">
-                @if (currentRequest) {
+                <!-- Selected Request Details -->
+                @if (selectedActiveRequest) {
                 <div class="tool-card">
                     <div class="results-header">
-                        <h4><i class="bi bi-list-check me-2"></i> {{ currentRequest.requestNumber }}</h4>
+                        <h4><i class="bi bi-list-check me-2"></i> {{ selectedActiveRequest.requestNumber }}</h4>
                         <div class="results-actions">
                             <span class="badge me-2" [ngClass]="{
-                                'bg-warning text-dark': currentRequest.status === 'PENDING',
-                                'bg-info': currentRequest.status === 'PROCESSING',
-                                'bg-success': currentRequest.status === 'COMPLETED',
-                                'bg-danger': currentRequest.status === 'CANCELLED'
-                            }">{{ getRequestStatusLabel(currentRequest.status) }}</span>
+                                'bg-warning text-dark': selectedActiveRequest.status === 'PENDING',
+                                'bg-info': selectedActiveRequest.status === 'PROCESSING',
+                                'bg-success': selectedActiveRequest.status === 'COMPLETED',
+                                'bg-danger': selectedActiveRequest.status === 'CANCELLED'
+                            }">{{ getRequestStatusLabel(selectedActiveRequest.status) }}</span>
                             <button type="button" class="copy-success-btn" (click)="copySuccessResults()">
                                 <i class="bi bi-clipboard me-1"></i> {{ 'REG.COPY_SUCCESS' | translate }}
                             </button>
                             <button type="button" class="copy-error-btn" (click)="copyFailedResults()">
                                 <i class="bi bi-clipboard me-1"></i> {{ 'REG.COPY_FAILED' | translate }}
                             </button>
+                            @if (selectedActiveRequest.status === 'PENDING') {
+                            <button type="button" class="btn btn-sm btn-outline-danger ms-2"
+                                (click)="cancelSelectedRequest()">
+                                <i class="bi bi-x-circle me-1"></i> {{ 'COMMON.CANCEL' | translate }}
+                            </button>
+                            }
                         </div>
                     </div>
 
                     <!-- Progress Bar -->
                     <div class="progress-section">
                         <div class="progress-info">
-                            <span>{{ 'REG.PROGRESS' | translate }}: {{ currentRequest.successCount +
-                                currentRequest.failedCount }}/{{ currentRequest.quantity }}</span>
+                            <span>{{ 'REG.PROGRESS' | translate }}: {{ selectedActiveRequest.successCount +
+                                selectedActiveRequest.failedCount }}/{{ selectedActiveRequest.quantity }}</span>
                             <span>
-                                <span class="text-success">{{ currentRequest.successCount }} ✓</span> |
-                                <span class="text-danger">{{ currentRequest.failedCount }} ✗</span>
+                                <span class="text-success">{{ selectedActiveRequest.successCount }} ✓</span> |
+                                <span class="text-danger">{{ selectedActiveRequest.failedCount }} ✗</span>
                             </span>
                         </div>
                         <div class="progress-bar-wrapper">
@@ -162,7 +197,7 @@
                                 {{ 'REG.ELAPSED_TIME' | translate }}: <strong>{{ elapsedTime }}</strong>
                             </small>
                             <small class="text-muted">{{ 'REG.TOTAL_CHARGED' | translate }}: <strong>{{
-                                    currentRequest.totalCharged | number }}đ</strong></small>
+                                    selectedActiveRequest.totalCharged | number }}đ</strong></small>
                         </div>
                     </div>
 
@@ -173,17 +208,17 @@
                             <div class="result-column">
                                 <div class="column-header success">
                                     <i class="bi bi-check-circle-fill me-1"></i> {{ 'REG.RESULT_SUCCESS' | translate }}
-                                    ({{ currentRequest.successCount }})
+                                    ({{ selectedActiveRequest.successCount }})
                                 </div>
                                 <div class="column-content">
-                                    @for (result of results; track result.id) {
+                                    @for (result of selectedActiveRequest.results; track result.id) {
                                     @if (result.status === 'SUCCESS' && result.accountData) {
                                     <div class="result-item success">
                                         <code>{{ result.accountData }}</code>
                                     </div>
                                     }
                                     }
-                                    @if (currentRequest.successCount === 0) {
+                                    @if (selectedActiveRequest.successCount === 0) {
                                     <div class="empty-message">{{ 'TOOLS.EMPTY_RESULT' | translate }}</div>
                                     }
                                 </div>
@@ -193,10 +228,10 @@
                             <div class="result-column">
                                 <div class="column-header error">
                                     <i class="bi bi-x-circle-fill me-1"></i> {{ 'REG.RESULT_FAILED' | translate }} ({{
-                                    currentRequest.failedCount }})
+                                    selectedActiveRequest.failedCount }})
                                 </div>
                                 <div class="column-content">
-                                    @for (result of results; track result.id) {
+                                    @for (result of selectedActiveRequest.results; track result.id) {
                                     @if (result.status === 'FAILED') {
                                     <div class="result-item error">
                                         <span class="result-input">{{ result.inputLine }}</span>
@@ -206,19 +241,19 @@
                                     </div>
                                     }
                                     }
-                                    @if (currentRequest.failedCount === 0) {
+                                    @if (selectedActiveRequest.failedCount === 0) {
                                     <div class="empty-message">{{ 'TOOLS.EMPTY_RESULT' | translate }}</div>
                                     }
                                 </div>
                             </div>
                         </div>
 
-                        @if (results.length === 0) {
+                        @if (!selectedActiveRequest.results || selectedActiveRequest.results.length === 0) {
                         <div class="text-center text-muted py-4">
-                            @if (currentRequest.status === 'PENDING') {
+                            @if (selectedActiveRequest.status === 'PENDING') {
                             <i class="bi bi-hourglass-split display-4 d-block mb-2"></i>
                             {{ 'REG.WAITING_TOOL' | translate }}
-                            } @else if (currentRequest.status === 'PROCESSING') {
+                            } @else if (selectedActiveRequest.status === 'PROCESSING') {
                             <div class="spinner-border text-primary mb-2"></div>
                             <div>{{ 'REG.PROCESSING_REALTIME' | translate }}</div>
                             } @else {
@@ -329,55 +364,56 @@
         </div>
 
         <!-- Request Detail Modal -->
-        @if (selectedRequest) {
+        @if (selectedHistoryRequest) {
         <div class="modal fade show d-block" style="background: rgba(0,0,0,0.7)">
             <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered">
                 <div class="modal-content detail-modal">
                     <div class="modal-header">
                         <h5 class="modal-title">
                             <i class="bi bi-file-text me-2"></i>
-                            {{ selectedRequest.requestNumber }}
+                            {{ selectedHistoryRequest.requestNumber }}
                         </h5>
                         <button type="button" class="btn-close btn-close-white"
-                            (click)="selectedRequest = null"></button>
+                            (click)="selectedHistoryRequest = null"></button>
                     </div>
                     <div class="modal-body">
                         <!-- Progress Section -->
                         <div class="progress-section mb-4">
                             <div class="d-flex justify-content-between align-items-center mb-2">
                                 <span class="fw-semibold">{{ 'COMMON.RESULT' | translate }}: {{
-                                    selectedRequest.successCount +
-                                    selectedRequest.failedCount }}/{{ selectedRequest.quantity }}</span>
+                                    selectedHistoryRequest.successCount +
+                                    selectedHistoryRequest.failedCount }}/{{ selectedHistoryRequest.quantity }}</span>
                                 <div>
-                                    <span class="badge bg-success me-1">{{ selectedRequest.successCount }} ✓</span>
-                                    <span class="badge bg-danger">{{ selectedRequest.failedCount }} ✗</span>
+                                    <span class="badge bg-success me-1">{{ selectedHistoryRequest.successCount }}
+                                        ✓</span>
+                                    <span class="badge bg-danger">{{ selectedHistoryRequest.failedCount }} ✗</span>
                                 </div>
                             </div>
                             <div class="progress-bar-wrapper">
                                 <div class="progress-bar"
-                                    [style.width.%]="(selectedRequest.successCount / selectedRequest.quantity) * 100">
+                                    [style.width.%]="(selectedHistoryRequest.successCount / selectedHistoryRequest.quantity) * 100">
                                 </div>
                             </div>
                             <div class="d-flex justify-content-between align-items-center mt-3">
                                 <div>
                                     <span class="text-muted me-3">{{ 'REG.TOTAL_CHARGED' | translate }}: <strong
                                             class="text-primary">{{
-                                            selectedRequest.totalCharged | number }}đ</strong></span>
+                                            selectedHistoryRequest.totalCharged | number }}đ</strong></span>
                                     <span class="text-muted">{{ 'REG.REQUEST_TYPE' | translate }}: <strong>{{
-                                            selectedRequest.requestType === 'USER_ONLY' ? ('REG.TYPE_USER_ONLY' |
+                                            selectedHistoryRequest.requestType === 'USER_ONLY' ? ('REG.TYPE_USER_ONLY' |
                                             translate) : ('REG.TYPE_USER_PASS' | translate) }}</strong></span>
                                 </div>
                                 <span class="badge" [ngClass]="{
-                                    'bg-warning text-dark': selectedRequest.status === 'PENDING',
-                                    'bg-info': selectedRequest.status === 'PROCESSING',
-                                    'bg-success': selectedRequest.status === 'COMPLETED',
-                                    'bg-danger': selectedRequest.status === 'CANCELLED'
-                                }">{{ getRequestStatusLabel(selectedRequest.status) }}</span>
+                                    'bg-warning text-dark': selectedHistoryRequest.status === 'PENDING',
+                                    'bg-info': selectedHistoryRequest.status === 'PROCESSING',
+                                    'bg-success': selectedHistoryRequest.status === 'COMPLETED',
+                                    'bg-danger': selectedHistoryRequest.status === 'CANCELLED'
+                                }">{{ getRequestStatusLabel(selectedHistoryRequest.status) }}</span>
                             </div>
                         </div>
 
                         <!-- Results Table -->
-                        @if (selectedRequest.results && selectedRequest.results.length > 0) {
+                        @if (selectedHistoryRequest.results && selectedHistoryRequest.results.length > 0) {
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
                                 <thead>
@@ -388,7 +424,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @for (result of selectedRequest.results; track result.id) {
+                                    @for (result of selectedHistoryRequest.results; track result.id) {
                                     <tr
                                         [ngClass]="{'success-row': result.status === 'SUCCESS', 'error-row': result.status === 'FAILED'}">
                                         <td><code>{{ result.inputLine }}</code></td>
@@ -425,13 +461,13 @@
                         }
                     </div>
                     <div class="modal-footer">
-                        <button class="btn btn-success" (click)="copyResultsFromRequest(selectedRequest)">
+                        <button class="btn btn-success" (click)="copyResultsFromRequest(selectedHistoryRequest)">
                             <i class="bi bi-clipboard me-1"></i> {{ 'REG.COPY_SUCCESS' | translate }}
                         </button>
-                        <button class="btn btn-danger" (click)="copyFailedFromRequest(selectedRequest)">
+                        <button class="btn btn-danger" (click)="copyFailedFromRequest(selectedHistoryRequest)">
                             <i class="bi bi-clipboard me-1"></i> {{ 'REG.COPY_FAILED' | translate }}
                         </button>
-                        <button type="button" class="btn btn-outline-secondary" (click)="selectedRequest = null">
+                        <button type="button" class="btn btn-outline-secondary" (click)="selectedHistoryRequest = null">
                             <i class="bi bi-x me-1"></i> {{ 'COMMON.CLOSE' | translate }}
                         </button>
                     </div>

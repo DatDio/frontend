@@ -58,10 +58,10 @@ export class RegService {
     }
 
     /**
-     * Get user's current pending/processing request (if any)
+     * Get user's current active (PENDING/PROCESSING) requests
      */
-    getMyPending(): Observable<ApiResponse<RegRequest | null>> {
-        return this.httpClient.get<ApiResponse<RegRequest | null>>(RegApi.MY_PENDING);
+    getMyActiveRequests(): Observable<ApiResponse<RegRequest[]>> {
+        return this.httpClient.get<ApiResponse<RegRequest[]>>(RegApi.MY_ACTIVE);
     }
 
     // ==================== ADMIN ENDPOINTS ====================
