@@ -500,22 +500,25 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
       ADMIN_ADJUST: 'badge-info',
       REG_PAYMENT: 'badge-info',
       REG_REFUND: 'badge-success',
-      REG_CANCEL_REFUND: 'badge-success'
+      REG_CANCEL_REFUND: 'badge-success',
+      OAUTH2_PAYMENT: 'badge-info',
+      OAUTH2_REFUND: 'badge-success',
+      OAUTH2_CANCEL_REFUND: 'badge-success'
     };
     return map[type] || 'badge-secondary';
   }
 
   getAmountClass(type: string): string {
-    const debitTypes = ['PURCHASE', 'REG_PAYMENT'];
-    const creditTypes = ['DEPOSIT', 'REFUND', 'REG_REFUND', 'REG_CANCEL_REFUND', 'ADMIN_ADJUST'];
+    const debitTypes = ['PURCHASE', 'REG_PAYMENT', 'OAUTH2_PAYMENT'];
+    const creditTypes = ['DEPOSIT', 'REFUND', 'REG_REFUND', 'REG_CANCEL_REFUND', 'ADMIN_ADJUST', 'OAUTH2_REFUND', 'OAUTH2_CANCEL_REFUND'];
     if (debitTypes.includes(type)) return 'text-danger';
     if (creditTypes.includes(type)) return 'text-success';
     return '';
   }
 
   getAmountPrefix(type: string): string {
-    const debitTypes = ['PURCHASE', 'REG_PAYMENT'];
-    const creditTypes = ['DEPOSIT', 'REFUND', 'REG_REFUND', 'REG_CANCEL_REFUND'];
+    const debitTypes = ['PURCHASE', 'REG_PAYMENT', 'OAUTH2_PAYMENT'];
+    const creditTypes = ['DEPOSIT', 'REFUND', 'REG_REFUND', 'REG_CANCEL_REFUND', 'OAUTH2_REFUND', 'OAUTH2_CANCEL_REFUND'];
     if (debitTypes.includes(type)) return '-';
     if (creditTypes.includes(type)) return '+';
     return '';

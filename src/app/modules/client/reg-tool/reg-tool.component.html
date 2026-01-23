@@ -124,7 +124,9 @@
                                         <code class="small">{{ req.requestNumber }}</code>
                                         <span class="badge" [ngClass]="{
                                             'bg-warning text-dark': req.status === 'PENDING',
-                                            'bg-info': req.status === 'PROCESSING'
+                                            'bg-info': req.status === 'PROCESSING',
+                                            'bg-success': req.status === 'COMPLETED',
+                                            'bg-danger': req.status === 'CANCELLED'
                                         }">{{ getRequestStatusLabel(req.status) }}</span>
                                     </div>
                                     <div class="progress-bar-wrapper" style="height: 6px;">
@@ -170,8 +172,7 @@
                                 <i class="bi bi-clipboard me-1"></i> {{ 'REG.COPY_FAILED' | translate }}
                             </button>
                             @if (selectedActiveRequest.status === 'PENDING') {
-                            <button type="button" class="btn btn-sm btn-outline-danger ms-2"
-                                (click)="cancelSelectedRequest()">
+                            <button type="button" class="btn btn-sm btn-danger ms-2" (click)="cancelSelectedRequest()">
                                 <i class="bi bi-x-circle me-1"></i> {{ 'COMMON.CANCEL' | translate }}
                             </button>
                             }
@@ -340,7 +341,7 @@
                                     <i class="bi bi-eye"></i>
                                 </button>
                                 @if (req.status === 'PENDING') {
-                                <button class="btn btn-sm btn-outline-danger ms-1" (click)="cancelRequest(req)"
+                                <button class="btn btn-sm btn-danger ms-1" (click)="cancelRequest(req)"
                                     title="{{ 'COMMON.CANCEL' | translate }}">
                                     <i class="bi bi-x-circle"></i>
                                 </button>

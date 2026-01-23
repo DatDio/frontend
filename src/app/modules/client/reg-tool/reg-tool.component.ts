@@ -229,13 +229,19 @@ export class RegToolComponent implements OnInit, OnDestroy {
 
         this.regService.create(request).subscribe({
             next: (response) => {
-                if (response.success) {
+                if (response.success && response.data) {
                     // Clear form
                     this.form.patchValue({ inputData: '', sharedPassword: '' });
                     this.notificationService.success(this.translateService.instant('REG.REQUEST_CREATED'));
                     this.loadMyRequests();
-                    // Refresh active requests and balance
-                    this.loadActiveRequests();
+
+                    // Add the new request to the beginning of activeRequests
+                    this.activeRequests.unshift(response.data);
+                    // Select the newly created request
+                    this.selectActiveRequest(response.data);
+                    // Subscribe to WebSocket for the new request
+                    this.subscribeToActiveRequests();
+                    // Refresh balance
                     this.transactionService.refreshBalance();
                 }
             },
@@ -348,31 +354,38 @@ export class RegToolComponent implements OnInit, OnDestroy {
             request.failedCount = data.failedCount;
             request.totalCharged = data.totalCharged;
 
+            // Replace the object in the array to trigger Angular change detection
+            const updatedRequest = { ...request };
+            this.activeRequests[requestIndex] = updatedRequest;
+
             if (data.requestStatus === 'COMPLETED' || data.requestStatus === 'CANCELLED') {
-                // Remove from active list
-                this.activeRequests.splice(requestIndex, 1);
+                // DON'T remove from active list - keep visible until page reload
+                // Just refresh history list and balance
                 this.loadMyRequests();
                 this.transactionService.refreshBalance();
 
-                // If this was the selected request, select another or clear
+                // Stop timer for completed/cancelled request
                 if (this.selectedActiveRequest?.id === requestId) {
-                    if (this.activeRequests.length > 0) {
-                        this.selectActiveRequest(this.activeRequests[0]);
-                    } else {
-                        this.selectedActiveRequest = null;
-                        this.stopTimer();
-                    }
+                    this.selectedActiveRequest = updatedRequest;
+                    this.stopTimer();
                 }
             } else if (this.selectedActiveRequest?.id === requestId) {
-                this.selectedActiveRequest = { ...request };
+                this.selectedActiveRequest = updatedRequest;
             }
             return;
         }
 
         // Handle individual result update
-        request.successCount = data.successCount;
-        request.failedCount = data.failedCount;
-        request.totalCharged = data.totalCharged;
+        // Only update counts if they are greater than current (prevent timeout messages from overwriting with 0)
+        if (data.successCount > request.successCount) {
+            request.successCount = data.successCount;
+        }
+        if (data.failedCount > request.failedCount) {
+            request.failedCount = data.failedCount;
+        }
+        if (data.totalCharged != null) {
+            request.totalCharged = data.totalCharged;
+        }
 
         // Add result to request's results array if it exists
         if (!request.results) {
@@ -387,9 +400,13 @@ export class RegToolComponent implements OnInit, OnDestroy {
             processedAt: data.processedAt
         });
 
+        // Replace the object in the array to trigger Angular change detection
+        const updatedRequest = { ...request };
+        this.activeRequests[requestIndex] = updatedRequest;
+
         // Update selected request if this is it
         if (this.selectedActiveRequest?.id === requestId) {
-            this.selectedActiveRequest = { ...request };
+            this.selectedActiveRequest = updatedRequest;
         }
     }
 

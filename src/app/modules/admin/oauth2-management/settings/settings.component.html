@@ -66,6 +66,16 @@
                     </div>
                     <small class="text-muted">Kết quả OAuth2 sẽ bị xóa sau số ngày này</small>
                 </div>
+
+                <!-- Max Pending Requests Per User -->
+                <div class="col-md-6">
+                    <label class="form-label fw-medium">Số request tối đa mỗi user</label>
+                    <div class="input-group">
+                        <input type="number" class="form-control" [(ngModel)]="maxPendingRequests" min="1" max="10">
+                        <span class="input-group-text">request</span>
+                    </div>
+                    <small class="text-muted">Số lượng yêu cầu tối đa mỗi user có thể gửi cùng lúc</small>
+                </div>
             </div>
 
             <hr class="my-4">

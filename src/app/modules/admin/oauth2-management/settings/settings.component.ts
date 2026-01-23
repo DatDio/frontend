@@ -23,6 +23,7 @@ export class OAuth2SettingsComponent implements OnInit {
     pricePerAccount = 500;
     resultRetentionDays = 7;
     maxAccountsPerRequest = 100;
+    maxPendingRequests = 5;
 
     ngOnInit(): void {
         this.loadSettings();
@@ -44,6 +45,9 @@ export class OAuth2SettingsComponent implements OnInit {
                             case 'oauth2.max_accounts_per_request':
                                 this.maxAccountsPerRequest = parseInt(setting.settingValue) || 100;
                                 break;
+                            case 'oauth2.max_pending_requests':
+                                this.maxPendingRequests = parseInt(setting.settingValue) || 5;
+                                break;
                         }
                     }
                 }
@@ -62,7 +66,8 @@ export class OAuth2SettingsComponent implements OnInit {
         const updates = [
             { key: 'oauth2.price_per_account', value: String(this.pricePerAccount), desc: 'Giá mỗi account get OAuth2 thành công (VND)' },
             { key: 'oauth2.result_retention_days', value: String(this.resultRetentionDays), desc: 'Số ngày lưu kết quả OAuth2' },
-            { key: 'oauth2.max_accounts_per_request', value: String(this.maxAccountsPerRequest), desc: 'Số account tối đa mỗi yêu cầu' }
+            { key: 'oauth2.max_accounts_per_request', value: String(this.maxAccountsPerRequest), desc: 'Số account tối đa mỗi yêu cầu' },
+            { key: 'oauth2.max_pending_requests', value: String(this.maxPendingRequests), desc: 'Số request tối đa mỗi user' }
         ];
 
         Promise.all(

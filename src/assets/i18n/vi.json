@@ -818,6 +818,8 @@
     "AUTO_DELETE_NOTE": "Tất cả dữ liệu yêu cầu sẽ được tự động xóa sau {{days}} ngày, vui lòng tải về kết quả ngay sau khi hoàn thành",
     "ADMIN_INPUT": "Input",
     "ADMIN_RESULT": "Result / Error",
-    "INVALID_FORMAT": "Có {{count}} dòng không đúng định dạng email|password"
+    "INVALID_FORMAT": "Có {{count}} dòng không đúng định dạng email|password",
+    "ACTIVE_REQUESTS": "Yêu cầu đang chạy",
+    "MAX_REQUESTS_REACHED": "Bạn đã đạt giới hạn {{max}} yêu cầu đang chờ xử lý"
   }
 }

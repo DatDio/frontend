@@ -64,6 +64,13 @@ export class OAuth2Service {
         return this.httpClient.get<ApiResponse<OAuth2Request | null>>(OAuth2Api.MY_PENDING);
     }
 
+    /**
+     * Get user's current active (PENDING/PROCESSING) requests
+     */
+    getMyActiveRequests(): Observable<ApiResponse<OAuth2Request[]>> {
+        return this.httpClient.get<ApiResponse<OAuth2Request[]>>(OAuth2Api.MY_ACTIVE);
+    }
+
     // ==================== ADMIN ENDPOINTS ====================
 
     /**

@@ -6,6 +6,7 @@ export class OAuth2Api {
     public static readonly CREATE = OAuth2Api.BASE;
     public static readonly LIST = OAuth2Api.BASE;
     public static readonly MY_PENDING = OAuth2Api.BASE + '/my-pending';
+    public static readonly MY_ACTIVE = OAuth2Api.BASE + '/my-active';
     public static readonly GET_BY_ID = (id: number | string) => OAuth2Api.BASE + `/${id}`;
     public static readonly CANCEL = (id: number | string) => OAuth2Api.BASE + `/${id}`;
 }

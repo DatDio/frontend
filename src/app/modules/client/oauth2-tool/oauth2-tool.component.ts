@@ -37,14 +37,14 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
     form!: FormGroup;
     isSubmitting = false;
 
-    // Current request tracking (for submit tab)
-    currentRequest: OAuth2Request | null = null;
-    results: OAuth2Result[] = [];
+    // Active requests tracking (for submit tab) - supports multiple requests
+    activeRequests: OAuth2Request[] = [];
+    selectedActiveRequest: OAuth2Request | null = null;  // Currently viewing request
 
     // History tab
     myRequests: OAuth2Request[] = [];
     loadingHistory = false;
-    selectedRequest: OAuth2Request | null = null;
+    selectedHistoryRequest: OAuth2Request | null = null;
 
     // Pagination
     paginationConfig = {
@@ -54,12 +54,10 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
         totalPages: 0
     };
 
-    // Check if user has pending request
-    hasPendingRequest = false;
-
     // Settings from backend
     pricePerAccount = 500;  // Default, will be fetched
     maxAccountsPerRequest = 100;  // Default, will be fetched
+    maxPendingRequests = 5;  // Default, will be fetched
     resultRetentionDays = 7;  // Default, will be fetched
 
     // Math for template
@@ -76,7 +74,7 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
         this.initForm();
         this.loadSettings();
         this.loadMyRequests();
-        this.checkPendingRequest();
+        this.loadActiveRequests();
     }
 
     ngOnDestroy(): void {
@@ -90,8 +88,10 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
                 if (response.success && response.data) {
                     const price = response.data['oauth2.price_per_account'];
                     const maxAccounts = response.data['oauth2.max_accounts_per_request'];
+                    const maxPending = response.data['oauth2.max_pending_requests'];
                     if (price) this.pricePerAccount = parseInt(price, 10);
                     if (maxAccounts) this.maxAccountsPerRequest = parseInt(maxAccounts, 10);
+                    if (maxPending) this.maxPendingRequests = parseInt(maxPending, 10);
                     const retentionDays = response.data['oauth2.result_retention_days'];
                     if (retentionDays) this.resultRetentionDays = parseInt(retentionDays, 10);
                 }
@@ -167,35 +167,50 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
         );
     }
 
-    private checkPendingRequest(): void {
-        this.oauth2Service.getMyPending().subscribe({
+    private loadActiveRequests(): void {
+        this.oauth2Service.getMyActiveRequests().subscribe({
             next: (response) => {
                 if (response.success && response.data) {
-                    const pending = response.data;
-                    this.hasPendingRequest = true;
-                    this.currentRequest = pending;
-                    this.results = pending.results || [];
+                    this.activeRequests = response.data;
 
-                    // Restore original input data to form
-                    if (pending.inputList && pending.inputList.length > 0) {
-                        const inputText = pending.inputList.join('\n');
-                        this.form.get('inputData')?.setValue(inputText);
+                    // If no request selected and we have active requests, select the first one
+                    if (!this.selectedActiveRequest && this.activeRequests.length > 0) {
+                        this.selectActiveRequest(this.activeRequests[0]);
+                    } else if (this.selectedActiveRequest) {
+                        // Update the selected request if it's still in the list
+                        const updated = this.activeRequests.find(r => r.id === this.selectedActiveRequest!.id);
+                        if (updated) {
+                            this.selectActiveRequest(updated);
+                        } else if (this.activeRequests.length > 0) {
+                            this.selectActiveRequest(this.activeRequests[0]);
+                        } else {
+                            this.selectedActiveRequest = null;
+                            this.stopTimer();
+                        }
                     }
 
-                    // Subscribe to WebSocket for real-time updates
-                    if (pending.status === 'PROCESSING') {
-                        this.subscribeToWebSocket(pending.id);
-                    }
-
-                    // Start timer if request is PENDING or PROCESSING
-                    if (pending.status === 'PENDING' || pending.status === 'PROCESSING') {
-                        this.startTimer();
-                    }
-                } else {
-                    this.hasPendingRequest = false;
+                    // Subscribe to WebSocket for all active requests
+                    this.subscribeToActiveRequests();
                 }
             }
         });
+    }
+
+    selectActiveRequest(request: OAuth2Request): void {
+        this.selectedActiveRequest = request;
+
+        // Restore input data to form
+        if (request.inputList && request.inputList.length > 0) {
+            const inputText = request.inputList.join('\n');
+            this.form.get('inputData')?.setValue(inputText);
+        }
+
+        // Start timer for PENDING or PROCESSING
+        if (request.status === 'PENDING' || request.status === 'PROCESSING') {
+            this.startTimer();
+        } else {
+            this.stopTimer();
+        }
     }
 
     onSubmit(): void {
@@ -204,8 +219,8 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
             return;
         }
 
-        if (this.hasPendingRequest) {
-            this.notificationService.error(this.translateService.instant('OAUTH2.CANCEL_PENDING_ONLY'));
+        if (this.activeRequests.length >= this.maxPendingRequests) {
+            this.notificationService.error(this.translateService.instant('OAUTH2.MAX_REQUESTS_REACHED', { max: this.maxPendingRequests }));
             return;
         }
 
@@ -230,16 +245,20 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
 
         this.oauth2Service.create(request).subscribe({
             next: (response) => {
-                if (response.success) {
-                    this.currentRequest = response.data;
-                    this.results = [];
+                if (response.success && response.data) {
+                    // Clear form
+                    this.form.patchValue({ inputData: '' });
                     this.notificationService.success(this.translateService.instant('OAUTH2.REQUEST_CREATED'));
-                    this.subscribeToWebSocket(response.data.id);
-                    this.hasPendingRequest = true;
                     this.loadMyRequests();
+
+                    // Add the new request to the beginning of activeRequests
+                    this.activeRequests.unshift(response.data);
+                    // Select the newly created request
+                    this.selectActiveRequest(response.data);
+                    // Subscribe to WebSocket for the new request
+                    this.subscribeToActiveRequests();
+                    // Refresh balance
                     this.transactionService.refreshBalance();
-                    // Start timer for new request
-                    this.startTimer();
                 }
             },
             error: (error) => {
@@ -253,17 +272,15 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
         });
     }
 
-    private subscribeToWebSocket(requestId: number): void {
+    private subscribeToActiveRequests(): void {
         this.unsubscribeWebSocket();
 
         const userId = this.authService.getCurrentUser()?.id;
-        if (!userId) return;
+        if (!userId || this.activeRequests.length === 0) return;
 
         const topic = `/topic/oauth2/${userId}`;
         this.wsUnsubscribe = this.wsService.subscribe<any>(topic, (data) => {
-            if (data.requestId === requestId) {
-                this.onResultReceived(data);
-            }
+            this.onResultReceived(data);
         });
     }
 
@@ -305,12 +322,13 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
      * Uses pickedAt if available (PROCESSING), otherwise createdAt (PENDING)
      */
     private updateElapsedTime(): void {
-        if (!this.currentRequest) {
+        if (!this.selectedActiveRequest) {
             this.elapsedTime = '00:00:00';
             return;
         }
 
-        const startTime = this.currentRequest.pickedAt || this.currentRequest.createdAt;
+        // Use pickedAt for PROCESSING, createdAt for PENDING
+        const startTime = this.selectedActiveRequest.pickedAt || this.selectedActiveRequest.createdAt;
         if (!startTime) {
             this.elapsedTime = '00:00:00';
             return;
@@ -332,39 +350,79 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
     }
 
     private onResultReceived(data: any): void {
+        const requestId = data.requestId;
+        const requestIndex = this.activeRequests.findIndex(r => r.id === requestId);
+
+        if (requestIndex === -1) {
+            // Request not in active list, refresh list
+            this.loadActiveRequests();
+            this.loadMyRequests();
+            return;
+        }
+
+        // Update the request in the list
+        const request = this.activeRequests[requestIndex];
+
         // Check if this is a request status update (completion notification)
-        if (data.requestStatus && this.currentRequest) {
-            this.currentRequest.status = data.requestStatus;
-            this.currentRequest.successCount = data.successCount;
-            this.currentRequest.failedCount = data.failedCount;
-            this.currentRequest.totalCharged = data.totalCharged;
+        if (data.requestStatus) {
+            request.status = data.requestStatus;
+            request.successCount = data.successCount;
+            request.failedCount = data.failedCount;
+            request.totalCharged = data.totalCharged;
+
+            // Replace the object in the array to trigger Angular change detection
+            const updatedRequest = { ...request };
+            this.activeRequests[requestIndex] = updatedRequest;
 
             if (data.requestStatus === 'COMPLETED' || data.requestStatus === 'CANCELLED') {
-                this.hasPendingRequest = false;
+                // DON'T remove from active list - keep visible until page reload
+                // Just refresh history list and balance
                 this.loadMyRequests();
                 this.transactionService.refreshBalance();
-                // Stop timer when request is done
-                this.stopTimer();
+
+                // Stop timer for completed/cancelled request
+                if (this.selectedActiveRequest?.id === requestId) {
+                    this.selectedActiveRequest = updatedRequest;
+                    this.stopTimer();
+                }
+            } else if (this.selectedActiveRequest?.id === requestId) {
+                this.selectedActiveRequest = updatedRequest;
             }
             return;
         }
 
         // Handle individual result update
-        const result: OAuth2Result = {
+        // Only update counts if they are greater than current (prevent timeout messages from overwriting with 0)
+        if (data.successCount > request.successCount) {
+            request.successCount = data.successCount;
+        }
+        if (data.failedCount > request.failedCount) {
+            request.failedCount = data.failedCount;
+        }
+        if (data.totalCharged != null) {
+            request.totalCharged = data.totalCharged;
+        }
+
+        // Add result to request's results array if it exists
+        if (!request.results) {
+            request.results = [];
+        }
+        request.results.push({
             id: Date.now(),
             inputLine: data.inputLine,
             accountData: data.accountData,
             status: data.status,
             errorMessage: data.errorMessage,
             processedAt: data.processedAt
-        };
+        });
 
-        this.results.push(result);
+        // Replace the object in the array to trigger Angular change detection
+        const updatedRequest = { ...request };
+        this.activeRequests[requestIndex] = updatedRequest;
 
-        if (this.currentRequest) {
-            this.currentRequest.successCount = data.successCount;
-            this.currentRequest.failedCount = data.failedCount;
-            this.currentRequest.totalCharged = data.totalCharged;
+        // Update selected request if this is it
+        if (this.selectedActiveRequest?.id === requestId) {
+            this.selectedActiveRequest = updatedRequest;
         }
     }
 
@@ -390,16 +448,7 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
         this.oauth2Service.getById(request.id).subscribe({
             next: (response) => {
                 if (response.success) {
-                    this.selectedRequest = response.data;
-
-                    // If viewing from submit tab and it's processing, show in main view
-                    if (this.activeTab === 'submit' &&
-                        (response.data.status === 'PENDING' || response.data.status === 'PROCESSING')) {
-                        this.currentRequest = response.data;
-                        this.results = response.data.results || [];
-                        this.selectedRequest = null;
-                        this.subscribeToWebSocket(request.id);
-                    }
+                    this.selectedHistoryRequest = response.data;
                 }
             }
         });
@@ -411,6 +460,7 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
             return;
         }
 
+        // Confirm before canceling with styled modal
         const confirmed = await this.confirmService.confirm({
             title: this.translateService.instant('OAUTH2.CANCEL_REQUEST'),
             message: this.translateService.instant('OAUTH2.CANCEL_CONFIRM'),
@@ -426,30 +476,26 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
         this.oauth2Service.cancel(request.id).subscribe({
             next: () => {
                 this.notificationService.success(this.translateService.instant('OAUTH2.REQUEST_CANCELLED'));
-                this.hasPendingRequest = false;
+                // Refresh lists and balance
+                this.loadActiveRequests();
                 this.loadMyRequests();
                 this.transactionService.refreshBalance();
-                if (this.currentRequest?.id === request.id) {
-                    this.currentRequest = null;
-                    this.results = [];
-                }
-                if (this.selectedRequest?.id === request.id) {
-                    this.selectedRequest = null;
-                }
             },
             error: () => this.notificationService.error(this.translateService.instant('OAUTH2.CREATE_ERROR'))
         });
     }
 
-    cancelCurrentRequest(): void {
-        if (!this.currentRequest) return;
-        this.cancelRequest(this.currentRequest);
+    cancelSelectedRequest(): void {
+        if (!this.selectedActiveRequest) return;
+        this.cancelRequest(this.selectedActiveRequest);
     }
 
     copySuccessResults(): void {
-        const successData = this.results
-            .filter(r => r.status === 'SUCCESS' && r.accountData)
-            .map(r => r.accountData)
+        if (!this.selectedActiveRequest?.results) return;
+
+        const successData = this.selectedActiveRequest.results
+            .filter((r: OAuth2Result) => r.status === 'SUCCESS' && r.accountData)
+            .map((r: OAuth2Result) => r.accountData)
             .join('\n');
 
         if (successData) {
@@ -477,9 +523,11 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
     }
 
     copyFailedResults(): void {
-        const failedData = this.results
-            .filter(r => r.status === 'FAILED')
-            .map(r => r.inputLine)
+        if (!this.selectedActiveRequest?.results) return;
+
+        const failedData = this.selectedActiveRequest.results
+            .filter((r: OAuth2Result) => r.status === 'FAILED')
+            .map((r: OAuth2Result) => r.inputLine)
             .join('\n');
 
         if (failedData) {
@@ -524,9 +572,9 @@ export class OAuth2ToolComponent implements OnInit, OnDestroy {
     }
 
     get progressPercent(): number {
-        if (!this.currentRequest) return 0;
-        const processed = this.currentRequest.successCount + this.currentRequest.failedCount;
-        return Math.round((processed / this.currentRequest.quantity) * 100);
+        if (!this.selectedActiveRequest) return 0;
+        const processed = this.selectedActiveRequest.successCount + this.selectedActiveRequest.failedCount;
+        return Math.round((processed / this.selectedActiveRequest.quantity) * 100);
     }
 
     getRequestStatusClass(status: OAuth2RequestStatus): string {
