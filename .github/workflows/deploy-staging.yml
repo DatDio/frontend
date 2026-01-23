@@ -1,0 +1,134 @@
+name: Frontend CI/CD Staging (Zero-Downtime)
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Angular app
+        run: npm run build -- --configuration=staging
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/dev'
+
+    steps:
+      - name: Deploy Frontend Staging
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          debug: true
+          command_timeout: 15m
+          script: |
+            set -e
+            
+            echo "=== Starting Frontend Staging Deploy ==="
+            cd /opt/mailshop-staging
+            
+            # Check nginx to determine current slot
+            NGINX_CONF="/etc/nginx/sites-enabled/mailshop-staging"
+            if grep -q "4003" "$NGINX_CONF"; then
+              CURRENT_PORT=4003
+              NEXT_PORT=4004
+              NEXT_NAME="frontend-staging-green"
+              OLD_NAME="frontend-staging-blue"
+            else
+              CURRENT_PORT=4004
+              NEXT_PORT=4003
+              NEXT_NAME="frontend-staging-blue"
+              OLD_NAME="frontend-staging-green"
+            fi
+            
+            echo "Current: $CURRENT_PORT, Next: $NEXT_PORT"
+            
+            # Pull code
+            echo "=== Pulling code ==="
+            cd frontend
+            git fetch --all
+            git reset --hard origin/dev
+            cd ..
+            
+            # Build
+            echo "=== Building ==="
+            docker compose build frontend
+            
+            # Clean old next-slot container
+            echo "=== Cleanup ==="
+            docker stop $NEXT_NAME 2>/dev/null || true
+            docker rm $NEXT_NAME 2>/dev/null || true
+            
+            # Start new container
+            echo "=== Starting $NEXT_NAME on port $NEXT_PORT ==="
+            docker run -d \
+              --name $NEXT_NAME \
+              --network mailshop-staging_mailshop-staging-network \
+              -p $NEXT_PORT:4000 \
+              -e NODE_ENV=staging \
+              --restart always \
+              mailshop-staging-frontend:latest
+            
+            # Wait for health
+            echo "=== Waiting for health check ==="
+            sleep 15
+            for i in 1 2 3 4 5 6 7 8 9 10; do
+              if curl -sf "http://127.0.0.1:$NEXT_PORT" > /dev/null; then
+                echo "Healthy!"
+                break
+              fi
+              echo "Waiting... $i"
+              sleep 5
+            done
+            
+            # Verify
+            if ! curl -sf "http://127.0.0.1:$NEXT_PORT" > /dev/null; then
+              echo "FAILED! Logs:"
+              docker logs $NEXT_NAME --tail 30
+              docker stop $NEXT_NAME || true
+              docker rm $NEXT_NAME || true
+              exit 1
+            fi
+            
+            # Switch nginx
+            echo "=== Switching nginx to $NEXT_PORT ==="
+            sudo sed -i "s|proxy_pass http://127.0.0.1:400[3-4]|proxy_pass http://127.0.0.1:$NEXT_PORT|g" "$NGINX_CONF"
+            sudo nginx -t && sudo nginx -s reload
+            
+            # Stop old
+            echo "=== Stopping old container ==="
+            sleep 3
+            docker stop $OLD_NAME 2>/dev/null || true
+            docker rm $OLD_NAME 2>/dev/null || true
+            
+            echo "=== DONE! Frontend Staging on port $NEXT_PORT ==="
+
+      - name: Verify
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: 22
+          script: |
+            curl -sf http://127.0.0.1:4003 > /dev/null && echo "OK!" || echo "FAILED"

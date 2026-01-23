@@ -8,8 +8,9 @@ RUN npm ci
 
 COPY . .
 
-# Build production (không SSR)
-RUN npm run build
+# Build with configurable environment (default: production)
+ARG BUILD_CONFIG=production
+RUN npm run build -- --configuration=${BUILD_CONFIG}
 
 # Production stage
 FROM node:20-alpine
