@@ -72,7 +72,7 @@ jobs:
             
             # Build
             echo "=== Building ==="
-            docker compose build frontend
+            docker compose build frontend-staging
             
             # Clean old next-slot container
             echo "=== Cleanup ==="
@@ -87,7 +87,7 @@ jobs:
               -p $NEXT_PORT:4000 \
               -e NODE_ENV=staging \
               --restart always \
-              mailshop-staging-frontend:latest
+              mailshop-staging-frontend-staging:latest
             
             # Wait for health
             echo "=== Waiting for health check ==="
