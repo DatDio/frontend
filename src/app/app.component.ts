@@ -2,6 +2,7 @@
 import { RouterOutlet } from '@angular/router';
 import { ToastComponent } from './shared/components/toast/toast.component';
 import { LoaderComponent } from './shared/components/loader/loader.component';
+import { AnnouncementPopupComponent } from './shared/components/announcement-popup/announcement-popup.component';
 
 @Component({
   selector: 'app-root',

@@ -1,0 +1,27 @@
+<div *ngIf="showPopup" class="announcement-backdrop" (click)="closePopup()">
+    <div class="announcement-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h5 class="modal-title">
+                <i class="bi bi-megaphone-fill me-2"></i>
+                {{ title }}
+            </h5>
+            <button type="button" class="btn-close" (click)="closePopup()"></button>
+        </div>
+
+        <div class="modal-body">
+            <div [innerHTML]="content"></div>
+        </div>
+
+        <div class="modal-footer">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="doNotShowAgain" #doNotShowCheckbox>
+                <label class="form-check-label" for="doNotShowAgain">
+                    {{ currentLang === 'vi' ? 'Không hiện lại trong 3 giờ tới' : 'Do not show again for 3 hours' }}
+                </label>
+            </div>
+            <button type="button" class="btn btn-primary" (click)="closePopup(doNotShowCheckbox.checked)">
+                {{ currentLang === 'vi' ? 'Đã hiểu' : 'Got it' }}
+            </button>
+        </div>
+    </div>
+</div>

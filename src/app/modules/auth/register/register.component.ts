@@ -2,7 +2,7 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { SeoService } from '../../../core/services/seo.service';
 import { RecaptchaService } from '../../../core/services/recaptcha.service';
@@ -18,6 +18,7 @@ export class RegisterComponent implements OnInit {
   registerForm: FormGroup;
   loading = false;
   errorMessage = '';
+  currentLang: string;
 
   constructor(
     private fb: FormBuilder,
@@ -25,6 +26,7 @@ export class RegisterComponent implements OnInit {
     private router: Router,
     private seoService: SeoService,
     private recaptchaService: RecaptchaService,
+    private translate: TranslateService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.registerForm = this.fb.group({
@@ -33,6 +35,7 @@ export class RegisterComponent implements OnInit {
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]]
     }, { validators: this.passwordMatchValidator });
+    this.currentLang = this.translate.currentLang || this.translate.defaultLang || 'vi';
   }
 
   ngOnInit(): void {
@@ -115,5 +118,11 @@ export class RegisterComponent implements OnInit {
 
   get confirmPassword() {
     return this.registerForm.get('confirmPassword');
+  }
+
+  switchLanguage(lang: string): void {
+    this.translate.use(lang);
+    this.currentLang = lang;
+    localStorage.setItem('language', lang);
   }
 }

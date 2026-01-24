@@ -2,7 +2,7 @@
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { AuthService } from '../../../core/services/auth.service';
 import { SeoService } from '../../../core/services/seo.service';
 import { RecaptchaService } from '../../../core/services/recaptcha.service';
@@ -25,6 +25,7 @@ export class LoginComponent implements OnInit {
   returnUrl = '/';
   googleClientId = environment.googleClientId;
   private googleInitialized = false;
+  currentLang: string;
 
   constructor(
     private fb: FormBuilder,
@@ -33,12 +34,14 @@ export class LoginComponent implements OnInit {
     private route: ActivatedRoute,
     private seoService: SeoService,
     private recaptchaService: RecaptchaService,
+    private translate: TranslateService,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
+    this.currentLang = this.translate.currentLang || this.translate.defaultLang || 'vi';
   }
 
   ngOnInit(): void {
@@ -180,6 +183,12 @@ export class LoginComponent implements OnInit {
     script.onload = () => initialize();
 
     document.head.appendChild(script);
+  }
+
+  switchLanguage(lang: string): void {
+    this.translate.use(lang);
+    this.currentLang = lang;
+    localStorage.setItem('language', lang);
   }
 
   private handleLoginSuccess(): void {

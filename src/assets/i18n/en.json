@@ -765,7 +765,9 @@
         "COPY_FAILED": "Copy Failed",
         "COPIED_FAILED": "Failed results copied to clipboard",
         "NO_FAILED_TO_COPY": "No failed results to copy",
-        "AUTO_DELETE_NOTE": "All request data will be automatically deleted after {{days}} days, please download results immediately after completion"
+        "AUTO_DELETE_NOTE": "All request data will be automatically deleted after {{days}} days, please download results immediately after completion",
+        "MAX_REQUESTS_REACHED": "You have reached the limit of {{max}} pending requests",
+        "ACTIVE_REQUESTS": "Running requests"
     },
     "OAUTH2": {
         "TITLE": "Get OAuth2 Token",
@@ -816,6 +818,8 @@
         "AUTO_DELETE_NOTE": "All request data will be automatically deleted after {{days}} days, please download results immediately after completion",
         "ADMIN_INPUT": "Input",
         "ADMIN_RESULT": "Result / Error",
-        "INVALID_FORMAT": "{{count}} lines have invalid format (required: email|password)"
+        "INVALID_FORMAT": "{{count}} lines have invalid format (required: email|password)",
+        "MAX_REQUESTS_REACHED": "You have reached the limit of {{max}} pending requests",
+        "ACTIVE_REQUESTS": "Running requests"
     }
 }

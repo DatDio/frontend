@@ -1,7 +1,7 @@
-import { environment } from '../../../../environments/environment';
+import { CommonApi } from '../commom.api';
 
-const BASE = `${environment.apiUrl}/v1/settings`;
-
-export const PublicSettingApi = {
-    GET_PUBLIC: `${BASE}/public`,
-};
+export class PublicSettingApi {
+    public static readonly BASE = CommonApi.CONTEXT_PATH + '/settings';
+    public static readonly GET_PUBLIC = PublicSettingApi.BASE + '/public';
+    public static readonly GET_ANNOUNCEMENT_ACTIVE = PublicSettingApi.BASE + '/announcement/active';
+}

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SystemSettingService } from '../../../core/services/system-setting.service';
 import { NotificationService } from '../../../core/services/notification.service';
+import { AnnouncementService, AnnouncementDTO } from '../../../core/services/announcement.service';
 import { SystemSetting } from '../../../core/models/system-setting.model';
 
 @Component({
@@ -15,11 +16,23 @@ import { SystemSetting } from '../../../core/models/system-setting.model';
 export class SettingsComponent implements OnInit {
     readonly #settingService = inject(SystemSettingService);
     readonly #notificationService = inject(NotificationService);
+    readonly #announcementService = inject(AnnouncementService);
 
     settings: SystemSetting[] = [];
     loading = false;
     editingKey: string | null = null;
     editValue = '';
+    activeTab = 'general'; // Tab navigation
+
+    // Announcement settings
+    announcement: AnnouncementDTO | null = null;
+    announcementLoading = false;
+    announcementSaving = false;
+    announcementTitleVi = '';
+    announcementTitleEn = '';
+    announcementContentVi = '';
+    announcementContentEn = '';
+    announcementIsActive = true;
 
     // Specific settings
     rankPeriodDays = 7;
@@ -56,6 +69,7 @@ export class SettingsComponent implements OnInit {
 
     ngOnInit(): void {
         this.loadSettings();
+        this.loadAnnouncement();
     }
 
     loadSettings(): void {
@@ -351,6 +365,76 @@ export class SettingsComponent implements OnInit {
                 if (response.success) {
                     this.#notificationService.success('Cập nhật số ngày xoá đơn hàng thành công');
                     this.loadSettings();
+                } else {
+                    this.#notificationService.error(response.message || 'Có lỗi xảy ra');
+                }
+            },
+            error: (error: { error?: { message?: string } }) => {
+                this.#notificationService.error(error.error?.message || 'Có lỗi xảy ra');
+            }
+        });
+    }
+
+    // ========== ANNOUNCEMENT SETTINGS ==========
+    loadAnnouncement(): void {
+        this.announcementLoading = true;
+        this.#announcementService.getAnnouncement().subscribe({
+            next: (response) => {
+                if (response.success && response.data) {
+                    this.announcement = response.data;
+                    this.announcementTitleVi = response.data.titleVi;
+                    this.announcementTitleEn = response.data.titleEn;
+                    this.announcementContentVi = response.data.contentVi;
+                    this.announcementContentEn = response.data.contentEn;
+                    this.announcementIsActive = response.data.isActive;
+                }
+                this.announcementLoading = false;
+            },
+            error: () => {
+                this.announcementLoading = false;
+            }
+        });
+    }
+
+    saveAnnouncement(): void {
+        if (!this.announcementTitleVi || !this.announcementTitleEn ||
+            !this.announcementContentVi || !this.announcementContentEn) {
+            this.#notificationService.error('Vui lòng điền đầy đủ thông tin');
+            return;
+        }
+
+        this.announcementSaving = true;
+        const data: AnnouncementDTO = {
+            titleVi: this.announcementTitleVi,
+            titleEn: this.announcementTitleEn,
+            contentVi: this.announcementContentVi,
+            contentEn: this.announcementContentEn,
+            isActive: this.announcementIsActive
+        };
+
+        this.#announcementService.saveAnnouncement(data).subscribe({
+            next: (response) => {
+                if (response.success) {
+                    this.#notificationService.success('Lưu thông báo thành công');
+                    this.loadAnnouncement();
+                } else {
+                    this.#notificationService.error(response.message || 'Có lỗi xảy ra');
+                }
+                this.announcementSaving = false;
+            },
+            error: (error: { error?: { message?: string } }) => {
+                this.#notificationService.error(error.error?.message || 'Có lỗi xảy ra');
+                this.announcementSaving = false;
+            }
+        });
+    }
+
+    toggleAnnouncement(): void {
+        this.#announcementService.toggleActive().subscribe({
+            next: (response) => {
+                if (response.success) {
+                    this.#notificationService.success('Đã cập nhật trạng thái thông báo');
+                    this.loadAnnouncement();
                 } else {
                     this.#notificationService.error(response.message || 'Có lỗi xảy ra');
                 }

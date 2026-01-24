@@ -7,6 +7,38 @@
             </h5>
         </div>
         <div class="card-body">
+            <!-- Tabs Navigation -->
+            <ul class="nav nav-tabs mb-4" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" [class.active]="activeTab === 'general'" (click)="activeTab = 'general'"
+                        type="button">
+                        <i class="bi bi-gear me-2"></i>
+                        Cài đặt chung
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" [class.active]="activeTab === 'payment'" (click)="activeTab = 'payment'"
+                        type="button">
+                        <i class="bi bi-credit-card me-2"></i>
+                        Thanh toán
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" [class.active]="activeTab === 'announcement'"
+                        (click)="activeTab = 'announcement'" type="button">
+                        <i class="bi bi-megaphone-fill me-2"></i>
+                        Thông báo
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" [class.active]="activeTab === 'other'" (click)="activeTab = 'other'"
+                        type="button">
+                        <i class="bi bi-three-dots me-2"></i>
+                        Khác
+                    </button>
+                </li>
+            </ul>
+
             <!-- Loading -->
             <div *ngIf="loading" class="text-center py-5">
                 <div class="spinner-border text-primary" role="status">
@@ -15,281 +47,353 @@
                 <p class="mt-2 text-muted">Đang tải cài đặt...</p>
             </div>
 
-            <!-- Settings Content -->
+            <!-- Tab Content -->
             <div *ngIf="!loading">
-                <!-- Rank Settings Section -->
-                <div class="settings-section">
-                    <h6 class="section-title">
-                        <i class="bi bi-trophy me-2"></i>
-                        Cài đặt Thứ hạng
-                    </h6>
+                <!-- General Settings Tab -->
+                <div *ngIf="activeTab === 'general'">
+                    <!-- Rank Settings Section -->
+                    <div class="settings-section">
+                        <h6 class="section-title">
+                            <i class="bi bi-trophy me-2"></i>
+                            Cài đặt Thứ hạng
+                        </h6>
 
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <label class="setting-label">Số ngày tính hạng</label>
-                            <p class="setting-description text-muted mb-0">
-                                Hệ thống sẽ tính tổng số tiền nạp trong khoảng thời gian này để xác định thứ hạng của
-                                người dùng.
-                            </p>
-                        </div>
-                        <div class="setting-control">
-                            <div class="input-group" style="width: 150px;">
-                                <input type="number" class="form-control" [(ngModel)]="rankPeriodDays" min="1" max="365"
-                                    placeholder="7">
-                                <span class="input-group-text">ngày</span>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <label class="setting-label">Số ngày tính hạng</label>
+                                <p class="setting-description text-muted mb-0">
+                                    Hệ thống sẽ tính tổng số tiền nạp trong khoảng thời gian này để xác định thứ hạng
+                                    của
+                                    người dùng.
+                                </p>
                             </div>
-                            <button class="btn btn-primary btn-sm ms-2" (click)="saveRankPeriodDays()">
-                                <i class="bi bi-check-lg me-1"></i>
-                                Lưu
+                            <div class="setting-control">
+                                <div class="input-group" style="width: 150px;">
+                                    <input type="number" class="form-control" [(ngModel)]="rankPeriodDays" min="1"
+                                        max="365" placeholder="7">
+                                    <span class="input-group-text">ngày</span>
+                                </div>
+                                <button class="btn btn-primary btn-sm ms-2" (click)="saveRankPeriodDays()">
+                                    <i class="bi bi-check-lg me-1"></i>
+                                    Lưu
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Settings Tab -->
+                <div *ngIf="activeTab === 'payment'">
+                    <!-- Casso Settings Section -->
+                    <div class="settings-section">
+                        <h6 class="section-title">
+                            <i class="bi bi-qr-code me-2"></i>
+                            Cấu hình Thanh toán Casso (VietQR)
+                            <span class="badge bg-success ms-2">Đang sử dụng</span>
+                        </h6>
+                        <p class="text-muted small mb-3">
+                            Nhập thông tin ngân hàng để nhận tiền qua chuyển khoản VietQR.
+                            Secure Token dùng để xác thực webhook callback từ Casso.
+                        </p>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Secure Token (Webhook)</label>
+                                <div class="input-group">
+                                    <input [type]="showSecureToken ? 'text' : 'password'" class="form-control"
+                                        [(ngModel)]="cassoSecureToken" placeholder="Nhập Secure Token từ Casso...">
+                                    <button class="btn btn-outline-secondary" type="button"
+                                        (click)="showSecureToken = !showSecureToken" title="Hiện/Ẩn token">
+                                        <i class="bi" [ngClass]="showSecureToken ? 'bi-eye-slash' : 'bi-eye'"></i>
+                                    </button>
+                                </div>
+                                <small class="text-muted">Để xác thực webhook callback từ Casso</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Mã Ngân Hàng</label>
+                                <select class="form-select" [(ngModel)]="cassoBankCode">
+                                    <option value="">-- Chọn ngân hàng --</option>
+                                    <option value="ACB">ACB - Ngân hàng Á Châu</option>
+                                    <option value="VCB">VCB - Vietcombank</option>
+                                    <option value="TCB">TCB - Techcombank</option>
+                                    <option value="MB">MB - Quân Đội</option>
+                                    <option value="VPB">VPB - VPBank</option>
+                                    <option value="TPB">TPB - TPBank</option>
+                                    <option value="BIDV">BIDV</option>
+                                    <option value="VTB">VTB - Vietinbank</option>
+                                    <option value="STB">STB - Sacombank</option>
+                                    <option value="MSB">MSB - Maritime Bank</option>
+                                    <option value="HDB">HDB - HDBank</option>
+                                    <option value="OCB">OCB - Phương Đông</option>
+                                    <option value="SHB">SHB - Sài Gòn Hà Nội</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Số Tài Khoản</label>
+                                <input type="text" class="form-control" [(ngModel)]="cassoBankAccount"
+                                    placeholder="VD: 123456789">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Tên Chủ Tài Khoản</label>
+                                <input type="text" class="form-control" [(ngModel)]="cassoAccountName"
+                                    placeholder="VD: NGUYEN VAN A (không dấu, viết hoa)">
+                                <small class="text-muted">Không dấu, viết hoa toàn bộ</small>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-primary" (click)="saveCassoSettings()" [disabled]="cassoSaving">
+                                <i class="bi bi-check-lg me-1" *ngIf="!cassoSaving"></i>
+                                <span class="spinner-border spinner-border-sm me-1" *ngIf="cassoSaving"></span>
+                                {{ cassoSaving ? 'Đang lưu...' : 'Lưu cấu hình Casso' }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- FPayment (Crypto) Settings Section -->
+                    <div class="settings-section mt-4">
+                        <h6 class="section-title">
+                            <i class="bi bi-currency-bitcoin me-2"></i>
+                            Cấu hình Thanh toán Crypto (FPayment)
+                            <span class="badge bg-info ms-2">USDT</span>
+                        </h6>
+                        <p class="text-muted small mb-3">
+                            Nhập thông tin FPayment để nhận tiền qua USDT. Tỷ giá USD/VND dùng để quy đổi số tiền VND
+                            sang
+                            USDT.
+                        </p>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Merchant ID</label>
+                                <input type="text" class="form-control" [(ngModel)]="fpaymentMerchantId"
+                                    placeholder="Nhập FPayment Merchant ID...">
+                                <small class="text-muted">Lấy từ trang quản lý FPayment</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">API Key</label>
+                                <div class="input-group">
+                                    <input [type]="showFpaymentApiKey ? 'text' : 'password'" class="form-control"
+                                        [(ngModel)]="fpaymentApiKey" placeholder="Nhập FPayment API Key...">
+                                    <button class="btn btn-outline-secondary" type="button"
+                                        (click)="showFpaymentApiKey = !showFpaymentApiKey" title="Hiện/Ẩn API Key">
+                                        <i class="bi" [ngClass]="showFpaymentApiKey ? 'bi-eye-slash' : 'bi-eye'"></i>
+                                    </button>
+                                </div>
+                                <small class="text-muted">Lấy từ trang quản lý FPayment</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Tỷ giá USD/VND</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">1 USDT =</span>
+                                    <input type="number" class="form-control" [(ngModel)]="fpaymentUsdVndRate"
+                                        min="1000" max="100000" placeholder="25000">
+                                    <span class="input-group-text">VND</span>
+                                </div>
+                                <small class="text-muted">Ví dụ: 25000 nghĩa là 1 USDT = 25,000 VND</small>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-primary" (click)="saveFPaymentSettings()"
+                                [disabled]="fpaymentSaving">
+                                <i class="bi bi-check-lg me-1" *ngIf="!fpaymentSaving"></i>
+                                <span class="spinner-border spinner-border-sm me-1" *ngIf="fpaymentSaving"></span>
+                                {{ fpaymentSaving ? 'Đang lưu...' : 'Lưu cấu hình FPayment' }}
                             </button>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- PayOS Settings Section -->
-                <!-- <div class="settings-section mt-4">
+            <!-- Announcement Tab -->
+            <div *ngIf="activeTab === 'announcement'">
+                <!-- Announcement Popup Settings Section -->
+                <div class="settings-section">
                     <h6 class="section-title">
-                        <i class="bi bi-credit-card me-2"></i>
-                        Cấu hình Thanh toán PayOS
-                        <span class="badge bg-secondary ms-2">Ẩn - Đang dùng Casso</span>
+                        <i class="bi bi-megaphone-fill me-2"></i>
+                        Cài đặt Popup Thông báo
+                        <span class="badge ms-2" [ngClass]="announcementIsActive ? 'bg-success' : 'bg-secondary'">
+                            {{ announcementIsActive ? 'Đang hiển thị' : 'Đã tắt' }}
+                        </span>
                     </h6>
                     <p class="text-muted small mb-3">
-                        Nhập thông tin xác thực PayOS để kích hoạt thanh toán. Nếu để trống, hệ thống sẽ sử dụng giá trị
-                        từ biến môi trường.
+                        Nội dung thông báo sẽ hiển thị dạng popup khi người dùng vào trang web. Hỗ trợ 2 ngôn ngữ
+                        Tiếng
+                        Việt và English.
                     </p>
 
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label">Client ID</label>
-                            <input type="text" class="form-control" [(ngModel)]="payosClientId"
-                                placeholder="Nhập PayOS Client ID...">
+                    <div *ngIf="announcementLoading" class="text-center py-4">
+                        <div class="spinner-border spinner-border-sm text-primary"></div>
+                        <p class="text-muted small mt-2 mb-0">Đang tải...</p>
+                    </div>
+
+                    <div *ngIf="!announcementLoading">
+                        <!-- Vietnamese Content -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-12">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i class="bi bi-flag-fill me-2"></i>
+                                            Nội dung Tiếng Việt
+                                        </h6>
+                                        <div class="mb-3">
+                                            <label class="form-label">Tiêu đề (Tiếng Việt)</label>
+                                            <input type="text" class="form-control" [(ngModel)]="announcementTitleVi"
+                                                placeholder="VD: Thông báo">
+                                        </div>
+                                        <div>
+                                            <label class="form-label">Nội dung (Tiếng Việt)</label>
+                                            <textarea class="form-control" rows="6" [(ngModel)]="announcementContentVi"
+                                                placeholder="Nhập nội dung thông báo bằng tiếng Việt...&#10;&#10;Hỗ trợ HTML cơ bản như <strong>, <br>, <a>, <ul>, <li>"></textarea>
+                                            <small class="text-muted">Hỗ trợ HTML cơ bản: &lt;strong&gt;,
+                                                &lt;br&gt;,
+                                                &lt;a&gt;, &lt;ul&gt;, &lt;li&gt;</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label">API Key</label>
-                            <input type="password" class="form-control" [(ngModel)]="payosApiKey"
-                                placeholder="Nhập PayOS API Key...">
+
+                        <!-- English Content -->
+                        <div class="row g-3 mb-3">
+                            <div class="col-12">
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <h6 class="card-title">
+                                            <i class="bi bi-flag me-2"></i>
+                                            English Content
+                                        </h6>
+                                        <div class="mb-3">
+                                            <label class="form-label">Title (English)</label>
+                                            <input type="text" class="form-control" [(ngModel)]="announcementTitleEn"
+                                                placeholder="e.g: Announcement">
+                                        </div>
+                                        <div>
+                                            <label class="form-label">Content (English)</label>
+                                            <textarea class="form-control" rows="6" [(ngModel)]="announcementContentEn"
+                                                placeholder="Enter announcement content in English...&#10;&#10;Support basic HTML like <strong>, <br>, <a>, <ul>, <li>"></textarea>
+                                            <small class="text-muted">Support basic HTML: &lt;strong&gt;,
+                                                &lt;br&gt;,
+                                                &lt;a&gt;, &lt;ul&gt;, &lt;li&gt;</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Checksum Key</label>
-                            <input type="password" class="form-control" [(ngModel)]="payosChecksumKey"
-                                placeholder="Nhập PayOS Checksum Key...">
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary" (click)="saveAnnouncement()"
+                                [disabled]="announcementSaving">
+                                <i class="bi bi-check-lg me-1" *ngIf="!announcementSaving"></i>
+                                <span class="spinner-border spinner-border-sm me-1" *ngIf="announcementSaving"></span>
+                                {{ announcementSaving ? 'Đang lưu...' : 'Lưu thông báo' }}
+                            </button>
+                            <button class="btn" [ngClass]="announcementIsActive ? 'btn-warning' : 'btn-success'"
+                                (click)="toggleAnnouncement()" [disabled]="!announcement">
+                                <i class="bi" [ngClass]="announcementIsActive ? 'bi-eye-slash' : 'bi-eye'"></i>
+                                {{ announcementIsActive ? 'Tắt hiển thị' : 'Bật hiển thị' }}
+                            </button>
                         </div>
                     </div>
-                    <div class="mt-3">
-                        <button class="btn btn-secondary" (click)="savePayOSSettings()" [disabled]="payosSaving">
-                            <i class="bi bi-check-lg me-1" *ngIf="!payosSaving"></i>
-                            <span class="spinner-border spinner-border-sm me-1" *ngIf="payosSaving"></span>
-                            {{ payosSaving ? 'Đang lưu...' : 'Lưu cấu hình PayOS' }}
-                        </button>
-                    </div>
-                </div> -->
+                </div>
+            </div>
+        </div>
 
-                <!-- Casso Settings Section -->
-                <div class="settings-section mt-4">
-                    <h6 class="section-title">
-                        <i class="bi bi-qr-code me-2"></i>
-                        Cấu hình Thanh toán Casso (VietQR)
-                        <span class="badge bg-success ms-2">Đang sử dụng</span>
-                    </h6>
-                    <p class="text-muted small mb-3">
-                        Nhập thông tin ngân hàng để nhận tiền qua chuyển khoản VietQR.
-                        Secure Token dùng để xác thực webhook callback từ Casso.
-                    </p>
+        <!-- Other Settings Tab -->
+        <div *ngIf="activeTab === 'other'" class="pt-2 px-3 pb-3">
+            <!-- Scheduler Settings Section -->
+            <div class="settings-section">
+                <h6 class="section-title">
+                    <i class="bi bi-clock-history me-2"></i>
+                    Cài đặt Tác vụ tự động
+                </h6>
+                <p class="text-muted small mb-3">
+                    Cấu hình thời gian cho các tác vụ tự động của hệ thống.
+                </p>
 
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Secure Token (Webhook)</label>
-                            <div class="input-group">
-                                <input [type]="showSecureToken ? 'text' : 'password'" class="form-control"
-                                    [(ngModel)]="cassoSecureToken" placeholder="Nhập Secure Token từ Casso...">
-                                <button class="btn btn-outline-secondary" type="button"
-                                    (click)="showSecureToken = !showSecureToken" title="Hiện/Ẩn token">
-                                    <i class="bi" [ngClass]="showSecureToken ? 'bi-eye-slash' : 'bi-eye'"></i>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <label class="setting-label">Timeout giao dịch thanh toán</label>
+                                <p class="setting-description text-muted mb-0">
+                                    Giao dịch PENDING sẽ tự động chuyển thành FAILED sau thời gian này.
+                                </p>
+                            </div>
+                            <div class="setting-control mt-2">
+                                <div class="input-group" style="width: 150px;">
+                                    <input type="number" class="form-control" [(ngModel)]="transactionTimeoutMinutes"
+                                        min="1" max="60" placeholder="10">
+                                    <span class="input-group-text">phút</span>
+                                </div>
+                                <button class="btn btn-primary btn-sm ms-2" (click)="saveTransactionTimeout()">
+                                    <i class="bi bi-check-lg me-1"></i>
+                                    Lưu
                                 </button>
                             </div>
-                            <small class="text-muted">Để xác thực webhook callback từ Casso</small>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Mã Ngân Hàng</label>
-                            <select class="form-select" [(ngModel)]="cassoBankCode">
-                                <option value="">-- Chọn ngân hàng --</option>
-                                <option value="ACB">ACB - Ngân hàng Á Châu</option>
-                                <option value="VCB">VCB - Vietcombank</option>
-                                <option value="TCB">TCB - Techcombank</option>
-                                <option value="MB">MB - Quân Đội</option>
-                                <option value="VPB">VPB - VPBank</option>
-                                <option value="TPB">TPB - TPBank</option>
-                                <option value="BIDV">BIDV</option>
-                                <option value="VTB">VTB - Vietinbank</option>
-                                <option value="STB">STB - Sacombank</option>
-                                <option value="MSB">MSB - Maritime Bank</option>
-                                <option value="HDB">HDB - HDBank</option>
-                                <option value="OCB">OCB - Phương Đông</option>
-                                <option value="SHB">SHB - Sài Gòn Hà Nội</option>
-                            </select>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Số Tài Khoản</label>
-                            <input type="text" class="form-control" [(ngModel)]="cassoBankAccount"
-                                placeholder="VD: 123456789">
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Tên Chủ Tài Khoản</label>
-                            <input type="text" class="form-control" [(ngModel)]="cassoAccountName"
-                                placeholder="VD: NGUYEN VAN A (không dấu, viết hoa)">
-                            <small class="text-muted">Không dấu, viết hoa toàn bộ</small>
                         </div>
                     </div>
-                    <div class="mt-3">
-                        <button class="btn btn-primary" (click)="saveCassoSettings()" [disabled]="cassoSaving">
-                            <i class="bi bi-check-lg me-1" *ngIf="!cassoSaving"></i>
-                            <span class="spinner-border spinner-border-sm me-1" *ngIf="cassoSaving"></span>
-                            {{ cassoSaving ? 'Đang lưu...' : 'Lưu cấu hình Casso' }}
-                        </button>
-                    </div>
-                </div>
-
-                <!-- FPayment (Crypto) Settings Section -->
-                <div class="settings-section mt-4">
-                    <h6 class="section-title">
-                        <i class="bi bi-currency-bitcoin me-2"></i>
-                        Cấu hình Thanh toán Crypto (FPayment)
-                        <span class="badge bg-info ms-2">USDT</span>
-                    </h6>
-                    <p class="text-muted small mb-3">
-                        Nhập thông tin FPayment để nhận tiền qua USDT. Tỷ giá USD/VND dùng để quy đổi số tiền VND sang
-                        USDT.
-                    </p>
-
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Merchant ID</label>
-                            <input type="text" class="form-control" [(ngModel)]="fpaymentMerchantId"
-                                placeholder="Nhập FPayment Merchant ID...">
-                            <small class="text-muted">Lấy từ trang quản lý FPayment</small>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">API Key</label>
-                            <div class="input-group">
-                                <input [type]="showFpaymentApiKey ? 'text' : 'password'" class="form-control"
-                                    [(ngModel)]="fpaymentApiKey" placeholder="Nhập FPayment API Key...">
-                                <button class="btn btn-outline-secondary" type="button"
-                                    (click)="showFpaymentApiKey = !showFpaymentApiKey" title="Hiện/Ẩn API Key">
-                                    <i class="bi" [ngClass]="showFpaymentApiKey ? 'bi-eye-slash' : 'bi-eye'"></i>
+                    <div class="col-md-6">
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <label class="setting-label">Xoá đơn hàng cũ sau</label>
+                                <p class="setting-description text-muted mb-0">
+                                    Đơn hàng và dữ liệu liên quan sẽ tự động bị xoá sau số ngày này.
+                                </p>
+                            </div>
+                            <div class="setting-control mt-2">
+                                <div class="input-group" style="width: 150px;">
+                                    <input type="number" class="form-control" [(ngModel)]="orderCleanupDays" min="1"
+                                        max="365" placeholder="3">
+                                    <span class="input-group-text">ngày</span>
+                                </div>
+                                <button class="btn btn-primary btn-sm ms-2" (click)="saveOrderCleanupDays()">
+                                    <i class="bi bi-check-lg me-1"></i>
+                                    Lưu
                                 </button>
                             </div>
-                            <small class="text-muted">Lấy từ trang quản lý FPayment</small>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Tỷ giá USD/VND</label>
-                            <div class="input-group">
-                                <span class="input-group-text">1 USDT =</span>
-                                <input type="number" class="form-control" [(ngModel)]="fpaymentUsdVndRate" min="1000"
-                                    max="100000" placeholder="25000">
-                                <span class="input-group-text">VND</span>
-                            </div>
-                            <small class="text-muted">Ví dụ: 25000 nghĩa là 1 USDT = 25,000 VND</small>
-                        </div>
-                    </div>
-                    <div class="mt-3">
-                        <button class="btn btn-primary" (click)="saveFPaymentSettings()" [disabled]="fpaymentSaving">
-                            <i class="bi bi-check-lg me-1" *ngIf="!fpaymentSaving"></i>
-                            <span class="spinner-border spinner-border-sm me-1" *ngIf="fpaymentSaving"></span>
-                            {{ fpaymentSaving ? 'Đang lưu...' : 'Lưu cấu hình FPayment' }}
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Scheduler Settings Section -->
-                <div class="settings-section mt-4">
-                    <h6 class="section-title">
-                        <i class="bi bi-clock-history me-2"></i>
-                        Cài đặt Tác vụ tự động
-                    </h6>
-                    <p class="text-muted small mb-3">
-                        Cấu hình thời gian cho các tác vụ tự động của hệ thống.
-                    </p>
-
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="setting-item">
-                                <div class="setting-info">
-                                    <label class="setting-label">Timeout giao dịch thanh toán</label>
-                                    <p class="setting-description text-muted mb-0">
-                                        Giao dịch PENDING sẽ tự động chuyển thành FAILED sau thời gian này.
-                                    </p>
-                                </div>
-                                <div class="setting-control mt-2">
-                                    <div class="input-group" style="width: 150px;">
-                                        <input type="number" class="form-control"
-                                            [(ngModel)]="transactionTimeoutMinutes" min="1" max="60" placeholder="10">
-                                        <span class="input-group-text">phút</span>
-                                    </div>
-                                    <button class="btn btn-primary btn-sm ms-2" (click)="saveTransactionTimeout()">
-                                        <i class="bi bi-check-lg me-1"></i>
-                                        Lưu
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="setting-item">
-                                <div class="setting-info">
-                                    <label class="setting-label">Xoá đơn hàng cũ sau</label>
-                                    <p class="setting-description text-muted mb-0">
-                                        Đơn hàng và dữ liệu liên quan sẽ tự động bị xoá sau số ngày này.
-                                    </p>
-                                </div>
-                                <div class="setting-control mt-2">
-                                    <div class="input-group" style="width: 150px;">
-                                        <input type="number" class="form-control" [(ngModel)]="orderCleanupDays" min="1"
-                                            max="365" placeholder="3">
-                                        <span class="input-group-text">ngày</span>
-                                    </div>
-                                    <button class="btn btn-primary btn-sm ms-2" (click)="saveOrderCleanupDays()">
-                                        <i class="bi bi-check-lg me-1"></i>
-                                        Lưu
-                                    </button>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Social Settings Section -->
-                <div class="settings-section mt-4">
-                    <h6 class="section-title">
-                        <i class="bi bi-link-45deg me-2"></i>
-                        Liên kết mạng xã hội
-                    </h6>
-                    <p class="text-muted small mb-3">
-                        Cấu hình các đường link hiển thị ở footer trang web.
-                    </p>
+            <!-- Social Settings Section -->
+            <div class="settings-section mt-4">
+                <h6 class="section-title">
+                    <i class="bi bi-link-45deg me-2"></i>
+                    Liên kết mạng xã hội
+                </h6>
+                <p class="text-muted small mb-3">
+                    Cấu hình các đường link hiển thị ở footer trang web.
+                </p>
 
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Link Nhóm Chat Telegram</label>
-                            <input type="text" class="form-control" [(ngModel)]="telegramGroupUrl"
-                                placeholder="https://t.me/mailshopgroupchat">
-                            <small class="text-muted">Link nhóm chat hỗ trợ khách hàng</small>
-                        </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Link Liên Hệ Admin</label>
-                            <input type="text" class="form-control" [(ngModel)]="telegramChannelUrl"
-                                placeholder="https://t.me/emailsieure_support">
-                            <small class="text-muted">Link liên hệ admin</small>
-                        </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Link Nhóm Chat Telegram</label>
+                        <input type="text" class="form-control" [(ngModel)]="telegramGroupUrl"
+                            placeholder="https://t.me/mailshopgroupchat">
+                        <small class="text-muted">Link nhóm chat hỗ trợ khách hàng</small>
                     </div>
-                    <div class="mt-3">
-                        <button class="btn btn-primary" (click)="saveSocialSettings()" [disabled]="socialSaving">
-                            <i class="bi bi-check-lg me-1" *ngIf="!socialSaving"></i>
-                            <span class="spinner-border spinner-border-sm me-1" *ngIf="socialSaving"></span>
-                            {{ socialSaving ? 'Đang lưu...' : 'Lưu cấu hình liên kết' }}
-                        </button>
+                    <div class="col-md-6">
+                        <label class="form-label">Link Liên Hệ Admin</label>
+                        <input type="text" class="form-control" [(ngModel)]="telegramChannelUrl"
+                            placeholder="https://t.me/emailsieure_support">
+                        <small class="text-muted">Link liên hệ admin</small>
                     </div>
                 </div>
+                <div class="mt-3">
+                    <button class="btn btn-primary" (click)="saveSocialSettings()" [disabled]="socialSaving">
+                        <i class="bi bi-check-lg me-1" *ngIf="!socialSaving"></i>
+                        <span class="spinner-border spinner-border-sm me-1" *ngIf="socialSaving"></span>
+                        {{ socialSaving ? 'Đang lưu...' : 'Lưu cấu hình liên kết' }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                <!-- All Settings Table - Hidden for cleaner UI
+    <!-- All Settings Table - Hidden for cleaner UI
                 <div class="settings-section mt-4" *ngIf="settings.length > 0">
                     <h6 class="section-title">
                         <i class="bi bi-list-ul me-2"></i>
@@ -347,7 +451,4 @@
                     <p class="mt-2">Chưa có cài đặt nào</p>
                 </div>
                 -->
-            </div>
-        </div>
-    </div>
 </div>

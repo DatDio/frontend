@@ -10,10 +10,12 @@ import { LanguageService } from '../../core/services/language.service';
 import { LanguageSwitcherComponent } from '../../shared/components/language-switcher/language-switcher.component';
 import { VndUsdPipe } from '../../shared/pipes/vnd-usd.pipe';
 
+import { AnnouncementPopupComponent } from '../../shared/components/announcement-popup/announcement-popup.component';
+
 @Component({
   selector: 'app-client-layout',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslateModule, LanguageSwitcherComponent, VndUsdPipe],
+  imports: [CommonModule, RouterModule, TranslateModule, LanguageSwitcherComponent, VndUsdPipe, AnnouncementPopupComponent],
   templateUrl: './client-layout.component.html',
   styleUrls: ['./client-layout.component.scss']
 })

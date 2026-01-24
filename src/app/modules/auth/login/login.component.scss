@@ -5,7 +5,51 @@
   justify-content: center;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 2rem;
+  position: relative;
 }
+
+.language-switcher {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 10;
+
+  .btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    backdrop-filter: blur(10px);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.5);
+      color: white;
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.25);
+    }
+  }
+
+  .dropdown-menu {
+    min-width: 150px;
+
+    .dropdown-item {
+      cursor: pointer;
+
+      &.active {
+        background-color: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        font-weight: 500;
+      }
+
+      &:hover {
+        background-color: rgba(102, 126, 234, 0.05);
+      }
+    }
+  }
+}
+
 
 .auth-card {
   background: var(--bg-card);

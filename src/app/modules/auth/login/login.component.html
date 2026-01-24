@@ -1,4 +1,23 @@
 ﻿<div class="auth-container">
+  <!-- Language Switcher -->
+  <div class="language-switcher">
+    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown"
+      aria-expanded="false">
+      <i class="bi bi-globe me-1"></i>
+      {{ currentLang === 'vi' ? 'Tiếng Việt' : 'English' }}
+    </button>
+    <ul class="dropdown-menu dropdown-menu-end">
+      <li><a class="dropdown-item" (click)="switchLanguage('vi')" [class.active]="currentLang === 'vi'">
+          <i class="bi bi-check me-2" *ngIf="currentLang === 'vi'"></i>
+          <span [class.ms-4]="currentLang !== 'vi'">Tiếng Việt</span>
+        </a></li>
+      <li><a class="dropdown-item" (click)="switchLanguage('en')" [class.active]="currentLang === 'en'">
+          <i class="bi bi-check me-2" *ngIf="currentLang === 'en'"></i>
+          <span [class.ms-4]="currentLang !== 'en'">English</span>
+        </a></li>
+    </ul>
+  </div>
+
   <div class="auth-card">
     <div class="text-center mb-4">
       <h2 class="auth-card__title">{{ 'AUTH.WELCOME_BACK' | translate }}</h2>
