@@ -1,0 +1,40 @@
+.content-wrapper {
+    .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+
+        .page-title {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+
+            i {
+                margin-right: 0.5rem;
+                color: var(--primary);
+            }
+        }
+
+        .page-subtitle {
+            margin: 0.25rem 0 0;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+    }
+
+    .search-card {
+        margin-bottom: 1.5rem;
+    }
+
+    .external-product,
+    .local-product {
+        .name {
+            font-weight: 500;
+        }
+    }
+
+    .btn-group-sm .btn {
+        padding: 0.25rem 0.5rem;
+    }
+}

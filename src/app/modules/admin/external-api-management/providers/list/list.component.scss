@@ -1,0 +1,56 @@
+.content-wrapper {
+    .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+
+        .page-title {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 600;
+
+            i {
+                margin-right: 0.5rem;
+                color: var(--primary);
+            }
+        }
+
+        .page-subtitle {
+            margin: 0.25rem 0 0;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+    }
+
+    .search-card {
+        margin-bottom: 1.5rem;
+    }
+
+    .provider-name {
+        strong {
+            color: var(--text);
+        }
+    }
+
+    .base-url {
+        font-size: 0.75rem;
+        background: var(--bg-light);
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        word-break: break-all;
+    }
+
+    .api-key-masked {
+        font-family: monospace;
+        font-size: 0.75rem;
+    }
+
+    .badge {
+        font-weight: 500;
+    }
+
+    .btn-group-sm .btn {
+        padding: 0.25rem 0.5rem;
+    }
+}

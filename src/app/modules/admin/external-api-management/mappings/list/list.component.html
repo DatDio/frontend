@@ -1,0 +1,165 @@
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="header-left">
+            <h1 class="page-title">
+                <i class="bi bi-link"></i>
+                Product Mappings
+            </h1>
+            <p class="page-subtitle">Quản lý mapping giữa sản phẩm nguồn và sản phẩm local</p>
+        </div>
+        <div class="header-actions">
+            <button type="button" class="btn btn-primary" (click)="onCreateClick()">
+                <i class="bi bi-plus-lg"></i>
+                Thêm Mapping
+            </button>
+        </div>
+    </div>
+
+    <!-- Search Form -->
+    <div class="card search-card">
+        <div class="card-body">
+            <form [formGroup]="formSearch" (ngSubmit)="handleSearch()">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Provider</label>
+                        <select class="form-select" formControlName="providerId">
+                            <option value="">Tất cả</option>
+                            @for (provider of providers; track provider.id) {
+                            <option [value]="provider.id">{{ provider.name }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">Trạng thái</label>
+                        <select class="form-select" formControlName="status">
+                            <option value="">Tất cả</option>
+                            <option value="1">Hoạt động</option>
+                            <option value="0">Ngưng</option>
+                        </select>
+                    </div>
+                    <div class="col-md-5 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Tìm kiếm
+                        </button>
+                        <button type="button" class="btn btn-secondary" (click)="clearForm()">
+                            <i class="bi bi-arrow-counterclockwise"></i> Reset
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 50px">#</th>
+                            <th>Provider</th>
+                            <th>External Product</th>
+                            <th>Local Product</th>
+                            <th class="text-end">Giá gốc</th>
+                            <th class="text-end">Giá bán</th>
+                            <th class="text-end">Lợi nhuận</th>
+                            <th class="text-center">Stock</th>
+                            <th class="text-center">Trạng thái</th>
+                            <th class="text-center" style="width: 150px">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (loading) {
+                        <tr>
+                            <td colspan="10" class="text-center py-4">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </td>
+                        </tr>
+                        } @else if (mappings.length === 0) {
+                        <tr>
+                            <td colspan="10" class="text-center py-4 text-muted">
+                                <i class="bi bi-inbox fs-1 mb-2"></i>
+                                <p>Chưa có mapping nào</p>
+                            </td>
+                        </tr>
+                        } @else {
+                        @for (mapping of mappings; track mapping.id; let i = $index) {
+                        <tr>
+                            <td class="text-center">{{ paginationConfig.currentPage * paginationConfig.pageSize + i + 1
+                                }}</td>
+                            <td>
+                                <span class="badge bg-primary">{{ mapping.providerName }}</span>
+                            </td>
+                            <td>
+                                <div class="external-product">
+                                    <span class="name">{{ mapping.externalProductName }}</span>
+                                    <small class="text-muted d-block">ID: {{ mapping.externalProductId ||
+                                        mapping.externalProductSlug }}</small>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="local-product">
+                                    <span class="name">{{ mapping.localProductName }}</span>
+                                    <small class="text-muted d-block">{{ mapping.categoryName }}</small>
+                                </div>
+                            </td>
+                            <td class="text-end text-muted">{{ formatCurrency(mapping.externalPrice) }}</td>
+                            <td class="text-end">
+                                <strong>{{ formatCurrency(mapping.localPrice) }}</strong>
+                            </td>
+                            <td class="text-end">
+                                @if (mapping.profitPerItem) {
+                                <span class="text-success">
+                                    +{{ formatCurrency(mapping.profitPerItem) }}
+                                    <small>({{ mapping.profitPercent | number:'1.0-1' }}%)</small>
+                                </span>
+                                } @else {
+                                <span class="text-muted">—</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-secondary">{{ mapping.lastSyncedStock || '?' }}</span>
+                            </td>
+                            <td class="text-center">
+                                <app-active-status-badge [status]="mapping.status || 1"></app-active-status-badge>
+                            </td>
+                            <td class="text-center">
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-outline-success" title="Sync Stock"
+                                        (click)="onSyncStock(mapping.providerId)">
+                                        <i class="bi bi-arrow-repeat"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-danger" title="Xóa"
+                                        (click)="onDeleteClick(mapping.id!)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        @if (mappings.length > 0) {
+        <div class="card-footer">
+            <app-pagination [config]="paginationConfig" (pageChange)="handlePageChange($event)"
+                (pageSizeChange)="selectPageSize($event)">
+            </app-pagination>
+        </div>
+        }
+    </div>
+</div>
+
+<!-- Create Modal -->
+@if (showCreateModal) {
+<app-external-product-mapping-create-modal [providers]="providers" [preselectedProviderId]="selectedProviderId"
+    (close)="onCreateModalClose()" (success)="onCreateSuccess()">
+</app-external-product-mapping-create-modal>
+}

@@ -1,0 +1,119 @@
+<div class="modal-backdrop" (click)="onClose()"></div>
+<div class="modal-container">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">
+                <i class="fas fa-link me-2"></i>
+                Tạo Product Mapping
+            </h5>
+            <button type="button" class="btn-close" (click)="onClose()"></button>
+        </div>
+
+        <div class="modal-body">
+            <form [formGroup]="form">
+                <!-- Step 1: Select Provider -->
+                <div class="mb-4">
+                    <label class="form-label">Provider <span class="text-danger">*</span></label>
+                    <select class="form-select" formControlName="providerId" (change)="onProviderChange()">
+                        <option value="">-- Chọn provider --</option>
+                        @for (provider of providers; track provider.id) {
+                        <option [value]="provider.id">{{ provider.name }}</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Step 2: Select External Product -->
+                @if (form.get('providerId')?.value) {
+                <div class="mb-4">
+                    <label class="form-label">Chọn sản phẩm từ nguồn</label>
+                    @if (loadingProducts) {
+                    <div class="text-center py-3">
+                        <div class="spinner-border text-primary" role="status"></div>
+                        <p class="mb-0 mt-2">Đang tải danh sách...</p>
+                    </div>
+                    } @else if (externalProducts.length === 0) {
+                    <div class="alert alert-info">
+                        Không có sản phẩm nào chưa được mapping
+                    </div>
+                    } @else {
+                    <div class="product-grid">
+                        @for (product of externalProducts; track product.id) {
+                        <div class="product-card" [class.selected]="selectedProduct?.id === product.id"
+                            (click)="onProductSelect(product)">
+                            <div class="product-name">{{ product.name }}</div>
+                            <div class="product-info">
+                                <span class="price">{{ formatCurrency(product.price) }}</span>
+                                <span class="stock">Stock: {{ product.stock }}</span>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                    }
+                </div>
+                }
+
+                <!-- Step 3: Configure Local Product -->
+                @if (selectedProduct) {
+                <hr class="my-4">
+                <h6 class="mb-3">
+                    <i class="bi bi-shop me-2"></i>
+                    Cấu hình sản phẩm Local
+                </h6>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Danh mục <span class="text-danger">*</span></label>
+                        <select class="form-select" formControlName="categoryId">
+                            <option value="">-- Chọn danh mục --</option>
+                            @for (cat of categories; track cat.id) {
+                            <option [value]="cat.id">{{ cat.name }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Tên sản phẩm <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" formControlName="localProductName">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Giá gốc (từ nguồn)</label>
+                        <input type="text" class="form-control"
+                            [value]="formatCurrency(form.get('externalPrice')?.value)" readonly>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Giá bán <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" formControlName="localPrice" min="1">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Lợi nhuận</label>
+                        <div class="profit-display" [class.positive]="profitAmount > 0"
+                            [class.negative]="profitAmount < 0">
+                            <strong>{{ formatCurrency(profitAmount) }}</strong>
+                            <small>({{ profitPercent | number:'1.0-1' }}%)</small>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Mô tả (tùy chọn)</label>
+                        <textarea class="form-control" formControlName="localDescription" rows="2"></textarea>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" formControlName="autoSync" id="autoSync">
+                            <label class="form-check-label" for="autoSync">Tự động sync stock từ nguồn</label>
+                        </div>
+                    </div>
+                </div>
+                }
+            </form>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="onClose()">Hủy</button>
+            <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="loading || !selectedProduct">
+                @if (loading) {
+                <span class="spinner-border spinner-border-sm me-1"></span>
+                }
+                Tạo Mapping
+            </button>
+        </div>
+    </div>
+</div>
