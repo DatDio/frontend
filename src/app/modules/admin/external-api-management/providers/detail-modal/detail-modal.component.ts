@@ -27,6 +27,7 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
     testResult: { success: boolean; balance: any; message: string } | null = null;
     externalProducts: ExternalProduct[] = [];
     loadingProducts = false;
+    fetchError: string | null = null;
 
     ngOnInit(): void {
         this.initForm();
@@ -129,6 +130,10 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         });
     }
 
+
+
+    // ...
+
     onFetchProducts(): void {
         if (this.isCreateMode) {
             this.notificationService.error('Vui lòng lưu provider trước');
@@ -136,6 +141,9 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         }
 
         this.loadingProducts = true;
+        this.fetchError = null;
+        this.externalProducts = [];
+
         this.externalApiService.fetchExternalProducts(this.provider!.id!).subscribe({
             next: (response: any) => {
                 this.externalProducts = response.data || [];
@@ -143,6 +151,7 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
                 this.loadingProducts = false;
             },
             error: (error: any) => {
+                this.fetchError = error?.error?.message || error?.message || 'Lỗi không xác định';
                 this.notificationService.error('Lỗi khi lấy danh sách sản phẩm');
                 this.loadingProducts = false;
             }

@@ -101,7 +101,8 @@
               <small class="text-muted">Số nhỏ hơn sẽ hiển thị trước. Mặc định là 0.</small>
             </div>
 
-            <!-- Cấu hình kho phụ -->
+            <!-- Cấu hình kho phụ - chỉ hiển thị cho LOCAL products -->
+            @if (!isExternalProduct) {
             <div class="row">
               <div class="col-12 mb-2">
                 <label class="form-label fw-bold text-primary">
@@ -122,6 +123,12 @@
                 <small class="text-muted">Số lượng tối đa hiển thị cho khách hàng</small>
               </div>
             </div>
+            } @else {
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle me-2"></i>
+              Sản phẩm từ nguồn bên ngoài (External API) - không có cấu hình kho nội bộ.
+            </div>
+            }
           </div>
         </div>
       </form>

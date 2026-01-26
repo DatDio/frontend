@@ -57,7 +57,7 @@
                             <th>Base URL</th>
                             <th class="text-center">API Key</th>
                             <th class="text-center">Auth Type</th>
-                            <th class="text-center">Products</th>
+                            <th class="text-center">Products Đã Map</th>
                             <th class="text-center">Auto Sync</th>
                             <th class="text-center">Trạng thái</th>
                             <th class="text-center" style="width: 220px">Thao tác</th>
@@ -93,7 +93,7 @@
                                 <code class="base-url">{{ provider.baseUrl }}</code>
                             </td>
                             <td class="text-center">
-                                <span class="api-key-masked">{{ provider.apiKey || '—' }}</span>
+                                <span class="api-key-text">{{ provider.apiKey || '—' }}</span>
                             </td>
                             <td class="text-center">
                                 <span class="badge" [class.bg-info]="provider.authType === 'HEADER'"
@@ -117,20 +117,20 @@
                                 <app-active-status-badge [status]="provider.status || 1"></app-active-status-badge>
                             </td>
                             <td class="text-center">
-                                <div class="btn-group btn-group-sm">
-                                    <button type="button" class="btn btn-outline-success" title="Test Connection"
+                                <div class="action-buttons">
+                                    <button type="button" class="icon-btn success" title="Test Connection"
                                         (click)="onTestConnection(provider)">
                                         <i class="bi bi-plug"></i>
                                     </button>
-                                    <button type="button" class="btn btn-outline-info" title="View Mappings"
+                                    <button type="button" class="icon-btn info" title="View Mappings"
                                         (click)="onViewMappings(provider)">
                                         <i class="bi bi-link-45deg"></i>
                                     </button>
-                                    <button type="button" class="btn btn-outline-primary" title="Chỉnh sửa"
+                                    <button type="button" class="icon-btn warning" title="Chỉnh sửa"
                                         (click)="onEditClick(provider)">
                                         <i class="bi bi-pencil"></i>
                                     </button>
-                                    <button type="button" class="btn btn-outline-danger" title="Xóa"
+                                    <button type="button" class="icon-btn danger" title="Xóa"
                                         (click)="onDeleteClick(provider.id!)">
                                         <i class="bi bi-trash"></i>
                                     </button>

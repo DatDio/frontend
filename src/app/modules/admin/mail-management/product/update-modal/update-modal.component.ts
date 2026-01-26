@@ -31,6 +31,9 @@ export class ProductUpdateModalComponent implements OnInit {
   imagePreview: string | null = null;
   imageFile: File | null = null;
 
+  // External product detection
+  isExternalProduct = false;
+
   ngOnInit(): void {
     this.initForm();
     this.loadProductData();
@@ -69,6 +72,8 @@ export class ProductUpdateModalComponent implements OnInit {
       if (this.product.imageUrl) {
         this.imagePreview = this.getFullImageUrl(this.product.imageUrl);
       }
+      // Check if external product
+      this.isExternalProduct = this.product.sourceType === 'EXTERNAL';
     }
   }
 

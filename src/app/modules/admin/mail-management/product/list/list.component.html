@@ -66,6 +66,7 @@
               <th>Hình ảnh</th>
               <th>Tên sản phẩm</th>
               <th>Danh mục</th>
+              <th>Nguồn</th>
               <th>Giá</th>
               <th>Kho chính</th>
               <th>Kho phụ</th>
@@ -90,27 +91,48 @@
               </td>
               <td>{{ product.name }}</td>
               <td>{{ product.categoryName || product.categoryId }}</td>
+              <td>
+                @if (product.sourceType === 'EXTERNAL') {
+                <span class="badge bg-info" title="Sản phẩm từ nguồn bên ngoài">
+                  <i class="bi bi-cloud me-1"></i>External
+                </span>
+                } @else {
+                <span class="badge bg-success" title="Sản phẩm từ kho nội bộ">
+                  <i class="bi bi-house me-1"></i>Local
+                </span>
+                }
+              </td>
               <td>{{ product.price}}</td>
               <td>
+                @if (product.sourceType === 'EXTERNAL') {
+                <span class="text-muted">-</span>
+                } @else {
                 <span class="badge bg-secondary" title="Kho chính (ẩn)">
                   <i class="bi bi-box-seam me-1"></i>{{ product.primaryQuantity || 0 }}
                 </span>
+                }
               </td>
               <td>
+                @if (product.sourceType === 'EXTERNAL') {
+                <span class="text-muted">API</span>
+                } @else {
                 <span class="badge bg-success" title="Kho phụ (hiển thị)">
                   <i class="bi bi-shop me-1"></i>{{ product.quantity }}
                 </span>
                 <small class="text-muted d-block">min: {{ product.minSecondaryStock || 500 }} | max: {{
                   product.maxSecondaryStock || 1000 }}</small>
+                }
               </td>
               <td>
                 <app-active-status-badge [status]="product.status"></app-active-status-badge>
               </td>
               <td style="text-align: center">
                 <div class="action-buttons">
+                  @if (product.sourceType !== 'EXTERNAL') {
                   <button class="icon-btn info" (click)="onDetail(product)" title="Xem tài khoản">
                     <i class="bi bi-eye"></i>
                   </button>
+                  }
                   <button class="icon-btn warning" (click)="onEditClick(product)" title="Chỉnh sửa">
                     <i class="bi bi-pencil"></i>
                   </button>
@@ -124,7 +146,7 @@
 
             @if (products.length === 0) {
             <tr>
-              <td colspan="9" class="text-center py-4 text-muted">
+              <td colspan="10" class="text-center py-4 text-muted">
                 Không có dữ liệu
               </td>
             </tr>
@@ -158,4 +180,35 @@
 <app-product-update-modal [product]="selectedProduct" [categories]="categories" (closeModal)="onUpdateModalClose()"
   (successUpdate)="onUpdateSuccess()">
 </app-product-update-modal>
+}
+
+<!-- Source Type Selection Dialog -->
+@if (showSourceTypeDialog) {
+<div class="modal-overlay" (click)="onSourceTypeDialogClose()">
+  <div class="source-type-dialog" (click)="$event.stopPropagation()">
+    <div class="dialog-header">
+      <h5 class="mb-0">Chọn loại sản phẩm</h5>
+      <button type="button" class="btn-close" (click)="onSourceTypeDialogClose()"></button>
+    </div>
+    <div class="dialog-body">
+      <p class="text-muted mb-4">Vui lòng chọn nguồn sản phẩm bạn muốn tạo:</p>
+      <div class="row g-3">
+        <div class="col-6">
+          <div class="source-card local" (click)="onSourceTypeSelect('LOCAL')">
+            <i class="bi bi-house-fill source-icon"></i>
+            <h6>Local</h6>
+            <small class="text-muted">Sản phẩm từ kho nội bộ, quản lý số lượng và tài khoản thủ công</small>
+          </div>
+        </div>
+        <div class="col-6">
+          <div class="source-card external" (click)="onSourceTypeSelect('EXTERNAL')">
+            <i class="bi bi-cloud-fill source-icon"></i>
+            <h6>External</h6>
+            <small class="text-muted">Sản phẩm từ API bên ngoài, tự động đồng bộ stock và đặt hàng</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 }

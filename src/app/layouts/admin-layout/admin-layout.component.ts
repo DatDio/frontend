@@ -17,6 +17,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   readonly authService = inject(AuthService);
 
   sidebarOpen = true;
+  externalApiExpanded = false;  // Track External API submenu state
   private routerSub?: Subscription;
 
   ngOnInit(): void {
@@ -36,6 +37,10 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
 
   toggleSidebar(): void {
     this.sidebarOpen = !this.sidebarOpen;
+  }
+
+  toggleExternalApiMenu(): void {
+    this.externalApiExpanded = !this.externalApiExpanded;
   }
 
   logout(): void {

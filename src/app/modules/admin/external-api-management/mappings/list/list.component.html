@@ -127,12 +127,12 @@
                                 <app-active-status-badge [status]="mapping.status || 1"></app-active-status-badge>
                             </td>
                             <td class="text-center">
-                                <div class="btn-group btn-group-sm">
-                                    <button type="button" class="btn btn-outline-success" title="Sync Stock"
+                                <div class="action-buttons">
+                                    <button type="button" class="icon-btn success" title="Sync Stock"
                                         (click)="onSyncStock(mapping.providerId)">
                                         <i class="bi bi-arrow-repeat"></i>
                                     </button>
-                                    <button type="button" class="btn btn-outline-danger" title="Xóa"
+                                    <button type="button" class="icon-btn danger" title="Xóa"
                                         (click)="onDeleteClick(mapping.id!)">
                                         <i class="bi bi-trash"></i>
                                     </button>
