@@ -26,8 +26,7 @@ export interface ExternalApiProvider {
     productNamePath?: string;
     productPricePath?: string;
     productStockPath?: string;
-    productSlugPath?: string;
-    productDescriptionPath?: string;
+    customFieldMappings?: string;  // JSON array: [{"name": "slug", "path": "$.slug"}]
 
     orderMethod?: string;
     orderPath?: string;
@@ -62,6 +61,12 @@ export interface ExternalProduct {
     providerName?: string;
     isMapped?: boolean;
     localProductId?: number;
+}
+
+export interface FetchProductsResult {
+    products: ExternalProduct[];
+    rawResponse: string;
+    sampleItem: string;
 }
 
 export interface ExternalProductMapping {
@@ -177,10 +182,25 @@ export class ExternalApiService {
             .pipe(finalize(() => this.loaderService.hide()));
     }
 
+    fetchExternalProductsWithRaw(id: number): Observable<ApiResponse<FetchProductsResult>> {
+        this.loaderService.show();
+        return this.httpClient
+            .get<ApiResponse<FetchProductsResult>>(ExternalApiProviderApi.FETCH_PRODUCTS_RAW(id))
+            .pipe(finalize(() => this.loaderService.hide()));
+    }
+
     getBalance(id: number): Observable<ApiResponse<{ balance: number; formatted: string }>> {
         return this.httpClient.get<ApiResponse<{ balance: number; formatted: string }>>(
             ExternalApiProviderApi.GET_BALANCE(id)
         );
+    }
+
+    placeTestOrder(providerId: number, productId: string, quantity: number): Observable<any> {
+        this.loaderService.show();
+        return this.httpClient.post<any>(
+            ExternalApiProviderApi.PLACE_ORDER(providerId),
+            { productId, quantity }
+        ).pipe(finalize(() => this.loaderService.hide()));
     }
 
     // ================== MAPPINGS ==================

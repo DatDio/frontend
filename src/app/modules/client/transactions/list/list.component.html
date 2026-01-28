@@ -256,8 +256,8 @@
       <div class="deposit-form">
         <label class="input-label">{{ 'TRANSACTION.DEPOSIT_AMOUNT' | translate }}</label>
         <div class="amount-input-wrapper">
-          <input type="text" class="amount-input" [value]="depositAmountDisplay"
-            (input)="onDepositAmountChange($any($event))" [placeholder]="'TRANSACTION.ENTER_AMOUNT' | translate">
+          <input type="text" class="amount-input" [value]="depositAmountDisplay" (input)="onDepositAmountChange($event)"
+            [placeholder]="'TRANSACTION.ENTER_AMOUNT' | translate">
           <span class="currency-tag">VNĐ</span>
         </div>
 

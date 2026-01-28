@@ -16,8 +16,14 @@ export class ExternalApiProviderApi {
     public static readonly FETCH_PRODUCTS = (id: number) =>
         ExternalApiProviderApi.PROVIDERS + `/${id}/products`;
 
+    public static readonly FETCH_PRODUCTS_RAW = (id: number) =>
+        ExternalApiProviderApi.PROVIDERS + `/${id}/products/raw`;
+
     public static readonly GET_BALANCE = (id: number) =>
         ExternalApiProviderApi.PROVIDERS + `/${id}/balance`;
+
+    public static readonly PLACE_ORDER = (id: number) =>
+        ExternalApiProviderApi.PROVIDERS + `/${id}/order`;
 
     // Mappings
     public static readonly MAPPINGS = ExternalApiProviderApi.BASE + '/mappings';

@@ -141,9 +141,10 @@ export class ExternalProductMappingListComponent implements OnInit {
 
     async onDeleteClick(id: number): Promise<void> {
         const confirmed = await this.confirmService.confirm({
-            title: 'Xác nhận xóa',
-            message: 'Bạn có chắc muốn xóa mapping này?',
-            confirmText: 'Xóa',
+            title: '⚠️ CẢNH BÁO',
+            message: 'Khi xóa Mapping, sản phẩm Local tương ứng cũng sẽ bị xóa vĩnh viễn (nếu chưa có đơn hàng). Bạn có chắc muốn tiếp tục?',
+            confirmText: 'Xóa vĩnh viễn',
+            confirmButtonClass: 'btn-danger',
             cancelText: 'Hủy'
         });
 
