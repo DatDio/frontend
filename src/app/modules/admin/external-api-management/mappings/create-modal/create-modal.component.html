@@ -4,18 +4,19 @@
         <div class="modal-header">
             <h5 class="modal-title">
                 <i class="fas fa-link me-2"></i>
-                Tạo Product Mapping
+                {{ isEditMode ? 'Cập nhật Mapping sản phẩm' : 'Tạo Mapping sản phẩm' }}
             </h5>
             <button type="button" class="btn-close" (click)="onClose()"></button>
         </div>
 
         <div class="modal-body">
             <form [formGroup]="form">
+                @if (!isEditMode) {
                 <!-- Step 1: Select Provider -->
                 <div class="mb-4">
-                    <label class="form-label">Provider <span class="text-danger">*</span></label>
+                    <label class="form-label">Nhà cung cấp <span class="text-danger">*</span></label>
                     <select class="form-select" formControlName="providerId" (change)="onProviderChange()">
-                        <option value="">-- Chọn provider --</option>
+                        <option value="">-- Chọn nhà cung cấp --</option>
                         @for (provider of providers; track provider.id) {
                         <option [value]="provider.id">{{ provider.name }}</option>
                         }
@@ -29,11 +30,11 @@
                     @if (loadingProducts) {
                     <div class="text-center py-3">
                         <div class="spinner-border text-primary" role="status"></div>
-                        <p class="mb-0 mt-2">Đang tải danh sách...</p>
+                        <p class="mb-0 mt-2">Đang tải sản phẩm...</p>
                     </div>
                     } @else if (externalProducts.length === 0) {
                     <div class="alert alert-info">
-                        Không có sản phẩm nào chưa được mapping
+                        Không có sản phẩm chưa mapping
                     </div>
                     } @else {
                     <div class="table-responsive border rounded" style="max-height: 300px;">
@@ -41,9 +42,9 @@
                             <thead class="sticky-top bg-white border-bottom">
                                 <tr>
                                     <th style="width: 50px;" class="text-center">#</th>
-                                    <th>Product Name</th>
-                                    <th class="text-end" style="width: 120px;">Price</th>
-                                    <th class="text-center" style="width: 100px;">Stock</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th class="text-end" style="width: 120px;">Giá</th>
+                                    <th class="text-center" style="width: 100px;">Tồn kho</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -73,13 +74,47 @@
                     }
                 </div>
                 }
-
+                }
+                @if (isEditMode && mapping) {
+                <div class="mb-4">
+                    <label class="form-label">Nhà cung cấp</label>
+                    <input type="text" class="form-control" [value]="mapping.providerName" readonly>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Sản phẩm nguồn</label>
+                    <div class="p-2 border rounded bg-light">
+                        <div><strong>{{ mapping.externalProductName }}</strong></div>
+                        <small class="text-muted">ID: {{ mapping.externalProductId || mapping.externalProductSlug }}</small>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label class="form-label">Giá gốc đang lưu</label>
+                    <input type="text" class="form-control" [value]="formatCurrency(originalExternalPrice)" readonly>
+                    <div class="mt-1">
+                        @if (loadingLatestProduct) {
+                        <small class="text-muted">Đang lấy giá hiện tại từ nguồn...</small>
+                        } @else if (latestExternalProduct) {
+                        <small class="text-muted">
+                            Giá gốc hiện tại từ nguồn:
+                            <strong>{{ formatCurrency(latestExternalProduct.price) }}</strong>
+                            | Tồn kho hiện tại:
+                            <strong>{{ latestExternalProduct.stock }}</strong>
+                            @if (originalExternalPrice !== null && latestExternalProduct.price !== originalExternalPrice) {
+                            <span class="text-warning"> (đã thay đổi)</span>
+                            }
+                        </small>
+                        } @else if (latestExternalError) {
+                        <small class="text-danger">{{ latestExternalError }}</small>
+                        }
+                    </div>
+                </div>
+                }
                 <!-- Step 3: Configure Local Product -->
-                @if (selectedProduct) {
+                @if (selectedProduct || isEditMode) {
                 <hr class="my-4">
                 <h6 class="mb-3">
                     <i class="bi bi-shop me-2"></i>
-                    Cấu hình sản phẩm Local
+                    Cấu hình sản phẩm local
                 </h6>
 
                 <div class="row g-3">
@@ -97,7 +132,7 @@
                         <input type="text" class="form-control" formControlName="localProductName">
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">Giá gốc (từ nguồn)</label>
+                        <label class="form-label">Giá gốc (hiện tại từ nguồn)</label>
                         <input type="text" class="form-control"
                             [value]="formatCurrency(form.get('externalPrice')?.value)" readonly>
                     </div>
@@ -123,6 +158,15 @@
                             <label class="form-check-label" for="autoSync">Tự động sync stock từ nguồn</label>
                         </div>
                     </div>
+                    @if (isEditMode) {
+                    <div class="col-md-6">
+                        <label class="form-label">Trạng thái</label>
+                        <select class="form-select" formControlName="status">
+                            <option [value]="1">Hoạt động</option>
+                            <option [value]="0">Ngừng</option>
+                        </select>
+                    </div>
+                    }
                 </div>
                 }
             </form>
@@ -130,12 +174,14 @@
 
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" (click)="onClose()">Hủy</button>
-            <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="loading || !selectedProduct">
+            <button type="button" class="btn btn-primary" (click)="onSubmit()"
+                [disabled]="loading || form.invalid || (!isEditMode && !selectedProduct)">
                 @if (loading) {
                 <span class="spinner-border spinner-border-sm me-1"></span>
                 }
-                Tạo Mapping
+                {{ isEditMode ? 'Cập nhật Mapping' : 'Tạo Mapping' }}
             </button>
         </div>
     </div>
 </div>
+

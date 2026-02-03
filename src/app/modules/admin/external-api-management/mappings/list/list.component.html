@@ -132,6 +132,10 @@
                                         (click)="onSyncStock(mapping.providerId)">
                                         <i class="bi bi-arrow-repeat"></i>
                                     </button>
+                                    <button type="button" class="icon-btn warning" title="Sửa"
+                                        (click)="onEditClick(mapping)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
                                     <button type="button" class="icon-btn danger" title="Xóa"
                                         (click)="onDeleteClick(mapping.id!)">
                                         <i class="bi bi-trash"></i>
@@ -161,5 +165,12 @@
 @if (showCreateModal) {
 <app-external-product-mapping-create-modal [providers]="providers" [preselectedProviderId]="selectedProviderId"
     (close)="onCreateModalClose()" (success)="onCreateSuccess()">
+</app-external-product-mapping-create-modal>
+}
+
+<!-- Edit Modal -->
+@if (showEditModal && selectedMapping) {
+<app-external-product-mapping-create-modal [providers]="providers" [mapping]="selectedMapping"
+    [isEditMode]="true" (close)="onEditModalClose()" (success)="onEditSuccess()">
 </app-external-product-mapping-create-modal>
 }

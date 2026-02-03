@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
+﻿import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ExternalApiService, ExternalApiProvider, ExternalProduct, FetchProductsResult } from '../../../../../core/services/external-api.service';
@@ -33,6 +33,8 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
     externalProducts: ExternalProduct[] = [];
     loadingProducts = false;
     fetchError: string | null = null;
+    orderError: string | null = null;
+    balanceError: string | null = null;
 
     // JSON Path Picker state
     sampleItem: any = null;
@@ -56,6 +58,20 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
 
     // Custom field mappings - dynamic array
     customFields: { name: string; path: string }[] = [];
+    orderErrorMappings: { code: string; message: string; messageEn: string; appErrorCode: string }[] = [];
+    orderParams: { key: string; valueType: 'productId' | 'slug' | 'quantity' | 'fixed'; value: string }[] = [];
+    orderTemplatePreview = '';
+    orderParamValueTypes = [
+        { value: 'productId', label: 'productId' },
+        { value: 'slug', label: 'slug' },
+        { value: 'quantity', label: 'quantity' },
+        { value: 'fixed', label: 'Giá trị cố định' }
+    ];
+    errorCodeOptions = [
+        { value: 'NOT_ENOUGH_STOCK', label: 'NOT_ENOUGH_STOCK (11001) - Tồn kho không đủ' },
+        { value: 'PRODUCT_NOT_FOUND', label: 'PRODUCT_NOT_FOUND (11000) - Không tìm thấy sản phẩm' },
+        { value: 'INTERNAL_SERVER_ERROR', label: 'INTERNAL_SERVER_ERROR (1000) - Lỗi máy chủ nội bộ' }
+    ];
 
     ngOnInit(): void {
         this.initForm();
@@ -93,13 +109,15 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
             orderDataPath: new FormControl(this.provider?.orderDataPath || ''),
             orderSuccessPath: new FormControl(this.provider?.orderSuccessPath || ''),
             orderSuccessValue: new FormControl(this.provider?.orderSuccessValue || ''),
+            orderMessagePath: new FormControl(this.provider?.orderMessagePath || ''),
+            orderErrorCodePath: new FormControl(this.provider?.orderErrorCodePath || ''),
 
             // Balance API
             balancePath: new FormControl(this.provider?.balancePath || ''),
             balanceValuePath: new FormControl(this.provider?.balanceValuePath || ''),
 
             // Sync
-            syncIntervalSeconds: new FormControl(this.provider?.syncIntervalSeconds || 300),
+            syncIntervalSeconds: new FormControl(this.provider?.syncIntervalSeconds || 5),
             autoSyncEnabled: new FormControl(this.provider?.autoSyncEnabled || false),
             status: new FormControl(this.provider?.status ?? 1),
             notes: new FormControl(this.provider?.notes || '')
@@ -113,6 +131,32 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
                 this.customFields = [];
             }
         }
+        if (this.provider?.orderErrorCodeMappings) {
+            try {
+                const parsed = JSON.parse(this.provider.orderErrorCodeMappings);
+                if (Array.isArray(parsed)) {
+                    this.orderErrorMappings = parsed.map((item: any) => ({
+                        code: item?.code || '',
+                        message: item?.message || item?.messageVi || '',
+                        messageEn: item?.messageEn || item?.message_en || '',
+                        appErrorCode: item?.appErrorCode || item?.errorCode || ''
+                    }));
+                } else {
+                    this.orderErrorMappings = [];
+                }
+            } catch (e) {
+                this.orderErrorMappings = [];
+            }
+        }
+
+        const initialOrderTemplate = this.provider?.orderBodyTemplate || '';
+        const initialOrderMethod = (this.provider?.orderMethod || this.form.get('orderMethod')?.value || 'POST') as string;
+        this.orderParams = this.parseOrderTemplate(initialOrderTemplate, initialOrderMethod);
+        this.syncOrderTemplatePreview();
+
+        this.form.get('orderMethod')?.valueChanges.subscribe(() => {
+            this.syncOrderTemplatePreview();
+        });
     }
 
     onTabChange(tab: 'basic' | 'product' | 'order' | 'balance'): void {
@@ -130,6 +174,24 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
 
     removeCustomField(index: number): void {
         this.customFields.splice(index, 1);
+    }
+
+    addOrderErrorMapping(): void {
+        this.orderErrorMappings.push({ code: '', message: '', messageEn: '', appErrorCode: '' });
+    }
+
+    removeOrderErrorMapping(index: number): void {
+        this.orderErrorMappings.splice(index, 1);
+    }
+
+    addOrderParam(): void {
+        this.orderParams.push({ key: '', valueType: 'productId', value: '' });
+        this.syncOrderTemplatePreview();
+    }
+
+    removeOrderParam(index: number): void {
+        this.orderParams.splice(index, 1);
+        this.syncOrderTemplatePreview();
     }
 
     togglePasteJson(): void {
@@ -161,6 +223,32 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         }
     }
 
+    private captureErrorResponse(error: any): { raw: string; parsed: any | null } {
+        const rawFromData = error?.error?.data?.rawResponse;
+        if (typeof rawFromData === 'string') {
+            try {
+                return { raw: JSON.stringify(JSON.parse(rawFromData), null, 2), parsed: JSON.parse(rawFromData) };
+            } catch {
+                return { raw: rawFromData, parsed: null };
+            }
+        }
+        if (rawFromData !== undefined && rawFromData !== null) {
+            return { raw: JSON.stringify(rawFromData, null, 2), parsed: rawFromData };
+        }
+
+        const errorBody = error?.error;
+        if (typeof errorBody === 'string') {
+            return { raw: errorBody, parsed: null };
+        }
+        if (errorBody !== undefined && errorBody !== null) {
+            return { raw: JSON.stringify(errorBody, null, 2), parsed: errorBody };
+        }
+        if (error?.message) {
+            return { raw: String(error.message), parsed: null };
+        }
+        return { raw: 'Unknown error', parsed: null };
+    }
+
     onSubmit(): void {
         if (this.form.invalid) {
             this.notificationService.error('Vui lòng điền đầy đủ thông tin bắt buộc');
@@ -169,11 +257,16 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
 
         this.loading = true;
         const data = this.form.getRawValue();
+        this.syncOrderTemplatePreview();
 
         // Add custom field mappings as JSON
         const validCustomFields = this.customFields.filter(f => f.name && f.path);
         data.customFieldMappings = validCustomFields.length > 0
             ? JSON.stringify(validCustomFields)
+            : null;
+        const validOrderErrors = this.orderErrorMappings.filter(e => e.code && e.appErrorCode);
+        data.orderErrorCodeMappings = validOrderErrors.length > 0
+            ? JSON.stringify(validOrderErrors)
             : null;
 
         const observable = this.isCreateMode
@@ -186,7 +279,15 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
                     this.notificationService.success(
                         this.isCreateMode ? 'Tạo provider thành công' : 'Cập nhật provider thành công'
                     );
+                    if (response.data) {
+                        this.provider = response.data;
+                        this.isCreateMode = false;
+                    }
                     this.success.emit();
+                    if (this.activeTab === 'product') {
+                        this.activeJsonTab = 'preview';
+                        this.onFetchProducts(true);
+                    }
                 }
                 this.loading = false;
             },
@@ -199,7 +300,7 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
 
     onTestConnection(): void {
         if (this.isCreateMode) {
-            this.notificationService.error('Vui lòng lưu provider trước khi test');
+            this.notificationService.error('Vui lòng điền đầy đủ thông tin bắt buộc');
             return;
         }
 
@@ -220,14 +321,35 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
     }
 
     testBalanceApi(): void {
-        if (this.isCreateMode) {
-            this.notificationService.error('Vui lòng lưu provider trước khi test');
+        if (this.form.invalid) {
+            this.notificationService.error('Vui lòng điền đầy đủ thông tin bắt buộc');
             return;
         }
 
         this.loading = true;
-        this.externalApiService.getBalance(this.provider!.id!).subscribe({
+        this.balanceError = null;
+        this.rawResponse = '';
+        this.sampleItem = null;
+        this.currentJsonNode = null;
+        this.currentJsonPath = [];
+        this.expandedNodes.clear();
+        this.resetPreview();
+        const data = this.form.getRawValue();
+        const validCustomFields = this.customFields.filter(f => f.name && f.path);
+        data.customFieldMappings = validCustomFields.length > 0
+            ? JSON.stringify(validCustomFields)
+            : null;
+        const validOrderErrors = this.orderErrorMappings.filter(e => e.code && e.appErrorCode);
+        data.orderErrorCodeMappings = validOrderErrors.length > 0
+            ? JSON.stringify(validOrderErrors)
+            : null;
+        if (this.provider?.id) {
+            data.id = this.provider.id;
+        }
+
+        this.externalApiService.getBalancePreview(data).subscribe({
             next: (response: any) => {
+                this.balanceError = null;
                 // Parse the response for JSON picker
                 const data = response?.data;
                 if (data) {
@@ -270,6 +392,14 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
                 this.loading = false;
             },
             error: (error: any) => {
+                this.balanceError = error?.error?.message || error?.message || 'Lỗi không xác định';
+                const captured = this.captureErrorResponse(error);
+                this.rawResponse = captured.raw;
+                this.sampleItem = null;
+                this.currentJsonNode = null;
+                this.currentJsonPath = [];
+                this.expandedNodes.clear();
+                this.resetPreview();
                 this.notificationService.error('Lỗi khi gọi Balance API');
                 this.loading = false;
             }
@@ -277,8 +407,8 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
     }
 
     async testOrderApi(): Promise<void> {
-        if (this.isCreateMode) {
-            this.notificationService.error('Vui lòng lưu provider trước khi test');
+        if (this.form.invalid) {
+            this.notificationService.error('Vui lòng điền đầy đủ thông tin bắt buộc');
             return;
         }
 
@@ -301,7 +431,7 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         // Confirm warning
         const confirmed = await this.confirmService.confirm({
             title: '⚠️ CẢNH BÁO',
-            message: 'Đây là TEST THẬT! Đơn hàng sẽ được đặt thật và có thể TỐN TIỀN! Bạn có chắc muốn tiếp tục?',
+            message: 'Đây là TEST THẬT! Đơn hàng sẽ có thật và có thể TỐN TIỀN! Bạn có chắc muốn tiếp tục?',
             confirmText: 'Đặt thử',
             cancelText: 'Hủy bỏ',
             confirmButtonClass: 'btn-danger'
@@ -312,8 +442,30 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         }
 
         this.loading = true;
-        this.externalApiService.placeTestOrder(this.provider!.id!, productId, 1).subscribe({
+        this.orderError = null;
+        this.rawResponse = '';
+        this.sampleItem = null;
+        this.currentJsonNode = null;
+        this.currentJsonPath = [];
+        this.expandedNodes.clear();
+        this.resetPreview();
+        const data = this.form.getRawValue();
+        this.syncOrderTemplatePreview();
+        const validCustomFields = this.customFields.filter(f => f.name && f.path);
+        data.customFieldMappings = validCustomFields.length > 0
+            ? JSON.stringify(validCustomFields)
+            : null;
+        const validOrderErrors = this.orderErrorMappings.filter(e => e.code && e.appErrorCode);
+        data.orderErrorCodeMappings = validOrderErrors.length > 0
+            ? JSON.stringify(validOrderErrors)
+            : null;
+        if (this.provider?.id) {
+            data.id = this.provider.id;
+        }
+
+        this.externalApiService.placeTestOrderPreview(data, productId, 1).subscribe({
             next: (response: any) => {
+                this.orderError = null;
                 // Parse the response for JSON picker
                 if (response) {
                     this.rawResponse = JSON.stringify(response, null, 2);
@@ -329,25 +481,23 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
                 this.loading = false;
             },
             error: (error: any) => {
-                // Still try to show the error response for debugging
-                if (error?.error) {
-                    this.rawResponse = JSON.stringify(error.error, null, 2);
-                    this.sampleItem = error.error;
-                    this.currentJsonNode = error.error;
-                    this.currentJsonPath = [];
-                    this.expandedNodes.clear();
-                    this.resetPreview();
-                    this.showJsonPicker = true;
-                }
+                this.orderError = error?.error?.message || error?.message || 'Lỗi không xác định';
+                const captured = this.captureErrorResponse(error);
+                this.rawResponse = captured.raw;
+                this.sampleItem = null;
+                this.currentJsonNode = null;
+                this.currentJsonPath = [];
+                this.expandedNodes.clear();
+                this.resetPreview();
                 this.notificationService.error('Lỗi khi gọi Order API: ' + (error?.error?.message || error?.message));
                 this.loading = false;
             }
         });
     }
 
-    onFetchProducts(): void {
-        if (this.isCreateMode) {
-            this.notificationService.error('Vui lòng lưu provider trước');
+    onFetchProducts(autoPreview: boolean = false): void {
+        if (this.form.invalid) {
+            this.notificationService.error('Vui lòng điền đầy đủ thông tin bắt buộc');
             return;
         }
 
@@ -362,7 +512,21 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         this.expandedNodes.clear();
         this.resetPreview();
 
-        this.externalApiService.fetchExternalProductsWithRaw(this.provider!.id!).subscribe({
+
+        const data = this.form.getRawValue();
+        const validCustomFields = this.customFields.filter(f => f.name && f.path);
+        data.customFieldMappings = validCustomFields.length > 0
+            ? JSON.stringify(validCustomFields)
+            : null;
+        const validOrderErrors = this.orderErrorMappings.filter(e => e.code && e.appErrorCode);
+        data.orderErrorCodeMappings = validOrderErrors.length > 0
+            ? JSON.stringify(validOrderErrors)
+            : null;
+        if (this.provider?.id) {
+            data.id = this.provider.id;
+        }
+
+        this.externalApiService.fetchExternalProductsWithRawPreview(data).subscribe({
             next: (response: any) => {
                 const data: FetchProductsResult = response.data;
                 this.externalProducts = data?.products || [];
@@ -395,14 +559,24 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
                 }
 
                 this.notificationService.success(`Tìm thấy ${this.externalProducts.length} sản phẩm`);
+                if (autoPreview) {
+                    this.activeJsonTab = 'preview';
+                }
                 this.loadingProducts = false;
             },
             error: (error: any) => {
                 this.fetchError = error?.error?.message || error?.message || 'Lỗi không xác định';
-                this.notificationService.error('Lỗi khi lấy danh sách sản phẩm');
+                if (autoPreview) {
+                    this.activeJsonTab = 'input';
+                }
+                this.notificationService.error('Loi khi lay danh sach san pham');
                 this.loadingProducts = false;
             }
         });
+    }
+
+    onOrderParamChange(): void {
+        this.syncOrderTemplatePreview();
     }
 
     // JSON Path Picker methods
@@ -427,6 +601,14 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         }
         this.activePathField = fieldName;
         this.showJsonPicker = true;
+    }
+
+    startResponsePathSelection(fieldName: string): void {
+        if (this.activeTab === 'basic') {
+            this.activeTab = 'product';
+        }
+        this.activeJsonTab = 'fields';
+        this.startPathSelection(fieldName);
     }
 
     /**
@@ -465,6 +647,8 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         for (const segment of this.currentJsonPath) {
             if (segment.startsWith('[')) {
                 path += segment;
+            } else if (/^\d+$/.test(segment)) {
+                path += '[' + segment + ']';
             } else {
                 path += '.' + segment;
             }
@@ -473,6 +657,8 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         // Add the new key
         if (key.startsWith('[')) {
             path += key;
+        } else if (/^\d+$/.test(key)) {
+            path += '[' + key + ']';
         } else {
             path += '.' + key;
         }
@@ -491,21 +677,199 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
     applyPathToField(path: string): void {
         if (!this.activePathField) return;
 
+        const isItemField = this.isItemField(this.activePathField);
+        const normalizedPath = isItemField ? this.normalizeItemPath(path) : path;
+        const previewPath = isItemField ? this.buildPreviewPathForItem(normalizedPath) : normalizedPath;
+
         // Check if this is a custom field (format: custom_N)
         if (this.activePathField.startsWith('custom_')) {
             const index = Number.parseInt(this.activePathField.replace('custom_', ''), 10);
             if (!Number.isNaN(index) && this.customFields[index]) {
-                this.customFields[index].path = path;
+                this.customFields[index].path = normalizedPath;
             }
         } else {
-            this.form.get(this.activePathField)?.setValue(path);
+            this.form.get(this.activePathField)?.setValue(normalizedPath);
         }
 
         // Update preview for the selected path
-        this.updatePreview(path);
+        this.updatePreview(previewPath);
 
-        this.notificationService.success(`Đã chọn: ${path}`);
+        this.notificationService.success(`Đã chọn: ${normalizedPath}`);
         this.activePathField = null;
+    }
+
+    private isItemField(fieldName: string): boolean {
+        return fieldName === 'productIdPath'
+            || fieldName === 'productNamePath'
+            || fieldName === 'productPricePath'
+            || fieldName === 'productStockPath'
+            || fieldName.startsWith('custom_');
+    }
+
+    private getDataPath(): string {
+        return (this.form.get('productListDataPath')?.value || '').trim();
+    }
+
+    private normalizeItemPath(path: string): string {
+        const dataPath = this.getDataPath();
+        if (!dataPath || !path) return path;
+
+        const base = this.stripArraySelector(dataPath);
+        if (!base || base === '$') return path;
+
+        if (!path.startsWith(base)) return path;
+
+        let remainder = path.slice(base.length);
+        remainder = remainder.replace(/^\[\d+\]/, '').replace(/^\[\*\]/, '').replace(/^\.\d+/, '');
+
+        if (!remainder) return '$';
+        if (remainder.startsWith('.')) return '$' + remainder;
+        if (remainder.startsWith('[')) return '$' + remainder;
+        return '$.' + remainder;
+    }
+
+    private buildPreviewPathForItem(itemPath: string): string {
+        const dataPath = this.getDataPath();
+        if (!dataPath) return itemPath;
+
+        const baseNoIndex = this.stripArraySelector(dataPath);
+        if (baseNoIndex && itemPath.startsWith(baseNoIndex)) {
+            return itemPath;
+        }
+
+        let base = dataPath.trim();
+        if (base === '$') {
+            base = '$[0]';
+        } else if (/\[\*\]$/.test(base)) {
+            base = base.replace(/\[\*\]$/, '[0]');
+        } else if (!/\[\d+\]$/.test(base)) {
+            base = base + '[0]';
+        }
+
+        if (itemPath === '$') return base;
+
+        const suffix = itemPath.startsWith('$.')
+            ? itemPath.slice(1)
+            : itemPath.startsWith('$')
+                ? itemPath.slice(1)
+                : '.' + itemPath;
+
+        return base + suffix;
+    }
+
+    private syncOrderTemplatePreview(): void {
+        const template = this.buildOrderTemplate();
+        this.orderTemplatePreview = template;
+        this.form.get('orderBodyTemplate')?.setValue(template, { emitEvent: false });
+    }
+
+    private buildOrderTemplate(): string {
+        const method = (this.form.get('orderMethod')?.value || 'POST') as string;
+        const params = this.orderParams.filter(p => p.key && p.key.trim().length > 0);
+        if (params.length === 0) {
+            return '';
+        }
+
+        if (method.toUpperCase() === 'GET') {
+            return params
+                .map(p => `${p.key.trim()}=${this.buildOrderValue(p)}`)
+                .join('&');
+        }
+
+        const entries = params.map(p => `"${this.escapeJsonKey(p.key)}": ${this.buildOrderValue(p, true)}`);
+        return `{${entries.join(', ')}}`;
+    }
+
+    private buildOrderValue(param: { key: string; valueType: 'productId' | 'slug' | 'quantity' | 'fixed'; value: string }, jsonMode: boolean = false): string {
+        if (param.valueType === 'productId') return '${productId}';
+        if (param.valueType === 'slug') return '${slug}';
+        if (param.valueType === 'quantity') return '${quantity}';
+
+        const raw = (param.value || '').trim();
+        if (!jsonMode) {
+            return raw;
+        }
+
+        return this.formatFixedValue(raw);
+    }
+
+    private formatFixedValue(value: string): string {
+        if (value === '') {
+            return '""';
+        }
+        const trimmed = value.trim();
+        if (trimmed === 'true' || trimmed === 'false' || trimmed === 'null') {
+            return trimmed;
+        }
+        const numeric = Number(trimmed);
+        if (!Number.isNaN(numeric) && trimmed === String(numeric)) {
+            return trimmed;
+        }
+        if ((trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+            return trimmed;
+        }
+        return JSON.stringify(trimmed);
+    }
+
+    private escapeJsonKey(key: string): string {
+        return key.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+    }
+
+    private parseOrderTemplate(template: string, method: string): { key: string; valueType: 'productId' | 'slug' | 'quantity' | 'fixed'; value: string }[] {
+        if (!template || !template.trim()) return [];
+
+        const isGet = (method || '').toUpperCase() === 'GET';
+        const trimmed = template.trim();
+        if (isGet || (!trimmed.startsWith('{') && trimmed.includes('='))) {
+            return this.parseOrderQueryTemplate(trimmed);
+        }
+        return this.parseOrderJsonTemplate(trimmed);
+    }
+
+    private parseOrderQueryTemplate(template: string): { key: string; valueType: 'productId' | 'slug' | 'quantity' | 'fixed'; value: string }[] {
+        const params: { key: string; valueType: 'productId' | 'slug' | 'quantity' | 'fixed'; value: string }[] = [];
+        for (const pair of template.split('&')) {
+            if (!pair) continue;
+            const idx = pair.indexOf('=');
+            const key = idx >= 0 ? pair.slice(0, idx) : pair;
+            const value = idx >= 0 ? pair.slice(idx + 1) : '';
+            if (!key.trim()) continue;
+            params.push(this.buildOrderParamFromValue(key, value));
+        }
+        return params;
+    }
+
+    private parseOrderJsonTemplate(template: string): { key: string; valueType: 'productId' | 'slug' | 'quantity' | 'fixed'; value: string }[] {
+        const params: { key: string; valueType: 'productId' | 'slug' | 'quantity' | 'fixed'; value: string }[] = [];
+        const regex = /\"([^\"]+)\"\\s*:\\s*([^,}]+)/g;
+        let match: RegExpExecArray | null;
+        while ((match = regex.exec(template)) !== null) {
+            const key = match[1];
+            let value = match[2].trim();
+            if (value.endsWith(',')) value = value.slice(0, -1).trim();
+            if (!key.trim()) continue;
+            params.push(this.buildOrderParamFromValue(key, value));
+        }
+        return params;
+    }
+
+    private buildOrderParamFromValue(key: string, rawValue: string): { key: string; valueType: 'productId' | 'slug' | 'quantity' | 'fixed'; value: string } {
+        const trimmed = rawValue.trim();
+        if (trimmed === '${productId}') return { key: key.trim(), valueType: 'productId', value: '' };
+        if (trimmed === '${slug}') return { key: key.trim(), valueType: 'slug', value: '' };
+        if (trimmed === '${quantity}') return { key: key.trim(), valueType: 'quantity', value: '' };
+
+        if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+            const unquoted = trimmed.slice(1, -1);
+            return { key: key.trim(), valueType: 'fixed', value: unquoted };
+        }
+        return { key: key.trim(), valueType: 'fixed', value: trimmed };
+    }
+
+    private stripArraySelector(path: string): string {
+        let base = path.trim();
+        base = base.replace(/\[\*\]$/, '').replace(/\[\d+\]$/, '');
+        return base;
     }
 
     /**
@@ -564,7 +928,7 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
             nodes = next;
         }
 
-        // Nếu nhiều node, trả về mảng; nếu một node, trả về chính nó
+        // Náº¿u nhiá»u node, tráº£ vá» máº£ng; náº¿u má»t node, tráº£ vá» chÃ­nh nÃ³
         if (nodes.length === 1) {
             return { value: nodes[0] };
         }
@@ -706,3 +1070,6 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         this.close.emit();
     }
 }
+
+
+

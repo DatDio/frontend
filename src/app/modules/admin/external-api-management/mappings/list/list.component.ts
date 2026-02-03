@@ -37,7 +37,9 @@ export class ExternalProductMappingListComponent implements OnInit {
     providers: ExternalApiProvider[] = [];
     loading = true;
     showCreateModal = false;
+    showEditModal = false;
     selectedProviderId: number | null = null;
+    selectedMapping: ExternalProductMapping | null = null;
 
     paginationConfig: PaginationConfig = {
         currentPage: 0,
@@ -136,6 +138,22 @@ export class ExternalProductMappingListComponent implements OnInit {
 
     onCreateSuccess(): void {
         this.showCreateModal = false;
+        this.loadMappings();
+    }
+
+    onEditClick(mapping: ExternalProductMapping): void {
+        this.selectedMapping = mapping;
+        this.showEditModal = true;
+    }
+
+    onEditModalClose(): void {
+        this.showEditModal = false;
+        this.selectedMapping = null;
+    }
+
+    onEditSuccess(): void {
+        this.showEditModal = false;
+        this.selectedMapping = null;
         this.loadMappings();
     }
 

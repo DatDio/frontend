@@ -34,6 +34,9 @@ export interface ExternalApiProvider {
     orderDataPath?: string;
     orderSuccessPath?: string;
     orderSuccessValue?: string;
+    orderMessagePath?: string;
+    orderErrorCodePath?: string;
+    orderErrorCodeMappings?: string;
 
     balancePath?: string;
     balanceValuePath?: string;
@@ -189,9 +192,23 @@ export class ExternalApiService {
             .pipe(finalize(() => this.loaderService.hide()));
     }
 
-    getBalance(id: number): Observable<ApiResponse<{ balance: number; formatted: string }>> {
-        return this.httpClient.get<ApiResponse<{ balance: number; formatted: string }>>(
+    fetchExternalProductsWithRawPreview(data: ExternalApiProvider): Observable<ApiResponse<FetchProductsResult>> {
+        this.loaderService.show();
+        return this.httpClient
+            .post<ApiResponse<FetchProductsResult>>(ExternalApiProviderApi.FETCH_PRODUCTS_RAW_PREVIEW, data)
+            .pipe(finalize(() => this.loaderService.hide()));
+    }
+
+    getBalance(id: number): Observable<ApiResponse<{ balance: number | null; rawResponse?: string; sampleItem?: string }>> {
+        return this.httpClient.get<ApiResponse<{ balance: number | null; rawResponse?: string; sampleItem?: string }>>(
             ExternalApiProviderApi.GET_BALANCE(id)
+        );
+    }
+
+    getBalancePreview(data: ExternalApiProvider): Observable<ApiResponse<{ balance: number | null; rawResponse?: string; sampleItem?: string }>> {
+        return this.httpClient.post<ApiResponse<{ balance: number | null; rawResponse?: string; sampleItem?: string }>>(
+            ExternalApiProviderApi.GET_BALANCE_PREVIEW,
+            data
         );
     }
 
@@ -200,6 +217,14 @@ export class ExternalApiService {
         return this.httpClient.post<any>(
             ExternalApiProviderApi.PLACE_ORDER(providerId),
             { productId, quantity }
+        ).pipe(finalize(() => this.loaderService.hide()));
+    }
+
+    placeTestOrderPreview(provider: ExternalApiProvider, productId: string, quantity: number): Observable<any> {
+        this.loaderService.show();
+        return this.httpClient.post<any>(
+            ExternalApiProviderApi.PLACE_ORDER_PREVIEW,
+            { provider, productId, quantity }
         ).pipe(finalize(() => this.loaderService.hide()));
     }
 

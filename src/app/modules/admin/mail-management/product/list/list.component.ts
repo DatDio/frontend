@@ -182,6 +182,12 @@ export class MailManagementListComponent implements OnInit {
   }
 
   onDetail(product: Product): void {
+    if (product.sourceType === 'EXTERNAL') {
+      this.router.navigate(['/admin/external-api/mappings'], {
+        queryParams: { search: product.name }
+      });
+      return;
+    }
     this.router.navigate(['/admin/mail-management', product.id, 'items'], {
       state: { productName: product.name }
     });

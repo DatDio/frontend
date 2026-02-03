@@ -16,6 +16,8 @@ import { Category } from '../../../../../core/models/category.model';
 export class ExternalProductMappingCreateModalComponent implements OnInit {
     @Input() providers: ExternalApiProvider[] = [];
     @Input() preselectedProviderId: number | null = null;
+    @Input() mapping: ExternalProductMapping | null = null;
+    @Input() isEditMode = false;
     @Output() close = new EventEmitter<void>();
     @Output() success = new EventEmitter<void>();
 
@@ -30,12 +32,34 @@ export class ExternalProductMappingCreateModalComponent implements OnInit {
     loadingProducts = false;
     loading = false;
     selectedProduct: ExternalProduct | null = null;
+    latestExternalProduct: ExternalProduct | null = null;
+    loadingLatestProduct = false;
+    latestExternalError: string | null = null;
+    originalExternalPrice: number | null = null;
 
     ngOnInit(): void {
         this.initForm();
         this.loadCategories();
 
-        if (this.preselectedProviderId) {
+        if (this.isEditMode && this.mapping) {
+            this.originalExternalPrice = this.mapping.externalPrice ?? null;
+            this.form.patchValue({
+                providerId: this.mapping.providerId,
+                externalProductId: this.mapping.externalProductId || '',
+                externalProductSlug: this.mapping.externalProductSlug || '',
+                externalProductName: this.mapping.externalProductName || '',
+                externalPrice: this.mapping.externalPrice || 0,
+                categoryId: this.mapping.categoryId || '',
+                localProductName: this.mapping.localProductName || '',
+                localPrice: this.mapping.localPrice || 0,
+                localDescription: this.mapping.localDescription || '',
+                autoSync: this.mapping.autoSync ?? true,
+                status: this.mapping.status ?? 1
+            });
+
+            this.form.get('providerId')?.disable();
+            this.fetchLatestExternalProduct();
+        } else if (this.preselectedProviderId) {
             this.form.patchValue({ providerId: this.preselectedProviderId });
             this.onProviderChange();
         }
@@ -52,7 +76,8 @@ export class ExternalProductMappingCreateModalComponent implements OnInit {
             localProductName: new FormControl('', [Validators.required]),
             localPrice: new FormControl(0, [Validators.required, Validators.min(1)]),
             localDescription: new FormControl(''),
-            autoSync: new FormControl(true)
+            autoSync: new FormControl(true),
+            status: new FormControl(1)
         });
     }
 
@@ -67,6 +92,7 @@ export class ExternalProductMappingCreateModalComponent implements OnInit {
     }
 
     onProviderChange(): void {
+        if (this.isEditMode) return;
         const providerId = this.form.get('providerId')?.value;
         if (!providerId) return;
 
@@ -83,7 +109,51 @@ export class ExternalProductMappingCreateModalComponent implements OnInit {
         });
     }
 
+    private fetchLatestExternalProduct(): void {
+        if (!this.mapping?.providerId) return;
+
+        this.loadingLatestProduct = true;
+        this.latestExternalError = null;
+
+        this.externalApiService.fetchExternalProducts(this.mapping.providerId).subscribe({
+            next: (response: any) => {
+                if (!response?.success) {
+                    this.latestExternalError = 'Không lấy được dữ liệu từ nguồn';
+                    this.loadingLatestProduct = false;
+                    return;
+                }
+                const products: ExternalProduct[] = response.data || [];
+                const externalId = this.mapping?.externalProductId;
+                const externalSlug = this.mapping?.externalProductSlug;
+
+                const matched = products.find(product => {
+                    if (externalId) return product.id === externalId;
+                    if (externalSlug) return product.slug === externalSlug || product.id === externalSlug;
+                    return false;
+                });
+
+                if (!matched) {
+                    this.latestExternalError = 'Không tìm thấy sản phẩm trên nguồn';
+                    this.loadingLatestProduct = false;
+                    return;
+                }
+
+                this.latestExternalProduct = matched;
+                this.form.patchValue({
+                    externalProductName: matched.name,
+                    externalPrice: matched.price
+                });
+                this.loadingLatestProduct = false;
+            },
+            error: () => {
+                this.latestExternalError = 'Không lấy được dữ liệu từ nguồn';
+                this.loadingLatestProduct = false;
+            }
+        });
+    }
+
     onProductSelect(product: ExternalProduct): void {
+        if (this.isEditMode) return;
         this.selectedProduct = product;
         this.form.patchValue({
             externalProductId: product.id,
@@ -114,17 +184,58 @@ export class ExternalProductMappingCreateModalComponent implements OnInit {
         }
 
         this.loading = true;
+        const raw = this.form.getRawValue();
+
+        if (this.isEditMode && this.mapping?.id) {
+            const data: Partial<ExternalProductMapping> = {
+                externalProductId: raw.externalProductId,
+                externalProductSlug: raw.externalProductSlug,
+                externalProductName: raw.externalProductName,
+                externalPrice: raw.externalPrice,
+                localPrice: raw.localPrice,
+                autoSync: raw.autoSync,
+                status: raw.status
+            };
+            const categoryControl = this.form.get('categoryId');
+            if (categoryControl?.dirty) {
+                data.categoryId = Number(raw.categoryId);
+            }
+            const nameControl = this.form.get('localProductName');
+            if (nameControl?.dirty) {
+                data.localProductName = raw.localProductName;
+            }
+            const descriptionControl = this.form.get('localDescription');
+            if (descriptionControl?.dirty) {
+                data.localDescription = raw.localDescription;
+            }
+
+            this.externalApiService.updateMapping(this.mapping.id, data).subscribe({
+                next: (response: any) => {
+                    if (response.success) {
+                        this.notificationService.success('Cập nhật mapping thành công');
+                        this.success.emit();
+                    }
+                    this.loading = false;
+                },
+                error: (error: any) => {
+                    this.notificationService.error(error?.error?.message || 'Có lỗi xảy ra');
+                    this.loading = false;
+                }
+            });
+            return;
+        }
+
         const data: ExternalProductMapping = {
-            providerId: Number(this.form.get('providerId')?.value),
-            externalProductId: this.form.get('externalProductId')?.value,
-            externalProductSlug: this.form.get('externalProductSlug')?.value,
-            externalProductName: this.form.get('externalProductName')?.value,
-            externalPrice: this.form.get('externalPrice')?.value,
-            categoryId: Number(this.form.get('categoryId')?.value),
-            localProductName: this.form.get('localProductName')?.value,
-            localPrice: this.form.get('localPrice')?.value,
-            localDescription: this.form.get('localDescription')?.value,
-            autoSync: this.form.get('autoSync')?.value
+            providerId: Number(raw.providerId),
+            externalProductId: raw.externalProductId,
+            externalProductSlug: raw.externalProductSlug,
+            externalProductName: raw.externalProductName,
+            externalPrice: raw.externalPrice,
+            categoryId: Number(raw.categoryId),
+            localProductName: raw.localProductName,
+            localPrice: raw.localPrice,
+            localDescription: raw.localDescription,
+            autoSync: raw.autoSync
         };
 
         this.externalApiService.createMapping(data).subscribe({
@@ -141,12 +252,13 @@ export class ExternalProductMappingCreateModalComponent implements OnInit {
             }
         });
     }
-
     onClose(): void {
         this.close.emit();
     }
 
-    formatCurrency(amount: number): string {
+    formatCurrency(amount: number | null | undefined): string {
+        if (amount === null || amount === undefined) return '—';
         return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
     }
 }
+

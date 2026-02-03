@@ -35,6 +35,7 @@ export class ExternalApiProviderListComponent implements OnInit {
 
     providers: ExternalApiProvider[] = [];
     loading = true;
+    balanceByProviderId: Record<number, string> = {};
     showDetailModal = false;
     selectedProvider: ExternalApiProvider | null = null;
     isCreateMode = false;
@@ -132,9 +133,6 @@ export class ExternalApiProviderListComponent implements OnInit {
     }
 
     onDetailModalSuccess(): void {
-        this.showDetailModal = false;
-        this.selectedProvider = null;
-        this.isCreateMode = false;
         this.loadProviders();
     }
 
@@ -165,6 +163,7 @@ export class ExternalApiProviderListComponent implements OnInit {
         this.externalApiService.testConnection(provider.id!).subscribe({
             next: (response: any) => {
                 if (response.success && response.data?.success) {
+                    this.balanceByProviderId[provider.id!] = this.formatBalance(response.data.balance);
                     this.notificationService.success(`Kết nối thành công! Balance: ${response.data.balance}`);
                 } else {
                     this.notificationService.error(response.data?.message || 'Kết nối thất bại');
@@ -180,5 +179,15 @@ export class ExternalApiProviderListComponent implements OnInit {
         this.router.navigate(['/admin/external-api/mappings'], {
             queryParams: { providerId: provider.id }
         });
+    }
+
+    formatBalance(value: any): string {
+        if (value === null || value === undefined || value === 'N/A') {
+            return 'N/A';
+        }
+        if (typeof value === 'number') {
+            return new Intl.NumberFormat('vi-VN').format(value) + ' VND';
+        }
+        return String(value);
     }
 }
