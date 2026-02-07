@@ -1,6 +1,6 @@
 ﻿import { Component, EventEmitter, Input, OnInit, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { ExternalApiService, ExternalApiProvider, ExternalProduct, FetchProductsResult } from '../../../../../core/services/external-api.service';
 import { NotificationService } from '../../../../../core/services/notification.service';
 import { ConfirmService } from '../../../../../shared/services/confirm.service';
@@ -36,7 +36,8 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
     orderError: string | null = null;
     balanceError: string | null = null;
 
-    // JSON Path Picker state
+    // JSON Path Picker state - PER TAB to avoid overwriting
+    // These are the "current" values used by the UI
     sampleItem: any = null;
     sampleItemRaw: string = '';
     rawResponse: string = '';
@@ -45,6 +46,11 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
     showPasteJson = false;
     pasteJsonText = '';
     activePathField: string | null = null;
+
+    // Per-tab data storage to restore when switching tabs
+    productTabData: { rawResponse: string; sampleItem: any; currentJsonPath: string[] } = { rawResponse: '', sampleItem: null, currentJsonPath: [] };
+    orderTabData: { rawResponse: string; sampleItem: any; currentJsonPath: string[] } = { rawResponse: '', sampleItem: null, currentJsonPath: [] };
+    balanceTabData: { rawResponse: string; sampleItem: any; currentJsonPath: string[] } = { rawResponse: '', sampleItem: null, currentJsonPath: [] };
 
     // For recursive JSON tree navigation
     currentJsonPath: string[] = []; // Track the path stack for breadcrumb
@@ -83,11 +89,73 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         this.lastPreviewError = null;
     }
 
+    // Custom validator để kiểm tra path phải bắt đầu bằng $
+    private jsonPathValidator(control: AbstractControl): ValidationErrors | null {
+        const value = control.value;
+        if (!value || value.trim() === '') return null; // Cho phép rỗng
+        if (!value.trim().startsWith('$')) {
+            return { jsonPath: 'Path phải bắt đầu bằng $' };
+        }
+        return null;
+    }
+
+    // Validator kiểm tra URL hợp lệ (http:// hoặc https://)
+    private urlValidator(control: AbstractControl): ValidationErrors | null {
+        const value = control.value;
+        if (!value || value.trim() === '') return null;
+        const urlPattern = /^https?:\/\/.+/i;
+        if (!urlPattern.test(value.trim())) {
+            return { url: 'URL phải bắt đầu bằng http:// hoặc https://' };
+        }
+        return null;
+    }
+
+    // Validator kiểm tra API path hợp lệ (bắt đầu bằng /)
+    private apiPathValidator(control: AbstractControl): ValidationErrors | null {
+        const value = control.value;
+        if (!value || value.trim() === '') return null; // Cho phép rỗng
+        if (!value.trim().startsWith('/')) {
+            return { apiPath: 'Path phải bắt đầu bằng /' };
+        }
+        return null;
+    }
+
+    // Validate custom fields và order error mappings trước khi submit
+    private validateAllMappings(): string[] {
+        const errors: string[] = [];
+
+        // Validate custom fields
+        for (const field of this.customFields) {
+            if (field.path && field.path.trim() && !field.path.trim().startsWith('$')) {
+                errors.push(`Custom field "${field.name}" path phải bắt đầu bằng $`);
+            }
+            if (field.path && !field.name?.trim()) {
+                errors.push('Custom field phải có tên');
+            }
+        }
+
+        // Validate order error mappings - check duplicate codes
+        const errorCodes = this.orderErrorMappings.filter(e => e.code?.trim()).map(e => e.code.trim());
+        const duplicateCodes = errorCodes.filter((code, index) => errorCodes.indexOf(code) !== index);
+        if (duplicateCodes.length > 0) {
+            errors.push(`Mã lỗi trùng: ${[...new Set(duplicateCodes)].join(', ')}`);
+        }
+
+        // Validate order error mappings - must have appErrorCode
+        for (const err of this.orderErrorMappings) {
+            if (err.code?.trim() && !err.appErrorCode?.trim()) {
+                errors.push(`Mã lỗi "${err.code}" chưa chọn App Error Code`);
+            }
+        }
+
+        return errors;
+    }
+
     private initForm(): void {
         this.form = this.fb.group({
             // Basic
             name: new FormControl(this.provider?.name || '', [Validators.required]),
-            baseUrl: new FormControl(this.provider?.baseUrl || '', [Validators.required]),
+            baseUrl: new FormControl(this.provider?.baseUrl || '', [Validators.required, this.urlValidator.bind(this)]),
             apiKey: new FormControl(this.provider?.apiKey || ''),
             authType: new FormControl(this.provider?.authType || 'HEADER'),
             authHeaderName: new FormControl(this.provider?.authHeaderName || 'Authorization'),
@@ -95,29 +163,32 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
 
             // Product List API
             productListMethod: new FormControl(this.provider?.productListMethod || 'GET'),
-            productListPath: new FormControl(this.provider?.productListPath || ''),
-            productListDataPath: new FormControl(this.provider?.productListDataPath || ''),
-            productIdPath: new FormControl(this.provider?.productIdPath || ''),
-            productNamePath: new FormControl(this.provider?.productNamePath || ''),
-            productPricePath: new FormControl(this.provider?.productPricePath || ''),
-            productStockPath: new FormControl(this.provider?.productStockPath || ''),
+            productListPath: new FormControl(this.provider?.productListPath || '', [this.apiPathValidator.bind(this)]),
+            productListDataPath: new FormControl(this.provider?.productListDataPath || '', [this.jsonPathValidator.bind(this)]),
+            productIdPath: new FormControl(this.provider?.productIdPath || '', [this.jsonPathValidator.bind(this)]),
+            productNamePath: new FormControl(this.provider?.productNamePath || '', [this.jsonPathValidator.bind(this)]),
+            productPricePath: new FormControl(this.provider?.productPricePath || '', [this.jsonPathValidator.bind(this)]),
+            productStockPath: new FormControl(this.provider?.productStockPath || '', [this.jsonPathValidator.bind(this)]),
 
             // Order API
             orderMethod: new FormControl(this.provider?.orderMethod || 'POST'),
-            orderPath: new FormControl(this.provider?.orderPath || ''),
+            orderPath: new FormControl(this.provider?.orderPath || '', [this.apiPathValidator.bind(this)]),
             orderBodyTemplate: new FormControl(this.provider?.orderBodyTemplate || ''),
-            orderDataPath: new FormControl(this.provider?.orderDataPath || ''),
-            orderSuccessPath: new FormControl(this.provider?.orderSuccessPath || ''),
-            orderSuccessValue: new FormControl(this.provider?.orderSuccessValue || ''),
-            orderMessagePath: new FormControl(this.provider?.orderMessagePath || ''),
-            orderErrorCodePath: new FormControl(this.provider?.orderErrorCodePath || ''),
+            orderDataPath: new FormControl(this.provider?.orderDataPath || '', [this.jsonPathValidator.bind(this)]),
+            orderNumberPath: new FormControl(this.provider?.orderNumberPath || '', [this.jsonPathValidator.bind(this)]),
+            orderErrorCodePath: new FormControl(this.provider?.orderErrorCodePath || '', [this.jsonPathValidator.bind(this)]),
+
+            // Common Response Config (dùng chung cho tất cả API)
+            successPath: new FormControl(this.provider?.successPath || '', [this.jsonPathValidator.bind(this)]),
+            successValue: new FormControl(this.provider?.successValue || ''),
+            messagePath: new FormControl(this.provider?.messagePath || '', [this.jsonPathValidator.bind(this)]),
 
             // Balance API
-            balancePath: new FormControl(this.provider?.balancePath || ''),
-            balanceValuePath: new FormControl(this.provider?.balanceValuePath || ''),
+            balancePath: new FormControl(this.provider?.balancePath || '', [this.apiPathValidator.bind(this)]),
+            balanceValuePath: new FormControl(this.provider?.balanceValuePath || '', [this.jsonPathValidator.bind(this)]),
 
             // Sync
-            syncIntervalSeconds: new FormControl(this.provider?.syncIntervalSeconds || 5),
+            syncIntervalSeconds: new FormControl(this.provider?.syncIntervalSeconds || 5, [Validators.min(1)]),
             autoSyncEnabled: new FormControl(this.provider?.autoSyncEnabled || false),
             status: new FormControl(this.provider?.status ?? 1),
             notes: new FormControl(this.provider?.notes || '')
@@ -160,8 +231,54 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
     }
 
     onTabChange(tab: 'basic' | 'product' | 'order' | 'balance'): void {
+        // Save current tab's data before switching
+        this.saveCurrentTabData();
+
         this.activeTab = tab;
         this.activeJsonTab = 'input'; // Reset sub-tab
+
+        // Restore new tab's data
+        this.restoreTabData(tab);
+    }
+
+    private saveCurrentTabData(): void {
+        const data = {
+            rawResponse: this.rawResponse,
+            sampleItem: this.sampleItem,
+            currentJsonPath: [...this.currentJsonPath]
+        };
+        switch (this.activeTab) {
+            case 'product':
+                this.productTabData = data;
+                break;
+            case 'order':
+                this.orderTabData = data;
+                break;
+            case 'balance':
+                this.balanceTabData = data;
+                break;
+        }
+    }
+
+    private restoreTabData(tab: 'basic' | 'product' | 'order' | 'balance'): void {
+        let data = { rawResponse: '', sampleItem: null, currentJsonPath: [] as string[] };
+        switch (tab) {
+            case 'product':
+                data = this.productTabData;
+                break;
+            case 'order':
+                data = this.orderTabData;
+                break;
+            case 'balance':
+                data = this.balanceTabData;
+                break;
+        }
+        this.rawResponse = data.rawResponse;
+        this.sampleItem = data.sampleItem;
+        this.currentJsonPath = [...data.currentJsonPath];
+        this.currentJsonNode = data.sampleItem;
+        this.expandedNodes.clear();
+        this.resetPreview();
     }
 
     setJsonTab(tab: 'input' | 'fields' | 'raw' | 'preview'): void {
@@ -250,8 +367,38 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
     }
 
     onSubmit(): void {
+        // Mark all controls as touched để hiển thị validation errors
+        this.form.markAllAsTouched();
+
         if (this.form.invalid) {
-            this.notificationService.error('Vui lòng điền đầy đủ thông tin bắt buộc');
+            // Tìm lỗi validation cụ thể
+            const errors: string[] = [];
+            Object.keys(this.form.controls).forEach(key => {
+                const control = this.form.get(key);
+                if (control?.errors?.['jsonPath']) {
+                    errors.push(`${key}: ${control.errors['jsonPath']}`);
+                } else if (control?.errors?.['url']) {
+                    errors.push(`${key}: ${control.errors['url']}`);
+                } else if (control?.errors?.['apiPath']) {
+                    errors.push(`${key}: ${control.errors['apiPath']}`);
+                } else if (control?.errors?.['min']) {
+                    errors.push(`${key}: Giá trị phải >= ${control.errors['min'].min}`);
+                } else if (control?.errors?.['required']) {
+                    errors.push(`${key}: Trường này bắt buộc`);
+                }
+            });
+            if (errors.length > 0) {
+                this.notificationService.error(errors.join(', '));
+            } else {
+                this.notificationService.error('Vui lòng điền đầy đủ thông tin bắt buộc');
+            }
+            return;
+        }
+
+        // Validate custom fields và order error mappings
+        const mappingErrors = this.validateAllMappings();
+        if (mappingErrors.length > 0) {
+            this.notificationService.error(mappingErrors.join(', '));
             return;
         }
 
@@ -388,6 +535,12 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
 
                     this.showJsonPicker = true;
                     this.notificationService.success('Đã lấy response Balance API!');
+                    // Save to balanceTabData for tab switching
+                    this.balanceTabData = {
+                        rawResponse: this.rawResponse,
+                        sampleItem: this.sampleItem,
+                        currentJsonPath: [...this.currentJsonPath]
+                    };
                 }
                 this.loading = false;
             },
@@ -477,6 +630,12 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
                     this.resetPreview();
                     this.showJsonPicker = true;
                     this.notificationService.success('Đã gọi Order API! Xem response bên dưới.');
+                    // Save to orderTabData for tab switching
+                    this.orderTabData = {
+                        rawResponse: this.rawResponse,
+                        sampleItem: this.sampleItem,
+                        currentJsonPath: [...this.currentJsonPath]
+                    };
                 }
                 this.loading = false;
             },
@@ -562,6 +721,12 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
                 if (autoPreview) {
                     this.activeJsonTab = 'preview';
                 }
+                // Save to productTabData for tab switching
+                this.productTabData = {
+                    rawResponse: this.rawResponse,
+                    sampleItem: this.sampleItem,
+                    currentJsonPath: [...this.currentJsonPath]
+                };
                 this.loadingProducts = false;
             },
             error: (error: any) => {

@@ -58,6 +58,8 @@
             <th>Email khách hàng</th>
             <th>Tổng tiền</th>
             <th>Trạng thái</th>
+            <th>Provider</th>
+            <th>Mã đơn External</th>
             <th>Ngày tạo</th>
             <th>Hành động</th>
           </tr>
@@ -65,7 +67,7 @@
         <tbody>
           @if (orders.length === 0) {
           <tr>
-            <td colspan="7" class="text-center text-muted py-4">Không có dữ liệu</td>
+            <td colspan="9" class="text-center text-muted py-4">Không có dữ liệu</td>
           </tr>
           }
           @for (order of orders; track order.id; let i = $index) {
@@ -80,6 +82,20 @@
               <span [ngClass]="'badge ' + getStatusClass(order.orderStatus)">
                 {{ getStatusLabel(order.orderStatus) }}
               </span>
+            </td>
+            <td>
+              @if (order.providerName) {
+              <span class="badge bg-info text-dark">{{ order.providerName }}</span>
+              } @else {
+              <span class="text-muted">-</span>
+              }
+            </td>
+            <td>
+              @if (order.externalOrderNumber) {
+              <span class="font-monospace small">{{ order.externalOrderNumber }}</span>
+              } @else {
+              <span class="text-muted">-</span>
+              }
             </td>
             <td>{{ order.createdAt | date: 'dd/MM/yyyy HH:mm' }}</td>
             <td>

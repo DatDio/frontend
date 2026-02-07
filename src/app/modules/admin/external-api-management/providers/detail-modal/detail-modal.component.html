@@ -51,7 +51,11 @@
                         <div class="col-md-6">
                             <label class="form-label">Base URL <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" formControlName="baseUrl"
+                                [class.is-invalid]="form.get('baseUrl')?.invalid && form.get('baseUrl')?.touched"
                                 placeholder="https://api.example.com">
+                            @if (form.get('baseUrl')?.errors?.['url'] && form.get('baseUrl')?.touched) {
+                            <small class="text-danger">{{ form.get('baseUrl')?.errors?.['url'] }}</small>
+                            }
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">API Key</label>
@@ -88,7 +92,12 @@
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Interval (giây)</label>
-                            <input type="number" class="form-control" formControlName="syncIntervalSeconds" min="1">
+                            <input type="number" class="form-control" formControlName="syncIntervalSeconds" min="1"
+                                [class.is-invalid]="form.get('syncIntervalSeconds')?.invalid && form.get('syncIntervalSeconds')?.touched">
+                            @if (form.get('syncIntervalSeconds')?.errors?.['min'] &&
+                            form.get('syncIntervalSeconds')?.touched) {
+                            <small class="text-danger">Giá trị phải >= 1</small>
+                            }
                         </div>
                         <div class="col-md-3 d-flex align-items-end">
                             <div class="form-check form-switch mb-2">
@@ -113,29 +122,38 @@
                         <div class="col-md-4">
                             <label class="form-label">Success Check Path (chung)</label>
                             <div class="input-group">
-                                <input type="text" class="form-control" formControlName="orderSuccessPath"
-                                    placeholder="code">
+                                <input type="text" class="form-control" formControlName="successPath"
+                                    [class.is-invalid]="form.get('successPath')?.invalid && form.get('successPath')?.touched"
+                                    placeholder="$.status">
                                 <button type="button" class="btn btn-outline-secondary"
-                                    (click)="startResponsePathSelection('orderSuccessPath')">
+                                    (click)="startResponsePathSelection('successPath')">
                                     <i class="bi bi-crosshair"></i>
                                 </button>
                             </div>
+                            @if (form.get('successPath')?.errors?.['jsonPath'] &&
+                            form.get('successPath')?.touched) {
+                            <small class="text-danger">{{ form.get('successPath')?.errors?.['jsonPath'] }}</small>
+                            }
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Success Value (chung)</label>
-                            <input type="text" class="form-control" formControlName="orderSuccessValue"
-                                placeholder="200">
+                            <input type="text" class="form-control" formControlName="successValue" placeholder="true">
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Message Path (chung)</label>
                             <div class="input-group">
-                                <input type="text" class="form-control" formControlName="orderMessagePath"
-                                    placeholder="message">
+                                <input type="text" class="form-control" formControlName="messagePath"
+                                    [class.is-invalid]="form.get('messagePath')?.invalid && form.get('messagePath')?.touched"
+                                    placeholder="$.message">
                                 <button type="button" class="btn btn-outline-secondary"
-                                    (click)="startResponsePathSelection('orderMessagePath')">
+                                    (click)="startResponsePathSelection('messagePath')">
                                     <i class="bi bi-crosshair"></i>
                                 </button>
                             </div>
+                            @if (form.get('messagePath')?.errors?.['jsonPath'] &&
+                            form.get('messagePath')?.touched) {
+                            <small class="text-danger">{{ form.get('messagePath')?.errors?.['jsonPath'] }}</small>
+                            }
                         </div>
                     </div>
                 </div>
@@ -160,7 +178,12 @@
                         <div class="col-md-9">
                             <label class="form-label">Path</label>
                             <input type="text" class="form-control" formControlName="productListPath"
+                                [class.is-invalid]="form.get('productListPath')?.invalid && form.get('productListPath')?.touched"
                                 placeholder="/api/products">
+                            @if (form.get('productListPath')?.errors?.['apiPath'] &&
+                            form.get('productListPath')?.touched) {
+                            <small class="text-danger">{{ form.get('productListPath')?.errors?.['apiPath'] }}</small>
+                            }
                         </div>
                     </div>
                 </div>
@@ -179,13 +202,19 @@
                             </label>
                             <div class="input-group">
                                 <input type="text" class="form-control" formControlName="productListDataPath"
-                                    placeholder="data hoặc $.data">
+                                    [class.is-invalid]="form.get('productListDataPath')?.invalid && form.get('productListDataPath')?.touched"
+                                    placeholder="$.data">
                                 <button type="button" class="btn btn-outline-secondary"
                                     (click)="startPathSelection('productListDataPath')" [disabled]="!sampleItem">
                                     <i class="bi bi-crosshair"></i>
                                 </button>
                             </div>
-                            <small class="text-muted">&#272;&#432;&#7901;ng d&#7851;n &#273;&#7871;n m&#7843;ng
+                            @if (form.get('productListDataPath')?.errors?.['jsonPath'] &&
+                            form.get('productListDataPath')?.touched) {
+                            <small class="text-danger">{{ form.get('productListDataPath')?.errors?.['jsonPath']
+                                }}</small>
+                            }
+                            <small class="text-muted">Đường dẫn đến mảng
                                 sản phẩm trong response</small>
                         </div>
                     </div>
@@ -205,12 +234,16 @@
                             </label>
                             <div class="input-group input-group-sm">
                                 <input type="text" class="form-control" [formControlName]="field.name"
-                                    placeholder="id, name...">
+                                    [class.is-invalid]="form.get(field.name)?.invalid && form.get(field.name)?.touched"
+                                    placeholder="$.id, $.name...">
                                 <button type="button" class="btn btn-outline-secondary"
                                     (click)="startPathSelection(field.name)" [disabled]="!sampleItem">
                                     <i class="bi bi-crosshair"></i>
                                 </button>
                             </div>
+                            @if (form.get(field.name)?.errors?.['jsonPath'] && form.get(field.name)?.touched) {
+                            <small class="text-danger">{{ form.get(field.name)?.errors?.['jsonPath'] }}</small>
+                            }
                         </div>
                         }
                     </div>
@@ -484,7 +517,12 @@
                         </div>
                         <div class="col-md-9">
                             <label class="form-label">Path</label>
-                            <input type="text" class="form-control" formControlName="orderPath" placeholder="/user/buy">
+                            <input type="text" class="form-control" formControlName="orderPath"
+                                [class.is-invalid]="form.get('orderPath')?.invalid && form.get('orderPath')?.touched"
+                                placeholder="/user/buy">
+                            @if (form.get('orderPath')?.errors?.['apiPath'] && form.get('orderPath')?.touched) {
+                            <small class="text-danger">{{ form.get('orderPath')?.errors?.['apiPath'] }}</small>
+                            }
                         </div>
                         <div class="col-12">
                             <div class="d-flex justify-content-between align-items-center mb-2">
@@ -541,27 +579,51 @@
                         </div>
                     </div>
                     <div class="row g-3 mt-1">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label">Data Path (kết quả order)</label>
                             <div class="input-group">
                                 <input type="text" class="form-control" formControlName="orderDataPath"
-                                    placeholder="data">
+                                    [class.is-invalid]="form.get('orderDataPath')?.invalid && form.get('orderDataPath')?.touched"
+                                    placeholder="$.data">
                                 <button type="button" class="btn btn-outline-secondary"
                                     (click)="startPathSelection('orderDataPath')" [disabled]="!sampleItem">
                                     <i class="bi bi-crosshair"></i>
                                 </button>
                             </div>
+                            @if (form.get('orderDataPath')?.errors?.['jsonPath'] && form.get('orderDataPath')?.touched)
+                            {
+                            <small class="text-danger">{{ form.get('orderDataPath')?.errors?.['jsonPath'] }}</small>
+                            }
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
+                            <label class="form-label">Order Number Path</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" formControlName="orderNumberPath"
+                                    [class.is-invalid]="form.get('orderNumberPath')?.invalid && form.get('orderNumberPath')?.touched"
+                                    placeholder="$.data.order_id">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    (click)="startPathSelection('orderNumberPath')" [disabled]="!sampleItem">
+                                    <i class="bi bi-crosshair"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted">Mã đơn hàng từ API để tra cứu</small>
+                        </div>
+                        <div class="col-md-4">
                             <label class="form-label">Error Code Path</label>
                             <div class="input-group">
                                 <input type="text" class="form-control" formControlName="orderErrorCodePath"
-                                    placeholder="error_code">
+                                    [class.is-invalid]="form.get('orderErrorCodePath')?.invalid && form.get('orderErrorCodePath')?.touched"
+                                    placeholder="$.error_code">
                                 <button type="button" class="btn btn-outline-secondary"
                                     (click)="startPathSelection('orderErrorCodePath')" [disabled]="!sampleItem">
                                     <i class="bi bi-crosshair"></i>
                                 </button>
                             </div>
+                            @if (form.get('orderErrorCodePath')?.errors?.['jsonPath'] &&
+                            form.get('orderErrorCodePath')?.touched) {
+                            <small class="text-danger">{{ form.get('orderErrorCodePath')?.errors?.['jsonPath']
+                                }}</small>
+                            }
                         </div>
                     </div>
 
@@ -810,18 +872,27 @@
                         <div class="col-md-8">
                             <label class="form-label">Path</label>
                             <input type="text" class="form-control" formControlName="balancePath"
+                                [class.is-invalid]="form.get('balancePath')?.invalid && form.get('balancePath')?.touched"
                                 placeholder="/api/balance">
+                            @if (form.get('balancePath')?.errors?.['apiPath'] && form.get('balancePath')?.touched) {
+                            <small class="text-danger">{{ form.get('balancePath')?.errors?.['apiPath'] }}</small>
+                            }
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Value Path</label>
                             <div class="input-group">
                                 <input type="text" class="form-control" formControlName="balanceValuePath"
-                                    placeholder="data.balance">
+                                    [class.is-invalid]="form.get('balanceValuePath')?.invalid && form.get('balanceValuePath')?.touched"
+                                    placeholder="$.data.balance">
                                 <button type="button" class="btn btn-outline-secondary"
                                     (click)="startPathSelection('balanceValuePath')" [disabled]="!sampleItem">
                                     <i class="bi bi-crosshair"></i>
                                 </button>
                             </div>
+                            @if (form.get('balanceValuePath')?.errors?.['jsonPath'] &&
+                            form.get('balanceValuePath')?.touched) {
+                            <small class="text-danger">{{ form.get('balanceValuePath')?.errors?.['jsonPath'] }}</small>
+                            }
                         </div>
 
                     </div>

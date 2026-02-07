@@ -17,6 +17,7 @@ export interface Product {
   maxSecondaryStock?: number; // Giới hạn tối đa kho phụ
   sortOrder?: number;
   sourceType?: 'LOCAL' | 'EXTERNAL';  // Nguồn sản phẩm
+  lastSyncedStock?: number;   // Stock từ external provider (chỉ có với EXTERNAL)
 }
 
 export interface ProductCreate {

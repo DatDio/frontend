@@ -105,7 +105,9 @@
               <td>{{ product.price}}</td>
               <td>
                 @if (product.sourceType === 'EXTERNAL') {
-                <span class="text-muted">-</span>
+                <span class="badge bg-info" title="Stock từ API ngoài">
+                  <i class="bi bi-cloud me-1"></i>{{ product.lastSyncedStock ?? '-' }}
+                </span>
                 } @else {
                 <span class="badge bg-secondary" title="Kho chính (ẩn)">
                   <i class="bi bi-box-seam me-1"></i>{{ product.primaryQuantity || 0 }}
@@ -114,7 +116,9 @@
               </td>
               <td>
                 @if (product.sourceType === 'EXTERNAL') {
-                <span class="text-muted">API</span>
+                <span class="badge bg-info" title="Stock từ API ngoài">
+                  <i class="bi bi-cloud me-1"></i>{{ product.lastSyncedStock ?? '-' }}
+                </span>
                 } @else {
                 <span class="badge bg-success" title="Kho phụ (hiển thị)">
                   <i class="bi bi-shop me-1"></i>{{ product.quantity }}
