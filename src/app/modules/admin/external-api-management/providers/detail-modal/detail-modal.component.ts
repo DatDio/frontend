@@ -64,7 +64,7 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
 
     // Custom field mappings - dynamic array
     customFields: { name: string; path: string }[] = [];
-    orderErrorMappings: { code: string; message: string; messageEn: string; appErrorCode: string }[] = [];
+    orderErrorMappings: { code: string; keyword: string; message: string; messageEn: string; appErrorCode: string }[] = [];
     orderParams: { key: string; valueType: 'productId' | 'slug' | 'quantity' | 'fixed'; value: string }[] = [];
     orderTemplatePreview = '';
     orderParamValueTypes = [
@@ -177,6 +177,7 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
             orderDataPath: new FormControl(this.provider?.orderDataPath || '', [this.jsonPathValidator.bind(this)]),
             orderNumberPath: new FormControl(this.provider?.orderNumberPath || '', [this.jsonPathValidator.bind(this)]),
             orderErrorCodePath: new FormControl(this.provider?.orderErrorCodePath || '', [this.jsonPathValidator.bind(this)]),
+            orderMessagePath: new FormControl(this.provider?.orderMessagePath || '', [this.jsonPathValidator.bind(this)]),
 
             // Common Response Config (dùng chung cho tất cả API)
             successPath: new FormControl(this.provider?.successPath || '', [this.jsonPathValidator.bind(this)]),
@@ -208,6 +209,7 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
                 if (Array.isArray(parsed)) {
                     this.orderErrorMappings = parsed.map((item: any) => ({
                         code: item?.code || '',
+                        keyword: item?.keyword || '',
                         message: item?.message || item?.messageVi || '',
                         messageEn: item?.messageEn || item?.message_en || '',
                         appErrorCode: item?.appErrorCode || item?.errorCode || ''
@@ -294,7 +296,7 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
     }
 
     addOrderErrorMapping(): void {
-        this.orderErrorMappings.push({ code: '', message: '', messageEn: '', appErrorCode: '' });
+        this.orderErrorMappings.push({ code: '', keyword: '', message: '', messageEn: '', appErrorCode: '' });
     }
 
     removeOrderErrorMapping(index: number): void {

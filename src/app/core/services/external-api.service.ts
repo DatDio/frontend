@@ -35,6 +35,7 @@ export interface ExternalApiProvider {
     orderNumberPath?: string;       // JSONPath để lấy mã đơn hàng từ external response
     orderErrorCodePath?: string;
     orderErrorCodeMappings?: string;
+    orderMessagePath?: string;       // JSONPath message riêng cho order (fallback sang messagePath chung)
 
     // Common response config (dùng chung cho tất cả API)
     successPath?: string;

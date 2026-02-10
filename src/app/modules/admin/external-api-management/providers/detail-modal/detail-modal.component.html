@@ -579,7 +579,7 @@
                         </div>
                     </div>
                     <div class="row g-3 mt-1">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Data Path (kết quả order)</label>
                             <div class="input-group">
                                 <input type="text" class="form-control" formControlName="orderDataPath"
@@ -595,7 +595,7 @@
                             <small class="text-danger">{{ form.get('orderDataPath')?.errors?.['jsonPath'] }}</small>
                             }
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Order Number Path</label>
                             <div class="input-group">
                                 <input type="text" class="form-control" formControlName="orderNumberPath"
@@ -608,7 +608,7 @@
                             </div>
                             <small class="text-muted">Mã đơn hàng từ API để tra cứu</small>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <label class="form-label">Error Code Path</label>
                             <div class="input-group">
                                 <input type="text" class="form-control" formControlName="orderErrorCodePath"
@@ -624,6 +624,24 @@
                             <small class="text-danger">{{ form.get('orderErrorCodePath')?.errors?.['jsonPath']
                                 }}</small>
                             }
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Message Path (riêng)</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" formControlName="orderMessagePath"
+                                    [class.is-invalid]="form.get('orderMessagePath')?.invalid && form.get('orderMessagePath')?.touched"
+                                    placeholder="$.message">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    (click)="startPathSelection('orderMessagePath')" [disabled]="!sampleItem">
+                                    <i class="bi bi-crosshair"></i>
+                                </button>
+                            </div>
+                            @if (form.get('orderMessagePath')?.errors?.['jsonPath'] &&
+                            form.get('orderMessagePath')?.touched) {
+                            <small class="text-danger">{{ form.get('orderMessagePath')?.errors?.['jsonPath']
+                                }}</small>
+                            }
+                            <small class="text-muted">Nếu trống sẽ dùng Message Path chung</small>
                         </div>
                     </div>
 
@@ -646,7 +664,11 @@
                                 <input type="text" class="form-control form-control-sm" [(ngModel)]="err.code"
                                     [ngModelOptions]="{standalone: true}" placeholder="Code (vd: 101)">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
+                                <input type="text" class="form-control form-control-sm" [(ngModel)]="err.keyword"
+                                    [ngModelOptions]="{standalone: true}" placeholder="Keyword (contains)">
+                            </div>
+                            <div class="col-md-2">
                                 <select class="form-select form-select-sm" [(ngModel)]="err.appErrorCode"
                                     [ngModelOptions]="{standalone: true}">
                                     <option value="" disabled>Chọn mã lỗi</option>
@@ -657,7 +679,7 @@
                             </div>
                             <!-- Only show message inputs if NO appErrorCode is selected -->
                             @if (!err.appErrorCode) {
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <input type="text" class="form-control form-control-sm" [(ngModel)]="err.message"
                                     [ngModelOptions]="{standalone: true}" placeholder="Thông báo (VI)">
                             </div>
@@ -666,7 +688,7 @@
                                     [ngModelOptions]="{standalone: true}" placeholder="Message (EN)">
                             </div>
                             } @else {
-                            <div class="col-md-6 d-flex align-items-center">
+                            <div class="col-md-5 d-flex align-items-center">
                                 <span class="text-muted small fst-italic"><i class="bi bi-info-circle me-1"></i>Sử dụng
                                     thông báo từ hệ thống</span>
                             </div>
