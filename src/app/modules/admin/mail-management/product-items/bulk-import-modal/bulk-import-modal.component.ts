@@ -31,6 +31,7 @@ export class BulkImportModalComponent {
   accountsText = '';
 
   isLoading = false;
+  skipDuplicateCheck = false;
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -72,7 +73,7 @@ export class BulkImportModalComponent {
 
     // Option 1: File upload (ưu tiên)
     if (this.selectedFile) {
-      this.productItemService.importFile(this.productId, this.selectedFile, this.expirationType).subscribe({
+      this.productItemService.importFile(this.productId, this.selectedFile, this.expirationType, this.skipDuplicateCheck).subscribe({
         next: (response: any) => {
           this.isLoading = false;
           if (response.success) {
@@ -95,7 +96,8 @@ export class BulkImportModalComponent {
       this.productItemService.createWithExpirationType(
         this.productId,
         this.accountsText,
-        this.expirationType
+        this.expirationType,
+        this.skipDuplicateCheck
       ).subscribe({
         next: (response: any) => {
           this.isLoading = false;

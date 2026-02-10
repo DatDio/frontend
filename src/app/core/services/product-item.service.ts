@@ -50,14 +50,15 @@ export class ProductItemService {
   /**
    * Create product items from textarea with ExpirationType
    */
-  createWithExpirationType(productId: number, accountData: string, expirationType: string): Observable<ApiResponse<string>> {
+  createWithExpirationType(productId: number, accountData: string, expirationType: string, skipDuplicateCheck: boolean = false): Observable<ApiResponse<string>> {
     this.loaderService.show();
 
     return this.httpClient
       .post<ApiResponse<string>>(AdminProductItemApi.CREATE, {
         productId,
         accountData,
-        expirationType
+        expirationType,
+        skipDuplicateCheck
       })
       .pipe(finalize(() => this.loaderService.hide()));
   }
@@ -78,12 +79,14 @@ export class ProductItemService {
   /**
    * Import items from TXT file with expirationType
    */
-  importFile(productId: number | string, file: File, expirationType: string = 'NONE'): Observable<ApiResponse<string>> {
+  importFile(productId: number | string, file: File, expirationType: string = 'NONE', skipDuplicateCheck: boolean = false): Observable<ApiResponse<string>> {
     const formData = new FormData();
     formData.append('file', file);
 
-    // Thêm expirationType vào URL params
-    const params = new HttpParams().set('expirationType', expirationType);
+    // Thêm expirationType và skipDuplicateCheck vào URL params
+    const params = new HttpParams()
+      .set('expirationType', expirationType)
+      .set('skipDuplicateCheck', skipDuplicateCheck.toString());
     this.loaderService.show();
 
     return this.httpClient

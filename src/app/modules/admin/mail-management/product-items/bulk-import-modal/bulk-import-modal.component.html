@@ -39,6 +39,19 @@
         </div>
       </div>
 
+      <!-- Skip Duplicate Check -->
+      <div class="mb-4">
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="skipDuplicateCheck" [(ngModel)]="skipDuplicateCheck">
+          <label class="form-check-label fw-bold" for="skipDuplicateCheck">
+            <i class="bi bi-lightning-charge me-1"></i> Bỏ qua lọc trùng
+          </label>
+        </div>
+        <small class="text-muted d-block mt-1">
+          Bật để import nhanh hơn. Tắt nếu muốn tự động loại bỏ tài khoản đã tồn tại.
+        </small>
+      </div>
+
       <!-- Option 1: File Upload -->
       <div class="mb-3">
         <label class="form-label fw-bold">
