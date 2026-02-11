@@ -68,6 +68,14 @@ export interface ExternalProduct {
     providerName?: string;
     isMapped?: boolean;
     localProductId?: number;
+    // Mapping details (khi đã mapped)
+    mappingId?: number;
+    categoryId?: number;
+    categoryName?: string;
+    localProductName?: string;
+    localPrice?: number;
+    localDescription?: string;
+    autoSync?: boolean;
 }
 
 export interface FetchProductsResult {
@@ -109,6 +117,7 @@ export interface ProviderFilter {
     status?: number;
     page?: number;
     limit?: number;
+    fetchBalance?: boolean;
 }
 
 export interface MappingFilter {
@@ -133,6 +142,7 @@ export class ExternalApiService {
         if (filter?.status != null) params = params.set('status', filter.status.toString());
         if (filter?.page != null) params = params.set('page', filter.page.toString());
         if (filter?.limit != null) params = params.set('limit', filter.limit.toString());
+        if (filter?.fetchBalance) params = params.set('fetchBalance', 'true');
 
         return this.httpClient.get<ApiResponse<PaginatedResponse<ExternalApiProvider>>>(
             ExternalApiProviderApi.PROVIDERS, { params }

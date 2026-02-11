@@ -141,10 +141,10 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
             errors.push(`Mã lỗi trùng: ${[...new Set(duplicateCodes)].join(', ')}`);
         }
 
-        // Validate order error mappings - must have appErrorCode
+        // Validate order error mappings - must have appErrorCode or custom message
         for (const err of this.orderErrorMappings) {
-            if (err.code?.trim() && !err.appErrorCode?.trim()) {
-                errors.push(`Mã lỗi "${err.code}" chưa chọn App Error Code`);
+            if ((err.code?.trim() || err.keyword?.trim()) && !err.appErrorCode?.trim() && !err.message?.trim() && !err.messageEn?.trim()) {
+                errors.push(`Mã lỗi "${err.code || err.keyword}" cần chọn App Error Code hoặc nhập thông báo tùy chỉnh`);
             }
         }
 
@@ -412,11 +412,11 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         const validCustomFields = this.customFields.filter(f => f.name && f.path);
         data.customFieldMappings = validCustomFields.length > 0
             ? JSON.stringify(validCustomFields)
-            : null;
-        const validOrderErrors = this.orderErrorMappings.filter(e => e.code && e.appErrorCode);
+            : '';
+        const validOrderErrors = this.orderErrorMappings.filter(e => (e.code || e.keyword) && (e.appErrorCode || e.message || e.messageEn));
         data.orderErrorCodeMappings = validOrderErrors.length > 0
             ? JSON.stringify(validOrderErrors)
-            : null;
+            : '';
 
         const observable = this.isCreateMode
             ? this.externalApiService.createProvider(data)
@@ -488,7 +488,7 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         data.customFieldMappings = validCustomFields.length > 0
             ? JSON.stringify(validCustomFields)
             : null;
-        const validOrderErrors = this.orderErrorMappings.filter(e => e.code && e.appErrorCode);
+        const validOrderErrors = this.orderErrorMappings.filter(e => (e.code || e.keyword) && (e.appErrorCode || e.message || e.messageEn));
         data.orderErrorCodeMappings = validOrderErrors.length > 0
             ? JSON.stringify(validOrderErrors)
             : null;
@@ -610,7 +610,7 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         data.customFieldMappings = validCustomFields.length > 0
             ? JSON.stringify(validCustomFields)
             : null;
-        const validOrderErrors = this.orderErrorMappings.filter(e => e.code && e.appErrorCode);
+        const validOrderErrors = this.orderErrorMappings.filter(e => (e.code || e.keyword) && (e.appErrorCode || e.message || e.messageEn));
         data.orderErrorCodeMappings = validOrderErrors.length > 0
             ? JSON.stringify(validOrderErrors)
             : null;
@@ -679,7 +679,7 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         data.customFieldMappings = validCustomFields.length > 0
             ? JSON.stringify(validCustomFields)
             : null;
-        const validOrderErrors = this.orderErrorMappings.filter(e => e.code && e.appErrorCode);
+        const validOrderErrors = this.orderErrorMappings.filter(e => (e.code || e.keyword) && (e.appErrorCode || e.message || e.messageEn));
         data.orderErrorCodeMappings = validOrderErrors.length > 0
             ? JSON.stringify(validOrderErrors)
             : null;

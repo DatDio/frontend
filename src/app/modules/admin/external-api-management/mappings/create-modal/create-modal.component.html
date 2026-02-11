@@ -34,7 +34,7 @@
                     </div>
                     } @else if (externalProducts.length === 0) {
                     <div class="alert alert-info">
-                        Không có sản phẩm chưa mapping
+                        Không có sản phẩm nào từ provider này
                     </div>
                     } @else {
                     <div class="table-responsive border rounded" style="max-height: 300px;">
@@ -45,12 +45,14 @@
                                     <th>Tên sản phẩm</th>
                                     <th class="text-end" style="width: 120px;">Giá</th>
                                     <th class="text-center" style="width: 100px;">Tồn kho</th>
+                                    <th class="text-center" style="width: 100px;">Trạng thái</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @for (product of externalProducts; track product.id) {
-                                <tr [class.table-primary]="selectedProduct?.id === product.id" style="cursor: pointer;"
-                                    (click)="onProductSelect(product)">
+                                <tr [class.table-primary]="selectedProduct?.id === product.id"
+                                    [class.table-warning]="product.isMapped && selectedProduct?.id !== product.id"
+                                    style="cursor: pointer;" (click)="onProductSelect(product)">
                                     <td class="text-center">
                                         <input type="radio" name="selectedProduct" class="form-check-input"
                                             [checked]="selectedProduct?.id === product.id">
@@ -65,6 +67,13 @@
                                             [class.bg-secondary]="product.stock === 0">
                                             {{ product.stock }}
                                         </span>
+                                    </td>
+                                    <td class="text-center">
+                                        @if (product.isMapped) {
+                                        <span class="badge bg-warning text-dark">Đã mapping</span>
+                                        } @else {
+                                        <span class="badge bg-success">Có sẵn</span>
+                                        }
                                     </td>
                                 </tr>
                                 }
@@ -84,7 +93,8 @@
                     <label class="form-label">Sản phẩm nguồn</label>
                     <div class="p-2 border rounded bg-light">
                         <div><strong>{{ mapping.externalProductName }}</strong></div>
-                        <small class="text-muted">ID: {{ mapping.externalProductId || mapping.externalProductSlug }}</small>
+                        <small class="text-muted">ID: {{ mapping.externalProductId || mapping.externalProductSlug
+                            }}</small>
                     </div>
                 </div>
                 <div class="mb-4">
@@ -99,7 +109,8 @@
                             <strong>{{ formatCurrency(latestExternalProduct.price) }}</strong>
                             | Tồn kho hiện tại:
                             <strong>{{ latestExternalProduct.stock }}</strong>
-                            @if (originalExternalPrice !== null && latestExternalProduct.price !== originalExternalPrice) {
+                            @if (originalExternalPrice !== null && latestExternalProduct.price !==
+                            originalExternalPrice) {
                             <span class="text-warning"> (đã thay đổi)</span>
                             }
                         </small>
@@ -179,9 +190,8 @@
                 @if (loading) {
                 <span class="spinner-border spinner-border-sm me-1"></span>
                 }
-                {{ isEditMode ? 'Cập nhật Mapping' : 'Tạo Mapping' }}
+                {{ isEditMode ? 'Cập nhật Mapping' : (selectedProduct?.isMapped ? 'Cập nhật Mapping' : 'Tạo Mapping') }}
             </button>
         </div>
     </div>
 </div>
-

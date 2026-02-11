@@ -121,7 +121,7 @@
                                 }
                             </td>
                             <td class="text-center">
-                                <span class="badge bg-secondary">{{ mapping.lastSyncedStock || '?' }}</span>
+                                <span class="badge bg-secondary">{{ mapping.lastSyncedStock ?? '?' }}</span>
                             </td>
                             <td class="text-center">
                                 <app-active-status-badge [status]="mapping.status || 1"></app-active-status-badge>
@@ -170,7 +170,7 @@
 
 <!-- Edit Modal -->
 @if (showEditModal && selectedMapping) {
-<app-external-product-mapping-create-modal [providers]="providers" [mapping]="selectedMapping"
-    [isEditMode]="true" (close)="onEditModalClose()" (success)="onEditSuccess()">
+<app-external-product-mapping-create-modal [providers]="providers" [mapping]="selectedMapping" [isEditMode]="true"
+    (close)="onEditModalClose()" (success)="onEditSuccess()">
 </app-external-product-mapping-create-modal>
 }

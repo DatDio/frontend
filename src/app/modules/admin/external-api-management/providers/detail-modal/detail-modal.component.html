@@ -664,7 +664,10 @@
                                 <input type="text" class="form-control form-control-sm" [(ngModel)]="err.code"
                                     [ngModelOptions]="{standalone: true}" placeholder="Code (vd: 101)">
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-auto d-flex align-items-center px-0">
+                                <span class="badge bg-secondary" style="font-size: 0.7em;">or</span>
+                            </div>
+                            <div class="col">
                                 <input type="text" class="form-control form-control-sm" [(ngModel)]="err.keyword"
                                     [ngModelOptions]="{standalone: true}" placeholder="Keyword (contains)">
                             </div>

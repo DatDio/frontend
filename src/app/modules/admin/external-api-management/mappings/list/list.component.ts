@@ -129,6 +129,8 @@ export class ExternalProductMappingListComponent implements OnInit {
     }
 
     onCreateClick(): void {
+        const providerId = this.formSearch.get('providerId')?.value;
+        this.selectedProviderId = providerId ? Number(providerId) : null;
         this.showCreateModal = true;
     }
 

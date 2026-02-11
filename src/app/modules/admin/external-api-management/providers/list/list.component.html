@@ -106,9 +106,17 @@
                                 <span class="badge bg-primary">{{ provider.mappedProductCount || 0 }}</span>
                             </td>
                             <td class="text-center">
-                                <span class="badge bg-light text-dark">
-                                    {{ balanceByProviderId[provider.id!] || 'N/A' }}
+                                @if (provider.currentBalance != null) {
+                                <span class="badge bg-success text-white">
+                                    {{ formatBalance(provider.currentBalance) }}
                                 </span>
+                                } @else if (balanceByProviderId[provider.id!]) {
+                                <span class="badge bg-success text-white">
+                                    {{ balanceByProviderId[provider.id!] }}
+                                </span>
+                                } @else {
+                                <span class="badge bg-light text-muted">N/A</span>
+                                }
                             </td>
                             <td class="text-center">
                                 @if (provider.autoSyncEnabled) {

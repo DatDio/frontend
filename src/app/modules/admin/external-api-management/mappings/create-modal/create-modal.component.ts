@@ -99,7 +99,12 @@ export class ExternalProductMappingCreateModalComponent implements OnInit {
         this.loadingProducts = true;
         this.externalApiService.fetchExternalProducts(Number(providerId)).subscribe({
             next: (response: any) => {
-                this.externalProducts = (response.data || []).filter((p: ExternalProduct) => !p.isMapped);
+                const products: ExternalProduct[] = response.data || [];
+                // Sort: unmapped first, then mapped
+                this.externalProducts = products.sort((a, b) => {
+                    if (a.isMapped === b.isMapped) return 0;
+                    return a.isMapped ? 1 : -1;
+                });
                 this.loadingProducts = false;
             },
             error: () => {
@@ -155,14 +160,30 @@ export class ExternalProductMappingCreateModalComponent implements OnInit {
     onProductSelect(product: ExternalProduct): void {
         if (this.isEditMode) return;
         this.selectedProduct = product;
-        this.form.patchValue({
-            externalProductId: product.id,
-            externalProductSlug: product.slug || '',
-            externalProductName: product.name,
-            externalPrice: product.price,
-            localProductName: product.name,
-            localPrice: Math.round(product.price * 1.2)  // Default 20% markup
-        });
+
+        if (product.isMapped) {
+            // Pre-fill from existing mapping data
+            this.form.patchValue({
+                externalProductId: product.id,
+                externalProductSlug: product.slug || '',
+                externalProductName: product.name,
+                externalPrice: product.price,
+                categoryId: product.categoryId || '',
+                localProductName: product.localProductName || product.name,
+                localPrice: product.localPrice || Math.round(product.price * 1.2),
+                localDescription: product.localDescription || '',
+                autoSync: product.autoSync ?? true
+            });
+        } else {
+            this.form.patchValue({
+                externalProductId: product.id,
+                externalProductSlug: product.slug || '',
+                externalProductName: product.name,
+                externalPrice: product.price,
+                localProductName: product.name,
+                localPrice: Math.round(product.price * 1.2)  // Default 20% markup
+            });
+        }
     }
 
     get profitAmount(): number {
@@ -210,6 +231,36 @@ export class ExternalProductMappingCreateModalComponent implements OnInit {
             }
 
             this.externalApiService.updateMapping(this.mapping.id, data).subscribe({
+                next: (response: any) => {
+                    if (response.success) {
+                        this.notificationService.success('Cập nhật mapping thành công');
+                        this.success.emit();
+                    }
+                    this.loading = false;
+                },
+                error: (error: any) => {
+                    this.notificationService.error(error?.error?.message || 'Có lỗi xảy ra');
+                    this.loading = false;
+                }
+            });
+            return;
+        }
+
+        // If selected product is already mapped → update existing mapping
+        if (this.selectedProduct?.isMapped && this.selectedProduct?.mappingId) {
+            const data: Partial<ExternalProductMapping> = {
+                externalProductId: raw.externalProductId,
+                externalProductSlug: raw.externalProductSlug,
+                externalProductName: raw.externalProductName,
+                externalPrice: raw.externalPrice,
+                categoryId: Number(raw.categoryId),
+                localProductName: raw.localProductName,
+                localPrice: raw.localPrice,
+                localDescription: raw.localDescription,
+                autoSync: raw.autoSync
+            };
+
+            this.externalApiService.updateMapping(this.selectedProduct.mappingId, data).subscribe({
                 next: (response: any) => {
                     if (response.success) {
                         this.notificationService.success('Cập nhật mapping thành công');

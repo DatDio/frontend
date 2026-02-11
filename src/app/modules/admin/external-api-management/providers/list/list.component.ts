@@ -96,7 +96,8 @@ export class ExternalApiProviderListComponent implements OnInit {
             name: this.dataFormSearch.name || undefined,
             status: this.dataFormSearch.status ? Number(this.dataFormSearch.status) : undefined,
             page: this.paginationConfig.currentPage,
-            limit: this.paginationConfig.pageSize
+            limit: this.paginationConfig.pageSize,
+            fetchBalance: true
         };
 
         this.externalApiService.listProviders(filter).subscribe({
