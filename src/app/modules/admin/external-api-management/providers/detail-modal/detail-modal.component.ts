@@ -451,8 +451,8 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         }
 
         this.loading = true;
-        const data = this.form.getRawValue();
         this.syncOrderTemplatePreview();
+        const data = this.form.getRawValue();
 
         const validOrderErrors = this.orderErrorMappings.filter(e => (e.code || e.keyword) && (e.appErrorCode || e.message || e.messageEn));
         data.orderErrorCodeMappings = validOrderErrors.length > 0
@@ -806,7 +806,10 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
 
     startResponsePathSelection(fieldName: string): void {
         if (this.activeTab === 'basic') {
+            // Save basic tab data first, then restore product tab data (which has sampleItem)
+            this.saveCurrentTabData();
             this.activeTab = 'product';
+            this.restoreTabData('product');
         }
         this.activeJsonTab = 'fields';
         this.startPathSelection(fieldName);
@@ -1068,7 +1071,7 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
 
     private parseOrderJsonTemplate(template: string): { key: string; valueType: 'productId' | 'slug' | 'quantity' | 'fixed'; value: string }[] {
         const params: { key: string; valueType: 'productId' | 'slug' | 'quantity' | 'fixed'; value: string }[] = [];
-        const regex = /\"([^\"]+)\"\\s*:\\s*([^,}]+)/g;
+        const regex = /"([^"]+)"\s*:\s*([^,}]+)/g;
         let match: RegExpExecArray | null;
         while ((match = regex.exec(template)) !== null) {
             const key = match[1];
