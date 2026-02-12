@@ -10,9 +10,9 @@ export const adminGuard: CanActivateFn = (route, state): Observable<boolean | Ur
   const router = inject(Router);
   const platformId = inject(PLATFORM_ID);
 
-  // On SSR: always allow - let the page render, auth will be checked on client
+  // On SSR: block prerendering of admin pages (they require auth, no SEO value)
   if (!isPlatformBrowser(platformId)) {
-    return of(true);
+    return of(false);
   }
 
   // On Browser: wait for auth to be ready, then check

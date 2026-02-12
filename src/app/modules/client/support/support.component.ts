@@ -1,5 +1,5 @@
-﻿import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+﻿import { Component, OnInit, inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { SeoService } from '../../../core/services/seo.service';
 import { SystemSettingService } from '../../../core/services/system-setting.service';
@@ -14,6 +14,7 @@ import { SystemSettingService } from '../../../core/services/system-setting.serv
 export class SupportComponent implements OnInit {
     private readonly seoService = inject(SeoService);
     private readonly settingService = inject(SystemSettingService);
+    private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
     // Social links with defaults
     telegramGroupUrl = 'https://t.me/EmailSieuRegroupchat';
@@ -26,7 +27,8 @@ export class SupportComponent implements OnInit {
             'hỗ trợ, support, liên hệ, telegram, EmailSieuRe'
         );
 
-        // Load settings
+        // Load settings (browser only — no backend during prerender)
+        if (!this.isBrowser) return;
         this.settingService.getPublicSettings().subscribe({
             next: (response) => {
                 if (response.success && response.data) {

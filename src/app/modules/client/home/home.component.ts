@@ -74,8 +74,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.seoService.setTitle('Email Siêu Rẻ - Hotmail Super Cheap');
     this.initOrderForm();
-    this.loadCategories();
-    this.subscribeToQuantityUpdates();
+    if (this.isBrowser) {
+      this.loadCategories();
+      this.subscribeToQuantityUpdates();
+    }
   }
 
   ngOnDestroy(): void {

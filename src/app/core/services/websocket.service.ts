@@ -1,4 +1,5 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { inject, Injectable, OnDestroy, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Client } from '@stomp/stompjs';
 import type { IFrame, IMessage, StompSubscription } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
@@ -15,12 +16,15 @@ type SubscriptionEntry<T> = {
 })
 export class WebSocketService implements OnDestroy {
 
-  private client: Client;
+  private client: Client | null = null;
   private readonly subscriptions: SubscriptionEntry<any>[] = [];
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   constructor() {
-    this.client = this.createClient();
-    this.client.activate();
+    if (this.isBrowser) {
+      this.client = this.createClient();
+      this.client.activate();
+    }
   }
 
   ngOnDestroy(): void {
@@ -28,6 +32,9 @@ export class WebSocketService implements OnDestroy {
   }
 
   subscribe<T>(destination: string, handler: (payload: T) => void): () => void {
+    if (!this.isBrowser) {
+      return () => {};
+    }
     const entry: SubscriptionEntry<T> = { destination, handler };
     this.subscriptions.push(entry as SubscriptionEntry<any>);
     this.trySubscribe(entry as SubscriptionEntry<any>);
@@ -38,7 +45,7 @@ export class WebSocketService implements OnDestroy {
     this.subscriptions.forEach(entry => entry.subscription?.unsubscribe());
     this.subscriptions.length = 0;
 
-    if (this.client.active) {
+    if (this.client?.active) {
       this.client.deactivate();
     }
   }
@@ -68,6 +75,8 @@ export class WebSocketService implements OnDestroy {
   }
 
   private trySubscribe(entry: SubscriptionEntry<any>): void {
+    if (!this.client) return;
+
     if (this.client.connected) {
       this.resubscribe(entry);
       return;
@@ -79,6 +88,8 @@ export class WebSocketService implements OnDestroy {
   }
 
   private resubscribe(entry: SubscriptionEntry<any>): void {
+    if (!this.client) return;
+
     entry.subscription?.unsubscribe();
 
     entry.subscription = this.client.subscribe(entry.destination, (message: IMessage) => {
@@ -96,7 +107,7 @@ export class WebSocketService implements OnDestroy {
       this.subscriptions.splice(index, 1);
     }
 
-    if (this.subscriptions.length === 0 && this.client.active) {
+    if (this.subscriptions.length === 0 && this.client?.active) {
       this.client.deactivate();
     }
   }

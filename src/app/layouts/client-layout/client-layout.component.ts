@@ -1,5 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { AuthService } from '../../core/services/auth.service';
@@ -25,6 +25,7 @@ export class ClientLayoutComponent implements OnInit {
   readonly themeService = inject(ThemeService);
   readonly settingService = inject(SystemSettingService);
   readonly languageService = inject(LanguageService);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   balance$ = this.walletService.balance$;
   theme$ = this.themeService.theme$;
@@ -39,6 +40,8 @@ export class ClientLayoutComponent implements OnInit {
   telegramChannelUrl = 'https://t.me/EmailSieuResupport';
 
   ngOnInit(): void {
+    if (!this.isBrowser) return;
+
     this.authService.isAuthenticated$.subscribe(isAuth => {
       if (isAuth) {
         this.walletService.getMyWallet().subscribe();

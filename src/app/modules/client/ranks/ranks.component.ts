@@ -1,5 +1,5 @@
-﻿import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+﻿import { Component, OnInit, inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { RankService } from '../../../core/services/rank.service';
 import { AuthService } from '../../../core/services/auth.service';
@@ -20,6 +20,7 @@ export class RanksComponent implements OnInit {
     readonly #authService = inject(AuthService);
     readonly #notificationService = inject(NotificationService);
     readonly #seoService = inject(SeoService);
+    readonly #isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
     ranks: Rank[] = [];
     myRankInfo: UserRankInfo | null = null;
@@ -32,6 +33,7 @@ export class RanksComponent implements OnInit {
             'Xem các cấp bậc thành viên và ưu đãi đặc biệt. Nạp tiền để nâng cấp hạng và nhận bonus hấp dẫn.',
             'hạng thành viên, membership, rank, bonus, ưu đãi, EmailSieuRe'
         );
+        if (!this.#isBrowser) return;
         this.isLoggedIn = this.#authService.isAuthenticated();
         this.loadRanks();
         if (this.isLoggedIn) {
