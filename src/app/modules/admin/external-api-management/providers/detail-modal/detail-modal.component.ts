@@ -63,10 +63,10 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
     lastPreviewError: string | null = null;
 
     // Custom field mappings - dynamic array
-    customFields: { name: string; path: string }[] = [];
     orderErrorMappings: { code: string; keyword: string; message: string; messageEn: string; appErrorCode: string }[] = [];
     orderParams: { key: string; valueType: 'productId' | 'slug' | 'quantity' | 'fixed'; value: string }[] = [];
     orderTemplatePreview = '';
+    jsonPathFields: string[] = [];
     orderParamValueTypes = [
         { value: 'productId', label: 'productId' },
         { value: 'slug', label: 'slug' },
@@ -78,6 +78,69 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         { value: 'PRODUCT_NOT_FOUND', label: 'PRODUCT_NOT_FOUND (11000) - Không tìm thấy sản phẩm' },
         { value: 'INTERNAL_SERVER_ERROR', label: 'INTERNAL_SERVER_ERROR (1000) - Lỗi máy chủ nội bộ' }
     ];
+
+    /** Enforce $ prefix on JSON path fields - called on blur */
+    onJsonPathBlur(fieldName: string): void {
+        const ctrl = this.form.get(fieldName);
+        if (!ctrl) return;
+        let val = (ctrl.value || '').toString().trim();
+        // Allow empty fields (unconfigured)
+        if (!val || val === '$') {
+            ctrl.setValue('', { emitEvent: false });
+            return;
+        }
+        if (!val.startsWith('$')) {
+            val = '$' + val;
+        }
+        ctrl.setValue(val, { emitEvent: false });
+    }
+
+    /** Prevent deleting the $ prefix character in JSON path fields */
+    onJsonPathKeydown(event: KeyboardEvent): void {
+        const input = event.target as HTMLInputElement;
+        const selStart = input.selectionStart ?? 0;
+        const selEnd = input.selectionEnd ?? 0;
+
+        // Prevent Backspace when cursor is at position 1 (would delete $)
+        if (event.key === 'Backspace' && selStart <= 1 && selEnd <= 1) {
+            event.preventDefault();
+            return;
+        }
+
+        // Prevent Delete when cursor is at position 0 (would delete $)
+        if (event.key === 'Delete' && selStart === 0 && selEnd === 0) {
+            event.preventDefault();
+            return;
+        }
+
+        // Prevent selecting and deleting $ (if selection includes position 0)
+        if ((event.key === 'Backspace' || event.key === 'Delete') && selStart === 0 && selEnd > 0) {
+            // Adjust selection to start after $
+            event.preventDefault();
+            input.setSelectionRange(1, selEnd);
+            // Delete the selected range after $
+            const val = input.value;
+            const newVal = '$' + val.substring(selEnd);
+            input.value = newVal;
+            input.setSelectionRange(1, 1);
+            input.dispatchEvent(new Event('input'));
+            return;
+        }
+
+        // Prevent Home key from going before $
+        if (event.key === 'Home' && !event.shiftKey) {
+            event.preventDefault();
+            input.setSelectionRange(1, 1);
+            return;
+        }
+
+        // Prevent Ctrl+A from including $, select from position 1
+        if (event.key === 'a' && (event.ctrlKey || event.metaKey)) {
+            event.preventDefault();
+            input.setSelectionRange(1, input.value.length);
+            return;
+        }
+    }
 
     ngOnInit(): void {
         this.initForm();
@@ -124,16 +187,6 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
     private validateAllMappings(): string[] {
         const errors: string[] = [];
 
-        // Validate custom fields
-        for (const field of this.customFields) {
-            if (field.path && field.path.trim() && !field.path.trim().startsWith('$')) {
-                errors.push(`Custom field "${field.name}" path phải bắt đầu bằng $`);
-            }
-            if (field.path && !field.name?.trim()) {
-                errors.push('Custom field phải có tên');
-            }
-        }
-
         // Validate order error mappings - check duplicate codes
         const errorCodes = this.orderErrorMappings.filter(e => e.code?.trim()).map(e => e.code.trim());
         const duplicateCodes = errorCodes.filter((code, index) => errorCodes.indexOf(code) !== index);
@@ -169,6 +222,7 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
             productNamePath: new FormControl(this.provider?.productNamePath || '', [this.jsonPathValidator.bind(this)]),
             productPricePath: new FormControl(this.provider?.productPricePath || '', [this.jsonPathValidator.bind(this)]),
             productStockPath: new FormControl(this.provider?.productStockPath || '', [this.jsonPathValidator.bind(this)]),
+            productDescriptionPath: new FormControl(this.provider?.productDescriptionPath || '', [this.jsonPathValidator.bind(this)]),
 
             // Order API
             orderMethod: new FormControl(this.provider?.orderMethod || 'POST'),
@@ -190,19 +244,19 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
 
             // Sync
             syncIntervalSeconds: new FormControl(this.provider?.syncIntervalSeconds || 5, [Validators.min(1)]),
-            autoSyncEnabled: new FormControl(this.provider?.autoSyncEnabled || false),
+            autoSyncEnabled: new FormControl(this.provider?.autoSyncEnabled ?? true),
             status: new FormControl(this.provider?.status ?? 1),
             notes: new FormControl(this.provider?.notes || '')
         });
 
-        // Parse custom field mappings from JSON
-        if (this.provider?.customFieldMappings) {
-            try {
-                this.customFields = JSON.parse(this.provider.customFieldMappings);
-            } catch (e) {
-                this.customFields = [];
-            }
-        }
+        // List of JSON path fields that require $ prefix (enforced on blur via template)
+        this.jsonPathFields = [
+            'productListDataPath', 'productIdPath', 'productNamePath',
+            'productPricePath', 'productStockPath', 'productDescriptionPath',
+            'orderDataPath', 'orderNumberPath', 'orderErrorCodePath', 'orderMessagePath',
+            'successPath', 'messagePath', 'balanceValuePath'
+        ];
+        // Parse order error code mappings from JSON
         if (this.provider?.orderErrorCodeMappings) {
             try {
                 const parsed = JSON.parse(this.provider.orderErrorCodeMappings);
@@ -285,14 +339,6 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
 
     setJsonTab(tab: 'input' | 'fields' | 'raw' | 'preview'): void {
         this.activeJsonTab = tab;
-    }
-
-    addCustomField(): void {
-        this.customFields.push({ name: '', path: '' });
-    }
-
-    removeCustomField(index: number): void {
-        this.customFields.splice(index, 1);
     }
 
     addOrderErrorMapping(): void {
@@ -408,11 +454,6 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         const data = this.form.getRawValue();
         this.syncOrderTemplatePreview();
 
-        // Add custom field mappings as JSON
-        const validCustomFields = this.customFields.filter(f => f.name && f.path);
-        data.customFieldMappings = validCustomFields.length > 0
-            ? JSON.stringify(validCustomFields)
-            : '';
         const validOrderErrors = this.orderErrorMappings.filter(e => (e.code || e.keyword) && (e.appErrorCode || e.message || e.messageEn));
         data.orderErrorCodeMappings = validOrderErrors.length > 0
             ? JSON.stringify(validOrderErrors)
@@ -484,10 +525,6 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         this.expandedNodes.clear();
         this.resetPreview();
         const data = this.form.getRawValue();
-        const validCustomFields = this.customFields.filter(f => f.name && f.path);
-        data.customFieldMappings = validCustomFields.length > 0
-            ? JSON.stringify(validCustomFields)
-            : null;
         const validOrderErrors = this.orderErrorMappings.filter(e => (e.code || e.keyword) && (e.appErrorCode || e.message || e.messageEn));
         data.orderErrorCodeMappings = validOrderErrors.length > 0
             ? JSON.stringify(validOrderErrors)
@@ -605,11 +642,6 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         this.expandedNodes.clear();
         this.resetPreview();
         const data = this.form.getRawValue();
-        this.syncOrderTemplatePreview();
-        const validCustomFields = this.customFields.filter(f => f.name && f.path);
-        data.customFieldMappings = validCustomFields.length > 0
-            ? JSON.stringify(validCustomFields)
-            : null;
         const validOrderErrors = this.orderErrorMappings.filter(e => (e.code || e.keyword) && (e.appErrorCode || e.message || e.messageEn));
         data.orderErrorCodeMappings = validOrderErrors.length > 0
             ? JSON.stringify(validOrderErrors)
@@ -675,10 +707,6 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
 
 
         const data = this.form.getRawValue();
-        const validCustomFields = this.customFields.filter(f => f.name && f.path);
-        data.customFieldMappings = validCustomFields.length > 0
-            ? JSON.stringify(validCustomFields)
-            : null;
         const validOrderErrors = this.orderErrorMappings.filter(e => (e.code || e.keyword) && (e.appErrorCode || e.message || e.messageEn));
         data.orderErrorCodeMappings = validOrderErrors.length > 0
             ? JSON.stringify(validOrderErrors)
@@ -811,11 +839,15 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         let path = '$';
 
         // Add current navigation path
+        // Convert [0] to [*] because [0] was only used for navigation (showing the first array item as sample).
+        // The user's intent is to select ALL items in the array, not just the first one.
         for (const segment of this.currentJsonPath) {
             if (segment.startsWith('[')) {
-                path += segment;
+                // Replace [0] with [*] — the picker always auto-navigates into the first element
+                const normalized = segment === '[0]' ? '[*]' : segment;
+                path += normalized;
             } else if (/^\d+$/.test(segment)) {
-                path += '[' + segment + ']';
+                path += '[*]';
             } else {
                 path += '.' + segment;
             }
@@ -848,15 +880,8 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         const normalizedPath = isItemField ? this.normalizeItemPath(path) : path;
         const previewPath = isItemField ? this.buildPreviewPathForItem(normalizedPath) : normalizedPath;
 
-        // Check if this is a custom field (format: custom_N)
-        if (this.activePathField.startsWith('custom_')) {
-            const index = Number.parseInt(this.activePathField.replace('custom_', ''), 10);
-            if (!Number.isNaN(index) && this.customFields[index]) {
-                this.customFields[index].path = normalizedPath;
-            }
-        } else {
-            this.form.get(this.activePathField)?.setValue(normalizedPath);
-        }
+        // Set value vào form control
+        this.form.get(this.activePathField)?.setValue(normalizedPath);
 
         // Update preview for the selected path
         this.updatePreview(previewPath);
@@ -870,29 +895,58 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
             || fieldName === 'productNamePath'
             || fieldName === 'productPricePath'
             || fieldName === 'productStockPath'
-            || fieldName.startsWith('custom_');
+            || fieldName === 'productDescriptionPath';
     }
 
     private getDataPath(): string {
         return (this.form.get('productListDataPath')?.value || '').trim();
     }
 
+    /**
+     * Normalize field path: bỏ prefix dataPath để chỉ còn đường dẫn tương đối.
+     * Khi hiển thị preview hoặc lưu field path, ta cần path tương đối (ví dụ $.id)
+     * thay vì path tuyệt đối (ví dụ $.categories[*].products[*].id).
+     *
+     * Cách 1: So sánh base structure (bỏ array selectors) → strip prefix
+     * Cách 2 (fallback): Lấy phần sau [*] hoặc [0] cuối cùng
+     */
     private normalizeItemPath(path: string): string {
         const dataPath = this.getDataPath();
         if (!dataPath || !path) return path;
 
-        const base = this.stripArraySelector(dataPath);
-        if (!base || base === '$') return path;
+        // Bỏ tất cả array selectors để so sánh cấu trúc nền
+        const stripAll = (p: string) => p.replace(/\[\*?\d*\]/g, '');
+        const baseDataPath = stripAll(dataPath);
+        const baseFieldPath = stripAll(path);
 
-        if (!path.startsWith(base)) return path;
+        if (!baseDataPath || baseDataPath === '$') return path;
 
-        let remainder = path.slice(base.length);
-        remainder = remainder.replace(/^\[\d+\]/, '').replace(/^\[\*\]/, '').replace(/^\.\d+/, '');
+        // Cách 1: Nếu field path chứa prefix của data path → bỏ prefix
+        if (baseFieldPath.startsWith(baseDataPath) && baseFieldPath.length > baseDataPath.length) {
+            const remainder = baseFieldPath.slice(baseDataPath.length);
+            if (remainder.startsWith('.')) {
+                return '$' + remainder;
+            }
+            return '$.' + remainder;
+        }
 
-        if (!remainder) return '$';
-        if (remainder.startsWith('.')) return '$' + remainder;
-        if (remainder.startsWith('[')) return '$' + remainder;
-        return '$.' + remainder;
+        // Cách 2 (fallback): Nếu path chứa [*] hoặc [0], lấy phần sau selector cuối cùng
+        // Ví dụ: "$.categories[*].products[*].id" → "$.id"
+        // Xử lý trường hợp dataPath không match prefix
+        const bracketRegex = /\[\*?\d*\]/g;
+        let lastBracketEnd = -1;
+        let match: RegExpExecArray | null;
+        while ((match = bracketRegex.exec(path)) !== null) {
+            lastBracketEnd = match.index + match[0].length;
+        }
+        if (lastBracketEnd > 0 && lastBracketEnd < path.length) {
+            const suffix = path.slice(lastBracketEnd);
+            if (suffix.startsWith('.')) {
+                return '$' + suffix;
+            }
+        }
+
+        return path;
     }
 
     private buildPreviewPathForItem(itemPath: string): string {
@@ -1183,7 +1237,8 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
 
         this.currentJsonPath.forEach((segment, idx) => {
             breadcrumb.push({
-                label: segment,
+                // Show [*] instead of [0] in breadcrumb to indicate "all items"
+                label: segment === '[0]' ? '[*]' : segment,
                 index: idx
             });
         });

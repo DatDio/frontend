@@ -41,6 +41,7 @@
                         <table class="table table-hover table-striped mb-0 align-middle">
                             <thead class="sticky-top bg-white border-bottom">
                                 <tr>
+                                    <th style="width: 50px;" class="text-center">STT</th>
                                     <th style="width: 50px;" class="text-center">#</th>
                                     <th>Tên sản phẩm</th>
                                     <th class="text-end" style="width: 120px;">Giá</th>
@@ -49,10 +50,11 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @for (product of externalProducts; track product.id) {
+                                @for (product of externalProducts; track product.id; let i = $index) {
                                 <tr [class.table-primary]="selectedProduct?.id === product.id"
                                     [class.table-warning]="product.isMapped && selectedProduct?.id !== product.id"
                                     style="cursor: pointer;" (click)="onProductSelect(product)">
+                                    <td class="text-center text-muted">{{ i + 1 }}</td>
                                     <td class="text-center">
                                         <input type="radio" name="selectedProduct" class="form-check-input"
                                             [checked]="selectedProduct?.id === product.id">

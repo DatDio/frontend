@@ -171,7 +171,7 @@ export class ExternalProductMappingCreateModalComponent implements OnInit {
                 categoryId: product.categoryId || '',
                 localProductName: product.localProductName || product.name,
                 localPrice: product.localPrice || Math.round(product.price * 1.2),
-                localDescription: product.localDescription || '',
+                localDescription: product.localDescription || product.description || '',
                 autoSync: product.autoSync ?? true
             });
         } else {
@@ -181,7 +181,8 @@ export class ExternalProductMappingCreateModalComponent implements OnInit {
                 externalProductName: product.name,
                 externalPrice: product.price,
                 localProductName: product.name,
-                localPrice: Math.round(product.price * 1.2)  // Default 20% markup
+                localPrice: Math.round(product.price * 1.2),  // Default 20% markup
+                localDescription: product.description || ''   // Auto-fill mô tả từ nguồn
             });
         }
     }

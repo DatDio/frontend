@@ -26,6 +26,7 @@ export interface ExternalApiProvider {
     productNamePath?: string;
     productPricePath?: string;
     productStockPath?: string;
+    productDescriptionPath?: string;
     customFieldMappings?: string;  // JSON array: [{"name": "slug", "path": "$.slug"}]
 
     orderMethod?: string;
@@ -64,6 +65,7 @@ export interface ExternalProduct {
     price: number;
     stock: number;
     description?: string;
+    customFields?: { [key: string]: string };  // Trường tùy chỉnh linh hoạt
     providerId?: number;
     providerName?: string;
     isMapped?: boolean;
