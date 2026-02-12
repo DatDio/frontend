@@ -50,6 +50,22 @@
                         <div class="info-value text-primary fw-bold">{{ order.totalAmount | number:'1.0-0' }} VND</div>
                     </div>
                 </div>
+
+                <!-- External Order Info (only for external products) -->
+                @if (order.providerName || order.externalOrderNumber) {
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <div class="info-label">Provider</div>
+                        <div class="info-value">
+                            <span class="badge bg-info text-dark">{{ order.providerName }}</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="info-label">Mã đơn External</div>
+                        <div class="info-value font-monospace">{{ order.externalOrderNumber || '-' }}</div>
+                    </div>
+                </div>
+                }
             </div>
 
             <!-- Account Data Section -->

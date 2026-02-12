@@ -52,6 +52,7 @@ export class MailManagementListComponent implements OnInit {
   loading = true;
   showCreateModal = false;
   showUpdateModal = false;
+  showSourceTypeDialog = false;  // Dialog chọn LOCAL/EXTERNAL
   selectedProduct: Product | null = null;
 
   paginationConfig: PaginationConfig = {
@@ -181,13 +182,33 @@ export class MailManagementListComponent implements OnInit {
   }
 
   onDetail(product: Product): void {
+    if (product.sourceType === 'EXTERNAL') {
+      this.router.navigate(['/admin/external-api/mappings'], {
+        queryParams: { search: product.name }
+      });
+      return;
+    }
     this.router.navigate(['/admin/mail-management', product.id, 'items'], {
       state: { productName: product.name }
     });
   }
 
   onCreateClick(): void {
-    this.showCreateModal = true;
+    this.showSourceTypeDialog = true;  // Hiển thị dialog chọn nguồn trước
+  }
+
+  onSourceTypeDialogClose(): void {
+    this.showSourceTypeDialog = false;
+  }
+
+  onSourceTypeSelect(type: 'LOCAL' | 'EXTERNAL'): void {
+    this.showSourceTypeDialog = false;
+    if (type === 'LOCAL') {
+      this.showCreateModal = true;
+    } else {
+      // Redirect to External API Mappings page
+      this.router.navigate(['/admin/external-api/mappings']);
+    }
   }
 
   onCreateModalClose(): void {

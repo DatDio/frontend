@@ -112,5 +112,23 @@ export const adminRoutes: Routes = [
         loadComponent: () => import('../../modules/admin/oauth2-management/settings/settings.component').then(m => m.OAuth2SettingsComponent)
       }
     ]
+  },
+  {
+    path: 'external-api',
+    children: [
+      {
+        path: '',
+        redirectTo: 'providers',
+        pathMatch: 'full'
+      },
+      {
+        path: 'providers',
+        loadComponent: () => import('../../modules/admin/external-api-management/providers/list/list.component').then(m => m.ExternalApiProviderListComponent)
+      },
+      {
+        path: 'mappings',
+        loadComponent: () => import('../../modules/admin/external-api-management/mappings/list/list.component').then(m => m.ExternalProductMappingListComponent)
+      }
+    ]
   }
 ];

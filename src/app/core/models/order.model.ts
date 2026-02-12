@@ -16,6 +16,10 @@ export interface Order {
 
   accountData: string[];
 
+  // External order info (for external products)
+  externalOrderNumber?: string;   // Mã đơn từ external API
+  providerName?: string;          // Tên provider nguồn
+
   createdAt: string;
 }
 

@@ -1,0 +1,1051 @@
+<div class="modal-backdrop" (click)="onClose()"></div>
+<div class="modal-container">
+    <div class="modal-content large">
+        <div class="modal-header">
+            <h5 class="modal-title">
+                <i class="fas fa-plug me-2"></i>
+                {{ isCreateMode ? 'Thêm Provider Mới' : 'Chỉnh Sửa Provider' }}
+            </h5>
+            <button type="button" class="btn-close" (click)="onClose()"></button>
+        </div>
+
+        <div class="modal-body">
+            <!-- Tabs -->
+            <ul class="nav nav-pills nav-fill mb-4">
+                <li class="nav-item">
+                    <a class="nav-link" [class.active]="activeTab === 'basic'" (click)="onTabChange('basic')">
+                        <i class="bi bi-gear me-1"></i> Cơ bản
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" [class.active]="activeTab === 'product'" (click)="onTabChange('product')">
+                        <i class="bi bi-box me-1"></i> Product API
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" [class.active]="activeTab === 'order'" (click)="onTabChange('order')">
+                        <i class="bi bi-cart me-1"></i> Order API
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" [class.active]="activeTab === 'balance'" (click)="onTabChange('balance')">
+                        <i class="bi bi-wallet2 me-1"></i> Balance
+                    </a>
+                </li>
+            </ul>
+
+            <form [formGroup]="form">
+                <!-- Basic Tab -->
+                @if (activeTab === 'basic') {
+                <div class="config-section">
+                    <div class="section-header">
+                        <i class="bi bi-info-circle"></i>
+                        <span>Thông tin cơ bản</span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Tên Provider <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" formControlName="name"
+                                placeholder="VD: mail30s.com">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Base URL <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" formControlName="baseUrl"
+                                [class.is-invalid]="form.get('baseUrl')?.invalid && form.get('baseUrl')?.touched"
+                                placeholder="https://api.example.com">
+                            @if (form.get('baseUrl')?.errors?.['url'] && form.get('baseUrl')?.touched) {
+                            <small class="text-danger">{{ form.get('baseUrl')?.errors?.['url'] }}</small>
+                            }
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">API Key</label>
+                            <input type="text" class="form-control" formControlName="apiKey"
+                                placeholder="Nhập API Key từ provider">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Kiểu xác thực</label>
+                            <select class="form-select" formControlName="authType">
+                                <option value="HEADER">Header (Authorization)</option>
+                                <option value="QUERY_PARAM">Query Param (?api_key=xxx)</option>
+                            </select>
+                        </div>
+                        @if (form.get('authType')?.value === 'HEADER') {
+                        <div class="col-md-6">
+                            <label class="form-label">Tên Header</label>
+                            <input type="text" class="form-control" formControlName="authHeaderName"
+                                placeholder="Authorization">
+                        </div>
+                        }
+                        @if (form.get('authType')?.value === 'QUERY_PARAM') {
+                        <div class="col-md-6">
+                            <label class="form-label">Tên Query Param</label>
+                            <input type="text" class="form-control" formControlName="authQueryParam"
+                                placeholder="api_key">
+                        </div>
+                        }
+                        <div class="col-md-6">
+                            <label class="form-label">Trạng thái</label>
+                            <select class="form-select" formControlName="status">
+                                <option [value]="1">Hoạt động</option>
+                                <option [value]="0">Ngưng</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Interval (giây)</label>
+                            <input type="number" class="form-control" formControlName="syncIntervalSeconds" min="1"
+                                [class.is-invalid]="form.get('syncIntervalSeconds')?.invalid && form.get('syncIntervalSeconds')?.touched">
+                            @if (form.get('syncIntervalSeconds')?.errors?.['min'] &&
+                            form.get('syncIntervalSeconds')?.touched) {
+                            <small class="text-danger">Giá trị phải >= 1</small>
+                            }
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" id="autoSync"
+                                    formControlName="autoSyncEnabled">
+                                <label class="form-check-label" for="autoSync">Auto Sync</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Ghi chú</label>
+                            <textarea class="form-control" formControlName="notes" rows="2"
+                                placeholder="Ghi chú thêm..."></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="config-section mt-3">
+                    <div class="section-header">
+                        <i class="bi bi-check-circle"></i>
+                        <span>API Response chung</span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">Success Check Path (chung)</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" formControlName="successPath"
+                                    [class.is-invalid]="form.get('successPath')?.invalid && form.get('successPath')?.touched"
+                                    placeholder="$.status">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    (click)="startResponsePathSelection('successPath')">
+                                    <i class="bi bi-crosshair"></i>
+                                </button>
+                            </div>
+                            @if (form.get('successPath')?.errors?.['jsonPath'] &&
+                            form.get('successPath')?.touched) {
+                            <small class="text-danger">{{ form.get('successPath')?.errors?.['jsonPath'] }}</small>
+                            }
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Success Value (chung)</label>
+                            <input type="text" class="form-control" formControlName="successValue" placeholder="true">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Message Path (chung)</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" formControlName="messagePath"
+                                    [class.is-invalid]="form.get('messagePath')?.invalid && form.get('messagePath')?.touched"
+                                    placeholder="$.message">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    (click)="startResponsePathSelection('messagePath')">
+                                    <i class="bi bi-crosshair"></i>
+                                </button>
+                            </div>
+                            @if (form.get('messagePath')?.errors?.['jsonPath'] &&
+                            form.get('messagePath')?.touched) {
+                            <small class="text-danger">{{ form.get('messagePath')?.errors?.['jsonPath'] }}</small>
+                            }
+                        </div>
+                    </div>
+                </div>
+                }
+
+                <!-- Product Tab -->
+                @if (activeTab === 'product') {
+                <!-- API Endpoint Config -->
+                <div class="config-section">
+                    <div class="section-header">
+                        <i class="bi bi-link-45deg"></i>
+                        <span>API Endpoint</span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Method</label>
+                            <select class="form-select" formControlName="productListMethod">
+                                <option value="GET">GET</option>
+                                <option value="POST">POST</option>
+                            </select>
+                        </div>
+                        <div class="col-md-9">
+                            <label class="form-label">Path</label>
+                            <input type="text" class="form-control" formControlName="productListPath"
+                                [class.is-invalid]="form.get('productListPath')?.invalid && form.get('productListPath')?.touched"
+                                placeholder="/api/products">
+                            @if (form.get('productListPath')?.errors?.['apiPath'] &&
+                            form.get('productListPath')?.touched) {
+                            <small class="text-danger">{{ form.get('productListPath')?.errors?.['apiPath'] }}</small>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Field Mappings -->
+                <div class="config-section mt-3">
+                    <div class="section-header">
+                        <i class="bi bi-diagram-3"></i>
+                        <span>Field Mappings</span>
+                    </div>
+                    <div class="row g-3 mb-2">
+                    </div>
+
+                    <!-- Core Field Mapping Grid (required) -->
+                    <div class="row g-2">
+                        @for (field of [
+                        {name: 'productIdPath', label: 'ID', icon: 'bi-key', required: true},
+                        {name: 'productNamePath', label: 'Tên SP', icon: 'bi-tag', required: true},
+                        {name: 'productPricePath', label: 'Giá', icon: 'bi-currency-dollar', required: true},
+                        {name: 'productStockPath', label: 'Tồn kho', icon: 'bi-box-seam', required: false}
+                        ]; track field.name) {
+                        <div class="col-md-3">
+                            <label class="form-label small">
+                                <i class="bi {{ field.icon }} me-1"></i>{{ field.label }}
+                                @if (field.required) {<span class="text-danger">*</span>}
+                            </label>
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" [formControlName]="field.name"
+                                    [class.is-invalid]="form.get(field.name)?.invalid && form.get(field.name)?.touched"
+                                    placeholder="$.id, $.name...">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    (click)="startPathSelection(field.name)" [disabled]="!sampleItem">
+                                    <i class="bi bi-crosshair"></i>
+                                </button>
+                            </div>
+                            @if (form.get(field.name)?.errors?.['jsonPath'] && form.get(field.name)?.touched) {
+                            <small class="text-danger">{{ form.get(field.name)?.errors?.['jsonPath'] }}</small>
+                            }
+                        </div>
+                        }
+                    </div>
+
+                    <!-- Mô tả (trường cố định, tùy chọn) -->
+                    <div class="row g-2 mt-1">
+                        <div class="col-md-12">
+                            <label class="form-label small">
+                                <i class="bi bi-card-text me-1"></i>Mô tả
+                            </label>
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" formControlName="productDescriptionPath"
+                                    [class.is-invalid]="form.get('productDescriptionPath')?.invalid && form.get('productDescriptionPath')?.touched"
+                                    placeholder="$.description">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    (click)="startPathSelection('productDescriptionPath')" [disabled]="!sampleItem">
+                                    <i class="bi bi-crosshair"></i>
+                                </button>
+                            </div>
+                            @if (form.get('productDescriptionPath')?.errors?.['jsonPath'] && form.get('productDescriptionPath')?.touched) {
+                            <small class="text-danger">{{ form.get('productDescriptionPath')?.errors?.['jsonPath'] }}</small>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Test & JSON Mapping -->
+                    <div class="config-section mt-3">
+                        <div class="section-header">
+                            <i class="bi bi-play-circle"></i>
+                            <span>Test & JSON Mapping</span>
+                        </div>
+
+                        <!-- Sub Tabs Navigation -->
+                        <ul class="nav nav-tabs nav-tabs-sm mb-3">
+                            <li class="nav-item">
+                                <a class="nav-link" [class.active]="activeJsonTab === 'input'"
+                                    (click)="setJsonTab('input')">
+                                    <i class="bi bi-cloud-arrow-down me-1"></i>Fetch Test
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" [class.active]="activeJsonTab === 'fields'"
+                                    (click)="setJsonTab('fields')" [class.disabled]="!sampleItem">
+                                    <i class="bi bi-braces me-1"></i>Chọn Fields
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" [class.active]="activeJsonTab === 'preview'"
+                                    (click)="setJsonTab('preview')" [class.disabled]="externalProducts.length === 0">
+                                    <i class="bi bi-table me-1"></i>Kết quả ({{ externalProducts.length
+                                    }})
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" [class.active]="activeJsonTab === 'raw'" (click)="setJsonTab('raw')"
+                                    [class.disabled]="!rawResponse">
+                                    <i class="bi bi-code me-1"></i>Raw JSON
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content border rounded p-3">
+                            <!-- TAB 1: INPUT & TEST -->
+                            @if (activeJsonTab === 'input') {
+                            <div class="d-flex gap-2 mb-3">
+                                @if (!isCreateMode) {
+                                <button type="button" class="btn btn-outline-primary" (click)="onFetchProducts()"
+                                    [disabled]="loadingProducts">
+                                    <i class="bi bi-cloud-arrow-down me-1"></i> Gọi API lấy danh sách
+                                    s&#225;ch
+                                    sản phẩm
+                                </button>
+                                }
+                                @if (loadingProducts) {
+                                <div class="text-muted d-flex align-items-center">
+                                    <span class="spinner-border spinner-border-sm me-2"></span>Đang
+                                    tải...
+                                </div>
+                                }
+                            </div>
+                            @if (fetchError) {
+                            <div class="alert alert-danger mt-3">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                {{ fetchError }}
+                            </div>
+                            }
+                            }
+
+                            <!-- TAB 2: PICK FIELDS -->
+                            @if (activeJsonTab === 'fields' && sampleItem) {
+                            @if (activePathField) {
+                            <div class="alert alert-info py-2 mb-2">
+                                <i class="bi bi-crosshair me-1"></i>
+                                Đang chọn cho trường: <strong>{{ activePathField }}</strong>
+                                <span class="text-muted ms-2">- Click <i class="bi bi-check-circle"></i> để
+                                    chọn path,
+                                    hoặc click vào tên field để đi sâu
+                                    vào</span>
+                            </div>
+                            } @else {
+                            <div class="alert alert-warning py-2 mb-2">
+                                <i class="bi bi-exclamation-circle me-1"></i>
+                                Vui lòng click vào nút <i class="bi bi-crosshair"></i> ở
+                                c&#225;c
+                                ô nhập liệu bên trên để bắt đầu
+                                chọn.
+                            </div>
+                            }
+
+                            <!-- Breadcrumb Navigation -->
+                            <nav class="json-breadcrumb mb-2" aria-label="JSON Path">
+                                <ol class="breadcrumb mb-0 small">
+                                    @for (crumb of getBreadcrumb(); track crumb.index) {
+                                    <li class="breadcrumb-item"
+                                        [class.active]="crumb.index === currentJsonPath.length - 1">
+                                        @if (crumb.index < currentJsonPath.length - 1 || crumb.index===-1) { <a
+                                            href="javascript:void(0)" (click)="navigateToLevel(crumb.index)">{{
+                                            crumb.label }}</a>
+                                            } @else {
+                                            {{ crumb.label }}
+                                            }
+                                    </li>
+                                    }
+                                </ol>
+                            </nav>
+
+                            <div class="json-tree">
+                                @for (item of getNodeKeys(); track item.key) {
+                                <div class="json-item d-flex align-items-center">
+                                    <!-- Expand/Navigate button for nested objects/arrays -->
+                                    @if (item.expandable) {
+                                    <button type="button" class="btn btn-sm btn-link p-0 me-1"
+                                        (click)="selectJsonPath(item.key, false)" title="Đi vào">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </button>
+                                    } @else {
+                                    <span class="me-3"></span>
+                                    }
+
+                                    <!-- Key name - click to navigate if expandable -->
+                                    <span class="json-key" [class.cursor-pointer]="item.expandable"
+                                        (click)="item.expandable ? selectJsonPath(item.key, false) : null">
+                                        {{ item.key }}
+                                    </span>
+
+                                    <!-- Type badge -->
+                                    <span class="json-type badge text-bg-light border text-secondary ms-2"
+                                        style="font-size: 0.7em;">
+                                        {{ item.type }}
+                                        @if (item.type === 'array') {
+                                        <span class="ms-1">[{{ item.value.length }}]</span>
+                                        }
+                                    </span>
+
+                                    <!-- Value preview -->
+                                    <span class="json-value text-muted ms-2 text-truncate flex-grow-1"
+                                        style="max-width: 300px;">
+                                        {{ item.preview }}
+                                    </span>
+
+                                    <!-- Select button - always visible when activePathField is set -->
+                                    @if (activePathField) {
+                                    <button type="button" class="btn btn-sm btn-outline-primary ms-2"
+                                        (click)="selectJsonPath(item.key, true)" title="Chọn path này">
+                                        <i class="bi bi-check-circle"></i>
+                                    </button>
+                                    }
+                                </div>
+                                }
+                            </div>
+
+                            <!-- Preview selected path output -->
+                            @if (lastPreviewPath) {
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="text-muted">Preview: <code>{{ lastPreviewPath }}</code></small>
+                                </div>
+                                @if (lastPreviewError) {
+                                <div class="alert alert-danger py-2 mb-0">
+                                    <i class="bi bi-exclamation-triangle me-1"></i>{{ lastPreviewError }}
+                                </div>
+                                } @else {
+                                <pre class="preview-box mb-0">{{ lastPreviewValue | json }}</pre>
+                                }
+                            </div>
+                            }
+                            }
+
+                            <!-- TAB 3: PREVIEW -->
+                            @if (activeJsonTab === 'preview') {
+                            @if (externalProducts.length === 0) {
+                            <div class="text-muted">Ch&#432;a c&#243; d&#7919; li&#7879;u. H&#227;y b&#7845;m "Fetch
+                                Test" &#273;&#7875; l&#7845;y danh s&#225;ch s&#7843;n ph&#7849;m.
+                            </div>
+                            } @else {
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered align-middle">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 50px" class="text-center">STT</th>
+                                            <th style="width: 80px">ID</th>
+                                            <th>Tên</th>
+                                            <th style="width: 120px" class="text-end">Giá</th>
+                                            <th style="width: 120px" class="text-end">Tồn kho</th>
+                                            <th>Mô tả</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @for (p of externalProducts; track p.id; let i = $index) {
+                                        <tr>
+                                            <td class="text-center">{{ i + 1 }}</td>
+                                            <td>{{ p.id }}</td>
+                                            <td>{{ p.name }}</td>
+                                            <td class="text-end">{{ p.price }}</td>
+                                            <td class="text-end">{{ p.stock }}</td>
+                                            <td class="text-truncate" style="max-width: 250px;"
+                                                [title]="p.description || ''">{{ p.description || '-' }}</td>
+                                        </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            }
+                            }
+
+                            <!-- TAB 4: RAW JSON -->
+                            @if (activeJsonTab === 'raw' && rawResponse) {
+                            <textarea class="form-control font-monospace raw-json-textarea" rows="15"
+                                readonly>{{ rawResponse }}</textarea>
+                            }
+                        </div>
+                    </div>
+                </div>
+                }
+
+                <!-- Order Tab -->
+                @if (activeTab === 'order') {
+                <div class="config-section">
+                    <div class="section-header">
+                        <i class="bi bi-cart"></i>
+                        <span>Order API</span>
+                    </div>
+                    <div class="alert alert-warning mb-3">
+                        <i class="bi bi-lightbulb me-1"></i>
+                        Bi&#7871;n c&#243; th&#7875; d&#249;ng: <strong>productId</strong>, <strong>slug</strong>,
+                        <strong>quantity</strong> (&#273;&#7863;t trong <code>$&#123;...&#125;</code>)
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <label class="form-label">Method</label>
+                            <select class="form-select" formControlName="orderMethod">
+                                <option value="GET">GET</option>
+                                <option value="POST">POST</option>
+                            </select>
+                        </div>
+                        <div class="col-md-9">
+                            <label class="form-label">Path</label>
+                            <input type="text" class="form-control" formControlName="orderPath"
+                                [class.is-invalid]="form.get('orderPath')?.invalid && form.get('orderPath')?.touched"
+                                placeholder="/user/buy">
+                            @if (form.get('orderPath')?.errors?.['apiPath'] && form.get('orderPath')?.touched) {
+                            <small class="text-danger">{{ form.get('orderPath')?.errors?.['apiPath'] }}</small>
+                            }
+                        </div>
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label mb-0">Thêm tham số đặt
+                                    hàng</label>
+                                <button type="button" class="btn btn-sm btn-outline-primary" (click)="addOrderParam()">
+                                    <i class="bi bi-plus me-1"></i>Thêm trường
+                                </button>
+                            </div>
+                            @if (orderParams.length > 0) {
+                            <div class="row g-2">
+                                @for (param of orderParams; track $index) {
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control form-control-sm" [(ngModel)]="param.key"
+                                        [ngModelOptions]="{standalone: true}" (ngModelChange)="onOrderParamChange()"
+                                        placeholder="Key (vd: pid)">
+                                </div>
+                                <div class="col-md-3">
+                                    <select class="form-select form-select-sm" [(ngModel)]="param.valueType"
+                                        [ngModelOptions]="{standalone: true}" (ngModelChange)="onOrderParamChange()">
+                                        @for (opt of orderParamValueTypes; track opt.value) {
+                                        <option [value]="opt.value">{{ opt.label }}</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    @if (param.valueType === 'fixed') {
+                                    <input type="text" class="form-control form-control-sm" [(ngModel)]="param.value"
+                                        [ngModelOptions]="{standalone: true}" (ngModelChange)="onOrderParamChange()"
+                                        placeholder="Giá trị cố định">
+                                    } @else {
+                                    <input type="text" class="form-control form-control-sm" [value]="param.valueType"
+                                        readonly>
+                                    }
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-sm btn-danger w-100"
+                                        (click)="removeOrderParam($index)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                                }
+                            </div>
+                            } @else {
+                            <div class="text-muted small">Chưa có tham số. Click "Thêm
+                                trường" để thêm.</div>
+                            }
+
+                            <div class="mt-2">
+                                <label class="form-label small fw-bold">Template (tự sinh)</label>
+                                <textarea class="form-control font-monospace" rows="3" [value]="orderTemplatePreview"
+                                    readonly></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-1">
+                        <div class="col-md-3">
+                            <label class="form-label">Data Path (kết quả order)</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" formControlName="orderDataPath"
+                                    [class.is-invalid]="form.get('orderDataPath')?.invalid && form.get('orderDataPath')?.touched"
+                                    placeholder="$.data">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    (click)="startPathSelection('orderDataPath')" [disabled]="!sampleItem">
+                                    <i class="bi bi-crosshair"></i>
+                                </button>
+                            </div>
+                            @if (form.get('orderDataPath')?.errors?.['jsonPath'] && form.get('orderDataPath')?.touched)
+                            {
+                            <small class="text-danger">{{ form.get('orderDataPath')?.errors?.['jsonPath'] }}</small>
+                            }
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Order Number Path</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" formControlName="orderNumberPath"
+                                    [class.is-invalid]="form.get('orderNumberPath')?.invalid && form.get('orderNumberPath')?.touched"
+                                    placeholder="$.data.order_id">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    (click)="startPathSelection('orderNumberPath')" [disabled]="!sampleItem">
+                                    <i class="bi bi-crosshair"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted">Mã đơn hàng từ API để tra cứu</small>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Error Code Path</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" formControlName="orderErrorCodePath"
+                                    [class.is-invalid]="form.get('orderErrorCodePath')?.invalid && form.get('orderErrorCodePath')?.touched"
+                                    placeholder="$.error_code">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    (click)="startPathSelection('orderErrorCodePath')" [disabled]="!sampleItem">
+                                    <i class="bi bi-crosshair"></i>
+                                </button>
+                            </div>
+                            @if (form.get('orderErrorCodePath')?.errors?.['jsonPath'] &&
+                            form.get('orderErrorCodePath')?.touched) {
+                            <small class="text-danger">{{ form.get('orderErrorCodePath')?.errors?.['jsonPath']
+                                }}</small>
+                            }
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">Message Path (riêng)</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" formControlName="orderMessagePath"
+                                    [class.is-invalid]="form.get('orderMessagePath')?.invalid && form.get('orderMessagePath')?.touched"
+                                    placeholder="$.message">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    (click)="startPathSelection('orderMessagePath')" [disabled]="!sampleItem">
+                                    <i class="bi bi-crosshair"></i>
+                                </button>
+                            </div>
+                            @if (form.get('orderMessagePath')?.errors?.['jsonPath'] &&
+                            form.get('orderMessagePath')?.touched) {
+                            <small class="text-danger">{{ form.get('orderMessagePath')?.errors?.['jsonPath']
+                                }}</small>
+                            }
+                            <small class="text-muted">Nếu trống sẽ dùng Message Path chung</small>
+                        </div>
+                    </div>
+
+                    <!-- Order Error Mapping Section -->
+                    <div class="mt-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label class="form-label mb-0 small fw-bold">
+                                <i class="bi bi-exclamation-diamond me-1"></i>Mã lỗi đặt
+                                hàng
+                            </label>
+                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                (click)="addOrderErrorMapping()">
+                                <i class="bi bi-plus me-1"></i>Thêm mã lỗi
+                            </button>
+                        </div>
+                        @if (orderErrorMappings.length > 0) {
+                        <div class="row g-2">
+                            @for (err of orderErrorMappings; track $index) {
+                            <div class="col-md-2">
+                                <input type="text" class="form-control form-control-sm" [(ngModel)]="err.code"
+                                    [ngModelOptions]="{standalone: true}" placeholder="Code (vd: 101)">
+                            </div>
+                            <div class="col-auto d-flex align-items-center px-0">
+                                <span class="badge bg-secondary" style="font-size: 0.7em;">or</span>
+                            </div>
+                            <div class="col">
+                                <input type="text" class="form-control form-control-sm" [(ngModel)]="err.keyword"
+                                    [ngModelOptions]="{standalone: true}" placeholder="Keyword (contains)">
+                            </div>
+                            <div class="col-md-2">
+                                <select class="form-select form-select-sm" [(ngModel)]="err.appErrorCode"
+                                    [ngModelOptions]="{standalone: true}">
+                                    <option value="" disabled>Chọn mã lỗi</option>
+                                    @for (opt of errorCodeOptions; track opt.value) {
+                                    <option [value]="opt.value">{{ opt.label }}</option>
+                                    }
+                                </select>
+                            </div>
+                            <!-- Only show message inputs if NO appErrorCode is selected -->
+                            @if (!err.appErrorCode) {
+                            <div class="col-md-2">
+                                <input type="text" class="form-control form-control-sm" [(ngModel)]="err.message"
+                                    [ngModelOptions]="{standalone: true}" placeholder="Thông báo (VI)">
+                            </div>
+                            <div class="col-md-3">
+                                <input type="text" class="form-control form-control-sm" [(ngModel)]="err.messageEn"
+                                    [ngModelOptions]="{standalone: true}" placeholder="Message (EN)">
+                            </div>
+                            } @else {
+                            <div class="col-md-5 d-flex align-items-center">
+                                <span class="text-muted small fst-italic"><i class="bi bi-info-circle me-1"></i>Sử dụng
+                                    thông báo từ hệ thống</span>
+                            </div>
+                            }
+                            <div class="col-md-1">
+                                <button type="button" class="btn btn-sm btn-danger w-100"
+                                    (click)="removeOrderErrorMapping($index)">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                            }
+                        </div>
+                        } @else {
+                        <div class="text-muted small">Chưa có mã lỗi. Click "Thêm mã
+                            lỗi" để thêm.</div>
+                        }
+                    </div>
+
+                    <!-- Test Order API Section -->
+                    <div class="config-section mt-3">
+                        <div class="section-header">
+                            <i class="bi bi-play-circle"></i>
+                            <span>Test & JSON Mapping</span>
+                        </div>
+
+                        <!-- Sub Tabs Navigation -->
+                        <ul class="nav nav-tabs nav-tabs-sm mb-3">
+                            <li class="nav-item">
+                                <a class="nav-link" [class.active]="activeJsonTab === 'input'"
+                                    (click)="setJsonTab('input')">
+                                    <i class="bi bi-keyboard me-1"></i>Input & Test
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" [class.active]="activeJsonTab === 'fields'"
+                                    (click)="setJsonTab('fields')" [class.disabled]="!sampleItem">
+                                    <i class="bi bi-braces me-1"></i>Chọn Fields
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" [class.active]="activeJsonTab === 'raw'" (click)="setJsonTab('raw')"
+                                    [class.disabled]="!rawResponse">
+                                    <i class="bi bi-code me-1"></i>Raw JSON
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content border rounded p-3">
+                            <!-- TAB 1: INPUT & TEST -->
+                            @if (activeJsonTab === 'input') {
+                            <div class="alert alert-info mb-3">
+                                <i class="bi bi-info-circle me-1"></i>
+                                <strong>Test Order:</strong> Kh&#244;ng n&#234;n test &#273;&#7863;t h&#224;ng
+                                th&#7853;t v&#236; s&#7869; t&#7889;n ti&#7873;n. H&#227;y paste JSON response
+                                m&#7851;u.
+                            </div>
+
+                            <div class="d-flex gap-2 mb-3">
+                                @if (!isCreateMode) {
+                                <button type="button" class="btn btn-outline-danger" (click)="testOrderApi()"
+                                    [disabled]="loading">
+                                    <i class="bi bi-play-circle me-1"></i> Test Order API &#9888;&#65039;
+                                </button>
+                                }
+                            </div>
+                            @if (orderError) {
+                            <div class="alert alert-danger mt-3">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                {{ orderError }}
+                            </div>
+                            }
+
+                            <div class="bg-light p-3 rounded">
+                                <label class="form-label small fw-bold">Paste JSON Response M&#7851;u:</label>
+                                <textarea class="form-control font-monospace mb-2" rows="6" [(ngModel)]="pasteJsonText"
+                                    [ngModelOptions]="{standalone: true}"
+                                    placeholder='&#123;"code": 200, "data": &#123;...&#125;&#125;'></textarea>
+                                <button type="button" class="btn btn-sm btn-primary" (click)="parseJsonInput()">
+                                    <i class="bi bi-check me-1"></i> Parse JSON
+                                </button>
+                            </div>
+                            }
+
+                            <!-- TAB 2: PICK FIELDS -->
+                            @if (activeJsonTab === 'fields' && sampleItem) {
+                            @if (activePathField) {
+                            <div class="alert alert-info py-2 mb-2">
+                                <i class="bi bi-crosshair me-1"></i>
+                                &#272;ang ch&#7885;n cho tr&#432;&#7901;ng: <strong>{{ activePathField }}</strong>
+                                <span class="text-muted ms-2">- Click <i class="bi bi-check-circle"></i>
+                                    &#273;&#7875;
+                                    ch&#7885;n path, ho&#7863;c click v&#224;o t&#234;n field &#273;&#7875; &#273;i
+                                    s&#226;u v&#224;o</span>
+                            </div>
+                            } @else {
+                            <div class="alert alert-warning py-2 mb-2">
+                                <i class="bi bi-exclamation-circle me-1"></i>
+                                Vui l&#242;ng click v&#224;o n&#250;t <i class="bi bi-crosshair"></i> &#7903;
+                                c&#225;c
+                                &#244; nh&#7853;p li&#7879;u b&#234;n tr&#234;n &#273;&#7875; b&#7855;t
+                                &#273;&#7847;u
+                                ch&#7885;n.
+                            </div>
+                            }
+
+                            <!-- Breadcrumb Navigation -->
+                            <nav class="json-breadcrumb mb-2" aria-label="JSON Path">
+                                <ol class="breadcrumb mb-0 small">
+                                    @for (crumb of getBreadcrumb(); track crumb.index) {
+                                    <li class="breadcrumb-item"
+                                        [class.active]="crumb.index === currentJsonPath.length - 1">
+                                        @if (crumb.index < currentJsonPath.length - 1 || crumb.index===-1) { <a
+                                            href="javascript:void(0)" (click)="navigateToLevel(crumb.index)">{{
+                                            crumb.label }}</a>
+                                            } @else {
+                                            {{ crumb.label }}
+                                            }
+                                    </li>
+                                    }
+                                </ol>
+                            </nav>
+
+                            <div class="json-tree">
+                                @for (item of getNodeKeys(); track item.key) {
+                                <div class="json-item d-flex align-items-center">
+                                    <!-- Expand/Navigate button for nested objects/arrays -->
+                                    @if (item.expandable) {
+                                    <button type="button" class="btn btn-sm btn-link p-0 me-1"
+                                        (click)="selectJsonPath(item.key, false)" title="&#272;i v&#224;o">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </button>
+                                    } @else {
+                                    <span class="me-3"></span>
+                                    }
+
+                                    <!-- Key name - click to navigate if expandable -->
+                                    <span class="json-key" [class.cursor-pointer]="item.expandable"
+                                        (click)="item.expandable ? selectJsonPath(item.key, false) : null">
+                                        {{ item.key }}
+                                    </span>
+
+                                    <!-- Type badge -->
+                                    <span class="json-type badge text-bg-light border text-secondary ms-2"
+                                        style="font-size: 0.7em;">
+                                        {{ item.type }}
+                                        @if (item.type === 'array') {
+                                        <span class="ms-1">[{{ item.value.length }}]</span>
+                                        }
+                                    </span>
+
+                                    <!-- Value preview -->
+                                    <span class="json-value text-muted ms-2 text-truncate flex-grow-1"
+                                        style="max-width: 300px;">
+                                        {{ item.preview }}
+                                    </span>
+
+                                    <!-- Select button - always visible when activePathField is set -->
+                                    @if (activePathField) {
+                                    <button type="button" class="btn btn-sm btn-outline-primary ms-2"
+                                        (click)="selectJsonPath(item.key, true)" title="Ch&#7885;n path n&#224;y">
+                                        <i class="bi bi-check-circle"></i>
+                                    </button>
+                                    }
+                                </div>
+                                }
+                            </div>
+
+                            <!-- Preview selected path output -->
+                            @if (lastPreviewPath) {
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="text-muted">Preview: <code>{{ lastPreviewPath }}</code></small>
+                                </div>
+                                @if (lastPreviewError) {
+                                <div class="alert alert-danger py-2 mb-0">
+                                    <i class="bi bi-exclamation-triangle me-1"></i>{{ lastPreviewError }}
+                                </div>
+                                } @else {
+                                <pre class="preview-box mb-0">{{ lastPreviewValue | json }}</pre>
+                                }
+                            </div>
+                            }
+                            }
+
+                            <!-- TAB 3: RAW JSON -->
+                            @if (activeJsonTab === 'raw' && rawResponse) {
+                            <textarea class="form-control font-monospace raw-json-textarea" rows="15"
+                                readonly>{{ rawResponse }}</textarea>
+                            }
+                        </div>
+                    </div>
+                </div>
+                }
+
+                <!-- Balance Tab -->
+                @if (activeTab === 'balance') {
+                <div class="config-section">
+                    <div class="section-header">
+                        <i class="bi bi-wallet2"></i>
+                        <span>Balance API</span>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Path</label>
+                            <input type="text" class="form-control" formControlName="balancePath"
+                                [class.is-invalid]="form.get('balancePath')?.invalid && form.get('balancePath')?.touched"
+                                placeholder="/api/balance">
+                            @if (form.get('balancePath')?.errors?.['apiPath'] && form.get('balancePath')?.touched) {
+                            <small class="text-danger">{{ form.get('balancePath')?.errors?.['apiPath'] }}</small>
+                            }
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Value Path</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" formControlName="balanceValuePath"
+                                    [class.is-invalid]="form.get('balanceValuePath')?.invalid && form.get('balanceValuePath')?.touched"
+                                    placeholder="$.data.balance">
+                                <button type="button" class="btn btn-outline-secondary"
+                                    (click)="startPathSelection('balanceValuePath')" [disabled]="!sampleItem">
+                                    <i class="bi bi-crosshair"></i>
+                                </button>
+                            </div>
+                            @if (form.get('balanceValuePath')?.errors?.['jsonPath'] &&
+                            form.get('balanceValuePath')?.touched) {
+                            <small class="text-danger">{{ form.get('balanceValuePath')?.errors?.['jsonPath'] }}</small>
+                            }
+                        </div>
+
+                    </div>
+
+                    <!-- Test Balance API Section -->
+                    <div class="config-section mt-3">
+                        <div class="section-header">
+                            <i class="bi bi-play-circle"></i>
+                            <span>Test & JSON Mapping</span>
+                        </div>
+
+                        <!-- Sub Tabs Navigation -->
+                        <ul class="nav nav-tabs nav-tabs-sm mb-3">
+                            <li class="nav-item">
+                                <a class="nav-link" [class.active]="activeJsonTab === 'input'"
+                                    (click)="setJsonTab('input')">
+                                    <i class="bi bi-keyboard me-1"></i>Input & Test
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" [class.active]="activeJsonTab === 'fields'"
+                                    (click)="setJsonTab('fields')" [class.disabled]="!sampleItem">
+                                    <i class="bi bi-braces me-1"></i>Ch&#7885;n Fields
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" [class.active]="activeJsonTab === 'raw'" (click)="setJsonTab('raw')"
+                                    [class.disabled]="!rawResponse">
+                                    <i class="bi bi-code me-1"></i>Raw JSON
+                                </a>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content border rounded p-3">
+                            <!-- TAB 1: INPUT & TEST -->
+                            @if (activeJsonTab === 'input') {
+                            <div class="d-flex gap-2 mb-3">
+                                @if (!isCreateMode) {
+                                <button type="button" class="btn btn-outline-success" (click)="testBalanceApi()"
+                                    [disabled]="loading">
+                                    <i class="bi bi-play-circle me-1"></i> Test Balance API
+                                </button>
+                                }
+                            </div>
+                            @if (balanceError) {
+                            <div class="alert alert-danger mt-3">
+                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                {{ balanceError }}
+                            </div>
+                            }
+
+                            <div class="bg-light p-3 rounded">
+                                <label class="form-label small fw-bold">Paste JSON Response M&#7851;u:</label>
+                                <textarea class="form-control font-monospace mb-2" rows="6" [(ngModel)]="pasteJsonText"
+                                    [ngModelOptions]="{standalone: true}"
+                                    placeholder='&#123;"code": 200, "data": &#123;"balance": 1000&#125;&#125;'></textarea>
+                                <button type="button" class="btn btn-sm btn-primary" (click)="parseJsonInput()">
+                                    <i class="bi bi-check me-1"></i> Parse JSON
+                                </button>
+                            </div>
+                            }
+
+                            <!-- TAB 2: PICK FIELDS -->
+                            @if (activeJsonTab === 'fields' && sampleItem) {
+                            @if (activePathField) {
+                            <div class="alert alert-info py-2 mb-2">
+                                <i class="bi bi-crosshair me-1"></i>
+                                &#272;ang ch&#7885;n cho tr&#432;&#7901;ng: <strong>{{ activePathField }}</strong>
+                                <span class="text-muted ms-2">- Click <i class="bi bi-check-circle"></i>
+                                    &#273;&#7875;
+                                    ch&#7885;n path, ho&#7863;c click v&#224;o t&#234;n field &#273;&#7875; &#273;i
+                                    s&#226;u v&#224;o</span>
+                            </div>
+                            } @else {
+                            <div class="alert alert-warning py-2 mb-2">
+                                <i class="bi bi-exclamation-circle me-1"></i>
+                                Vui l&#242;ng click v&#224;o n&#250;t <i class="bi bi-crosshair"></i> &#7903;
+                                c&#225;c
+                                &#244; nh&#7853;p li&#7879;u b&#234;n
+                                tr&#234;n &#273;&#7875; b&#7855;t &#273;&#7847;u ch&#7885;n.
+                            </div>
+                            }
+
+                            <!-- Breadcrumb Navigation -->
+                            <nav class="json-breadcrumb mb-2" aria-label="JSON Path">
+                                <ol class="breadcrumb mb-0 small">
+                                    @for (crumb of getBreadcrumb(); track crumb.index) {
+                                    <li class="breadcrumb-item"
+                                        [class.active]="crumb.index === currentJsonPath.length - 1">
+                                        @if (crumb.index < currentJsonPath.length - 1 || crumb.index===-1) { <a
+                                            href="javascript:void(0)" (click)="navigateToLevel(crumb.index)">{{
+                                            crumb.label }}</a>
+                                            } @else {
+                                            {{ crumb.label }}
+                                            }
+                                    </li>
+                                    }
+                                </ol>
+                            </nav>
+
+                            <div class="json-tree">
+                                @for (item of getNodeKeys(); track item.key) {
+                                <div class="json-item d-flex align-items-center">
+                                    <!-- Expand/Navigate button for nested objects/arrays -->
+                                    @if (item.expandable) {
+                                    <button type="button" class="btn btn-sm btn-link p-0 me-1"
+                                        (click)="selectJsonPath(item.key, false)" title="&#272;i v&#224;o">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </button>
+                                    } @else {
+                                    <span class="me-3"></span>
+                                    }
+
+                                    <!-- Key name - click to navigate if expandable -->
+                                    <span class="json-key" [class.cursor-pointer]="item.expandable"
+                                        (click)="item.expandable ? selectJsonPath(item.key, false) : null">
+                                        {{ item.key }}
+                                    </span>
+
+                                    <!-- Type badge -->
+                                    <span class="json-type badge text-bg-light border text-secondary ms-2"
+                                        style="font-size: 0.7em;">
+                                        {{ item.type }}
+                                        @if (item.type === 'array') {
+                                        <span class="ms-1">[{{ item.value.length }}]</span>
+                                        }
+                                    </span>
+
+                                    <!-- Value preview -->
+                                    <span class="json-value text-muted ms-2 text-truncate flex-grow-1"
+                                        style="max-width: 300px;">
+                                        {{ item.preview }}
+                                    </span>
+
+                                    <!-- Select button - always visible when activePathField is set -->
+                                    @if (activePathField) {
+                                    <button type="button" class="btn btn-sm btn-outline-primary ms-2"
+                                        (click)="selectJsonPath(item.key, true)" title="Ch&#7885;n path n&#224;y">
+                                        <i class="bi bi-check-circle"></i>
+                                    </button>
+                                    }
+                                </div>
+                                }
+                            </div>
+                            }
+
+                            <!-- TAB 3: RAW JSON -->
+                            @if (activeJsonTab === 'raw' && rawResponse) {
+                            <textarea class="form-control font-monospace raw-json-textarea" rows="15"
+                                readonly>{{ rawResponse }}</textarea>
+                            }
+                        </div>
+                    </div>
+                </div>
+                }
+            </form>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="onClose()">H&#7911;y</button>
+            <button type="button" class="btn btn-primary" (click)="onSubmit()" [disabled]="loading">
+                @if (loading) {
+                <span class="spinner-border spinner-border-sm me-1"></span>
+                }
+                {{ isCreateMode ? 'T&#7841;o m&#7899;i' : 'C&#7853;p nh&#7853;t' }}
+            </button>
+        </div>
+    </div>
+</div>

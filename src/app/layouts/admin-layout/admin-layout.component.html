@@ -71,6 +71,26 @@
           <span>Quản lý OAuth2</span>
         </a>
 
+        <!-- External API Expandable Menu -->
+        <div class="nav-item-expandable">
+          <a class="nav-link" (click)="toggleExternalApiMenu()" [class.expanded]="externalApiExpanded"
+            [class.active]="externalApiExpanded">
+            <i class="bi bi-plug"></i>
+            <span>External API</span>
+            <i class="bi bi-chevron-down expand-icon" [class.rotated]="externalApiExpanded"></i>
+          </a>
+          <div class="submenu" [class.show]="externalApiExpanded">
+            <a class="nav-link submenu-item" routerLink="/admin/external-api/providers" routerLinkActive="active">
+              <i class="bi bi-server"></i>
+              <span>Providers</span>
+            </a>
+            <a class="nav-link submenu-item" routerLink="/admin/external-api/mappings" routerLinkActive="active">
+              <i class="bi bi-link-45deg"></i>
+              <span>Mappings</span>
+            </a>
+          </div>
+        </div>
+
         <a class="nav-link" routerLink="/admin/settings" routerLinkActive="active">
           <i class="bi bi-gear"></i>
           <span>Cài đặt</span>
