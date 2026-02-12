@@ -747,9 +747,15 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
                     }
                 }
 
-                this.notificationService.success(`Tìm thấy ${this.externalProducts.length} sản phẩm`);
-                if (autoPreview) {
-                    this.activeJsonTab = 'preview';
+                if (this.externalProducts.length > 0) {
+                    this.notificationService.success(`Tìm thấy ${this.externalProducts.length} sản phẩm`);
+                    if (autoPreview) {
+                        this.activeJsonTab = 'preview';
+                    }
+                } else {
+                    this.notificationService.info('API kết nối thành công. Hãy chọn field paths từ JSON tree.');
+                    // Chuyển sang tab Chọn Fields để user pick paths
+                    this.activeJsonTab = 'fields';
                 }
                 // Save to productTabData for tab switching
                 this.productTabData = {

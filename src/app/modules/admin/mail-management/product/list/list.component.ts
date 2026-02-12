@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -14,6 +14,9 @@ import { ProductCreateModalComponent } from '../create-modal/create-modal.compon
 import { ProductUpdateModalComponent } from '../update-modal/update-modal.component';
 import { ActiveStatusSelectComponent } from '../../../../../shared/components/active-status-select/active-status-select.component';
 import { ActiveStatusBadgeComponent } from '../../../../../shared/components/active-status-badge/active-status-badge.component';
+import { WebSocketService } from '../../../../../core/services/websocket.service';
+import { ProductQuantityMessage } from '../../../../../core/models/product-quantity-message.model';
+import { StockSyncResultMessage } from '../../../../../core/models/stock-sync-result-message.model';
 interface ProductSearchFilter {
   name?: string;
   categoryId?: number;
@@ -38,7 +41,7 @@ interface ProductSearchFilter {
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss'
 })
-export class MailManagementListComponent implements OnInit {
+export class MailManagementListComponent implements OnInit, OnDestroy {
   private readonly productService = inject(ProductService);
   private readonly categoryService = inject(CategoryService);
   private readonly notificationService = inject(NotificationService);
@@ -46,6 +49,7 @@ export class MailManagementListComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
   private readonly paginationService = inject(PaginationService);
+  private readonly webSocketService = inject(WebSocketService);
 
   products: Product[] = [];
   categories: Category[] = [];
@@ -54,6 +58,10 @@ export class MailManagementListComponent implements OnInit {
   showUpdateModal = false;
   showSourceTypeDialog = false;  // Dialog chọn LOCAL/EXTERNAL
   selectedProduct: Product | null = null;
+
+  // WebSocket unsubscribe
+  private productQuantityUnsub?: () => void;
+  private stockSyncUnsub?: () => void;
 
   paginationConfig: PaginationConfig = {
     currentPage: 0,
@@ -69,6 +77,47 @@ export class MailManagementListComponent implements OnInit {
     this.initForm();
     this.loadCategories();
     this.loadProducts();
+    this.subscribeToStockUpdates();
+  }
+
+  ngOnDestroy(): void {
+    this.productQuantityUnsub?.();
+    this.stockSyncUnsub?.();
+  }
+
+  private subscribeToStockUpdates(): void {
+    // Subscribe to product-quantity for LOCAL products (kho phụ)
+    this.productQuantityUnsub = this.webSocketService.subscribe<ProductQuantityMessage>(
+      '/topic/product-quantity',
+      (payload) => this.handleQuantityUpdate(payload)
+    );
+
+    // Subscribe to stock-sync for EXTERNAL products (lastSyncedStock)
+    this.stockSyncUnsub = this.webSocketService.subscribe<StockSyncResultMessage>(
+      '/topic/admin/stock-sync',
+      (payload) => this.handleStockSyncUpdate(payload)
+    );
+  }
+
+  private handleQuantityUpdate(update: ProductQuantityMessage): void {
+    if (!update?.productId) return;
+    this.products = this.products.map(product =>
+      product.id === update.productId
+        ? { ...product, quantity: update.quantity }
+        : product
+    );
+  }
+
+  private handleStockSyncUpdate(result: StockSyncResultMessage): void {
+    if (!result?.updates?.length) return;
+    const updateMap = new Map(result.updates.map(u => [u.localProductId, u]));
+    this.products = this.products.map(product => {
+      const syncUpdate = updateMap.get(product.id);
+      if (syncUpdate && product.sourceType === 'EXTERNAL') {
+        return { ...product, lastSyncedStock: syncUpdate.lastSyncedStock };
+      }
+      return product;
+    });
   }
 
   private initForm(): void {
@@ -184,7 +233,7 @@ export class MailManagementListComponent implements OnInit {
   onDetail(product: Product): void {
     if (product.sourceType === 'EXTERNAL') {
       this.router.navigate(['/admin/external-api/mappings'], {
-        queryParams: { search: product.name }
+        queryParams: { localProductId: product.id }
       });
       return;
     }

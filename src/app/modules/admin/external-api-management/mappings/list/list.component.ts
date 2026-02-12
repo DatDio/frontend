@@ -1,6 +1,6 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ExternalApiService, ExternalApiProvider, ExternalProductMapping, MappingFilter } from '../../../../../core/services/external-api.service';
 import { NotificationService } from '../../../../../core/services/notification.service';
@@ -9,6 +9,8 @@ import { PaginationComponent, PaginationConfig } from '../../../../../shared/com
 import { PaginationService } from '../../../../../shared/services/pagination.service';
 import { ActiveStatusBadgeComponent } from '../../../../../shared/components/active-status-badge/active-status-badge.component';
 import { ExternalProductMappingCreateModalComponent } from '../create-modal/create-modal.component';
+import { WebSocketService } from '../../../../../core/services/websocket.service';
+import { StockSyncResultMessage } from '../../../../../core/models/stock-sync-result-message.model';
 
 @Component({
     selector: 'app-external-product-mapping-list',
@@ -25,13 +27,14 @@ import { ExternalProductMappingCreateModalComponent } from '../create-modal/crea
     templateUrl: './list.component.html',
     styleUrl: './list.component.scss'
 })
-export class ExternalProductMappingListComponent implements OnInit {
+export class ExternalProductMappingListComponent implements OnInit, OnDestroy {
     private readonly externalApiService = inject(ExternalApiService);
     private readonly notificationService = inject(NotificationService);
     private readonly confirmService = inject(ConfirmService);
     private readonly route = inject(ActivatedRoute);
     private readonly fb = inject(FormBuilder);
     private readonly paginationService = inject(PaginationService);
+    private readonly webSocketService = inject(WebSocketService);
 
     mappings: ExternalProductMapping[] = [];
     providers: ExternalApiProvider[] = [];
@@ -40,6 +43,12 @@ export class ExternalProductMappingListComponent implements OnInit {
     showEditModal = false;
     selectedProviderId: number | null = null;
     selectedMapping: ExternalProductMapping | null = null;
+    filterLocalProductId: number | null = null;
+
+    // WebSocket & countdown
+    private stockSyncUnsub?: () => void;
+    countdownByProviderId: Record<number, number> = {};
+    private countdownInterval: any = null;
 
     paginationConfig: PaginationConfig = {
         currentPage: 0,
@@ -53,14 +62,67 @@ export class ExternalProductMappingListComponent implements OnInit {
     ngOnInit(): void {
         this.initForm();
         this.loadProviders();
+        this.subscribeToStockSync();
+        this.startCountdownTimer();
 
-        // Check query param for providerId
+        // Check query param for providerId and localProductId
         this.route.queryParams.subscribe(params => {
             if (params['providerId']) {
                 this.selectedProviderId = Number(params['providerId']);
                 this.formSearch.patchValue({ providerId: this.selectedProviderId });
             }
+            if (params['localProductId']) {
+                this.filterLocalProductId = Number(params['localProductId']);
+            } else {
+                this.filterLocalProductId = null;
+            }
             this.loadMappings();
+        });
+    }
+
+    ngOnDestroy(): void {
+        this.stockSyncUnsub?.();
+        if (this.countdownInterval) {
+            clearInterval(this.countdownInterval);
+        }
+    }
+
+    private subscribeToStockSync(): void {
+        this.stockSyncUnsub = this.webSocketService.subscribe<StockSyncResultMessage>(
+            '/topic/admin/stock-sync',
+            (payload) => this.handleStockSyncResult(payload)
+        );
+    }
+
+    private handleStockSyncResult(result: StockSyncResultMessage): void {
+        if (!result?.providerId) return;
+
+        // Reset countdown for this provider
+        const provider = this.providers.find(p => p.id === result.providerId);
+        if (provider?.syncIntervalSeconds) {
+            this.countdownByProviderId[result.providerId] = provider.syncIntervalSeconds;
+        }
+
+        // Update mapping data in-place
+        if (!result.updates?.length) return;
+        const updateMap = new Map(result.updates.map(u => [u.mappingId, u]));
+        this.mappings = this.mappings.map(mapping => {
+            const syncUpdate = updateMap.get(mapping.id!);
+            if (syncUpdate) {
+                const newExternalPrice = syncUpdate.externalPrice;
+                const localPrice = mapping.localPrice;
+                const profit = (localPrice != null && newExternalPrice != null) ? localPrice - newExternalPrice : undefined;
+                const profitPercent = (profit != null && newExternalPrice != null && newExternalPrice > 0)
+                    ? (profit * 100 / newExternalPrice) : undefined;
+                return {
+                    ...mapping,
+                    lastSyncedStock: syncUpdate.lastSyncedStock,
+                    externalPrice: newExternalPrice,
+                    profitPerItem: profit,
+                    profitPercent: profitPercent
+                };
+            }
+            return mapping;
         });
     }
 
@@ -76,9 +138,36 @@ export class ExternalProductMappingListComponent implements OnInit {
             next: (response: any) => {
                 if (response.success) {
                     this.providers = response.data || [];
+                    this.initCountdowns();
                 }
             }
         });
+    }
+
+    private startCountdownTimer(): void {
+        this.countdownInterval = setInterval(() => {
+            for (const provider of this.providers) {
+                if (provider.id && provider.autoSyncEnabled && provider.syncIntervalSeconds) {
+                    const id = provider.id;
+                    const current = this.countdownByProviderId[id] ?? provider.syncIntervalSeconds;
+                    const next = current - 1;
+                    this.countdownByProviderId[id] = next <= 0 ? provider.syncIntervalSeconds : next;
+                }
+            }
+        }, 1000);
+    }
+
+    private initCountdowns(): void {
+        for (const provider of this.providers) {
+            if (provider.id && provider.autoSyncEnabled && provider.syncIntervalSeconds) {
+                this.countdownByProviderId[provider.id] ??= provider.syncIntervalSeconds;
+            }
+        }
+    }
+
+    getProviderSyncInterval(providerId: number): number | null {
+        const provider = this.providers.find(p => p.id === providerId);
+        return provider?.autoSyncEnabled ? (provider.syncIntervalSeconds ?? null) : null;
     }
 
     handleSearch(): void {
@@ -99,6 +188,7 @@ export class ExternalProductMappingListComponent implements OnInit {
 
     clearForm(): void {
         this.formSearch.reset({ providerId: '', status: '' });
+        this.filterLocalProductId = null;
         this.paginationConfig.currentPage = 0;
         this.loadMappings();
     }
@@ -108,10 +198,13 @@ export class ExternalProductMappingListComponent implements OnInit {
         const formData = this.formSearch.getRawValue();
         const filter: MappingFilter = {
             providerId: formData.providerId ? Number(formData.providerId) : undefined,
+            localProductId: this.filterLocalProductId ?? undefined,
             status: formData.status ? Number(formData.status) : undefined,
             page: this.paginationConfig.currentPage,
             limit: this.paginationConfig.pageSize
         };
+
+        console.log('[DEBUG] loadMappings filter:', JSON.stringify(filter), 'filterLocalProductId:', this.filterLocalProductId);
 
         this.externalApiService.listMappings(filter).subscribe({
             next: (response: any) => {

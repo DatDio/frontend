@@ -124,6 +124,7 @@ export interface ProviderFilter {
 
 export interface MappingFilter {
     providerId?: number;
+    localProductId?: number;
     status?: number;
     page?: number;
     limit?: number;
@@ -249,6 +250,7 @@ export class ExternalApiService {
     listMappings(filter?: MappingFilter): Observable<ApiResponse<PaginatedResponse<ExternalProductMapping>>> {
         let params = new HttpParams();
         if (filter?.providerId != null) params = params.set('providerId', filter.providerId.toString());
+        if (filter?.localProductId != null) params = params.set('localProductId', filter.localProductId.toString());
         if (filter?.status != null) params = params.set('status', filter.status.toString());
         if (filter?.page != null) params = params.set('page', filter.page.toString());
         if (filter?.limit != null) params = params.set('limit', filter.limit.toString());

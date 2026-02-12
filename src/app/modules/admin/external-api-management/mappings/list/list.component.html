@@ -65,6 +65,7 @@
                             <th class="text-end">Giá bán</th>
                             <th class="text-end">Lợi nhuận</th>
                             <th class="text-center">Stock</th>
+                            <th class="text-center">Auto Sync</th>
                             <th class="text-center">Trạng thái</th>
                             <th class="text-center" style="width: 150px">Thao tác</th>
                         </tr>
@@ -72,7 +73,7 @@
                     <tbody>
                         @if (loading) {
                         <tr>
-                            <td colspan="10" class="text-center py-4">
+                            <td colspan="11" class="text-center py-4">
                                 <div class="spinner-border text-primary" role="status">
                                     <span class="visually-hidden">Loading...</span>
                                 </div>
@@ -80,7 +81,7 @@
                         </tr>
                         } @else if (mappings.length === 0) {
                         <tr>
-                            <td colspan="10" class="text-center py-4 text-muted">
+                            <td colspan="11" class="text-center py-4 text-muted">
                                 <i class="bi bi-inbox fs-1 mb-2"></i>
                                 <p>Chưa có mapping nào</p>
                             </td>
@@ -122,6 +123,20 @@
                             </td>
                             <td class="text-center">
                                 <span class="badge bg-secondary">{{ mapping.lastSyncedStock ?? '?' }}</span>
+                            </td>
+                            <td class="text-center">
+                                @if (getProviderSyncInterval(mapping.providerId); as interval) {
+                                <span class="badge bg-success">
+                                    <i class="bi bi-arrow-repeat"></i> {{ interval }}s
+                                </span>
+                                <br>
+                                <small class="text-muted" style="font-size: 0.7rem; font-variant-numeric: tabular-nums;">
+                                    <i class="bi bi-clock"></i>
+                                    {{ countdownByProviderId[mapping.providerId] ?? interval }}s
+                                </small>
+                                } @else {
+                                <span class="badge bg-secondary">Off</span>
+                                }
                             </td>
                             <td class="text-center">
                                 <app-active-status-badge [status]="mapping.status || 1"></app-active-status-badge>
