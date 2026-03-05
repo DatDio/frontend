@@ -79,6 +79,13 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         { value: 'INTERNAL_SERVER_ERROR', label: 'INTERNAL_SERVER_ERROR (1000) - Lỗi máy chủ nội bộ' }
     ];
 
+    // Visual field order builder state
+    fieldOrderParts: string[] = [];       // split parts from sample data, e.g. ["email", "pass", "clientId", "token"]
+    fieldOrderIndices: number[] = [];     // selected order indices, e.g. [0, 1, 3, 2]
+    fieldOrderPreview: string = '';       // live preview of reordered result
+    dragFieldOrderIdx: number | null = null;     // drag source index
+    dragOverFieldOrderIdx: number | null = null;  // drag over target index
+
     /** Enforce $ prefix on JSON path fields - called on blur */
     onJsonPathBlur(fieldName: string): void {
         const ctrl = this.form.get(fieldName);
@@ -229,6 +236,8 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
             orderPath: new FormControl(this.provider?.orderPath || '', [this.apiPathValidator.bind(this)]),
             orderBodyTemplate: new FormControl(this.provider?.orderBodyTemplate || ''),
             orderDataPath: new FormControl(this.provider?.orderDataPath || '', [this.jsonPathValidator.bind(this)]),
+            orderDataSeparator: new FormControl(this.provider?.orderDataSeparator || ''),
+            orderDataFieldOrder: new FormControl(this.provider?.orderDataFieldOrder || ''),
             orderNumberPath: new FormControl(this.provider?.orderNumberPath || '', [this.jsonPathValidator.bind(this)]),
             orderErrorCodePath: new FormControl(this.provider?.orderErrorCodePath || '', [this.jsonPathValidator.bind(this)]),
             orderMessagePath: new FormControl(this.provider?.orderMessagePath || '', [this.jsonPathValidator.bind(this)]),
@@ -383,6 +392,8 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
             this.rawResponse = JSON.stringify(json, null, 2);
             this.activeJsonTab = 'fields'; // Auto switch to fields
             this.notificationService.success('Đã parse JSON thành công! Click vào các field để navigate hoặc chọn path');
+            // Auto-trigger field order builder if separator is set
+            this.tryRefreshFieldOrder();
         } catch (e) {
             this.notificationService.error('JSON không hợp lệ!');
         }
@@ -654,16 +665,36 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
             next: (response: any) => {
                 this.orderError = null;
                 // Parse the response for JSON picker
-                if (response) {
-                    this.rawResponse = JSON.stringify(response, null, 2);
-                    // Initialize tree with FULL response, not just .data
-                    this.sampleItem = response;
-                    this.currentJsonNode = response;
+                // response = backend ApiResponse wrapping ExternalOrderResultDTO
+                // We need rawResponse (the actual external API response) for the field picker
+                const resultData = response?.data;
+                if (resultData) {
+                    let externalJson: any = null;
+                    if (resultData.rawResponse) {
+                        try {
+                            externalJson = JSON.parse(resultData.rawResponse);
+                            this.rawResponse = JSON.stringify(externalJson, null, 2);
+                        } catch {
+                            this.rawResponse = resultData.rawResponse;
+                        }
+                    }
+
+                    // Initialize tree with external API response (not backend wrapper)
+                    if (externalJson) {
+                        this.sampleItem = externalJson;
+                        this.currentJsonNode = externalJson;
+                    } else {
+                        this.sampleItem = resultData;
+                        this.currentJsonNode = resultData;
+                        this.rawResponse = JSON.stringify(resultData, null, 2);
+                    }
                     this.currentJsonPath = [];
                     this.expandedNodes.clear();
                     this.resetPreview();
                     this.showJsonPicker = true;
                     this.notificationService.success('Đã gọi Order API! Xem response bên dưới.');
+                    // Auto-trigger field order builder if separator is set
+                    this.tryRefreshFieldOrder();
                     // Save to orderTabData for tab switching
                     this.orderTabData = {
                         rawResponse: this.rawResponse,
@@ -675,13 +706,32 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
             },
             error: (error: any) => {
                 this.orderError = error?.error?.message || error?.message || 'Lỗi không xác định';
-                const captured = this.captureErrorResponse(error);
-                this.rawResponse = captured.raw;
-                this.sampleItem = null;
-                this.currentJsonNode = null;
-                this.currentJsonPath = [];
-                this.expandedNodes.clear();
-                this.resetPreview();
+                // Try to extract rawResponse from error (backend sends it even on failure)
+                const errorData = error?.error?.data;
+                if (errorData?.rawResponse) {
+                    let externalJson: any = null;
+                    try {
+                        externalJson = JSON.parse(errorData.rawResponse);
+                        this.rawResponse = JSON.stringify(externalJson, null, 2);
+                    } catch {
+                        this.rawResponse = errorData.rawResponse;
+                    }
+                    if (externalJson) {
+                        this.sampleItem = externalJson;
+                        this.currentJsonNode = externalJson;
+                        this.currentJsonPath = [];
+                        this.expandedNodes.clear();
+                        this.resetPreview();
+                    }
+                } else {
+                    const captured = this.captureErrorResponse(error);
+                    this.rawResponse = captured.raw;
+                    this.sampleItem = null;
+                    this.currentJsonNode = null;
+                    this.currentJsonPath = [];
+                    this.expandedNodes.clear();
+                    this.resetPreview();
+                }
                 this.notificationService.error('Lỗi khi gọi Order API: ' + (error?.error?.message || error?.message));
                 this.loading = false;
             }
@@ -1071,7 +1121,7 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
 
     private parseOrderJsonTemplate(template: string): { key: string; valueType: 'productId' | 'slug' | 'quantity' | 'fixed'; value: string }[] {
         const params: { key: string; valueType: 'productId' | 'slug' | 'quantity' | 'fixed'; value: string }[] = [];
-        const regex = /"([^"]+)"\s*:\s*([^,}]+)/g;
+        const regex = /"([^"]+)"\s*:\s*("(?:[^"\\]|\\.)*"|\$\{[^}]+\}|[^,}\s]+)/g;
         let match: RegExpExecArray | null;
         while ((match = regex.exec(template)) !== null) {
             const key = match[1];
@@ -1084,15 +1134,15 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
     }
 
     private buildOrderParamFromValue(key: string, rawValue: string): { key: string; valueType: 'productId' | 'slug' | 'quantity' | 'fixed'; value: string } {
-        const trimmed = rawValue.trim();
+        let trimmed = rawValue.trim();
+        // Unquote if wrapped in quotes
+        if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+            trimmed = trimmed.slice(1, -1);
+        }
         if (trimmed === '${productId}') return { key: key.trim(), valueType: 'productId', value: '' };
         if (trimmed === '${slug}') return { key: key.trim(), valueType: 'slug', value: '' };
         if (trimmed === '${quantity}') return { key: key.trim(), valueType: 'quantity', value: '' };
 
-        if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
-            const unquoted = trimmed.slice(1, -1);
-            return { key: key.trim(), valueType: 'fixed', value: unquoted };
-        }
         return { key: key.trim(), valueType: 'fixed', value: trimmed };
     }
 
@@ -1295,6 +1345,173 @@ export class ExternalApiProviderDetailModalComponent implements OnInit {
         if (value === null) return 'null';
         if (Array.isArray(value)) return 'array';
         return typeof value;
+    }
+
+    // ==========================================
+    // Visual Field Order Builder
+    // ==========================================
+
+    /** Auto-trigger when separator input changes */
+    onSeparatorInput(): void {
+        const separator = (this.form.get('orderDataSeparator')?.value || '').toString();
+        if (separator && this.sampleItem) {
+            this.refreshFieldOrderParts();
+        } else {
+            this.fieldOrderParts = [];
+            this.fieldOrderIndices = [];
+            this.fieldOrderPreview = '';
+        }
+    }
+
+    /** Try to refresh field order builder if both separator and sampleItem are available */
+    private tryRefreshFieldOrder(): void {
+        const separator = (this.form.get('orderDataSeparator')?.value || '').toString();
+        if (separator && this.sampleItem && this.form.get('orderDataPath')?.value) {
+            this.refreshFieldOrderParts();
+        }
+    }
+
+    /** Extract sample account data and split by separator to show parts */
+    refreshFieldOrderParts(): void {
+        this.fieldOrderParts = [];
+        this.fieldOrderIndices = [];
+        this.fieldOrderPreview = '';
+        this.form.get('orderDataFieldOrder')?.setValue('', { emitEvent: false });
+
+        const separator = (this.form.get('orderDataSeparator')?.value || '').toString();
+        if (!separator || !this.sampleItem) return;
+
+        const dataPath = (this.form.get('orderDataPath')?.value || '').toString().trim();
+        if (!dataPath) return;
+
+        const result = this.evaluateJsonPath(dataPath, this.sampleItem);
+        if (result.error || result.value == null) return;
+
+        // Get first line of account data
+        let sampleLine = '';
+        if (typeof result.value === 'string') {
+            sampleLine = result.value.split('\n')[0].trim();
+        } else if (Array.isArray(result.value) && result.value.length > 0) {
+            sampleLine = String(result.value[0]).split('\n')[0].trim();
+        } else {
+            sampleLine = String(result.value).split('\n')[0].trim();
+        }
+
+        if (!sampleLine || !sampleLine.includes(separator)) return;
+
+        this.fieldOrderParts = sampleLine.split(separator);
+        // Default: all indices in original order
+        this.fieldOrderIndices = this.fieldOrderParts.map((_, i) => i);
+        this.syncFieldOrderToForm();
+    }
+
+    /** Initialize field order builder from existing form value */
+    initFieldOrderFromForm(): void {
+        const fieldOrder = (this.form.get('orderDataFieldOrder')?.value || '').toString().trim();
+        if (!fieldOrder || this.fieldOrderParts.length === 0) return;
+
+        const matches = fieldOrder.match(/\[(\d+)\]/g);
+        if (matches) {
+            this.fieldOrderIndices = matches.map((m: string) => parseInt(m.replace(/[[\]]/g, ''), 10))
+                .filter((n: number) => !isNaN(n) && n < this.fieldOrderParts.length);
+            this.updateFieldOrderPreview();
+        }
+    }
+
+    /** Add a field index to the output order */
+    addFieldOrderIndex(idx: number): void {
+        this.fieldOrderIndices.push(idx);
+        this.syncFieldOrderToForm();
+    }
+
+    /** Remove a field index from the output order at position */
+    removeFieldOrderIndex(pos: number): void {
+        this.fieldOrderIndices.splice(pos, 1);
+        this.syncFieldOrderToForm();
+    }
+
+    /** Move a field in the output order */
+    moveFieldOrder(pos: number, direction: -1 | 1): void {
+        const newPos = pos + direction;
+        if (newPos < 0 || newPos >= this.fieldOrderIndices.length) return;
+        const tmp = this.fieldOrderIndices[pos];
+        this.fieldOrderIndices[pos] = this.fieldOrderIndices[newPos];
+        this.fieldOrderIndices[newPos] = tmp;
+        this.syncFieldOrderToForm();
+    }
+
+    // Drag & drop handlers for output chips
+    onFieldOrderDragStart(event: DragEvent, index: number): void {
+        this.dragFieldOrderIdx = index;
+        if (event.dataTransfer) {
+            event.dataTransfer.effectAllowed = 'move';
+        }
+    }
+
+    onFieldOrderDragEnter(event: DragEvent, index: number): void {
+        event.preventDefault();
+        if (this.dragFieldOrderIdx !== null && this.dragFieldOrderIdx !== index) {
+            this.dragOverFieldOrderIdx = index;
+        }
+    }
+
+    onFieldOrderDragOver(event: DragEvent): void {
+        event.preventDefault();
+        if (event.dataTransfer) {
+            event.dataTransfer.dropEffect = 'move';
+        }
+    }
+
+    onFieldOrderDrop(event: DragEvent): void {
+        event.preventDefault();
+        if (this.dragFieldOrderIdx !== null && this.dragOverFieldOrderIdx !== null
+            && this.dragFieldOrderIdx !== this.dragOverFieldOrderIdx) {
+            const item = this.fieldOrderIndices.splice(this.dragFieldOrderIdx, 1)[0];
+            this.fieldOrderIndices.splice(this.dragOverFieldOrderIdx, 0, item);
+            this.syncFieldOrderToForm();
+        }
+        this.dragFieldOrderIdx = null;
+        this.dragOverFieldOrderIdx = null;
+    }
+
+    onFieldOrderDragEnd(): void {
+        this.dragFieldOrderIdx = null;
+        this.dragOverFieldOrderIdx = null;
+    }
+
+    /** Reset field order to default (original order, all fields) */
+    resetFieldOrder(): void {
+        this.fieldOrderIndices = this.fieldOrderParts.map((_, i) => i);
+        this.syncFieldOrderToForm();
+    }
+
+    /** Sync indices array → form control string + preview */
+    private syncFieldOrderToForm(): void {
+        if (this.fieldOrderIndices.length === 0) {
+            this.form.get('orderDataFieldOrder')?.setValue('', { emitEvent: false });
+            this.fieldOrderPreview = '';
+            return;
+        }
+        const value = this.fieldOrderIndices.map(i => `[${i}]`).join('|');
+        this.form.get('orderDataFieldOrder')?.setValue(value, { emitEvent: false });
+        this.updateFieldOrderPreview();
+    }
+
+    /** Update the live preview of reordered data */
+    private updateFieldOrderPreview(): void {
+        if (this.fieldOrderParts.length === 0 || this.fieldOrderIndices.length === 0) {
+            this.fieldOrderPreview = '';
+            return;
+        }
+        this.fieldOrderPreview = this.fieldOrderIndices
+            .filter(i => i >= 0 && i < this.fieldOrderParts.length)
+            .map(i => this.fieldOrderParts[i])
+            .join('|');
+    }
+
+    /** Check if an index is already used in the current order */
+    isFieldIndexUsed(idx: number): boolean {
+        return this.fieldOrderIndices.includes(idx);
     }
 
     onClose(): void {

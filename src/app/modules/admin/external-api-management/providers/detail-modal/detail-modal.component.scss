@@ -521,6 +521,124 @@ $z-modal: 1050;
 // BUTTON ENHANCEMENTS (Component Override)
 // =============================================
 
+// =============================================
+// FIELD ORDER BUILDER
+// =============================================
+
+.field-order-builder {
+    background: $white;
+    border: 1px solid $gray-200;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.fo-section {
+    .fo-label {
+        font-size: 0.75rem;
+        color: $gray-400;
+        font-weight: 500;
+        margin-bottom: 6px;
+    }
+
+    .fo-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+}
+
+.fo-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    line-height: 1.3;
+    padding: 4px 10px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+
+    .fo-chip-idx {
+        background: rgba(0, 0, 0, 0.08);
+        border-radius: 4px;
+        padding: 1px 5px;
+        font-weight: 700;
+        font-size: 0.7rem;
+        min-width: 18px;
+        text-align: center;
+        color: $gray-700;
+    }
+
+    .fo-chip-val {
+        max-width: 100px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+}
+
+.fo-chip-output {
+    background: $primary-bg;
+    color: $primary-dark;
+    border: 1px solid rgba($primary, 0.3);
+    padding: 3px 4px 3px 4px;
+    cursor: grab;
+    user-select: none;
+
+    &:active {
+        cursor: grabbing;
+    }
+
+    .fo-grip {
+        color: $gray-400;
+        font-size: 0.7rem;
+        margin-right: 2px;
+    }
+
+    .fo-chip-idx {
+        background: rgba($primary, 0.15);
+        color: $primary-dark;
+    }
+
+    .fo-remove {
+        background: none;
+        border: none;
+        padding: 0 3px;
+        cursor: pointer;
+        font-size: 0.65rem;
+        color: $gray-400;
+        transition: color 0.15s;
+        margin-left: 2px;
+
+        &:hover {
+            color: $danger;
+        }
+    }
+
+    &.fo-dragging {
+        opacity: 0.4;
+    }
+
+    &.fo-drag-over {
+        border-color: $primary;
+        box-shadow: -2px 0 0 0 $primary;
+    }
+}
+
+.fo-preview {
+    background: #f8fafc;
+    border: 1px dashed $gray-200;
+    border-radius: 6px;
+    padding: 6px 10px;
+
+    code {
+        color: $primary-dark;
+        font-size: 0.78rem;
+        word-break: break-all;
+    }
+}
+
 .btn-primary {
     background: $gradient-primary;
     border: none;

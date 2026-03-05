@@ -558,6 +558,70 @@
                             }
                         </div>
                         <div class="col-md-3">
+                            <label class="form-label">Ký tự phân tách</label>
+                            <input type="text" class="form-control" formControlName="orderDataSeparator"
+                                placeholder="VD: ----" (input)="onSeparatorInput()">
+                            <small class="text-muted">Dấu phân tách trong dữ liệu account</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Thứ tự fields</label>
+                            <!-- Visual builder when parts are available -->
+                            @if (fieldOrderParts.length > 0) {
+                            <div class="field-order-builder">
+                                <div class="fo-section">
+                                    <div class="d-flex align-items-center gap-1 fo-label">
+                                        <span>Kéo thả để sắp xếp lại</span>
+                                        <button type="button" class="btn btn-link btn-sm p-0" style="font-size: 0.7rem; color: inherit" (click)="resetFieldOrder()" title="Reset về mặc định">
+                                            <i class="bi bi-arrow-counterclockwise"></i>
+                                        </button>
+                                    </div>
+                                    <div class="fo-chips fo-chips-drop" 
+                                        (dragover)="onFieldOrderDragOver($event)"
+                                        (drop)="onFieldOrderDrop($event)">
+                                        @for (idx of fieldOrderIndices; track $index) {
+                                        <div class="fo-chip fo-chip-output"
+                                            draggable="true"
+                                            [class.fo-dragging]="dragFieldOrderIdx === $index"
+                                            [class.fo-drag-over]="dragOverFieldOrderIdx === $index"
+                                            (dragstart)="onFieldOrderDragStart($event, $index)"
+                                            (dragenter)="onFieldOrderDragEnter($event, $index)"
+                                            (dragend)="onFieldOrderDragEnd()">
+                                            <i class="bi bi-grip-vertical fo-grip"></i>
+                                            <span class="fo-chip-idx">{{idx}}</span>
+                                            <span class="fo-chip-val">{{fieldOrderParts[idx]}}</span>
+                                        </div>
+                                        }
+                                    </div>
+                                </div>
+                                @if (fieldOrderPreview) {
+                                <div class="fo-preview mt-2">
+                                    <div class="fo-label" style="margin-bottom: 2px">Preview</div>
+                                    <code>{{fieldOrderPreview}}</code>
+                                </div>
+                                }
+                                <input type="hidden" formControlName="orderDataFieldOrder">
+                            </div>
+                            } @else {
+                            <!-- Fallback: plain text input + analyze button -->
+                            <div class="input-group">
+                                <input type="text" class="form-control" formControlName="orderDataFieldOrder"
+                                    placeholder="VD: [0]|[1]|[3]|[2]">
+                                <button type="button" class="btn btn-outline-info" (click)="refreshFieldOrderParts()"
+                                    [disabled]="!sampleItem || !form.get('orderDataSeparator')?.value"
+                                    title="Phân tích dữ liệu mẫu để sắp xếp trực quan">
+                                    <i class="bi bi-lightning-fill"></i> Phân tích
+                                </button>
+                            </div>
+                            @if (!sampleItem) {
+                            <small class="text-warning"><i class="bi bi-info-circle"></i> Test Order API trước để có dữ liệu mẫu</small>
+                            } @else if (!form.get('orderDataSeparator')?.value) {
+                            <small class="text-warning"><i class="bi bi-info-circle"></i> Nhập ký tự phân tách trước</small>
+                            } @else {
+                            <small class="text-muted">Click "Phân tích" để sắp xếp trực quan</small>
+                            }
+                            }
+                        </div>
+                        <div class="col-md-3">
                             <label class="form-label">Order Number Path</label>
                             <div class="input-group">
                                 <input type="text" class="form-control" formControlName="orderNumberPath"

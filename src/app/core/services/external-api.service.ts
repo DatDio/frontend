@@ -33,6 +33,8 @@ export interface ExternalApiProvider {
     orderPath?: string;
     orderBodyTemplate?: string;
     orderDataPath?: string;
+    orderDataSeparator?: string;     // Ký tự phân tách trong account data (VD: "----")
+    orderDataFieldOrder?: string;    // Thứ tự sắp xếp fields sau khi split (VD: "[0]|[1]|[3]|[2]")
     orderNumberPath?: string;       // JSONPath để lấy mã đơn hàng từ external response
     orderErrorCodePath?: string;
     orderErrorCodeMappings?: string;
