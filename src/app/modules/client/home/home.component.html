@@ -153,64 +153,61 @@
         <div class="product-list">
 
           <div class="product-header">
-            <div class="col-name"><i class="bi bi-envelope me-2"></i>{{ 'HOME.PRODUCT' | translate }}</div>
-            <div class="col-live"><i class="bi bi-hourglass-split me-2"></i>{{ 'HOME.LIVETIME' | translate }}</div>
-            <div class="col-country"><i class="bi bi-globe me-2"></i>{{ 'HOME.COUNTRY' | translate }}</div>
-            <div class="col-price text-start"><i class="bi bi-tag me-2"></i>{{ 'HOME.PRICE' | translate }}</div>
-            <div class="col-quantity text-start"><i class="bi bi-cart me-2"></i>{{ 'HOME.QUANTITY' | translate }}</div>
-            <div class="col-action"></div>
+                  <div class="col-id"><i class="bi bi-hash me-2"></i>ID</div>
+                  <div class="col-name"><i class="bi bi-envelope me-2"></i>{{ 'HOME.PRODUCT' | translate }}</div>
+                  <div class="col-live"><i class="bi bi-hourglass-split me-2"></i>{{ 'HOME.LIVETIME' | translate }}</div>
+                  <div class="col-country"><i class="bi bi-globe me-2"></i>{{ 'HOME.COUNTRY' | translate }}</div>
+                  <div class="col-price text-start"><i class="bi bi-tag me-2"></i>{{ 'HOME.PRICE' | translate }}</div>
+                  <div class="col-quantity text-start"><i class="bi bi-cart me-2"></i>{{ 'HOME.QUANTITY' | translate }}</div>
+                  <div class="col-action"></div>
           </div>
 
           @for (product of category.products; track product.id) {
-          <div class="product-item">
-
-            <div class="info-col" [attr.data-label]="'HOME.PRODUCT' | translate">
-              <div class="product-info-wrapper">
-                @if (product.imageUrl) {
-                <img [src]="product.imageUrl" alt="{{ product.name }}" class="product-image">
-                } @else {
-                <div class="product-image-placeholder">
-                  <i class="bi bi-envelope"></i>
-                </div>
-                }
-                <div class="product-text">
-                  <div class="product-name">{{ product.name }}</div>
-                  <div class="product-desc">{{ product.description }}</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="live-col" [attr.data-label]="'HOME.LIVETIME' | translate">
-              <span class="live-chip">{{ product.liveTime || '—' }}</span>
-            </div>
-
-            <div class="country-col" [attr.data-label]="'HOME.COUNTRY' | translate">
-              <span class="country-chip">
-                <i class="bi bi-flag me-1"></i>{{ product.country || '—' }}
-              </span>
-            </div>
-
-            <div class="price-col text-start" [attr.data-label]="'HOME.PRICE' | translate">
-              <div class="price">{{ product.price | vndUsd }}</div>
-            </div>
-
-            <div class="quantity-col text-start" [attr.data-label]="'HOME.QUANTITY' | translate">
-              <div class="quantity-box">{{ product.quantity | number }}</div>
-            </div>
-
-            <div class="action-col" [attr.data-label]="'COMMON.ACTION' | translate">
-              @if (product.quantity > 0) {
-              <button class="buy-btn" (click)="prepareOrder(product)">
-                <i class="bi bi-plus me-1"></i> {{ 'COMMON.BUY' | translate }}
-              </button>
-              } @else {
-              <button class="buy-btn sold-out" disabled>
-                <i class="bi bi-x-circle me-1"></i> {{ 'COMMON.OUT_OF_STOCK' | translate }}
-              </button>
-              }
-            </div>
-
-          </div>
+                    <div class="product-item">
+                      <div class="id-col" [attr.data-label]="'HOME.ID' | translate">
+                        <span class="id-chip">{{ product.id }}</span>
+                      </div>
+                      <div class="info-col" [attr.data-label]="'HOME.PRODUCT' | translate">
+                        <div class="product-info-wrapper">
+                          @if (product.imageUrl) {
+                          <img [src]="product.imageUrl" alt="{{ product.name }}" class="product-image">
+                          } @else {
+                          <div class="product-image-placeholder">
+                            <i class="bi bi-envelope"></i>
+                          </div>
+                          }
+                          <div class="product-text">
+                            <div class="product-name">{{ product.name }}</div>
+                            <div class="product-desc">{{ product.description }}</div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="live-col" [attr.data-label]="'HOME.LIVETIME' | translate">
+                        <span class="live-chip">{{ product.liveTime || '—' }}</span>
+                      </div>
+                      <div class="country-col" [attr.data-label]="'HOME.COUNTRY' | translate">
+                        <span class="country-chip">
+                          <i class="bi bi-flag me-1"></i>{{ product.country || '—' }}
+                        </span>
+                      </div>
+                      <div class="price-col text-start" [attr.data-label]="'HOME.PRICE' | translate">
+                        <div class="price">{{ product.price | vndUsd }}</div>
+                      </div>
+                      <div class="quantity-col text-start" [attr.data-label]="'HOME.QUANTITY' | translate">
+                        <div class="quantity-box">{{ product.quantity | number }}</div>
+                      </div>
+                      <div class="action-col" [attr.data-label]="'COMMON.ACTION' | translate">
+                        @if (product.quantity > 0) {
+                        <button class="buy-btn" (click)="prepareOrder(product)">
+                          <i class="bi bi-plus me-1"></i> {{ 'COMMON.BUY' | translate }}
+                        </button>
+                        } @else {
+                        <button class="buy-btn sold-out" disabled>
+                          <i class="bi bi-x-circle me-1"></i> {{ 'COMMON.OUT_OF_STOCK' | translate }}
+                        </button>
+                        }
+                      </div>
+                    </div>
           }
 
         </div>

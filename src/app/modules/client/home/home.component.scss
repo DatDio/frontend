@@ -317,7 +317,7 @@
 
 .product-header {
   display: grid;
-  grid-template-columns: 1.2fr 140px 140px 140px 120px 130px;
+  grid-template-columns: 70px 1.2fr 140px 140px 140px 120px 130px;
   gap: $spacing-4;
   padding: $spacing-3 $spacing-5;
   background: var(--bg-table-header);
@@ -341,7 +341,7 @@
 
 .product-item {
   display: grid;
-  grid-template-columns: 1.2fr 140px 140px 140px 120px 130px;
+  grid-template-columns: 70px 1.2fr 140px 140px 140px 120px 130px;
   gap: $spacing-4;
   padding: $spacing-5;
   background: var(--bg-card);
@@ -354,6 +354,23 @@
     border-color: $primary;
     background: var(--bg-table-row-hover);
     box-shadow: var(--shadow-card-hover);
+  }
+
+  .id-col {
+    .id-chip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: $spacing-1 $spacing-2;
+      background: rgba($primary, 0.12);
+      color: $primary;
+      border-radius: $radius-md;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-bold;
+      font-family: 'Consolas', 'Monaco', monospace;
+      min-width: 40px;
+      word-break: break-all;
+    }
   }
 
   .info-col {
@@ -503,6 +520,10 @@
     gap: $spacing-3;
     padding: $spacing-4;
 
+    .id-col {
+      display: none;
+    }
+
     .info-col {
       grid-column: span 2;
     }
@@ -533,6 +554,10 @@
   @media (max-width: $breakpoint-sm) {
     grid-template-columns: 1fr;
     gap: $spacing-3;
+
+    .id-col {
+      display: none;
+    }
 
     .info-col {
       grid-column: span 1;
