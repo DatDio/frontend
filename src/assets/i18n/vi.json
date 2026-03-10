@@ -426,7 +426,8 @@
     "MAX_VALUE": "Giá trị tối đa là {{max}}",
     "MIN_LENGTH": "Độ dài tối thiểu là {{min}} ký tự",
     "MAX_LENGTH": "Độ dài tối đa là {{max}} ký tự",
-    "PATTERN_INVALID": "Định dạng không hợp lệ"
+    "PATTERN_INVALID": "Định dạng không hợp lệ",
+    "MAX_QUANTITY_ORDER": "Sản phẩm chỉ cho phép mua tối đa 500 mail mỗi đơn"
   },
   "MESSAGE": {
     "SUCCESS": "Thành công",

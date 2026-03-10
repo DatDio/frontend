@@ -426,7 +426,8 @@
         "MAX_VALUE": "Maximum value is {{max}}",
         "MIN_LENGTH": "Minimum length is {{min}} characters",
         "MAX_LENGTH": "Maximum length is {{max}} characters",
-        "PATTERN_INVALID": "Invalid format"
+        "PATTERN_INVALID": "Invalid format",
+        "MAX_QUANTITY_ORDER": "This product allows a maximum of 500 mails per order"
     },
     "MESSAGE": {
         "SUCCESS": "Success",

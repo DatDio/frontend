@@ -32,6 +32,7 @@ declare var bootstrap: any;
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit, OnDestroy {
+  private readonly EXTERNAL_MAX_QUANTITY = 500;
   private readonly platformId = inject(PLATFORM_ID);
   private readonly isBrowser = isPlatformBrowser(this.platformId);
   private readonly seoService = inject(SeoService);
@@ -129,6 +130,15 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.selectedProduct = product;
     this.orderForm.patchValue({ quantity: 1 });
+
+    // Dynamic max validator for external products
+    const quantityControl = this.orderForm.get('quantity');
+    if (product.sourceType === 'EXTERNAL') {
+      quantityControl?.setValidators([Validators.required, Validators.min(1), Validators.max(this.EXTERNAL_MAX_QUANTITY)]);
+    } else {
+      quantityControl?.setValidators([Validators.required, Validators.min(1)]);
+    }
+    quantityControl?.updateValueAndValidity();
 
     const modalElement = document.getElementById('orderModal');
     if (modalElement) {
