@@ -76,6 +76,8 @@
           <th>Trạng thái</th>
           <th>Loại hết hạn</th>
           <th>Thời gian hết hạn</th>
+          <th style="background:#fff3cd;">Hết hạn</th>
+          <th style="background:#fff3cd;">Server Time</th>
           <th>Người mua</th>
           <th>Ngày bán</th>
           <th>Hành động</th>
@@ -84,7 +86,7 @@
       <tbody>
         @if (items.length === 0) {
         <tr>
-          <td colspan="7" class="text-center text-muted py-4">Không có dữ liệu</td>
+          <td colspan="10" class="text-center text-muted py-4">Không có dữ liệu</td>
         </tr>
         }
         @for (item of items; track item.id; let i = $index) {
@@ -117,6 +119,18 @@
             } @else {
             <span class="text-muted">-</span>
             }
+          </td>
+          <td style="background:#fff9e6;">
+            @if (item.isTimeExpired === true) {
+            <span class="badge bg-danger">Đã hết hạn</span>
+            } @else if (item.isTimeExpired === false) {
+            <span class="badge bg-success">Còn hạn</span>
+            } @else {
+            <span class="text-muted">-</span>
+            }
+          </td>
+          <td style="background:#fff9e6;">
+            <small>{{ item.serverTime }}</small>
           </td>
           <td>{{ item.buyerName || '-' }}</td>
           <td>{{ item.soldAt ? (item.soldAt | date: 'dd/MM/yyyy') : '-' }}</td>

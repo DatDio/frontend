@@ -19,6 +19,9 @@ export interface ProductItem {
   expiresAt?: string;               // Thời điểm hết hạn (null = không hết hạn)
   expired?: boolean;
   expiredAt?: string;
+  // Debug fields
+  isTimeExpired?: boolean;  // Java isExpired() result
+  serverTime?: string;      // Server's LocalDateTime.now()
 }
 export interface ProductItemCreate {
   productId: number;
