@@ -17,7 +17,6 @@
     </div>
   </div>
 
-  <!-- Search Form -->
   <div class="card mb-4 shadow-sm">
     <div class="card-body">
       <form [formGroup]="searchForm">
@@ -39,11 +38,9 @@
             <label for="expirationType" class="form-label">Loại hết hạn</label>
             <select id="expirationType" class="form-select" formControlName="expirationType">
               <option value="">Tất cả</option>
-              <option value="NONE">Không hết hạn</option>
-              <option value="HOURS_3">3 giờ</option>
-              <option value="HOURS_6">6 giờ</option>
-              <option value="MONTH_1">1 tháng</option>
-              <option value="MONTH_6">6 tháng</option>
+              @for (option of expirationTypeOptions; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+              }
             </select>
           </div>
           <div class="col-md-4 d-flex align-items-end gap-2">
@@ -51,7 +48,7 @@
               <i class="bi bi-search"></i> Tìm kiếm
             </button>
             <button type="button" class="btn btn-secondary" (click)="clearForm()">
-              <i class="bi bi-arrow-clockwise"></i> Xoá bộ lọc
+              <i class="bi bi-arrow-clockwise"></i> Xóa bộ lọc
             </button>
           </div>
         </div>
@@ -59,7 +56,6 @@
     </div>
   </div>
 
-  <!-- Items Table -->
   <div class="table-responsive bg-white rounded shadow-sm">
     <div class="card-header">
       <div class="row align-items-center">
@@ -105,9 +101,11 @@
             }
           </td>
           <td>
-            <span class="badge" [class.bg-secondary]="item.expirationType === 'NONE'"
-              [class.bg-warning]="item.expirationType === 'HOURS_3' || item.expirationType === 'HOURS_6'"
-              [class.bg-info]="item.expirationType === 'MONTH_1' || item.expirationType === 'MONTH_6'">
+            <span
+              class="badge"
+              [class.bg-secondary]="item.expirationType === 'NONE'"
+              [class.bg-warning]="isHourExpiration(item.expirationType)"
+              [class.bg-info]="isMonthExpiration(item.expirationType)">
               {{ item.expirationLabel || 'Không hết hạn' }}
             </span>
           </td>
@@ -146,7 +144,6 @@
     </table>
   </div>
 
-  <!-- Pagination -->
   <app-pagination [config]="{
       currentPage: currentPage,
       totalPages: totalPages,
@@ -161,7 +158,6 @@
 </app-bulk-import-modal>
 }
 
-<!-- Bulk Delete Modal -->
 @if (showBulkDeleteModal) {
 <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
   <div class="modal-dialog modal-lg">
@@ -182,7 +178,7 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="showBulkDeleteModal = false">Hủy</button>
         <button type="button" class="btn btn-danger" (click)="onConfirmBulkDelete()"
-          [disabled]="!bulkDeleteData?.trim()">
+          [disabled]="!bulkDeleteData.trim()">
           <i class="bi bi-trash me-1"></i> Xóa tài khoản
         </button>
       </div>

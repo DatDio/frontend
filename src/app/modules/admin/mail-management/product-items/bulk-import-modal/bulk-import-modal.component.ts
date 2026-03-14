@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductItemService } from '../../../../../core/services/product-item.service';
 import { NotificationService } from '../../../../../core/services/notification.service';
-import { ExpirationType } from '../../../../../core/models/product-item.model';
+import { EXPIRATION_TYPE_OPTIONS, ExpirationType } from '../../../../../core/models/product-item.model';
 
 @Component({
   selector: 'app-bulk-import-modal',
@@ -19,8 +19,8 @@ export class BulkImportModalComponent {
 
   private readonly productItemService = inject(ProductItemService);
   private readonly notificationService = inject(NotificationService);
+  readonly expirationTypeOptions = EXPIRATION_TYPE_OPTIONS;
 
-  // ExpirationType enum matching backend
   expirationType: ExpirationType = 'NONE';
 
   // Option 1: File upload

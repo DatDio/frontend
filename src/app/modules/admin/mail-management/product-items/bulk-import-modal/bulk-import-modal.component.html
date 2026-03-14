@@ -5,41 +5,26 @@
       <button type="button" class="btn-close" (click)="onClose()"></button>
     </div>
     <div class="modal-body">
-      <!-- Expiration Type Selection (matching backend enum) -->
       <div class="mb-4">
         <label class="form-label fw-bold">
           <i class="bi bi-clock-history me-1"></i> Thời gian hết hạn
         </label>
         <div class="d-flex flex-wrap gap-3">
+          @for (option of expirationTypeOptions; track option.value) {
           <div class="form-check">
-            <input class="form-check-input" type="radio" name="expirationType" id="expNone" [(ngModel)]="expirationType"
-              value="NONE">
-            <label class="form-check-label" for="expNone">Không hết hạn</label>
+            <input
+              class="form-check-input"
+              type="radio"
+              name="expirationType"
+              [attr.id]="'exp-' + option.value.toLowerCase()"
+              [(ngModel)]="expirationType"
+              [value]="option.value">
+            <label class="form-check-label" [attr.for]="'exp-' + option.value.toLowerCase()">{{ option.label }}</label>
           </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="expirationType" id="exp3h" [(ngModel)]="expirationType"
-              value="HOURS_3">
-            <label class="form-check-label" for="exp3h">3 giờ</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="expirationType" id="exp6h" [(ngModel)]="expirationType"
-              value="HOURS_6">
-            <label class="form-check-label" for="exp6h">6 giờ</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="expirationType" id="exp1m" [(ngModel)]="expirationType"
-              value="MONTH_1">
-            <label class="form-check-label" for="exp1m">1 tháng</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input" type="radio" name="expirationType" id="exp6m" [(ngModel)]="expirationType"
-              value="MONTH_6">
-            <label class="form-check-label" for="exp6m">6 tháng</label>
-          </div>
+          }
         </div>
       </div>
 
-      <!-- Skip Duplicate Check -->
       <div class="mb-4">
         <div class="form-check form-switch">
           <input class="form-check-input" type="checkbox" id="skipDuplicateCheck" [(ngModel)]="skipDuplicateCheck">
@@ -52,7 +37,6 @@
         </small>
       </div>
 
-      <!-- Option 1: File Upload -->
       <div class="mb-3">
         <label class="form-label fw-bold">
           <i class="bi bi-file-earmark-text me-1"></i> Chọn file TXT
@@ -69,9 +53,8 @@
         }
       </div>
 
-      <div class="text-center text-muted mb-3">— hoặc —</div>
+      <div class="text-center text-muted mb-3">- hoặc -</div>
 
-      <!-- Option 2: Textarea Input -->
       <div class="mb-3">
         <label for="accountsInput" class="form-label fw-bold">
           <i class="bi bi-list-ul me-1"></i> Nhập trực tiếp

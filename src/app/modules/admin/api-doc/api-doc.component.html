@@ -5,7 +5,6 @@
     </h2>
     <p class="text-muted mb-4">Tài liệu API dành cho Admin - Quản lý tài khoản sản phẩm</p>
 
-    <!-- API: Create Items -->
     <div class="api-card">
         <div class="api-header">
             <span class="method-badge post">POST</span>
@@ -55,7 +54,7 @@
                             <td><code>expirationType</code></td>
                             <td>Enum</td>
                             <td><span class="badge bg-secondary">No</span></td>
-                            <td>NONE | HOURS_3 | HOURS_6 | MONTH_1 | MONTH_6</td>
+                            <td>{{ expirationTypeText }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -71,7 +70,6 @@
         </div>
     </div>
 
-    <!-- API: Import Items -->
     <div class="api-card">
         <div class="api-header">
             <span class="method-badge post">POST</span>
@@ -130,7 +128,7 @@
                             <td><code>expirationType</code></td>
                             <td>String</td>
                             <td><span class="badge bg-secondary">No</span></td>
-                            <td>NONE (default) | HOURS_3 | HOURS_6 | MONTH_1 | MONTH_6</td>
+                            <td>{{ importExpirationTypeText }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -148,7 +146,6 @@
         </div>
     </div>
 
-    <!-- Expiration Types -->
     <div class="api-card">
         <div class="api-header">
             <i class="bi bi-clock-history me-2"></i>
@@ -163,26 +160,12 @@
                     </tr>
                 </thead>
                 <tbody>
+                    @for (option of expirationTypeOptions; track option.value) {
                     <tr>
-                        <td><code>NONE</code></td>
-                        <td>Không hết hạn</td>
+                        <td><code>{{ option.value }}</code></td>
+                        <td>{{ option.label }}</td>
                     </tr>
-                    <tr>
-                        <td><code>HOURS_3</code></td>
-                        <td>Hết hạn sau 3 giờ</td>
-                    </tr>
-                    <tr>
-                        <td><code>HOURS_6</code></td>
-                        <td>Hết hạn sau 6 giờ</td>
-                    </tr>
-                    <tr>
-                        <td><code>MONTH_1</code></td>
-                        <td>Hết hạn sau 1 tháng (30 ngày)</td>
-                    </tr>
-                    <tr>
-                        <td><code>MONTH_6</code></td>
-                        <td>Hết hạn sau 6 tháng</td>
-                    </tr>
+                    }
                 </tbody>
             </table>
         </div>

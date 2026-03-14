@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { EXPIRATION_TYPE_OPTIONS } from '../../../core/models/product-item.model';
 
 @Component({
     selector: 'app-api-doc',
@@ -9,10 +10,17 @@ import { CommonModule } from '@angular/common';
     styleUrls: ['./api-doc.component.scss']
 })
 export class ApiDocComponent {
+    readonly expirationTypeOptions = EXPIRATION_TYPE_OPTIONS;
+    readonly expirationTypeText = this.expirationTypeOptions.map(option => option.value).join(' | ');
+    readonly importExpirationTypeText = `NONE (default) | ${this.expirationTypeOptions
+        .filter(option => option.value !== 'NONE')
+        .map(option => option.value)
+        .join(' | ')}`;
+
     createRequestExample = `{
   "productId": 1,
   "accountData": "user1@mail.com|password1\\nuser2@mail.com|password2",
-  "expirationType": "MONTH_1"
+  "expirationType": "MONTH_2"
 }`;
 
     createResponseExample = `{
@@ -27,11 +35,11 @@ export class ApiDocComponent {
 --data-raw '{
     "productId": 1,
     "accountData": "email1@example|passexample1|refresh_token1|client_id1\\nemail2@example|passexample2|refresh_token2|client_id2\\nemail3@example|passexample3|refresh_token3|client_id3\\n",
-    "expirationType": "NONE"
+    "expirationType": "HOURS_2"
 }'`;
 
     importCurlExample = `curl -X POST \\
-  'https://emailsieure.com/admin/api/v1/product-items/import/1?expirationType=MONTH_1' \\
+  'https://emailsieure.com/admin/api/v1/product-items/import/1?expirationType=HOURS_1' \\
   -H 'X-API-KEY: <your_api_key>' \\
   -F 'file=@accounts.txt'`;
 

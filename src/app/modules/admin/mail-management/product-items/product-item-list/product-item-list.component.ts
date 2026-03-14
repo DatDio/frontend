@@ -2,7 +2,13 @@ import { Component, OnInit, inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { ProductItem } from '../../../../../core/models/product-item.model';
+import {
+  EXPIRATION_TYPE_OPTIONS,
+  HOUR_EXPIRATION_TYPES,
+  MONTH_EXPIRATION_TYPES,
+  ProductItem,
+  ExpirationType
+} from '../../../../../core/models/product-item.model';
 import { ProductItemService } from '../../../../../core/services/product-item.service';
 import { NotificationService } from '../../../../../core/services/notification.service';
 import { ConfirmService } from '../../../../../shared/services/confirm.service';
@@ -24,6 +30,9 @@ export class ProductItemListComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
   private readonly platformId = inject(PLATFORM_ID);
+  readonly expirationTypeOptions = EXPIRATION_TYPE_OPTIONS;
+  readonly hourExpirationTypes = HOUR_EXPIRATION_TYPES;
+  readonly monthExpirationTypes = MONTH_EXPIRATION_TYPES;
 
   productId: number | null = null;
   productName = '';
@@ -294,5 +303,13 @@ export class ProductItemListComponent implements OnInit {
   getExpiryTime(createdAt: string, expirationHours: number): Date {
     const created = new Date(createdAt);
     return new Date(created.getTime() + expirationHours * 60 * 60 * 1000);
+  }
+
+  isHourExpiration(expirationType?: ExpirationType): boolean {
+    return !!expirationType && this.hourExpirationTypes.includes(expirationType);
+  }
+
+  isMonthExpiration(expirationType?: ExpirationType): boolean {
+    return !!expirationType && this.monthExpirationTypes.includes(expirationType);
   }
 }
