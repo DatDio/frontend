@@ -1,4 +1,4 @@
-﻿import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -66,12 +66,12 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
 
   // ========== DEPOSIT ==========
   depositMethod: 'vietqr' | 'crypto' = 'vietqr';
-  depositAmount: number = 10000;
-  depositAmountDisplay: string = '10,000';
+  depositAmount: number = 50000;
+  depositAmountDisplay: string = '50,000';
 
   // ========== CRYPTO DEPOSIT ==========
-  cryptoAmount: number = 1;
-  cryptoAmountDisplay: string = '1';
+  cryptoAmount: number = 5;
+  cryptoAmountDisplay: string = '5';
   usdVndRate: number = 26000; // Tỷ giá mặc định 1 USDT = 26,000 VND
   estimatedVnd: number = 26000; // Default: 1 USDT * 26000
 
@@ -259,7 +259,7 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
 
   // ================== CREATE DEPOSIT (WEB2M) ==================
   createDeposit(): void {
-    if (!this.depositAmount || this.depositAmount < 10000) {
+    if (!this.depositAmount || this.depositAmount < 50000) {
       this.notificationService.error(this.translate.instant('MESSAGE.MIN_DEPOSIT_ERROR'));
       return;
     }
@@ -294,7 +294,7 @@ export class ClientTransactionListComponent implements OnInit, OnDestroy {
   // ================== CREATE DEPOSIT CRYPTO (FPAYMENT) ==================
   createDepositCrypto(): void {
     // Validate minimum USDT amount (1 USDT)
-    if (!this.cryptoAmount || this.cryptoAmount < 1) {
+    if (!this.cryptoAmount || this.cryptoAmount < 5) {
       this.notificationService.error(this.translate.instant('TRANSACTION.MIN_USDT_ERROR'));
       return;
     }
