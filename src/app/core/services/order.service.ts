@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { LoaderService } from './loader.service';
-import { Order, OrderCreate, OrderFilter } from '../models/order.model';
+import { Order, OrderCleanupResult, OrderCreate, OrderFilter } from '../models/order.model';
 import { ApiResponse, PaginatedResponse } from '../models/common.model';
 import { AdminOrderApi } from '../../Utils/apis/orders/admin-order.api';
 import { OrderApi } from '../../Utils/apis/orders/client-order.api';
@@ -95,6 +95,14 @@ export class OrderService {
 
     return this.httpClient
       .delete<ApiResponse<void>>(AdminOrderApi.DELETE(id))
+      .pipe(finalize(() => this.loaderService.hide()));
+  }
+
+  cleanupExpired(): Observable<ApiResponse<OrderCleanupResult>> {
+    this.loaderService.show();
+
+    return this.httpClient
+      .post<ApiResponse<OrderCleanupResult>>(AdminOrderApi.CLEANUP_EXPIRED, {})
       .pipe(finalize(() => this.loaderService.hide()));
   }
 }

@@ -9,6 +9,7 @@ import { ConfirmService } from '../../../../shared/services/confirm.service';
 import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
 import { PaginationService } from '../../../../shared/services/pagination.service';
 import { OrderDetailModalComponent } from '../order-detail-modal/order-detail-modal.component';
+import { finalize } from 'rxjs/operators';
 
 interface OrderSearchFilter {
   orderNumber?: string;
@@ -45,6 +46,7 @@ export class OrderListComponent implements OnInit {
 
   selectedOrderId: number | null = null;
   showDetailModal = false;
+  isCleaningExpiredOrders = false;
 
   ngOnInit(): void {
     this.initForm();
@@ -165,6 +167,45 @@ export class OrderListComponent implements OnInit {
   onModalClose(): void {
     this.showDetailModal = false;
     this.selectedOrderId = null;
+  }
+
+  async onCleanupExpiredOrders(): Promise<void> {
+    const confirmed = await this.confirmService.confirm({
+      title: 'Xác nhận xóa đơn quá hạn',
+      message: 'Hệ thống sẽ xóa tất cả đơn hàng cũ hơn số ngày lưu trữ đang cấu hình trong Cài đặt. Tiếp tục?',
+      confirmText: 'Xóa ngay',
+      cancelText: 'Hủy',
+      confirmButtonClass: 'btn-danger'
+    });
+
+    if (!confirmed || this.isCleaningExpiredOrders) {
+      return;
+    }
+
+    this.isCleaningExpiredOrders = true;
+    this.orderService.cleanupExpired()
+      .pipe(finalize(() => this.isCleaningExpiredOrders = false))
+      .subscribe({
+        next: (response) => {
+          const result = response.data;
+          if (result && result.ordersDeleted === 0) {
+            this.notificationService.info(`Không có đơn hàng quá hạn để xóa (quá ${result.cleanupDays} ngày)`, 5000);
+          } else {
+            const message = result
+              ? `Đã xóa ${result.ordersDeleted} đơn hàng, ${result.productItemsDeleted} tài khoản (quá ${result.cleanupDays} ngày)`
+              : 'Đã xóa đơn hàng quá hạn';
+            this.notificationService.success(message, 5000);
+          }
+
+          this.paginationConfig.currentPage = 0;
+          this.loadOrders();
+        },
+        error: (error: any) => {
+          console.error('Error cleaning up expired orders:', error);
+          const message = error?.error?.message || 'Lỗi khi xóa đơn hàng quá hạn';
+          this.notificationService.error(message, 5000);
+        }
+      });
   }
 
   async onDeleteOrder(id: number): Promise<void> {

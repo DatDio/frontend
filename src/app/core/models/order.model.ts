@@ -36,3 +36,12 @@ export interface OrderFilter extends PageFilter {
   userEmail?: string;
   orderStatus?: string;
 }
+
+export interface OrderCleanupResult {
+  cleanupDays: number;
+  cutoffDate: string;
+  ordersDeleted: number;
+  productItemsDeleted: number;
+  emailLogsDeleted: number;
+  batchCount: number;
+}

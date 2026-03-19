@@ -1,6 +1,15 @@
 ﻿<div class="container-fluid p-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
+  <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
     <h1>Quản lý đơn hàng</h1>
+    <button type="button" class="btn btn-danger cleanup-btn" [disabled]="isCleaningExpiredOrders"
+      (click)="onCleanupExpiredOrders()">
+      @if (isCleaningExpiredOrders) {
+      <span class="spinner-border spinner-border-sm me-2" aria-hidden="true"></span>
+      } @else {
+      <i class="bi bi-trash3 me-2"></i>
+      }
+      Xóa đơn quá hạn
+    </button>
   </div>
 
   <!-- Search Form -->
