@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { LoaderService } from './loader.service';
-import { Order, OrderCleanupResult, OrderCreate, OrderFilter } from '../models/order.model';
+import { Order, OrderCleanupStartResponse, OrderCleanupStatus, OrderCreate, OrderFilter } from '../models/order.model';
 import { ApiResponse, PaginatedResponse } from '../models/common.model';
 import { AdminOrderApi } from '../../Utils/apis/orders/admin-order.api';
 import { OrderApi } from '../../Utils/apis/orders/client-order.api';
@@ -98,11 +98,15 @@ export class OrderService {
       .pipe(finalize(() => this.loaderService.hide()));
   }
 
-  cleanupExpired(): Observable<ApiResponse<OrderCleanupResult>> {
+  cleanupExpired(): Observable<ApiResponse<OrderCleanupStartResponse>> {
     this.loaderService.show();
 
     return this.httpClient
-      .post<ApiResponse<OrderCleanupResult>>(AdminOrderApi.CLEANUP_EXPIRED, {})
+      .post<ApiResponse<OrderCleanupStartResponse>>(AdminOrderApi.CLEANUP_EXPIRED, {})
       .pipe(finalize(() => this.loaderService.hide()));
+  }
+
+  getCleanupExpiredStatus(): Observable<ApiResponse<OrderCleanupStatus>> {
+    return this.httpClient.get<ApiResponse<OrderCleanupStatus>>(AdminOrderApi.CLEANUP_EXPIRED_STATUS);
   }
 }

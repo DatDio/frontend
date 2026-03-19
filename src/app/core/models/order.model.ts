@@ -45,3 +45,21 @@ export interface OrderCleanupResult {
   emailLogsDeleted: number;
   batchCount: number;
 }
+
+export interface OrderCleanupStartResponse {
+  started: boolean;
+  running: boolean;
+  cleanupDays: number;
+  batchSize: number;
+  lastStartedAt: string | null;
+}
+
+export interface OrderCleanupStatus {
+  running: boolean;
+  cleanupDays: number;
+  batchSize: number;
+  lastStartedAt: string | null;
+  lastFinishedAt: string | null;
+  lastError: string | null;
+  lastResult: OrderCleanupResult | null;
+}

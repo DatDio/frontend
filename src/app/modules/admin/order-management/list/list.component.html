@@ -8,7 +8,7 @@
       } @else {
       <i class="bi bi-trash3 me-2"></i>
       }
-      Xóa đơn quá hạn
+      {{ isCleaningExpiredOrders ? 'Đang dọn...' : 'Xóa đơn quá hạn' }}
     </button>
   </div>
 

@@ -1,15 +1,15 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Order } from '../../../../core/models/order.model';
+import { Subscription, interval } from 'rxjs';
+import { Order, OrderCleanupStatus } from '../../../../core/models/order.model';
 import { OrderService } from '../../../../core/services/order.service';
 import { NotificationService } from '../../../../core/services/notification.service';
 import { ConfirmService } from '../../../../shared/services/confirm.service';
 import { PaginationComponent, PaginationConfig } from '../../../../shared/components/pagination/pagination.component';
 import { PaginationService } from '../../../../shared/services/pagination.service';
 import { OrderDetailModalComponent } from '../order-detail-modal/order-detail-modal.component';
-import { finalize } from 'rxjs/operators';
 
 interface OrderSearchFilter {
   orderNumber?: string;
@@ -25,7 +25,7 @@ interface OrderSearchFilter {
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss'
 })
-export class OrderListComponent implements OnInit {
+export class OrderListComponent implements OnInit, OnDestroy {
   private readonly orderService = inject(OrderService);
   private readonly notificationService = inject(NotificationService);
   private readonly confirmService = inject(ConfirmService);
@@ -47,10 +47,16 @@ export class OrderListComponent implements OnInit {
   selectedOrderId: number | null = null;
   showDetailModal = false;
   isCleaningExpiredOrders = false;
+  private cleanupStatusPollingSub: Subscription | null = null;
 
   ngOnInit(): void {
     this.initForm();
     this.loadOrders();
+    this.loadCleanupStatus(false);
+  }
+
+  ngOnDestroy(): void {
+    this.stopCleanupStatusPolling();
   }
 
   private initForm(): void {
@@ -142,7 +148,6 @@ export class OrderListComponent implements OnInit {
         if (response.success && response.data?.content) {
           this.orders = response.data.content;
 
-          // Extract pagination từ backend
           const paginationInfo = this.paginationService.extractPaginationInfo(response.data);
           this.paginationConfig = {
             currentPage: paginationInfo.currentPage,
@@ -172,8 +177,8 @@ export class OrderListComponent implements OnInit {
   async onCleanupExpiredOrders(): Promise<void> {
     const confirmed = await this.confirmService.confirm({
       title: 'Xác nhận xóa đơn quá hạn',
-      message: 'Hệ thống sẽ xóa tất cả đơn hàng cũ hơn số ngày lưu trữ đang cấu hình trong Cài đặt. Tiếp tục?',
-      confirmText: 'Xóa ngay',
+      message: 'Hệ thống sẽ dọn nền toàn bộ đơn hàng cũ hơn số ngày lưu trữ đang cấu hình trong Cài đặt. Tiếp tục?',
+      confirmText: 'Bắt đầu dọn',
       cancelText: 'Hủy',
       confirmButtonClass: 'btn-danger'
     });
@@ -182,30 +187,106 @@ export class OrderListComponent implements OnInit {
       return;
     }
 
-    this.isCleaningExpiredOrders = true;
-    this.orderService.cleanupExpired()
-      .pipe(finalize(() => this.isCleaningExpiredOrders = false))
-      .subscribe({
-        next: (response) => {
-          const result = response.data;
-          if (result && result.ordersDeleted === 0) {
-            this.notificationService.info(`Không có đơn hàng quá hạn để xóa (quá ${result.cleanupDays} ngày)`, 5000);
-          } else {
-            const message = result
-              ? `Đã xóa ${result.ordersDeleted} đơn hàng, ${result.productItemsDeleted} tài khoản (quá ${result.cleanupDays} ngày)`
-              : 'Đã xóa đơn hàng quá hạn';
-            this.notificationService.success(message, 5000);
-          }
-
-          this.paginationConfig.currentPage = 0;
-          this.loadOrders();
-        },
-        error: (error: any) => {
-          console.error('Error cleaning up expired orders:', error);
-          const message = error?.error?.message || 'Lỗi khi xóa đơn hàng quá hạn';
-          this.notificationService.error(message, 5000);
+    this.orderService.cleanupExpired().subscribe({
+      next: (response) => {
+        const result = response.data;
+        if (!result) {
+          this.notificationService.error('Không thể khởi động cleanup đơn hàng quá hạn', 5000);
+          return;
         }
-      });
+
+        this.isCleaningExpiredOrders = result.running;
+        if (result.running) {
+          this.startCleanupStatusPolling();
+        }
+
+        if (result.started) {
+          this.notificationService.info(
+            `Đã bắt đầu dọn nền đơn hàng quá hạn (quá ${result.cleanupDays} ngày). Có thể rời trang.`,
+            5000
+          );
+        } else if (result.running) {
+          this.notificationService.info('Cleanup đơn hàng quá hạn đang chạy.', 5000);
+        } else {
+          this.notificationService.warning('Không thể khởi động cleanup đơn hàng quá hạn.', 5000);
+        }
+      },
+      error: (error: any) => {
+        console.error('Error starting cleanup job:', error);
+        const message = error?.error?.message || 'Lỗi khi khởi động cleanup đơn hàng quá hạn';
+        this.notificationService.error(message, 5000);
+      }
+    });
+  }
+
+  private loadCleanupStatus(announceCompletion: boolean): void {
+    this.orderService.getCleanupExpiredStatus().subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.applyCleanupStatus(response.data, announceCompletion);
+        }
+      },
+      error: (error: any) => {
+        console.error('Error loading cleanup status:', error);
+      }
+    });
+  }
+
+  private applyCleanupStatus(status: OrderCleanupStatus, announceCompletion: boolean): void {
+    const wasRunning = this.isCleaningExpiredOrders;
+    this.isCleaningExpiredOrders = status.running;
+
+    if (status.running) {
+      this.startCleanupStatusPolling();
+      return;
+    }
+
+    this.stopCleanupStatusPolling();
+
+    if (!announceCompletion || !wasRunning) {
+      return;
+    }
+
+    this.paginationConfig.currentPage = 0;
+    this.loadOrders();
+
+    if (status.lastError) {
+      this.notificationService.error(`Cleanup đơn hàng quá hạn thất bại: ${status.lastError}`, 5000);
+      return;
+    }
+
+    if (!status.lastResult) {
+      this.notificationService.info('Cleanup đơn hàng quá hạn đã kết thúc.', 5000);
+      return;
+    }
+
+    if (status.lastResult.ordersDeleted === 0) {
+      this.notificationService.info(
+        `Không có đơn hàng quá hạn để xóa (quá ${status.lastResult.cleanupDays} ngày)`,
+        5000
+      );
+      return;
+    }
+
+    this.notificationService.success(
+      `Đã xóa ${status.lastResult.ordersDeleted} đơn hàng, ${status.lastResult.productItemsDeleted} tài khoản`,
+      5000
+    );
+  }
+
+  private startCleanupStatusPolling(): void {
+    if (this.cleanupStatusPollingSub) {
+      return;
+    }
+
+    this.cleanupStatusPollingSub = interval(5000).subscribe(() => {
+      this.loadCleanupStatus(true);
+    });
+  }
+
+  private stopCleanupStatusPolling(): void {
+    this.cleanupStatusPollingSub?.unsubscribe();
+    this.cleanupStatusPollingSub = null;
   }
 
   async onDeleteOrder(id: number): Promise<void> {
