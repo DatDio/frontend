@@ -17,6 +17,7 @@ import { ActiveStatusBadgeComponent } from '../../../../../shared/components/act
 import { WebSocketService } from '../../../../../core/services/websocket.service';
 import { ProductQuantityMessage } from '../../../../../core/models/product-quantity-message.model';
 import { StockSyncResultMessage } from '../../../../../core/models/stock-sync-result-message.model';
+import { MailsNgonService } from '../../../../../core/services/mailsngon.service';
 interface ProductSearchFilter {
   name?: string;
   categoryId?: number;
@@ -50,6 +51,7 @@ export class MailManagementListComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly paginationService = inject(PaginationService);
   private readonly webSocketService = inject(WebSocketService);
+  private readonly mailsNgonService = inject(MailsNgonService);
 
   products: Product[] = [];
   categories: Category[] = [];
@@ -232,8 +234,23 @@ export class MailManagementListComponent implements OnInit, OnDestroy {
 
   onDetail(product: Product): void {
     if (product.sourceType === 'EXTERNAL') {
-      this.router.navigate(['/admin/external-api/mappings'], {
-        queryParams: { localProductId: product.id }
+      this.mailsNgonService.getMappingByLocalProduct(product.id).subscribe({
+        next: (response) => {
+          if (response.success && response.data) {
+            this.router.navigate(['/admin/mailsngon/mappings'], {
+              queryParams: { localProductId: product.id }
+            });
+            return;
+          }
+          this.router.navigate(['/admin/external-api/mappings'], {
+            queryParams: { localProductId: product.id }
+          });
+        },
+        error: () => {
+          this.router.navigate(['/admin/external-api/mappings'], {
+            queryParams: { localProductId: product.id }
+          });
+        }
       });
       return;
     }
@@ -250,13 +267,14 @@ export class MailManagementListComponent implements OnInit, OnDestroy {
     this.showSourceTypeDialog = false;
   }
 
-  onSourceTypeSelect(type: 'LOCAL' | 'EXTERNAL'): void {
+  onSourceTypeSelect(type: 'LOCAL' | 'EXTERNAL_API' | 'MAILSNGON'): void {
     this.showSourceTypeDialog = false;
     if (type === 'LOCAL') {
       this.showCreateModal = true;
-    } else {
-      // Redirect to External API Mappings page
+    } else if (type === 'EXTERNAL_API') {
       this.router.navigate(['/admin/external-api/mappings']);
+    } else {
+      this.router.navigate(['/admin/mailsngon/mappings']);
     }
   }
 

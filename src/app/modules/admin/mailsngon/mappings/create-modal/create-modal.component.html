@@ -1,0 +1,176 @@
+<div class="modal-backdrop" (click)="onClose()"></div>
+<div class="modal-container">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title">
+                <i class="bi bi-cloud-arrow-down me-2"></i>
+                {{ isEditMode ? 'Cập nhật Mapping MailsNgon' : 'Tạo Mapping MailsNgon' }}
+            </h5>
+            <button type="button" class="btn-close" (click)="onClose()"></button>
+        </div>
+
+        <div class="modal-body">
+            <form [formGroup]="form">
+                @if (!isEditMode) {
+                <div class="mb-4">
+                    <label class="form-label">Chọn mail type từ MailsNgon</label>
+                    @if (loadingProducts) {
+                    <div class="text-center py-3">
+                        <div class="spinner-border text-primary"></div>
+                        <p class="mb-0 mt-2">Đang tải sản phẩm...</p>
+                    </div>
+                    } @else if (remoteProducts.length === 0) {
+                    <div class="alert alert-info">Không có mail type nào từ MailsNgon</div>
+                    } @else {
+                    <div class="table-responsive border rounded" style="max-height: 320px;">
+                        <table class="table table-hover table-striped mb-0 align-middle">
+                            <thead class="sticky-top bg-white border-bottom">
+                                <tr>
+                                    <th style="width: 50px;" class="text-center">#</th>
+                                    <th>Mail Type</th>
+                                    <th class="text-end" style="width: 120px;">Giá</th>
+                                    <th class="text-center" style="width: 90px;">Stock</th>
+                                    <th class="text-center" style="width: 110px;">Trạng thái</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (product of remoteProducts; track product.mailTypeId; let i = $index) {
+                                <tr [class.table-primary]="selectedProduct?.mailTypeId === product.mailTypeId"
+                                    [class.table-warning]="product.isMapped && selectedProduct?.mailTypeId !== product.mailTypeId"
+                                    style="cursor: pointer;" (click)="onProductSelect(product)">
+                                    <td class="text-center text-muted">{{ i + 1 }}</td>
+                                    <td>
+                                        <div class="fw-medium">{{ product.mailTypeName }}</div>
+                                        <small class="text-muted d-block">{{ product.mailGroupName }}</small>
+                                        <small class="text-muted d-block">Key: {{ product.mailTypeKey }}</small>
+                                    </td>
+                                    <td class="text-end fw-bold text-primary">{{ formatCurrency(product.price) }}</td>
+                                    <td class="text-center">
+                                        <span class="badge" [class.bg-success]="(product.stock || 0) > 0"
+                                            [class.bg-secondary]="(product.stock || 0) === 0">
+                                            {{ product.stock ?? 0 }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        @if (product.isMapped) {
+                                        <span class="badge bg-warning text-dark">Đã mapping</span>
+                                        } @else {
+                                        <span class="badge bg-success">Có sẵn</span>
+                                        }
+                                    </td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    }
+                </div>
+                }
+
+                @if (isEditMode && mapping) {
+                <div class="mb-4">
+                    <label class="form-label">Mail type nguồn</label>
+                    <div class="p-3 border rounded bg-light">
+                        <div><strong>{{ mapping.mailTypeName }}</strong></div>
+                        <small class="text-muted d-block">{{ mapping.mailGroupName || '—' }}</small>
+                        <small class="text-muted d-block">Key: {{ mapping.mailTypeKey }}</small>
+                    </div>
+                    <div class="mt-2">
+                        @if (loadingProducts) {
+                        <small class="text-muted">Đang lấy dữ liệu mới từ MailsNgon...</small>
+                        } @else if (latestRemoteProduct) {
+                        <small class="text-muted">
+                            Giá hiện tại: <strong>{{ formatCurrency(latestRemoteProduct.price) }}</strong>
+                            | Stock: <strong>{{ latestRemoteProduct.stock ?? 0 }}</strong>
+                        </small>
+                        } @else if (latestRemoteError) {
+                        <small class="text-danger">{{ latestRemoteError }}</small>
+                        }
+                    </div>
+                </div>
+                }
+
+                @if (selectedProduct || isEditMode) {
+                <hr class="my-4">
+                <h6 class="mb-3">
+                    <i class="bi bi-shop me-2"></i>
+                    Cấu hình local product
+                </h6>
+
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Danh mục <span class="text-danger">*</span></label>
+                        <select class="form-select" formControlName="categoryId">
+                            <option value="">-- Chọn danh mục --</option>
+                            @for (cat of categories; track cat.id) {
+                            <option [value]="cat.id">{{ cat.name }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Tên sản phẩm <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" formControlName="localProductName">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Giá gốc</label>
+                        <input type="text" class="form-control" [value]="formatCurrency(form.get('externalPrice')?.value)" readonly>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Giá bán <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" formControlName="localPrice" min="1">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">Lợi nhuận</label>
+                        <div class="profit-display" [class.positive]="profitAmount > 0" [class.negative]="profitAmount < 0">
+                            <strong>{{ formatCurrency(profitAmount) }}</strong>
+                            <small>({{ profitPercent | number:'1.0-1' }}%)</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">TTL</label>
+                        <input type="text" class="form-control" formControlName="ttl" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Location</label>
+                        <input type="text" class="form-control" formControlName="location" readonly>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Mô tả local</label>
+                        <textarea class="form-control" formControlName="localDescription" rows="2"></textarea>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Note từ MailsNgon</label>
+                        <textarea class="form-control" formControlName="note" rows="2" readonly></textarea>
+                    </div>
+                    <div class="col-12">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" formControlName="autoSync" id="autoSyncMailsNgon">
+                            <label class="form-check-label" for="autoSyncMailsNgon">Tự động sync stock MailsNgon</label>
+                        </div>
+                    </div>
+                    @if (isEditMode) {
+                    <div class="col-md-6">
+                        <label class="form-label">Trạng thái</label>
+                        <select class="form-select" formControlName="status">
+                            <option [value]="1">Hoạt động</option>
+                            <option [value]="0">Ngưng</option>
+                        </select>
+                    </div>
+                    }
+                </div>
+                }
+            </form>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="onClose()">Hủy</button>
+            <button type="button" class="btn btn-primary" (click)="onSubmit()"
+                [disabled]="loading || form.invalid || (!isEditMode && !selectedProduct)">
+                @if (loading) {
+                <span class="spinner-border spinner-border-sm me-1"></span>
+                }
+                {{ isEditMode ? 'Cập nhật Mapping' : (selectedProduct?.isMapped ? 'Cập nhật Mapping' : 'Tạo Mapping') }}
+            </button>
+        </div>
+    </div>
+</div>

@@ -130,5 +130,23 @@ export const adminRoutes: Routes = [
         loadComponent: () => import('../../modules/admin/external-api-management/mappings/list/list.component').then(m => m.ExternalProductMappingListComponent)
       }
     ]
+  },
+  {
+    path: 'mailsngon',
+    children: [
+      {
+        path: '',
+        redirectTo: 'settings',
+        pathMatch: 'full'
+      },
+      {
+        path: 'settings',
+        loadComponent: () => import('../../modules/admin/mailsngon/settings/settings.component').then(m => m.MailsNgonSettingsComponent)
+      },
+      {
+        path: 'mappings',
+        loadComponent: () => import('../../modules/admin/mailsngon/mappings/list/list.component').then(m => m.MailsNgonMappingListComponent)
+      }
+    ]
   }
 ];

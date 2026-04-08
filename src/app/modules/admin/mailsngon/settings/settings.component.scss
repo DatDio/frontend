@@ -1,0 +1,52 @@
+.container-fluid {
+  .page-header h4 {
+    font-weight: 600;
+  }
+}
+
+.card {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+}
+
+.card-header {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.08), rgba(34, 197, 94, 0.08));
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.balance-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.balance-card {
+  padding: 1rem;
+  border-radius: 14px;
+  background: #f8fafc;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+
+  &.highlight {
+    background: linear-gradient(135deg, #0f766e, #0891b2);
+    color: #fff;
+  }
+
+  .label {
+    display: block;
+    font-size: 0.8rem;
+    margin-bottom: 0.35rem;
+    opacity: 0.8;
+  }
+
+  strong {
+    display: block;
+    word-break: break-word;
+  }
+}
+
+@media (max-width: 768px) {
+  .balance-grid {
+    grid-template-columns: 1fr;
+  }
+}
