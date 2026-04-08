@@ -1,4 +1,4 @@
-﻿<div class="admin-layout">
+<div class="admin-layout">
   <!-- Top Navigation -->
   <nav class="navbar navbar-expand navbar-dark bg-dark admin-navbar">
     <div class="container-fluid">
@@ -85,6 +85,26 @@
               <span>Providers</span>
             </a>
             <a class="nav-link submenu-item" routerLink="/admin/external-api/mappings" routerLinkActive="active">
+              <i class="bi bi-link-45deg"></i>
+              <span>Mappings</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- MailsNgon Expandable Menu -->
+        <div class="nav-item-expandable">
+          <a class="nav-link" (click)="toggleMailsNgonMenu()" [class.expanded]="mailsNgonExpanded"
+            [class.active]="mailsNgonExpanded">
+            <i class="bi bi-cloud-arrow-down"></i>
+            <span>MailsNgon</span>
+            <i class="bi bi-chevron-down expand-icon" [class.rotated]="mailsNgonExpanded"></i>
+          </a>
+          <div class="submenu" [class.show]="mailsNgonExpanded">
+            <a class="nav-link submenu-item" routerLink="/admin/mailsngon/settings" routerLinkActive="active">
+              <i class="bi bi-gear"></i>
+              <span>Cài đặt</span>
+            </a>
+            <a class="nav-link submenu-item" routerLink="/admin/mailsngon/mappings" routerLinkActive="active">
               <i class="bi bi-link-45deg"></i>
               <span>Mappings</span>
             </a>

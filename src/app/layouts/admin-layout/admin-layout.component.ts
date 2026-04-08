@@ -18,6 +18,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
 
   sidebarOpen = true;
   externalApiExpanded = false;  // Track External API submenu state
+  mailsNgonExpanded = false;    // Track MailsNgon submenu state
   private routerSub?: Subscription;
 
   ngOnInit(): void {
@@ -41,6 +42,10 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
 
   toggleExternalApiMenu(): void {
     this.externalApiExpanded = !this.externalApiExpanded;
+  }
+
+  toggleMailsNgonMenu(): void {
+    this.mailsNgonExpanded = !this.mailsNgonExpanded;
   }
 
   logout(): void {

@@ -1,0 +1,173 @@
+<div class="content-wrapper">
+    <div class="content-header">
+        <div class="header-left">
+            <h1 class="page-title">
+                <i class="bi bi-cloud-arrow-down"></i>
+                MailsNgon Mappings
+            </h1>
+            <p class="page-subtitle">Map mail type của MailsNgon sang local product và quản lý giá bán riêng.</p>
+        </div>
+        <div class="header-actions">
+            <button type="button" class="btn btn-outline-primary" (click)="onSyncStock()" [disabled]="syncing">
+                <span *ngIf="syncing" class="spinner-border spinner-border-sm me-1"></span>
+                <i *ngIf="!syncing" class="bi bi-arrow-repeat me-1"></i>
+                Sync Stock
+            </button>
+            <button type="button" class="btn btn-primary" (click)="onCreateClick()">
+                <i class="bi bi-plus-lg"></i>
+                Thêm Mapping
+            </button>
+        </div>
+    </div>
+
+    <div class="card search-card">
+        <div class="card-body">
+            <form [formGroup]="formSearch" (ngSubmit)="handleSearch()">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label">Trạng thái</label>
+                        <select class="form-select" formControlName="status">
+                            <option value="">Tất cả</option>
+                            <option value="1">Hoạt động</option>
+                            <option value="0">Ngưng</option>
+                        </select>
+                    </div>
+                    <div class="col-md-8 d-flex align-items-end gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Tìm kiếm
+                        </button>
+                        <button type="button" class="btn btn-secondary" (click)="clearForm()">
+                            <i class="bi bi-arrow-counterclockwise"></i> Reset
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th class="text-center" style="width: 50px">#</th>
+                            <th>Mail Type</th>
+                            <th>Local Product</th>
+                            <th class="text-end">Giá gốc</th>
+                            <th class="text-end">Giá bán</th>
+                            <th class="text-end">Lợi nhuận</th>
+                            <th class="text-center">Stock</th>
+                            <th class="text-center">Auto Sync</th>
+                            <th class="text-center">Trạng thái</th>
+                            <th class="text-center" style="width: 130px">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (loading) {
+                        <tr>
+                            <td colspan="10" class="text-center py-4">
+                                <div class="spinner-border text-primary"></div>
+                            </td>
+                        </tr>
+                        } @else if (mappings.length === 0) {
+                        <tr>
+                            <td colspan="10" class="text-center py-4 text-muted">
+                                <i class="bi bi-inbox fs-1 mb-2"></i>
+                                <p>Chưa có mapping MailsNgon nào</p>
+                            </td>
+                        </tr>
+                        } @else {
+                        @for (mapping of mappings; track mapping.id; let i = $index) {
+                        <tr>
+                            <td class="text-center">{{ paginationConfig.currentPage * paginationConfig.pageSize + i + 1 }}</td>
+                            <td>
+                                <div class="external-product">
+                                    <span class="name">{{ mapping.mailTypeName }}</span>
+                                    <small class="text-muted d-block">{{ mapping.mailGroupName || '—' }}</small>
+                                    <small class="text-muted d-block">Key: {{ mapping.mailTypeKey }}</small>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="local-product">
+                                    <span class="name">{{ mapping.localProductName }}</span>
+                                    <small class="text-muted d-block">{{ mapping.categoryName }}</small>
+                                </div>
+                            </td>
+                            <td class="text-end text-muted">{{ formatCurrency(mapping.externalPrice) }}</td>
+                            <td class="text-end">
+                                <strong>{{ formatCurrency(mapping.localPrice) }}</strong>
+                            </td>
+                            <td class="text-end">
+                                @if (mapping.profitPerItem != null) {
+                                <span class="text-success">
+                                    +{{ formatCurrency(mapping.profitPerItem) }}
+                                    <small>({{ mapping.profitPercent | number:'1.0-1' }}%)</small>
+                                </span>
+                                } @else {
+                                <span class="text-muted">—</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-secondary">{{ mapping.lastSyncedStock ?? '?' }}</span>
+                            </td>
+                            <td class="text-center">
+                                @if (mapping.autoSync && settings.autoSyncEnabled && settings.syncIntervalSeconds) {
+                                <span class="badge bg-success">
+                                    <i class="bi bi-arrow-repeat"></i> {{ settings.syncIntervalSeconds }}s
+                                </span>
+                                <br>
+                                <small class="text-muted" style="font-size: 0.7rem; font-variant-numeric: tabular-nums;">
+                                    <i class="bi bi-clock"></i>
+                                    {{ countdown || settings.syncIntervalSeconds }}s
+                                </small>
+                                } @else {
+                                <span class="badge bg-secondary">Off</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <app-active-status-badge [status]="mapping.status || 1"></app-active-status-badge>
+                            </td>
+                            <td class="text-center">
+                                <div class="action-buttons">
+                                    <button type="button" class="icon-btn warning" title="Sửa" (click)="onEditClick(mapping)">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button type="button" class="icon-btn danger" title="Xóa" (click)="onDeleteClick(mapping.id!)">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @if (mappings.length > 0) {
+        <div class="card-footer">
+            <app-pagination [config]="paginationConfig" (pageChange)="handlePageChange($event)"
+                (pageSizeChange)="selectPageSize($event)">
+            </app-pagination>
+        </div>
+        }
+    </div>
+</div>
+
+@if (showCreateModal) {
+<app-mailsngon-mapping-create-modal
+    (close)="onCreateModalClose()"
+    (success)="onCreateSuccess()">
+</app-mailsngon-mapping-create-modal>
+}
+
+@if (showEditModal && selectedMapping) {
+<app-mailsngon-mapping-create-modal
+    [mapping]="selectedMapping"
+    [isEditMode]="true"
+    (close)="onEditModalClose()"
+    (success)="onEditSuccess()">
+</app-mailsngon-mapping-create-modal>
+}

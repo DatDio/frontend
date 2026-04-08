@@ -189,24 +189,31 @@
 <div class="modal-overlay" (click)="onSourceTypeDialogClose()">
   <div class="source-type-dialog" (click)="$event.stopPropagation()">
     <div class="dialog-header">
-      <h5 class="mb-0">Chọn loại sản phẩm</h5>
+      <h5 class="mb-0">Chọn nguồn sản phẩm</h5>
       <button type="button" class="btn-close" (click)="onSourceTypeDialogClose()"></button>
     </div>
     <div class="dialog-body">
-      <p class="text-muted mb-4">Vui lòng chọn nguồn sản phẩm bạn muốn tạo:</p>
+      <p class="text-muted mb-4">Chọn nơi quản lý sản phẩm trước khi tạo mapping hoặc tạo kho local.</p>
       <div class="row g-3">
-        <div class="col-6">
+        <div class="col-md-4">
           <div class="source-card local" (click)="onSourceTypeSelect('LOCAL')">
             <i class="bi bi-house-fill source-icon"></i>
             <h6>Local</h6>
             <small class="text-muted">Sản phẩm từ kho nội bộ, quản lý số lượng và tài khoản thủ công</small>
           </div>
         </div>
-        <div class="col-6">
-          <div class="source-card external" (click)="onSourceTypeSelect('EXTERNAL')">
+        <div class="col-md-4">
+          <div class="source-card external" (click)="onSourceTypeSelect('EXTERNAL_API')">
             <i class="bi bi-cloud-fill source-icon"></i>
-            <h6>External</h6>
-            <small class="text-muted">Sản phẩm từ API bên ngoài, tự động đồng bộ stock và đặt hàng</small>
+            <h6>External API</h6>
+            <small class="text-muted">Nguồn generic có provider riêng, cấu hình parser và đặt hàng động</small>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="source-card mailsngon" (click)="onSourceTypeSelect('MAILSNGON')">
+            <i class="bi bi-cloud-arrow-down-fill source-icon"></i>
+            <h6>MailsNgon</h6>
+            <small class="text-muted">Nguồn cố định cho MailsNgon, sync stock riêng và đặt hàng theo flow riêng</small>
           </div>
         </div>
       </div>
