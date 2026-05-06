@@ -17,6 +17,127 @@
     </div>
   </div>
 
+  @if (hasSupplierStats) {
+  <div class="card mb-4 shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <div>
+        <h5 class="mb-0">Thống kê NCC</h5>
+        <small class="text-muted">Tổng hợp lượng bán và mail hết hạn theo ngày và API key</small>
+      </div>
+      @if (statsLoading) {
+      <div class="spinner-border spinner-border-sm text-primary" role="status">
+        <span class="visually-hidden">Đang tải...</span>
+      </div>
+      }
+    </div>
+    <div class="card-body">
+      <form [formGroup]="statsFilterForm" (ngSubmit)="loadSupplierStats()" class="mb-4">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-3">
+            <label class="form-label small text-muted">Từ ngày</label>
+            <input type="date" class="form-control" formControlName="startDate">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small text-muted">Đến ngày</label>
+            <input type="date" class="form-control" formControlName="endDate">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label small text-muted">Tool API Key</label>
+            <select class="form-select" formControlName="toolApiKeyId">
+              <option value="">Tất cả</option>
+              @for (key of availableToolKeys; track key.id) {
+                <option [value]="key.id">{{ key.name }} ({{ key.prefix }}...)</option>
+              }
+            </select>
+          </div>
+          <div class="col-md-3 d-flex align-items-end gap-2">
+            <button type="submit" class="btn btn-primary flex-grow-1" [disabled]="statsLoading">
+              <i class="bi bi-search me-1"></i> Lọc dữ liệu
+            </button>
+            <button type="button" class="btn btn-secondary" (click)="clearStatsFilter()">
+              <i class="bi bi-arrow-clockwise me-1"></i> Xóa bộ lọc
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <div class="border rounded p-3 bg-light h-100">
+            <div class="text-muted small text-uppercase">Bán hôm nay</div>
+            <div class="display-6 fw-semibold">{{ supplierStats?.todaySold ?? 0 }}</div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="border rounded p-3 bg-light h-100">
+            <div class="text-muted small text-uppercase">Hết hạn hôm nay</div>
+            <div class="display-6 fw-semibold text-danger">{{ supplierStats?.todayExpired ?? 0 }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-5">
+          <h6 class="mb-3">Theo ngày</h6>
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead>
+                <tr>
+                  <th>Ngày</th>
+                  <th>Đã bán</th>
+                  <th>Hết hạn</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if (!supplierStats?.recentDays?.length) {
+                <tr>
+                  <td colspan="3" class="text-center text-muted py-3">Chưa có dữ liệu đối tác</td>
+                </tr>
+                }
+                @for (day of supplierStats?.recentDays ?? []; track day.statDate) {
+                <tr>
+                  <td>{{ day.statDate | date:'dd/MM/yyyy' }}</td>
+                  <td>{{ day.soldCount }}</td>
+                  <td>{{ day.expiredCount }}</td>
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="col-lg-7">
+          <h6 class="mb-3">Theo API key</h6>
+          <div class="table-responsive">
+            <table class="table table-sm align-middle">
+              <thead>
+                <tr>
+                  <th>API key</th>
+                  <th>Đã bán</th>
+                  <th>Hết hạn</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if (!supplierStats?.byToolKey?.length) {
+                <tr>
+                  <td colspan="3" class="text-center text-muted py-3">Chưa có dữ liệu đối tác</td>
+                </tr>
+                }
+                @for (tool of supplierStats?.byToolKey ?? []; track tool.toolApiKeyId) {
+                <tr>
+                  <td>{{ getToolDisplayName(tool.toolName, tool.toolKeyPrefix) }}</td>
+                  <td>{{ tool.soldCount }}</td>
+                  <td>{{ tool.expiredCount }}</td>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
   <div class="card mb-4 shadow-sm">
     <div class="card-body">
       <form [formGroup]="searchForm">
@@ -60,7 +181,7 @@
     <div class="card-header">
       <div class="row align-items-center">
         <div class="col-md-6">
-          <span class="text-muted">Tổng: {{ totalElements }} sản phẩm</span>
+          <span class="text-muted">Tổng: {{ totalElements }} tài khoản</span>
         </div>
       </div>
     </div>
@@ -169,8 +290,7 @@
       <div class="modal-body">
         <div class="alert alert-warning">
           <i class="bi bi-exclamation-triangle me-2"></i>
-          Nhập danh sách tài khoản cần xóa, mỗi dòng một tài khoản (có thể nhập full account hoặc chỉ email, mỗi dòng 1
-          email).
+          Nhập danh sách tài khoản cần xóa, mỗi dòng một tài khoản. Có thể nhập full account hoặc chỉ email.
         </div>
         <textarea class="form-control" rows="10" [(ngModel)]="bulkDeleteData"
           placeholder="mail|pass|refresh_token|client_id"></textarea>

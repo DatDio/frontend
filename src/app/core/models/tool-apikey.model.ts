@@ -1,3 +1,8 @@
+export interface ToolApiKeyProductSummary {
+    id: number;
+    name: string;
+}
+
 export interface ToolApiKey {
     id: number;
     name: string;
@@ -8,11 +13,32 @@ export interface ToolApiKey {
     lastUsedAt?: string;
     lastUsedIp?: string;
     createdAt: string;
+    canRegTool?: boolean;
+    canOauth2Tool?: boolean;
+    canProductUpload?: boolean;
+    canProductExpiredExport?: boolean;
+    allowedProductIds?: number[];
+    allowedProducts?: ToolApiKeyProductSummary[];
 }
 
 export interface ToolApiKeyCreate {
     name: string;
     description?: string;
+    canRegTool?: boolean;
+    canOauth2Tool?: boolean;
+    canProductUpload?: boolean;
+    canProductExpiredExport?: boolean;
+    allowedProductIds?: number[];
+}
+
+export interface ToolApiKeyUpdate {
+    name: string;
+    description?: string;
+    canRegTool?: boolean;
+    canOauth2Tool?: boolean;
+    canProductUpload?: boolean;
+    canProductExpiredExport?: boolean;
+    allowedProductIds?: number[];
 }
 
 export interface ToolApiKeyGenerated {

@@ -3,69 +3,18 @@
         <i class="bi bi-file-code me-2"></i>
         API Documentation
     </h2>
-    <p class="text-muted mb-4">Tài liệu API dành cho Admin - Quản lý tài khoản sản phẩm</p>
+    <p class="text-muted mb-4">Tài liệu cho partner upload mail bằng Tool API Key và admin đối soát.</p>
 
     <div class="api-card">
         <div class="api-header">
-            <span class="method-badge post">POST</span>
-            <code class="endpoint">/admin/product-items/create</code>
+            <i class="bi bi-key me-2"></i>
+            <span class="fw-bold">Authentication</span>
         </div>
         <div class="api-body">
-            <h5>Thêm tài khoản mới</h5>
-            <p class="text-muted">Thêm một hoặc nhiều tài khoản vào sản phẩm. Hệ thống tự động kiểm tra trùng lặp.</p>
-
-            <div class="section">
-                <h6><i class="bi bi-key me-1"></i> Authentication</h6>
-                <p class="mb-1"><code>Authorization: Bearer &lt;admin_token&gt;</code></p>
-                <p class="mb-0 text-muted">hoặc</p>
-                <p class="mb-0"><code>X-API-KEY: &lt;your_api_key&gt;</code></p>
-            </div>
-
-            <div class="section">
-                <h6><i class="bi bi-send me-1"></i> Request Body</h6>
-                <pre class="code-block">{{createRequestExample}}</pre>
-            </div>
-
-            <div class="section">
-                <h6><i class="bi bi-list-ul me-1"></i> Parameters</h6>
-                <table class="table table-sm">
-                    <thead>
-                        <tr>
-                            <th>Field</th>
-                            <th>Type</th>
-                            <th>Required</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><code>productId</code></td>
-                            <td>Long</td>
-                            <td><span class="badge bg-danger">Yes</span></td>
-                            <td>ID của sản phẩm</td>
-                        </tr>
-                        <tr>
-                            <td><code>accountData</code></td>
-                            <td>String</td>
-                            <td><span class="badge bg-danger">Yes</span></td>
-                            <td>Danh sách tài khoản, mỗi dòng một tài khoản</td>
-                        </tr>
-                        <tr>
-                            <td><code>expirationType</code></td>
-                            <td>Enum</td>
-                            <td><span class="badge bg-secondary">No</span></td>
-                            <td>{{ expirationTypeText }}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <div class="section">
-                <h6><i class="bi bi-terminal me-1"></i> cURL Example</h6>
-                <pre class="code-block">{{createCurlExample}}</pre>
-            </div>
-            <div class="section">
-                <h6><i class="bi bi-check-circle me-1"></i> Response</h6>
-                <pre class="code-block">{{createResponseExample}}</pre>
+            <p class="mb-2"><code>X-API-KEY: mtk_*</code></p>
+            <p class="mb-3 text-muted">Mỗi Tool API Key chỉ được thao tác trên sản phẩm được whitelist và theo capability đã cấp.</p>
+            <div class="alert alert-info mb-0">
+                {{ adminNote }}
             </div>
         </div>
     </div>
@@ -73,62 +22,46 @@
     <div class="api-card">
         <div class="api-header">
             <span class="method-badge post">POST</span>
-            <code class="endpoint">/admin/product-items/import/&#123;productId&#125;</code>
+            <code class="endpoint">/api/v1/product-items-tool/products/&#123;productId&#125;/items</code>
         </div>
         <div class="api-body">
-            <h5>Import tài khoản từ file TXT</h5>
-            <p class="text-muted">Upload file .txt chứa danh sách tài khoản, mỗi dòng một tài khoản.</p>
+            <h5>Upload accountData dạng text</h5>
+            <p class="text-muted">Dùng cho đối tác có script reg/up mail. Hệ thống tự check capability upload và whitelist sản phẩm của key.</p>
 
             <div class="section">
-                <h6><i class="bi bi-key me-1"></i> Authentication</h6>
-                <p class="mb-1"><code>Authorization: Bearer &lt;admin_token&gt;</code></p>
-                <p class="mb-0 text-muted">hoặc</p>
-                <p class="mb-0"><code>X-API-KEY: &lt;your_api_key&gt;</code></p>
+                <h6><i class="bi bi-send me-1"></i> Request Body</h6>
+                <pre class="code-block">{{ partnerUploadRequestExample }}</pre>
             </div>
 
             <div class="section">
-                <h6><i class="bi bi-list-ul me-1"></i> Path Parameters</h6>
+                <h6><i class="bi bi-list-ul me-1"></i> Fields</h6>
                 <table class="table table-sm">
                     <thead>
                         <tr>
                             <th>Field</th>
                             <th>Type</th>
-                            <th>Description</th>
+                            <th>Bắt buộc</th>
+                            <th>Mô tả</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td><code>productId</code></td>
-                            <td>Long</td>
-                            <td>ID của sản phẩm cần import tài khoản</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="section">
-                <h6><i class="bi bi-upload me-1"></i> Form Data</h6>
-                <table class="table table-sm">
-                    <thead>
-                        <tr>
-                            <th>Field</th>
-                            <th>Type</th>
-                            <th>Required</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><code>file</code></td>
-                            <td>File</td>
-                            <td><span class="badge bg-danger">Yes</span></td>
-                            <td>File .txt chứa danh sách tài khoản</td>
+                            <td><code>accountData</code></td>
+                            <td>String</td>
+                            <td><span class="badge bg-danger">Có</span></td>
+                            <td>Danh sách account, mỗi dòng 1 account</td>
                         </tr>
                         <tr>
                             <td><code>expirationType</code></td>
-                            <td>String</td>
-                            <td><span class="badge bg-secondary">No</span></td>
-                            <td>{{ importExpirationTypeText }}</td>
+                            <td>Enum</td>
+                            <td><span class="badge bg-secondary">Không</span></td>
+                            <td>{{ expirationTypeText }}</td>
+                        </tr>
+                        <tr>
+                            <td><code>skipDuplicateCheck</code></td>
+                            <td>Boolean</td>
+                            <td><span class="badge bg-secondary">Không</span></td>
+                            <td>Bỏ qua check trùng lặp trong DB trước khi insert</td>
                         </tr>
                     </tbody>
                 </table>
@@ -136,12 +69,78 @@
 
             <div class="section">
                 <h6><i class="bi bi-terminal me-1"></i> cURL Example</h6>
-                <pre class="code-block">{{importCurlExample}}</pre>
+                <pre class="code-block">{{ partnerUploadCurlExample }}</pre>
             </div>
 
             <div class="section">
                 <h6><i class="bi bi-check-circle me-1"></i> Response</h6>
-                <pre class="code-block">{{importResponseExample}}</pre>
+                <pre class="code-block">{{ partnerUploadResponseExample }}</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="api-card">
+        <div class="api-header">
+            <span class="method-badge post">POST</span>
+            <code class="endpoint">/api/v1/product-items-tool/products/&#123;productId&#125;/import</code>
+        </div>
+        <div class="api-body">
+            <h5>Import file TXT</h5>
+            <p class="text-muted">Upload file .txt chứa danh sách account. Vẫn bị chặn nếu key không có quyền trên sản phẩm đó.</p>
+
+            <div class="section">
+                <h6><i class="bi bi-upload me-1"></i> Query + Form Data</h6>
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Bắt buộc</th>
+                            <th>Mô tả</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>file</code></td>
+                            <td>File</td>
+                            <td><span class="badge bg-danger">Có</span></td>
+                            <td>File txt chứa account data</td>
+                        </tr>
+                        <tr>
+                            <td><code>expirationType</code></td>
+                            <td>Enum</td>
+                            <td><span class="badge bg-secondary">Không</span></td>
+                            <td>{{ expirationTypeText }}</td>
+                        </tr>
+                        <tr>
+                            <td><code>skipDuplicateCheck</code></td>
+                            <td>Boolean</td>
+                            <td><span class="badge bg-secondary">Không</span></td>
+                            <td>Bỏ qua duplicate check trước khi insert</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h6><i class="bi bi-terminal me-1"></i> cURL Example</h6>
+                <pre class="code-block">{{ partnerImportCurlExample }}</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="api-card">
+        <div class="api-header">
+            <span class="method-badge get">GET</span>
+            <code class="endpoint">/api/v1/product-items-tool/products/&#123;productId&#125;/expired</code>
+        </div>
+        <div class="api-body">
+            <h5>Lấy mail hết hạn</h5>
+            <p class="text-muted">Chỉ key có capability expired export mới gọi được endpoint này. Partner không có quyền xóa expired.</p>
+
+            <div class="section">
+                <h6><i class="bi bi-terminal me-1"></i> cURL Example</h6>
+                <pre class="code-block">{{ partnerExpiredCurlExample }}</pre>
             </div>
         </div>
     </div>
@@ -149,14 +148,14 @@
     <div class="api-card">
         <div class="api-header">
             <i class="bi bi-clock-history me-2"></i>
-            <span class="fw-bold">Expiration Types Reference</span>
+            <span class="fw-bold">Tham chiếu Expiration Types</span>
         </div>
         <div class="api-body">
             <table class="table table-sm">
                 <thead>
                     <tr>
-                        <th>Value</th>
-                        <th>Description</th>
+                        <th>Giá trị</th>
+                        <th>Mô tả</th>
                     </tr>
                 </thead>
                 <tbody>

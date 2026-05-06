@@ -1,0 +1,2 @@
+import './polyfills.server.mjs';
+var n=function(e){return e.ACTIVE="1",e.INACTIVE="0",e}(n||{}),t=[{label:"Ho\u1EA1t \u0111\u1ED9ng",value:n.ACTIVE},{label:"Kh\xF4ng ho\u1EA1t \u0111\u1ED9ng",value:n.INACTIVE}];export{n as a,t as b};

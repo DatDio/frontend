@@ -38,3 +38,34 @@ export interface StatisticsFilter {
     endDate?: string;
     period?: 'WEEK' | 'MONTH' | 'YEAR';
 }
+
+export interface ProductSupplierDailyPoint {
+    statDate: string;
+    soldCount: number;
+    expiredCount: number;
+}
+
+export interface ProductSupplierToolKeyBreakdown {
+    toolApiKeyId: number;
+    toolName?: string;
+    toolKeyPrefix?: string;
+    soldCount: number;
+    expiredCount: number;
+}
+
+export interface ProductSupplierStatsFilter {
+    startDate?: string;
+    endDate?: string;
+    toolApiKeyId?: number;
+}
+
+export interface ProductSupplierStats {
+    productId: number;
+    productName: string;
+    startDate: string;
+    endDate: string;
+    todaySold: number;
+    todayExpired: number;
+    recentDays: ProductSupplierDailyPoint[];
+    byToolKey: ProductSupplierToolKeyBreakdown[];
+}

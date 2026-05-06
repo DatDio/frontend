@@ -1,0 +1,295 @@
+<div class="container-fluid">
+    <div class="page-header d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="mb-1">{{ config.title }}</h4>
+            <p class="text-muted mb-0">{{ config.description }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            @if (config.showMailManagementBackLink) {
+            <a class="btn btn-outline-secondary" routerLink="/admin/mail-management">
+                <i class="bi bi-arrow-left me-1"></i> Về danh sách sản phẩm
+            </a>
+            }
+            <button class="btn btn-primary" (click)="openModal()">
+                <i class="bi bi-plus-lg"></i> Tạo Tool API Key
+            </button>
+        </div>
+    </div>
+
+    @if (!config.showMailManagementBackLink) {
+    <ul class="nav nav-tabs mb-4">
+        @if (mode === 'reg') {
+        <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/reg-management/list">
+                <i class="bi bi-list-ul me-1"></i> Reg Requests
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" routerLink="/admin/reg-management/tool-apikeys">
+                <i class="bi bi-key me-1"></i> Tool API Keys
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/reg-management/settings">
+                <i class="bi bi-gear me-1"></i> Cài đặt
+            </a>
+        </li>
+        }
+
+        @if (mode === 'oauth2') {
+        <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/oauth2-management/list">
+                <i class="bi bi-list-ul me-1"></i> OAuth2 Requests
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" routerLink="/admin/oauth2-management/tool-apikeys">
+                <i class="bi bi-key me-1"></i> Tool API Keys
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/oauth2-management/settings">
+                <i class="bi bi-gear me-1"></i> Cài đặt
+            </a>
+        </li>
+        }
+    </ul>
+    }
+
+    <div class="alert alert-info mb-4">
+        <i class="bi bi-info-circle me-2"></i>
+        <strong>{{ config.modeLabel }}</strong> key dùng prefix <code>mtk_</code> và chỉ hiển thị 1 lần khi tạo.
+        Endpoint áp dụng: <code>{{ config.endpointHint }}</code>.
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Tên</th>
+                            <th>Prefix</th>
+                            <th>Quyền</th>
+                            <th>Sản phẩm</th>
+                            <th>Trạng thái</th>
+                            <th>Sử dụng lần cuối</th>
+                            <th>Ngày tạo</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (isLoading) {
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">Đang tải...</span>
+                                </div>
+                            </td>
+                        </tr>
+                        } @else if (toolApiKeys.length === 0) {
+                        <tr>
+                            <td colspan="8" class="text-center py-4 text-muted">
+                                {{ config.emptyMessage }}
+                            </td>
+                        </tr>
+                        }
+
+                        @for (key of toolApiKeys; track key.id) {
+                        <tr>
+                            <td>
+                                <div class="fw-medium">{{ key.name }}</div>
+                                <small class="text-muted">{{ key.description || '-' }}</small>
+                            </td>
+                            <td><code>{{ key.prefix }}...</code></td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-1">
+                                    @for (label of getCapabilityLabels(key); track label) {
+                                    <span class="badge bg-light text-dark border">{{ label }}</span>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-wrap gap-1">
+                                    @if (!key.allowedProducts?.length) {
+                                        <span class="text-muted small">-</span>
+                                    }
+                                    @for (product of key.allowedProducts; track product.id; let last = $last) {
+                                        <a [routerLink]="['/admin/mail-management', product.id, 'items']" class="small text-decoration-none text-primary hover-underline" title="Xem danh sách tài khoản">
+                                            {{ product.name }}{{ !last ? ',' : '' }}
+                                        </a>
+                                    }
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge" [ngClass]="getStatusClass(key.status)">
+                                    {{ getStatusLabel(key.status) }}
+                                </span>
+                            </td>
+                            <td>
+                                @if (key.lastUsedAt) {
+                                <span>{{ key.lastUsedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                                <br>
+                                <small class="text-muted">IP: {{ key.lastUsedIp }}</small>
+                                } @else {
+                                <span class="text-muted">Chưa sử dụng</span>
+                                }
+                            </td>
+                            <td>{{ key.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary" (click)="openModal(key)" title="Sửa">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    @if (key.status === 0) {
+                                    <button class="btn btn-outline-warning" (click)="onRevoke(key)" title="Vô hiệu hóa">
+                                        <i class="bi bi-pause-circle"></i>
+                                    </button>
+                                    } @else {
+                                    <button class="btn btn-outline-success" (click)="onActivate(key)" title="Kích hoạt lại">
+                                        <i class="bi bi-play-circle"></i>
+                                    </button>
+                                    }
+                                    <button class="btn btn-outline-danger" (click)="onDelete(key)" title="Xóa">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (showCreateModal) {
+<div class="modal-backdrop fade show"></div>
+<div class="modal fade show d-block" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ isEditMode ? 'Chỉnh sửa Tool API Key' : 'Tạo Tool API Key mới' }}</h5>
+                <button type="button" class="btn-close" (click)="onCloseCreateModal()"></button>
+            </div>
+            <form [formGroup]="formCreate" (ngSubmit)="onSubmit()">
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Tên Tool <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" formControlName="name" placeholder="VD: Partner tool A">
+                            @if (formCreate.get('name')?.invalid && formCreate.get('name')?.touched) {
+                            <div class="text-danger small mt-1">Tên không được để trống</div>
+                            }
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Mô tả</label>
+                            <input type="text" class="form-control" formControlName="description" placeholder="Mô tả thêm cho key này">
+                        </div>
+                    </div>
+
+                    @if (mode === 'product-upload') {
+                    <div class="mt-4">
+                        <h6 class="mb-3">Phân quyền (Capabilities)</h6>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="canProductUpload" formControlName="canProductUpload">
+                            <label class="form-check-label" for="canProductUpload">
+                                Upload mail vào sản phẩm được cấp quyền
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="canProductExpiredExport" formControlName="canProductExpiredExport">
+                            <label class="form-check-label" for="canProductExpiredExport">
+                                Tải danh sách mail hết hạn của sản phẩm được cấp quyền
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0">Whitelist sản phẩm</h6>
+                            @if (isLoadingProducts) {
+                            <span class="text-muted small">Đang tải sản phẩm...</span>
+                            }
+                        </div>
+                        <div class="product-checkbox-list border rounded p-2" style="max-height: 200px; overflow-y: auto; background: #fff;">
+                            @for (product of availableProducts; track product.id) {
+                            <div class="form-check mb-1">
+                                <input class="form-check-input" type="checkbox" 
+                                    [id]="'product_' + product.id" 
+                                    [checked]="isProductSelected(product.id)"
+                                    (change)="toggleProductSelection(product.id, $event)">
+                                <label class="form-check-label" [for]="'product_' + product.id">
+                                    {{ product.name }}
+                                </label>
+                            </div>
+                            }
+                        </div>
+                        <div class="form-text">
+                            Đánh dấu vào các sản phẩm bạn muốn cho phép Key này upload.
+                        </div>
+                        @if (isProductScopeEnabled() && (formCreate.get('allowedProductIds')?.value?.length || 0) === 0) {
+                        <div class="text-danger small mt-2">Hãy chọn ít nhất 1 sản phẩm.</div>
+                        }
+                    </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="onCloseCreateModal()">Hủy</button>
+                    <button type="submit" class="btn btn-primary">
+                        @if (isEditMode) {
+                        <i class="bi bi-check-lg"></i> Lưu thay đổi
+                        } @else {
+                        <i class="bi bi-plus-lg"></i> Tạo Key
+                        }
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+}
+
+@if (showKeyModal && generatedKey) {
+<div class="modal-backdrop fade show"></div>
+<div class="modal fade show d-block" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title"><i class="bi bi-check-circle me-2"></i>Tool API Key đã được tạo</h5>
+                <button type="button" class="btn-close btn-close-white" (click)="onCloseKeyModal()"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Quan trọng:</strong> API Key chỉ hiển thị một lần. Hãy copy và lưu trữ an toàn.
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Tên Tool:</label>
+                    <p class="mb-0">{{ generatedKey.metadata.name }}</p>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">API Key:</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control font-monospace" [value]="generatedKey.apiKey" readonly>
+                        <button class="btn btn-outline-primary" (click)="copyToClipboard(generatedKey.apiKey)">
+                            <i class="bi bi-clipboard"></i> Copy
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-4 p-3 bg-light rounded">
+                    <h6 class="mb-2">Cách sử dụng:</h6>
+                    <code>curl -H "X-API-KEY: {{ generatedKey.apiKey }}" https://your-api.com{{ config.createUsagePath }}</code>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" (click)="onCloseKeyModal()">Đã lưu Key</button>
+            </div>
+        </div>
+    </div>
+</div>
+}

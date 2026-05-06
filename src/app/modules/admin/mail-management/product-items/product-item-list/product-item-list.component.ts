@@ -9,9 +9,13 @@ import {
   ProductItem,
   ExpirationType
 } from '../../../../../core/models/product-item.model';
+import { ProductSupplierStats } from '../../../../../core/models/statistics.model';
 import { ProductItemService } from '../../../../../core/services/product-item.service';
 import { NotificationService } from '../../../../../core/services/notification.service';
+import { StatisticsService } from '../../../../../core/services/statistics.service';
+import { ToolApiKeyService } from '../../../../../core/services/tool-apikey.service';
 import { ConfirmService } from '../../../../../shared/services/confirm.service';
+import { ToolApiKey } from '../../../../../core/models/tool-apikey.model';
 import { BulkImportModalComponent } from '../bulk-import-modal/bulk-import-modal.component';
 import { PaginationComponent } from '../../../../../shared/components/pagination/pagination.component';
 
@@ -25,6 +29,8 @@ import { PaginationComponent } from '../../../../../shared/components/pagination
 export class ProductItemListComponent implements OnInit {
   private readonly productItemService = inject(ProductItemService);
   private readonly notificationService = inject(NotificationService);
+  private readonly statisticsService = inject(StatisticsService);
+  private readonly toolApiKeyService = inject(ToolApiKeyService);
   private readonly confirmService = inject(ConfirmService);
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
@@ -41,13 +47,18 @@ export class ProductItemListComponent implements OnInit {
   pageSize = 10;
   totalPages = 0;
   totalElements = 0;
+  supplierStats: ProductSupplierStats | null = null;
+  statsLoading = false;
   showImportModal = false;
   showBulkDeleteModal = false;
   bulkDeleteData = '';
   searchForm!: FormGroup;
+  statsFilterForm!: FormGroup;
+  availableToolKeys: ToolApiKey[] = [];
 
   ngOnInit(): void {
     this.initSearchForm();
+    this.initStatsFilterForm();
 
     // Get product name from route state (passed from product list page)
     // Only access history in browser environment
@@ -63,6 +74,8 @@ export class ProductItemListComponent implements OnInit {
       if (id) {
         this.productId = Number.parseInt(id, 10);
         this.loadItems();
+        this.loadToolApiKeysForProduct();
+        this.loadSupplierStats();
       }
     });
   }
@@ -73,6 +86,36 @@ export class ProductItemListComponent implements OnInit {
       sold: [''],
       expirationType: ['']
     });
+  }
+
+  initStatsFilterForm(): void {
+    const today = new Date();
+    const lastWeek = new Date(today);
+    lastWeek.setDate(lastWeek.getDate() - 6);
+
+    this.statsFilterForm = this.fb.group({
+      startDate: [lastWeek.toISOString().substring(0, 10)],
+      endDate: [today.toISOString().substring(0, 10)],
+      toolApiKeyId: ['']
+    });
+  }
+
+  loadToolApiKeysForProduct(): void {
+    this.toolApiKeyService.getAll().subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.availableToolKeys = response.data.filter(key =>
+            key.allowedProductIds && key.allowedProductIds.includes(this.productId!)
+          );
+        }
+      },
+      error: (error) => console.error('Error loading tool API keys:', error)
+    });
+  }
+
+  clearStatsFilter(): void {
+    this.initStatsFilterForm();
+    this.loadSupplierStats();
   }
 
   loadItems(): void {
@@ -112,6 +155,43 @@ export class ProductItemListComponent implements OnInit {
           this.notificationService.error('Lỗi khi tải danh sách tài khoản');
         }
       });
+  }
+
+  loadSupplierStats(): void {
+    if (!this.productId) return;
+
+    this.statsLoading = true;
+
+    const filterValue = this.statsFilterForm.value;
+    const filter = {
+      startDate: filterValue.startDate || undefined,
+      endDate: filterValue.endDate || undefined,
+      toolApiKeyId: filterValue.toolApiKeyId ? Number(filterValue.toolApiKeyId) : undefined
+    };
+
+    this.statisticsService.getProductSupplierStats(this.productId, filter).subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          this.supplierStats = response.data;
+          if (response.data.productName) {
+            this.productName = response.data.productName;
+          }
+        }
+        this.statsLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading supplier stats:', error);
+        this.statsLoading = false;
+      }
+    });
+  }
+
+  get hasSupplierStats(): boolean {
+    if (!this.supplierStats) return false;
+    const hasDaily = this.supplierStats.recentDays && this.supplierStats.recentDays.length > 0;
+    const hasTool = this.supplierStats.byToolKey && this.supplierStats.byToolKey.length > 0;
+    const hasToday = (this.supplierStats.todaySold || 0) > 0 || (this.supplierStats.todayExpired || 0) > 0;
+    return hasDaily || hasTool || hasToday;
   }
 
   onPreviousPage(): void {
@@ -311,5 +391,12 @@ export class ProductItemListComponent implements OnInit {
 
   isMonthExpiration(expirationType?: ExpirationType): boolean {
     return !!expirationType && this.monthExpirationTypes.includes(expirationType);
+  }
+
+  getToolDisplayName(toolName?: string, toolKeyPrefix?: string): string {
+    if (toolName && toolKeyPrefix) {
+      return `${toolName} (${toolKeyPrefix}...)`;
+    }
+    return toolName || toolKeyPrefix || 'Unknown key';
   }
 }

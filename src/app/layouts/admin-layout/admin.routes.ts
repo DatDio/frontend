@@ -36,6 +36,11 @@ export const adminRoutes: Routes = [
         loadComponent: () => import('../../modules/admin/mail-management/product/list/list.component').then(m => m.MailManagementListComponent)
       },
       {
+        path: 'upload-api-keys',
+        data: { toolKeyMode: 'product-upload' },
+        loadComponent: () => import('../../modules/admin/shared/tool-apikey-list/tool-apikey-list.component').then(m => m.ToolApiKeyListComponent)
+      },
+      {
         path: ':id/items',
         loadComponent: () => import('../../modules/admin/mail-management/product-items/product-item-list/product-item-list.component').then(m => m.ProductItemListComponent)
       }
@@ -83,7 +88,8 @@ export const adminRoutes: Routes = [
       },
       {
         path: 'tool-apikeys',
-        loadComponent: () => import('../../modules/admin/reg-management/tool-apikeys/list.component').then(m => m.ToolApiKeyListComponent)
+        data: { toolKeyMode: 'reg' },
+        loadComponent: () => import('../../modules/admin/shared/tool-apikey-list/tool-apikey-list.component').then(m => m.ToolApiKeyListComponent)
       },
       {
         path: 'settings',
@@ -105,7 +111,8 @@ export const adminRoutes: Routes = [
       },
       {
         path: 'tool-apikeys',
-        loadComponent: () => import('../../modules/admin/oauth2-management/tool-apikeys/list.component').then(m => m.ToolApiKeyListComponent)
+        data: { toolKeyMode: 'oauth2' },
+        loadComponent: () => import('../../modules/admin/shared/tool-apikey-list/tool-apikey-list.component').then(m => m.ToolApiKeyListComponent)
       },
       {
         path: 'settings',

@@ -1,0 +1,2 @@
+import './polyfills.server.mjs';
+var l=[{value:"NONE",label:"Kh\xF4ng h\u1EBFt h\u1EA1n"},{value:"HOURS_1",label:"1 gi\u1EDD"},{value:"HOURS_2",label:"2 gi\u1EDD"},{value:"HOURS_3",label:"3 gi\u1EDD"},{value:"HOURS_6",label:"6 gi\u1EDD"},{value:"MONTH_1",label:"1 th\xE1ng"},{value:"MONTH_2",label:"2 th\xE1ng"},{value:"MONTH_6",label:"6 th\xE1ng"}],O=["HOURS_1","HOURS_2","HOURS_3","HOURS_6"],_=["MONTH_1","MONTH_2","MONTH_6"];export{l as a,O as b,_ as c};

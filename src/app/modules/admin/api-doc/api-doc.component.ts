@@ -12,40 +12,40 @@ import { EXPIRATION_TYPE_OPTIONS } from '../../../core/models/product-item.model
 export class ApiDocComponent {
     readonly expirationTypeOptions = EXPIRATION_TYPE_OPTIONS;
     readonly expirationTypeText = this.expirationTypeOptions.map(option => option.value).join(' | ');
-    readonly importExpirationTypeText = `NONE (default) | ${this.expirationTypeOptions
-        .filter(option => option.value !== 'NONE')
-        .map(option => option.value)
-        .join(' | ')}`;
 
-    createRequestExample = `{
-  "productId": 1,
+    readonly partnerUploadRequestExample = `{
   "accountData": "user1@mail.com|password1\\nuser2@mail.com|password2",
-  "expirationType": "MONTH_2"
+  "expirationType": "HOURS_3",
+  "skipDuplicateCheck": false
 }`;
 
-    createResponseExample = `{
-    "success": true,
-    "message": "Thêm thành công. Có 3 tài khoản bị trùng.",
-    "timestamp": "2026-01-05T04:45:00.644664544"
+    readonly partnerUploadResponseExample = `{
+  "success": true,
+  "message": "Success",
+  "data": {
+    "productId": 123,
+    "totalInput": 2,
+    "insertedCount": 2,
+    "duplicateCount": 0,
+    "message": "Upload thành công"
+  }
 }`;
 
-    createCurlExample = `curl --location 'https://emailsieure.com/admin/api/v1/product-items/create' \\
+    readonly partnerUploadCurlExample = `curl --location 'https://emailsieure.com/api/v1/product-items-tool/products/123/items' \\
 --header 'Content-Type: application/json' \\
---header 'X-API-KEY: <your_api_key>' \\
---data-raw '{
-    "productId": 1,
-    "accountData": "email1@example|passexample1|refresh_token1|client_id1\\nemail2@example|passexample2|refresh_token2|client_id2\\nemail3@example|passexample3|refresh_token3|client_id3\\n",
-    "expirationType": "HOURS_2"
+--header 'X-API-KEY: mtk_xxxxxxxxxxxxxxxxxxxx' \\
+--data '{
+  "accountData": "email1@example.com|pass1\\nemail2@example.com|pass2",
+  "expirationType": "HOURS_3",
+  "skipDuplicateCheck": false
 }'`;
 
-    importCurlExample = `curl -X POST \\
-  'https://emailsieure.com/admin/api/v1/product-items/import/1?expirationType=HOURS_1' \\
-  -H 'X-API-KEY: <your_api_key>' \\
-  -F 'file=@accounts.txt'`;
+    readonly partnerImportCurlExample = `curl --location 'https://emailsieure.com/api/v1/product-items-tool/products/123/import?expirationType=HOURS_3&skipDuplicateCheck=false' \\
+--header 'X-API-KEY: mtk_xxxxxxxxxxxxxxxxxxxx' \\
+--form 'file=@accounts.txt'`;
 
-    importResponseExample = `{
-    "success": true,
-    "message": "Import thành công 0 tài khoản",
-    "timestamp": "2026-01-05T04:37:40.489892517"
-}`;
+    readonly partnerExpiredCurlExample = `curl --location 'https://emailsieure.com/api/v1/product-items-tool/products/123/expired' \\
+--header 'X-API-KEY: mtk_xxxxxxxxxxxxxxxxxxxx'`;
+
+    readonly adminNote = `Admin import cũ vẫn nằm ở /admin/api/v1/product-items/* và dùng Bearer admin. Partner tool nên dùng bộ endpoint /api/v1/product-items-tool/* để áp dụng whitelist sản phẩm và capability mới.`;
 }
