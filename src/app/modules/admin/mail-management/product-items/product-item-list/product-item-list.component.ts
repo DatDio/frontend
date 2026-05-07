@@ -84,7 +84,8 @@ export class ProductItemListComponent implements OnInit {
     this.searchForm = this.fb.group({
       accountData: [''],
       sold: [''],
-      expirationType: ['']
+      expirationType: [''],
+      sourceToolApiKeyId: ['']
     });
   }
 
@@ -129,6 +130,7 @@ export class ProductItemListComponent implements OnInit {
     const accountData = this.searchForm.get('accountData')?.value;
     const sold = this.searchForm.get('sold')?.value;
     const expirationType = this.searchForm.get('expirationType')?.value;
+    const sourceToolApiKeyId = this.searchForm.get('sourceToolApiKeyId')?.value;
 
     if (accountData) {
       params.accountData = accountData;
@@ -138,6 +140,9 @@ export class ProductItemListComponent implements OnInit {
     }
     if (expirationType) {
       params.expirationType = expirationType;
+    }
+    if (sourceToolApiKeyId) {
+      params.sourceToolApiKeyId = Number(sourceToolApiKeyId);
     }
 
     this.productItemService

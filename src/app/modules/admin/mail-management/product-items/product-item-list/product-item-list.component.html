@@ -164,6 +164,17 @@
               }
             </select>
           </div>
+          @if (availableToolKeys.length > 0) {
+          <div class="col-md-3">
+            <label for="sourceToolApiKeyId" class="form-label">Tool API Key (NCC)</label>
+            <select id="sourceToolApiKeyId" class="form-select" formControlName="sourceToolApiKeyId">
+              <option value="">Tất cả</option>
+              @for (key of availableToolKeys; track key.id) {
+              <option [value]="key.id">{{ key.name }} ({{ key.prefix }}...)</option>
+              }
+            </select>
+          </div>
+          }
           <div class="col-md-4 d-flex align-items-end gap-2">
             <button type="button" class="btn btn-primary flex-grow-1" (click)="handleSearch()">
               <i class="bi bi-search"></i> Tìm kiếm
@@ -195,6 +206,9 @@
           <th>Thời gian hết hạn</th>
           <th style="background:#fff3cd;">Hết hạn</th>
           <th style="background:#fff3cd;">Server Time</th>
+          @if (availableToolKeys.length > 0) {
+          <th>Tool API Key</th>
+          }
           <th>Người mua</th>
           <th>Ngày bán</th>
           <th>Hành động</th>
@@ -251,6 +265,15 @@
           <td style="background:#fff9e6;">
             <small>{{ item.serverTime }}</small>
           </td>
+          @if (availableToolKeys.length > 0) {
+          <td>
+            @if (item.sourceToolKeyName) {
+              <span class="badge bg-info text-dark">{{ item.sourceToolKeyName }}</span>
+            } @else {
+              <span class="text-muted small">Local</span>
+            }
+          </td>
+          }
           <td>{{ item.buyerName || '-' }}</td>
           <td>{{ item.soldAt ? (item.soldAt | date: 'dd/MM/yyyy') : '-' }}</td>
           <td>

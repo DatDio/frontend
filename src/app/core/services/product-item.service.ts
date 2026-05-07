@@ -29,6 +29,7 @@ export class ProductItemService {
     if (filter?.sold !== undefined) params = params.set('sold', filter.sold.toString());
     if (filter?.accountData !== undefined) params = params.set('accountData', filter.accountData.toString());
     if (filter?.expirationType) params = params.set('expirationType', filter.expirationType);
+    if (filter?.sourceToolApiKeyId) params = params.set('sourceToolApiKeyId', filter.sourceToolApiKeyId.toString());
 
     return this.httpClient
       .get<ApiResponse<PaginatedResponse<ProductItem>>>(AdminProductItemApi.SEARCH, { params })

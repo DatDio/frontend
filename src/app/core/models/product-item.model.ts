@@ -56,6 +56,9 @@ export interface ProductItem {
   expiredAt?: string;
   isTimeExpired?: boolean;
   serverTime?: string;
+  // NCC info
+  sourceToolApiKeyId?: number;
+  sourceToolKeyName?: string;
 }
 
 export interface ProductItemCreate {
@@ -69,4 +72,5 @@ export interface ProductItemFilter extends PageFilter {
   sold?: boolean | string;
   accountData?: string;
   expirationType?: ExpirationType;
+  sourceToolApiKeyId?: number;
 }
